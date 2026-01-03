@@ -1,0 +1,54 @@
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Get,
+} from '@nestjs/common';
+import { AuthService } from '../services/auth.service';
+import { LoginDto } from '../dto/login.dto';
+import { LoginResponseDto } from '../dto/login-response.dto';
+import { UserResponseDto } from '../dto/user-response.dto';
+import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
+
+interface CurrentUserPayload {
+  id: string;
+  email: string;
+  name: string;
+  roleId: string;
+  role: {
+    id: string;
+    name: string;
+    level: number;
+  };
+}
+
+@Controller('backoffice/auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  /**
+   * Login do backoffice
+   * POST /backoffice/auth/login
+   */
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
+    return this.authService.login(loginDto);
+  }
+
+  /**
+   * Retorna dados do usuário logado
+   * GET /backoffice/auth/me
+   */
+  @Get('me')
+  @UseGuards(BackofficeAuthGuard)
+  async getMe(
+    @CurrentUser() user: CurrentUserPayload,
+  ): Promise<UserResponseDto> {
+    return await this.authService.getUserById(user.id);
+  }
+}

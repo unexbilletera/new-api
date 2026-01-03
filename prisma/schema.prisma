@@ -1,0 +1,1639 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model accreditations {
+  id                String                @id @db.Char(36)
+  status            accreditations_status @default(pending)
+  type              accreditations_type   @default(bind)
+  number            String                @db.VarChar(50)
+  name              String?               @db.VarChar(100)
+  notes             String?               @db.Text
+  amount            Decimal               @default(0.00) @db.Decimal(12, 2)
+  date              DateTime?             @db.DateTime(0)
+  transactionId     String?               @db.Char(36)
+  userId            String?               @db.Char(36)
+  createdAt         DateTime              @db.DateTime(0)
+  updatedAt         DateTime              @db.DateTime(0)
+  deletedAt         DateTime?             @db.DateTime(0)
+  taxDocumentType   String                @db.VarChar(10)
+  taxDocumentNumber String                @db.VarChar(50)
+  transactions      transactions?         @relation(fields: [transactionId], references: [id], map: "accreditations_ibfk_51")
+  users             users?                @relation(fields: [userId], references: [id], map: "accreditations_ibfk_52")
+
+  @@unique([number, type], map: "key")
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([name], map: "name")
+  @@index([number], map: "number")
+  @@index([status], map: "status")
+  @@index([taxDocumentNumber], map: "taxDocumentNumber")
+  @@index([transactionId], map: "transactionId")
+  @@index([type], map: "type")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+}
+
+model backofficeLogs {
+  id              String          @id @db.Char(36)
+  userId          String          @db.Char(36)
+  action          String          @db.VarChar(100)
+  statusCode      Int
+  success         Boolean
+  ipAddress       String          @db.VarChar(45)
+  browser         String?         @db.VarChar(100)
+  userAgent       String?         @db.Text
+  location        String?         @db.VarChar(150)
+  details         Json?
+  before          Json?
+  after           Json?
+  createdAt       DateTime        @default(now()) @db.DateTime(0)
+  backofficeUsers backofficeUsers @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "backoffice_logs_ibfk_1")
+
+  @@index([action], map: "action")
+  @@index([createdAt], map: "createdAt")
+  @@index([userId], map: "userId")
+}
+
+model backofficeRoles {
+  id              String            @id @db.Char(36)
+  name            String            @unique(map: "name") @db.VarChar(100)
+  description     String?           @db.VarChar(255)
+  level           Int
+  createdAt       DateTime          @default(now()) @db.DateTime(0)
+  updatedAt       DateTime          @default(now()) @db.DateTime(0)
+  deletedAt       DateTime?         @db.DateTime(0)
+  backofficeUsers backofficeUsers[]
+
+  @@index([deletedAt], map: "deletedAt")
+  @@index([level], map: "level")
+}
+
+model backofficeUsers {
+  id              String                 @id @db.Char(36)
+  name            String                 @db.VarChar(150)
+  email           String                 @unique(map: "email") @db.VarChar(255)
+  password        String                 @db.VarChar(255)
+  roleId          String                 @db.Char(36)
+  status          backofficeUsers_status @default(active)
+  lastLoginAt     DateTime?              @db.DateTime(0)
+  createdAt       DateTime               @default(now()) @db.DateTime(0)
+  updatedAt       DateTime               @default(now()) @db.DateTime(0)
+  deletedAt       DateTime?              @db.DateTime(0)
+  backofficeLogs  backofficeLogs[]
+  backofficeRoles backofficeRoles        @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "backoffice_users_ibfk_1")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([roleId], map: "roleId")
+  @@index([status], map: "status")
+}
+
+model benefits {
+  id               String          @id @db.Char(36)
+  storeId          String          @db.Char(36)
+  status           benefits_status @default(enable)
+  type             benefits_type   @default(amount)
+  name             String?         @db.VarChar(100)
+  image            String?         @db.VarChar(100)
+  notes            String?         @db.Text
+  shortDescription String?         @db.Text
+  longDescription  String?         @db.Text
+  value            Decimal         @default(0.00) @db.Decimal(12, 2)
+  validFrom        DateTime        @db.Date
+  validTo          DateTime        @db.Date
+  validSunday      Boolean         @default(false)
+  validMonday      Boolean         @default(false)
+  validTuesday     Boolean         @default(false)
+  validWednesday   Boolean         @default(false)
+  validThursday    Boolean         @default(false)
+  validFriday      Boolean         @default(false)
+  validSaturday    Boolean         @default(false)
+  createdAt        DateTime        @db.DateTime(0)
+  updatedAt        DateTime        @db.DateTime(0)
+  deletedAt        DateTime?       @db.DateTime(0)
+  stores           stores          @relation(fields: [storeId], references: [id], onDelete: NoAction, map: "benefits_ibfk_1")
+  transactions     transactions[]
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([name], map: "name")
+  @@index([status], map: "status")
+  @@index([storeId], map: "storeId")
+  @@index([type], map: "type")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+model branches {
+  id           String                @id @db.Char(36)
+  storeId      String                @db.Char(36)
+  status       branches_status       @default(enable)
+  name         String?               @db.VarChar(100)
+  image        String?               @db.VarChar(100)
+  notes        String?               @db.Text
+  phone        String?               @db.VarChar(100)
+  email        String?               @db.VarChar(100)
+  link1        String?               @db.VarChar(255)
+  link2        String?               @db.VarChar(255)
+  link3        String?               @db.VarChar(255)
+  link4        String?               @db.VarChar(255)
+  position     Unsupported("point")?
+  address1     String?               @db.VarChar(100)
+  address2     String?               @db.VarChar(100)
+  createdAt    DateTime              @db.DateTime(0)
+  updatedAt    DateTime              @db.DateTime(0)
+  deletedAt    DateTime?             @db.DateTime(0)
+  stores       stores                @relation(fields: [storeId], references: [id], onDelete: NoAction, map: "branches_ibfk_1")
+  sailpoints   sailpoints[]
+  transactions transactions[]
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([email], map: "email")
+  @@index([name], map: "name")
+  @@index([phone], map: "phone")
+  @@index([status], map: "status")
+  @@index([storeId], map: "storeId")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model campaign_codes {
+  id                  String                @id @db.Char(36)
+  code                String                @unique(map: "code") @db.VarChar(50)
+  name                String                @db.VarChar(100)
+  description         String?               @db.Text
+  isActive            Boolean               @default(true)
+  validFrom           DateTime?             @db.DateTime(0)
+  validTo             DateTime?             @db.DateTime(0)
+  createdAt           DateTime              @default(now()) @db.DateTime(0)
+  updatedAt           DateTime              @default(now()) @db.DateTime(0)
+  deletedAt           DateTime?             @db.DateTime(0)
+  user_campaign_codes user_campaign_codes[]
+
+  @@index([code], map: "idx_code")
+  @@index([deletedAt], map: "idx_deleted_at")
+  @@index([isActive], map: "idx_is_active")
+  @@index([validFrom], map: "idx_valid_from")
+  @@index([validTo], map: "idx_valid_to")
+}
+
+model cards {
+  id              String           @id @db.Char(36)
+  userId          String           @db.Char(36)
+  userIdentityId  String?          @db.Char(36)
+  reference       String?          @db.Text
+  tokenId         String?          @db.VarChar(50)
+  micronautaId    String?          @unique(map: "micronautaId") @db.VarChar(50)
+  status          cards_status     @default(pending)
+  type            cards_type?
+  subType         cards_subType?
+  mode            cards_mode?
+  brand           cards_brand?
+  pan             String?          @db.VarChar(20)
+  cvv             String?          @db.VarChar(10)
+  expiration      String?          @db.VarChar(5)
+  name            String?          @db.VarChar(100)
+  image           String?          @db.VarChar(100)
+  notes           String?          @db.Text
+  createdAt       DateTime         @db.DateTime(0)
+  updatedAt       DateTime         @db.DateTime(0)
+  deletedAt       DateTime?        @db.DateTime(0)
+  users           users            @relation(fields: [userId], references: [id], onDelete: NoAction, map: "cards_ibfk_67")
+  usersIdentities usersIdentities? @relation(fields: [userIdentityId], references: [id], map: "cards_ibfk_68")
+  credits         credits[]
+  transactions    transactions[]
+
+  @@index([brand], map: "brand")
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([name], map: "name")
+  @@index([reference(length: 100)], map: "reference")
+  @@index([status], map: "status")
+  @@index([type], map: "type")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+  @@index([userIdentityId], map: "userIdentityId")
+}
+
+model categories {
+  id               String             @id @db.Char(36)
+  status           categories_status  @default(enable)
+  name             String?            @db.VarChar(100)
+  image            String?            @db.VarChar(100)
+  notes            String?            @db.Text
+  createdAt        DateTime           @db.DateTime(0)
+  updatedAt        DateTime           @db.DateTime(0)
+  deletedAt        DateTime?          @db.DateTime(0)
+  storesCategories storesCategories[]
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([name], map: "name")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+model challenges {
+  id        String    @id @db.Char(36)
+  userId    String    @db.Char(36)
+  deviceId  String    @db.Char(36)
+  challenge String    @db.Text
+  createdAt DateTime  @default(now()) @db.DateTime(0)
+  expiresAt DateTime  @db.DateTime(0)
+  used      Boolean   @default(false)
+  usedAt    DateTime? @db.DateTime(0)
+  users     users     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "challenges_ibfk_1")
+  devices   devices   @relation(fields: [deviceId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "challenges_ibfk_2")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deviceId], map: "deviceId")
+  @@index([expiresAt], map: "expiresAt")
+  @@index([used], map: "used")
+  @@index([userId], map: "userId")
+}
+
+model contacts {
+  id                                  String                @id @db.Char(36)
+  userId                              String                @db.Char(36)
+  contactUserId                       String?               @db.Char(36)
+  contactUserIdentityId               String?               @db.Char(36)
+  status                              contacts_status       @default(enable)
+  type                                contacts_type         @default(internal)
+  name                                String?               @db.VarChar(100)
+  image                               String?               @db.VarChar(100)
+  notes                               String?               @db.Text
+  phone                               String?               @db.VarChar(100)
+  email                               String?               @db.VarChar(100)
+  link1                               String?               @db.VarChar(255)
+  link2                               String?               @db.VarChar(255)
+  link3                               String?               @db.VarChar(255)
+  link4                               String?               @db.VarChar(255)
+  position                            Unsupported("point")?
+  address1                            String?               @db.VarChar(100)
+  address2                            String?               @db.VarChar(100)
+  cbu                                 String?               @db.VarChar(25)
+  alias                               String?               @db.VarChar(100)
+  createdAt                           DateTime              @db.DateTime(0)
+  updatedAt                           DateTime              @db.DateTime(0)
+  deletedAt                           DateTime?             @db.DateTime(0)
+  taxDocumentType                     String?               @db.VarChar(10)
+  taxDocumentNumber                   String?               @db.VarChar(50)
+  accountNumber                       String?               @db.VarChar(50)
+  users_contacts_userIdTousers        users                 @relation("contacts_userIdTousers", fields: [userId], references: [id], onDelete: NoAction, map: "contacts_ibfk_100")
+  users_contacts_contactUserIdTousers users?                @relation("contacts_contactUserIdTousers", fields: [contactUserId], references: [id], map: "contacts_ibfk_101")
+  usersIdentities                     usersIdentities?      @relation(fields: [contactUserIdentityId], references: [id], map: "contacts_ibfk_102")
+  transactions                        transactions[]
+
+  @@index([contactUserId], map: "contactUserId")
+  @@index([contactUserIdentityId], map: "contactUserIdentityId")
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([email], map: "email")
+  @@index([name], map: "name")
+  @@index([phone], map: "phone")
+  @@index([status], map: "status")
+  @@index([type], map: "type")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+}
+
+model credits {
+  id                                               String          @id @db.Char(36)
+  date                                             DateTime        @unique(map: "date") @db.DateTime(0)
+  number                                           Int             @unique(map: "number") @default(autoincrement())
+  userId                                           String          @db.Char(36)
+  userIdentityId                                   String          @db.Char(36)
+  userAccountId                                    String          @db.Char(36)
+  creditTypeId                                     String          @db.Char(36)
+  cardId                                           String?         @db.Char(36)
+  amount                                           Decimal         @default(0.00) @db.Decimal(12, 2)
+  sealed                                           Decimal         @default(0.00) @db.Decimal(12, 2)
+  net                                              Decimal         @default(0.00) @db.Decimal(12, 2)
+  fees                                             Int             @default(0)
+  feeAmount                                        Decimal         @default(0.00) @db.Decimal(12, 2)
+  approvalFile                                     String?         @db.VarChar(100)
+  approvalUserId                                   String?         @db.Char(36)
+  dueDay                                           Int?
+  lastFee                                          Int?
+  lastDueDate                                      DateTime?       @db.DateTime(0)
+  type                                             credits_type
+  status                                           credits_status  @default(pending)
+  notes                                            String?         @db.Text
+  createdAt                                        DateTime        @db.DateTime(0)
+  updatedAt                                        DateTime        @db.DateTime(0)
+  deletedAt                                        DateTime?       @db.DateTime(0)
+  creditsTypeId                                    String?         @db.Char(36)
+  users_credits_userIdTousers                      users           @relation("credits_userIdTousers", fields: [userId], references: [id], onDelete: NoAction, map: "credits_ibfk_211")
+  usersIdentities                                  usersIdentities @relation(fields: [userIdentityId], references: [id], onDelete: NoAction, map: "credits_ibfk_212")
+  usersAccounts                                    usersAccounts   @relation(fields: [userAccountId], references: [id], onDelete: NoAction, map: "credits_ibfk_213")
+  creditsTypes_credits_creditTypeIdTocreditsTypes  creditsTypes    @relation("credits_creditTypeIdTocreditsTypes", fields: [creditTypeId], references: [id], onDelete: NoAction, map: "credits_ibfk_214")
+  cards                                            cards?          @relation(fields: [cardId], references: [id], map: "credits_ibfk_215")
+  users_credits_approvalUserIdTousers              users?          @relation("credits_approvalUserIdTousers", fields: [approvalUserId], references: [id], map: "credits_ibfk_216")
+  creditsTypes_credits_creditsTypeIdTocreditsTypes creditsTypes?   @relation("credits_creditsTypeIdTocreditsTypes", fields: [creditsTypeId], references: [id], map: "credits_ibfk_217")
+  transactions                                     transactions[]
+
+  @@index([approvalUserId], map: "approvalUserId")
+  @@index([cardId], map: "cardId")
+  @@index([createdAt], map: "createdAt")
+  @@index([creditTypeId], map: "creditTypeId")
+  @@index([creditsTypeId], map: "creditsTypeId")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([fees], map: "fees")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userAccountId], map: "userAccountId")
+  @@index([userId], map: "userId")
+  @@index([userIdentityId], map: "userIdentityId")
+}
+
+model creditsTypes {
+  id                                          String              @id @db.Char(36)
+  name                                        String              @unique(map: "name") @db.VarChar(100)
+  amount                                      Decimal             @default(0.00) @db.Decimal(12, 2)
+  sealed                                      Decimal             @default(0.00) @db.Decimal(12, 2)
+  net                                         Decimal             @default(0.00) @db.Decimal(12, 2)
+  fees                                        Int                 @default(0)
+  feeAmount                                   Decimal             @default(0.00) @db.Decimal(12, 2)
+  status                                      creditsTypes_status @default(enable)
+  notes                                       String?             @db.Text
+  createdAt                                   DateTime            @db.DateTime(0)
+  updatedAt                                   DateTime            @db.DateTime(0)
+  deletedAt                                   DateTime?           @db.DateTime(0)
+  credits_credits_creditTypeIdTocreditsTypes  credits[]           @relation("credits_creditTypeIdTocreditsTypes")
+  credits_credits_creditsTypeIdTocreditsTypes credits[]           @relation("credits_creditsTypeIdTocreditsTypes")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([fees], map: "fees")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model daily_spending_tracking {
+  id                   String          @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  userIdentityId       String          @db.Char(36)
+  transactionDate      DateTime        @db.Date
+  dailyTransferSpent   Decimal?        @default(0.00) @db.Decimal(15, 2)
+  dailyBoletoSpent     Decimal?        @default(0.00) @db.Decimal(15, 2)
+  nightlyTransferSpent Decimal?        @default(0.00) @db.Decimal(15, 2)
+  nightlyBoletoSpent   Decimal?        @default(0.00) @db.Decimal(15, 2)
+  transferCount        Int?            @default(0)
+  boletoCount          Int?            @default(0)
+  dailyQrCodeSpentAr   Decimal?        @default(0.00) @db.Decimal(15, 2)
+  dailyQrCodeSpentBr   Decimal?        @default(0.00) @db.Decimal(15, 2)
+  dailyPixSpentBr      Decimal?        @default(0.00) @db.Decimal(15, 2)
+  qrCodeCountAr        Int?            @default(0)
+  qrCodeCountBr        Int?            @default(0)
+  pixCountBr           Int?            @default(0)
+  transferCountAr      Int?            @default(0)
+  transferCountBr      Int?            @default(0)
+  createdAt            DateTime?       @default(now()) @db.DateTime(0)
+  updatedAt            DateTime?       @default(now()) @db.DateTime(0)
+  usersIdentities      usersIdentities @relation(fields: [userIdentityId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "daily_spending_tracking_ibfk_1")
+
+  @@unique([userIdentityId, transactionDate], map: "unique_daily_tracking")
+  @@index([transactionDate], map: "idx_daily_spending_tracking_date")
+  @@index([userIdentityId], map: "idx_daily_spending_tracking_identity")
+  @@index([userIdentityId, transactionDate], map: "idx_daily_tracking_identity_date")
+}
+
+model devices {
+  id               String         @id @db.Char(36)
+  userId           String         @db.Char(36)
+  deviceIdentifier String         @db.VarChar(255)
+  publicKeyPem     String         @db.Text
+  keyType          String         @db.VarChar(10)
+  platform         String         @db.VarChar(20)
+  attestation      Json?
+  createdAt        DateTime       @default(now()) @db.DateTime(0)
+  lastUsedAt       DateTime?      @db.DateTime(0)
+  revokedAt        DateTime?      @db.DateTime(0)
+  status           devices_status @default(pending)
+  challenges       challenges[]
+  users            users          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "devices_ibfk_1")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deviceIdentifier], map: "deviceIdentifier")
+  @@index([userId, deviceIdentifier], map: "idx_user_device_health")
+  @@index([userId], map: "userId")
+}
+
+model email_validation_codes {
+  id         String    @id @db.Char(36)
+  email      String    @unique @db.VarChar(255)
+  code       String    @db.VarChar(255)
+  language   String    @default("es") @db.VarChar(10)
+  verified   Boolean   @default(false)
+  verifiedAt DateTime? @db.DateTime(0)
+  createdAt  DateTime  @default(now()) @db.DateTime(0)
+  expiresAt  DateTime  @db.DateTime(0)
+
+  @@index([email], map: "email")
+  @@index([expiresAt], map: "expiresAt")
+  @@index([verified], map: "verified")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model exchange_rate_codes {
+  id                String                        @id @db.Char(36)
+  rate_code         String                        @unique(map: "rate_code") @db.VarChar(255)
+  user_id           String                        @db.Char(36)
+  from_currency     String                        @db.VarChar(3)
+  to_currency       String                        @db.VarChar(3)
+  operation         exchange_rate_codes_operation
+  amount            Decimal                       @db.Decimal(12, 2)
+  rate              Decimal                       @db.Decimal(12, 6)
+  converted_amount  Decimal                       @db.Decimal(12, 2)
+  commission_rate   Decimal                       @db.Decimal(5, 4)
+  commission_amount Decimal                       @db.Decimal(12, 2)
+  total_debit       Decimal                       @db.Decimal(12, 2)
+  created_at        DateTime                      @default(now()) @db.DateTime(0)
+  expires_at        DateTime                      @db.DateTime(0)
+  used              Boolean                       @default(false)
+  used_at           DateTime?                     @db.DateTime(0)
+  transaction_id    String?                       @db.Char(36)
+  metadata          Json?
+  users             users                         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "exchange_rate_codes_ibfk_1")
+  transactions      transactions?                 @relation(fields: [transaction_id], references: [id], onUpdate: NoAction, map: "exchange_rate_codes_ibfk_2")
+
+  @@index([created_at], map: "idx_created_at")
+  @@index([expires_at], map: "idx_expires_at")
+  @@index([rate_code], map: "idx_rate_code")
+  @@index([transaction_id], map: "idx_transaction_id")
+  @@index([used], map: "idx_used")
+  @@index([user_id], map: "idx_user_id")
+}
+
+model home_actions {
+  id             String                  @id @db.Char(36)
+  name           String                  @db.VarChar(100)
+  icon           String                  @db.VarChar(50)
+  actionType     home_actions_actionType
+  actionValue    String                  @db.VarChar(500)
+  order          Int                     @default(0)
+  enabled        Boolean                 @default(true)
+  translationKey String?                 @db.VarChar(100)
+  moduleName     String?                 @db.VarChar(100)
+  section        home_actions_section    @default(home)
+  createdAt      DateTime                @default(now()) @db.DateTime(0)
+  updatedAt      DateTime                @db.DateTime(0)
+
+  @@index([createdAt], map: "createdAt")
+  @@index([enabled], map: "enabled")
+  @@index([order], map: "order")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model manteca_depositors {
+  id         String                     @id @db.Char(36)
+  country    manteca_depositors_country
+  name       String?                    @db.VarChar(255)
+  document   String?                    @db.VarChar(50)
+  cvu        String?                    @db.VarChar(50)
+  is_active  Boolean                    @default(true)
+  notes      String?                    @db.Text
+  created_at DateTime                   @default(now()) @db.DateTime(0)
+  updated_at DateTime                   @default(now()) @db.DateTime(0)
+
+  @@index([country], map: "idx_country")
+  @@index([cvu], map: "idx_cvu")
+  @@index([document], map: "idx_document")
+  @@index([is_active], map: "idx_is_active")
+  @@index([name], map: "idx_name")
+}
+
+model modules {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  name      String   @db.VarChar(255)
+  isActive  Int      @default(1) @db.TinyInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model monthly_spending_tracking {
+  id                     String          @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  userIdentityId         String          @db.Char(36)
+  year                   Int
+  month                  Int             @db.TinyInt
+  monthlyTransferSpentAr Decimal?        @default(0.00) @db.Decimal(15, 2)
+  monthlyTransferSpentBr Decimal?        @default(0.00) @db.Decimal(15, 2)
+  createdAt              DateTime?       @default(now()) @db.DateTime(0)
+  updatedAt              DateTime?       @default(now()) @db.DateTime(0)
+  usersIdentities        usersIdentities @relation(fields: [userIdentityId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "monthly_spending_tracking_ibfk_1")
+
+  @@unique([userIdentityId, year, month], map: "unique_monthly_tracking")
+  @@index([userIdentityId], map: "idx_monthly_spending_tracking_identity")
+  @@index([year, month], map: "idx_monthly_spending_tracking_period")
+}
+
+model news {
+  id          String          @id @db.Char(36)
+  status      news_status     @default(enable)
+  title       String          @db.VarChar(255)
+  description String?         @db.Text
+  image       String          @db.Text
+  actionType  news_actionType @default(deep_link)
+  actionValue String?         @db.Text
+  order       Int             @default(0)
+  validFrom   DateTime?       @db.DateTime(0)
+  validTo     DateTime?       @db.DateTime(0)
+  createdAt   DateTime        @default(now()) @db.DateTime(0)
+  updatedAt   DateTime        @db.DateTime(0)
+  deletedAt   DateTime?       @db.DateTime(0)
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([order], map: "order")
+  @@index([status], map: "status")
+  @@index([validFrom], map: "validFrom")
+  @@index([validTo], map: "validTo")
+}
+
+model notifications {
+  id        String               @id @db.Char(36)
+  userId    String               @db.Char(36)
+  status    notifications_status @default(pending)
+  title     String?              @db.VarChar(100)
+  message   String?              @db.Text
+  createdAt DateTime             @db.DateTime(0)
+  updatedAt DateTime             @db.DateTime(0)
+  readedAt  DateTime?            @db.DateTime(0)
+  deletedAt DateTime?            @db.DateTime(0)
+  users     users                @relation(fields: [userId], references: [id], onDelete: NoAction, map: "notifications_ibfk_1")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([readedAt], map: "readedAt")
+  @@index([status], map: "status")
+  @@index([title], map: "title")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+}
+
+model phone_validation_codes {
+  id         String    @id @db.Char(36)
+  phone      String    @unique @db.VarChar(20)
+  code       String    @db.VarChar(255)
+  method     String    @db.VarChar(10)
+  language   String    @default("es") @db.VarChar(10)
+  verified   Boolean   @default(false)
+  verifiedAt DateTime? @db.DateTime(0)
+  createdAt  DateTime  @default(now()) @db.DateTime(0)
+  expiresAt  DateTime  @db.DateTime(0)
+
+  @@index([expiresAt], map: "expiresAt")
+  @@index([method], map: "method")
+  @@index([phone], map: "phone")
+  @@index([verified], map: "verified")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ramp_operations {
+  id                                                               String                         @id @db.Char(36)
+  manteca_operation_id                                             String?                        @db.VarChar(255)
+  manteca_external_id                                              String?                        @db.VarChar(255)
+  user_id                                                          String                         @db.Char(36)
+  direction                                                        ramp_operations_direction
+  status                                                           ramp_operations_status         @default(STARTING)
+  country                                                          ramp_operations_country
+  deposit_amount                                                   Decimal                        @db.Decimal(12, 2)
+  asset_amount                                                     Decimal?                       @db.Decimal(12, 8)
+  fiat_amount                                                      Decimal?                       @db.Decimal(12, 2)
+  fee_total                                                        Decimal                        @default(0.00) @db.Decimal(12, 2)
+  expected_credit_amount                                           Decimal                        @db.Decimal(12, 2)
+  deposit_address                                                  String?                        @db.VarChar(255)
+  deposit_alias                                                    String?                        @db.VarChar(255)
+  withdraw_address                                                 String                         @db.VarChar(255)
+  stages_data                                                      Json?
+  debit_transaction_id                                             String?                        @db.Char(36)
+  credit_transaction_id                                            String?                        @db.Char(36)
+  manteca_webhook_received                                         Boolean                        @default(false)
+  manteca_webhook_id                                               String?                        @db.VarChar(255)
+  manteca_confirmed_at                                             DateTime?                      @db.DateTime(0)
+  bank_webhook_received                                            Boolean                        @default(false)
+  bank_provider                                                    ramp_operations_bank_provider?
+  bank_webhook_id                                                  String?                        @db.VarChar(255)
+  bank_confirmed_at                                                DateTime?                      @db.DateTime(0)
+  credited_once                                                    Boolean                        @default(false)
+  credited_by                                                      ramp_operations_credited_by?
+  created_at                                                       DateTime                       @default(now()) @db.DateTime(0)
+  updated_at                                                       DateTime                       @default(now()) @db.DateTime(0)
+  expires_at                                                       DateTime?                      @db.DateTime(0)
+  users                                                            users                          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ramp_operations_ibfk_1")
+  transactions_ramp_operations_debit_transaction_idTotransactions  transactions?                  @relation("ramp_operations_debit_transaction_idTotransactions", fields: [debit_transaction_id], references: [id], onUpdate: NoAction, map: "ramp_operations_ibfk_2")
+  transactions_ramp_operations_credit_transaction_idTotransactions transactions?                  @relation("ramp_operations_credit_transaction_idTotransactions", fields: [credit_transaction_id], references: [id], onUpdate: NoAction, map: "ramp_operations_ibfk_3")
+
+  @@index([country], map: "idx_country")
+  @@index([created_at], map: "idx_created_at")
+  @@index([credit_transaction_id], map: "idx_credit_transaction_id")
+  @@index([credited_once], map: "idx_credited_once")
+  @@index([debit_transaction_id], map: "idx_debit_transaction_id")
+  @@index([direction], map: "idx_direction")
+  @@index([expires_at], map: "idx_expires_at")
+  @@index([manteca_external_id], map: "idx_manteca_external_id")
+  @@index([manteca_operation_id], map: "idx_manteca_operation_id")
+  @@index([status], map: "idx_status")
+  @@index([user_id], map: "idx_user_id")
+}
+
+model sailpoints {
+  id                    String                  @id @db.Char(36)
+  storeId               String                  @db.Char(36)
+  branchId              String                  @db.Char(36)
+  status                sailpoints_status       @default(enable)
+  name                  String?                 @db.VarChar(100)
+  image                 String?                 @db.VarChar(100)
+  notes                 String?                 @db.Text
+  createdAt             DateTime                @db.DateTime(0)
+  updatedAt             DateTime                @db.DateTime(0)
+  deletedAt             DateTime?               @db.DateTime(0)
+  stores                stores                  @relation(fields: [storeId], references: [id], onDelete: NoAction, map: "sailpoints_ibfk_61")
+  branches              branches                @relation(fields: [branchId], references: [id], onDelete: Cascade, map: "sailpoints_ibfk_62")
+  transactions          transactions[]
+  usersIdentitiesGrants usersIdentitiesGrants[]
+
+  @@index([branchId], map: "branchId")
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([name], map: "name")
+  @@index([status], map: "status")
+  @@index([storeId], map: "storeId")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+model services_actions {
+  id             String                      @id @db.Char(36)
+  name           String                      @db.VarChar(100)
+  icon           String                      @db.VarChar(50)
+  actionType     services_actions_actionType
+  actionValue    String                      @db.VarChar(500)
+  order          Int                         @default(0)
+  enabled        Boolean                     @default(true)
+  translationKey String?                     @db.VarChar(100)
+  moduleName     String?                     @db.VarChar(100)
+  createdAt      DateTime                    @default(now()) @db.DateTime(0)
+  updatedAt      DateTime                    @db.DateTime(0)
+
+  @@index([createdAt], map: "createdAt")
+  @@index([enabled], map: "enabled")
+  @@index([order], map: "order")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+model spending_limit_alerts {
+  id              String                          @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  userIdentityId  String                          @db.Char(36)
+  transactionId   String?                         @db.Char(36)
+  alertType       spending_limit_alerts_alertType
+  attemptedAmount Decimal                         @db.Decimal(15, 2)
+  currentLimit    Decimal                         @db.Decimal(15, 2)
+  currentSpent    Decimal                         @db.Decimal(15, 2)
+  status          spending_limit_alerts_status?   @default(pending)
+  reviewedBy      String?                         @db.Char(36)
+  reviewedAt      DateTime?                       @db.DateTime(0)
+  notes           String?                         @db.Text
+  createdAt       DateTime?                       @default(now()) @db.DateTime(0)
+  updatedAt       DateTime?                       @default(now()) @db.DateTime(0)
+  usersIdentities usersIdentities                 @relation(fields: [userIdentityId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "spending_limit_alerts_ibfk_1")
+  users           users?                          @relation(fields: [reviewedBy], references: [id], onUpdate: NoAction, map: "spending_limit_alerts_ibfk_2")
+
+  @@index([userIdentityId, status], map: "idx_alerts_identity_status")
+  @@index([createdAt], map: "idx_spending_limit_alerts_created")
+  @@index([userIdentityId], map: "idx_spending_limit_alerts_identity")
+  @@index([status], map: "idx_spending_limit_alerts_status")
+  @@index([alertType], map: "idx_spending_limit_alerts_type")
+  @@index([reviewedBy], map: "reviewedBy")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model spending_limit_profiles {
+  id                   String    @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  name                 String    @db.VarChar(100)
+  description          String?   @db.Text
+  isDefault            Boolean?  @default(false)
+  isActive             Boolean?  @default(true)
+  createdAt            DateTime? @default(now()) @db.DateTime(0)
+  updatedAt            DateTime? @default(now()) @db.DateTime(0)
+  deletedAt            DateTime? @db.DateTime(0)
+  dailyTransferLimit   Decimal   @default(0.00) @db.Decimal(15, 2)
+  dailyBoletoLimit     Decimal   @default(0.00) @db.Decimal(15, 2)
+  dailyExchangeLimit   Decimal?  @db.Decimal(15, 2)
+  nightlyTransferLimit Decimal?  @db.Decimal(15, 2)
+  nightlyBoletoLimit   Decimal?  @db.Decimal(15, 2)
+  nightlyStartHour     Int?      @db.TinyInt
+  nightlyEndHour       Int?      @default(7) @db.TinyInt
+  limitsAr             Json?
+  limitsBr             Json?
+
+  @@index([isActive, isDefault], map: "idx_profiles_active_default")
+  @@index([isActive], map: "idx_spending_limit_profiles_active")
+  @@index([isDefault], map: "idx_spending_limit_profiles_default")
+  @@index([deletedAt], map: "idx_spending_limit_profiles_deleted")
+}
+
+model stores {
+  id               String                @id @db.Char(36)
+  userId           String                @db.Char(36)
+  userIdentityId   String                @db.Char(36)
+  status           stores_status         @default(enable)
+  name             String?               @db.VarChar(100)
+  image            String?               @db.VarChar(100)
+  notes            String?               @db.Text
+  phone            String?               @db.VarChar(100)
+  email            String?               @db.VarChar(100)
+  link1            String?               @db.VarChar(255)
+  link2            String?               @db.VarChar(255)
+  link3            String?               @db.VarChar(255)
+  link4            String?               @db.VarChar(255)
+  position         Unsupported("point")?
+  address1         String?               @db.VarChar(100)
+  address2         String?               @db.VarChar(100)
+  createdAt        DateTime              @db.DateTime(0)
+  updatedAt        DateTime              @db.DateTime(0)
+  deletedAt        DateTime?             @db.DateTime(0)
+  benefits         benefits[]
+  branches         branches[]
+  sailpoints       sailpoints[]
+  users            users                 @relation(fields: [userId], references: [id], onDelete: NoAction, map: "stores_ibfk_61")
+  usersIdentities  usersIdentities       @relation(fields: [userIdentityId], references: [id], onDelete: NoAction, map: "stores_ibfk_62")
+  storesCategories storesCategories[]
+  transactions     transactions[]
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([email], map: "email")
+  @@index([name], map: "name")
+  @@index([phone], map: "phone")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+  @@index([userIdentityId], map: "userIdentityId")
+}
+
+model storesCategories {
+  id         String     @id @db.Char(36)
+  storeId    String     @db.Char(36)
+  categoryId String     @db.Char(36)
+  createdAt  DateTime   @db.DateTime(0)
+  updatedAt  DateTime   @db.DateTime(0)
+  stores     stores     @relation(fields: [storeId], references: [id], onDelete: Cascade, map: "storesCategories_ibfk_51")
+  categories categories @relation(fields: [categoryId], references: [id], onDelete: Cascade, map: "storesCategories_ibfk_52")
+
+  @@unique([storeId, categoryId], map: "storeId_categoryId")
+  @@unique([storeId, categoryId], map: "storesCategories_storeId_categoryId_unique")
+  @@index([categoryId], map: "categoryId")
+}
+
+model system_config {
+  id          String    @id @db.Char(36)
+  key         String    @unique(map: "system_config_key") @db.VarChar(100)
+  value       String    @db.Text
+  description String?   @db.VarChar(255)
+  category    String    @default("general") @db.VarChar(50)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @db.DateTime(0)
+  updatedAt   DateTime  @default(now()) @db.DateTime(0)
+  deletedAt   DateTime? @db.DateTime(0)
+
+  @@index([isActive], map: "idx_system_config_active")
+  @@index([category], map: "idx_system_config_category")
+  @@index([key], map: "idx_system_config_key")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model transaction_validation_limits {
+  id                        String                                 @id @db.Char(36)
+  currency                  transaction_validation_limits_currency
+  maxAmountNoValidation     Decimal                                @default(500.00) @db.Decimal(15, 2)
+  maxAmountBiometricOnly    Decimal                                @default(2000.00) @db.Decimal(15, 2)
+  minAmountPasswordRequired Decimal                                @default(2000.01) @db.Decimal(15, 2)
+  isActive                  Boolean                                @default(true)
+  createdAt                 DateTime                               @default(now()) @db.Timestamp(0)
+  updatedAt                 DateTime                               @default(now()) @db.Timestamp(0)
+  deletedAt                 DateTime?                              @db.Timestamp(0)
+
+  @@unique([currency, isActive, deletedAt], map: "unique_currency_active")
+  @@index([currency, isActive], map: "idx_currency_active")
+}
+
+model transactions {
+  id                                                                  String                @id @db.Char(36)
+  date                                                                DateTime              @db.DateTime(0)
+  number                                                              Int                   @unique(map: "number") @default(autoincrement())
+  code                                                                String?               @db.VarChar(255)
+  reference                                                           String?               @db.Text
+  ticket                                                              String?               @db.Text
+  type                                                                transactions_type
+  status                                                              transactions_status   @default(pending)
+  sourceUserId                                                        String?               @db.Char(36)
+  sourceIdentityId                                                    String?               @db.Char(36)
+  sourceAccountId                                                     String?               @db.Char(36)
+  sourceName                                                          String?               @db.VarChar(100)
+  sourceCvu                                                           String?               @db.VarChar(25)
+  sourceCbu                                                           String?               @db.VarChar(25)
+  sourceAlias                                                         String?               @db.VarChar(100)
+  cardId                                                              String?               @db.Char(36)
+  targetUserId                                                        String?               @db.Char(36)
+  targetIdentityId                                                    String?               @db.Char(36)
+  targetAccountId                                                     String?               @db.Char(36)
+  targetContactId                                                     String?               @db.Char(36)
+  targetName                                                          String?               @db.VarChar(100)
+  targetCvu                                                           String?               @db.VarChar(25)
+  targetCbu                                                           String?               @db.VarChar(25)
+  targetAlias                                                         String?               @db.VarChar(100)
+  storeId                                                             String?               @db.Char(36)
+  branchId                                                            String?               @db.Char(36)
+  sailpointId                                                         String?               @db.Char(36)
+  benefitId                                                           String?               @db.Char(36)
+  amount                                                              Decimal?              @db.Decimal(12, 2)
+  reason                                                              String?               @db.VarChar(255)
+  relatedTransactionId                                                String?               @db.Char(36)
+  bindId                                                              String?               @unique(map: "bindId") @db.VarChar(50)
+  reverseBindId                                                       String?               @db.VarChar(50)
+  coelsaId                                                            String?               @db.VarChar(50)
+  reverseCoelsaId                                                     String?               @db.VarChar(50)
+  gireId                                                              String?               @unique(map: "gireId") @db.VarChar(50)
+  reverseGireId                                                       String?               @db.VarChar(50)
+  micronautaId                                                        String?               @unique(map: "micronautaId") @db.VarChar(50)
+  companyCode                                                         String?               @db.VarChar(50)
+  onlineConciliation                                                  DateTime?             @db.DateTime(0)
+  offlineConciliation                                                 DateTime?             @db.DateTime(0)
+  createdAt                                                           DateTime              @db.DateTime(0)
+  updatedAt                                                           DateTime              @db.DateTime(0)
+  deletedAt                                                           DateTime?             @db.DateTime(0)
+  creditId                                                            String?               @db.Char(36)
+  userId                                                              String?               @db.Char(36)
+  country                                                             String?               @db.VarChar(10)
+  currency                                                            String?               @db.VarChar(10)
+  sourceTaxDocumentType                                               String?               @db.VarChar(10)
+  sourceTaxDocumentNumber                                             String?               @db.VarChar(50)
+  targetTaxDocumentType                                               String?               @db.VarChar(10)
+  targetTaxDocumentNumber                                             String?               @db.VarChar(50)
+  sourceAccountNumber                                                 String?               @db.VarChar(100)
+  targetAccountNumber                                                 String?               @db.VarChar(100)
+  cronosId                                                            String?               @db.VarChar(50)
+  reverseCronosId                                                     String?               @db.VarChar(50)
+  targetBank                                                          String?               @db.VarChar(100)
+  mantecaId                                                           String?               @db.VarChar(50)
+  reverseMantecaId                                                    String?               @db.VarChar(50)
+  accreditations                                                      accreditations[]
+  exchange_rate_codes                                                 exchange_rate_codes[]
+  ramp_operations_ramp_operations_debit_transaction_idTotransactions  ramp_operations[]     @relation("ramp_operations_debit_transaction_idTotransactions")
+  ramp_operations_ramp_operations_credit_transaction_idTotransactions ramp_operations[]     @relation("ramp_operations_credit_transaction_idTotransactions")
+  users_transactions_sourceUserIdTousers                              users?                @relation("transactions_sourceUserIdTousers", fields: [sourceUserId], references: [id], map: "transactions_ibfk_407")
+  usersIdentities_transactions_sourceIdentityIdTousersIdentities      usersIdentities?      @relation("transactions_sourceIdentityIdTousersIdentities", fields: [sourceIdentityId], references: [id], map: "transactions_ibfk_408")
+  usersAccounts_transactions_sourceAccountIdTousersAccounts           usersAccounts?        @relation("transactions_sourceAccountIdTousersAccounts", fields: [sourceAccountId], references: [id], map: "transactions_ibfk_409")
+  cards                                                               cards?                @relation(fields: [cardId], references: [id], map: "transactions_ibfk_410")
+  users_transactions_targetUserIdTousers                              users?                @relation("transactions_targetUserIdTousers", fields: [targetUserId], references: [id], map: "transactions_ibfk_411")
+  usersIdentities_transactions_targetIdentityIdTousersIdentities      usersIdentities?      @relation("transactions_targetIdentityIdTousersIdentities", fields: [targetIdentityId], references: [id], map: "transactions_ibfk_412")
+  usersAccounts_transactions_targetAccountIdTousersAccounts           usersAccounts?        @relation("transactions_targetAccountIdTousersAccounts", fields: [targetAccountId], references: [id], map: "transactions_ibfk_413")
+  contacts                                                            contacts?             @relation(fields: [targetContactId], references: [id], map: "transactions_ibfk_414")
+  stores                                                              stores?               @relation(fields: [storeId], references: [id], map: "transactions_ibfk_415")
+  branches                                                            branches?             @relation(fields: [branchId], references: [id], map: "transactions_ibfk_416")
+  sailpoints                                                          sailpoints?           @relation(fields: [sailpointId], references: [id], map: "transactions_ibfk_417")
+  benefits                                                            benefits?             @relation(fields: [benefitId], references: [id], map: "transactions_ibfk_418")
+  transactions                                                        transactions?         @relation("transactionsTotransactions", fields: [relatedTransactionId], references: [id], map: "transactions_ibfk_419")
+  other_transactions                                                  transactions[]        @relation("transactionsTotransactions")
+  credits                                                             credits?              @relation(fields: [creditId], references: [id], map: "transactions_ibfk_420")
+  users_transactions_userIdTousers                                    users?                @relation("transactions_userIdTousers", fields: [userId], references: [id], map: "transactions_ibfk_421")
+  transactionsLogs                                                    transactionsLogs[]
+  transactionsWsLogs                                                  transactionsWsLogs[]
+
+  @@index([benefitId], map: "benefitId")
+  @@index([branchId], map: "branchId")
+  @@index([cardId], map: "cardId")
+  @@index([code], map: "code")
+  @@index([companyCode], map: "companyCode")
+  @@index([createdAt], map: "createdAt")
+  @@index([creditId], map: "creditId")
+  @@index([date], map: "date")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([relatedTransactionId], map: "relatedTransactionId")
+  @@index([sailpointId], map: "sailpointId")
+  @@index([sourceAccountId], map: "sourceAccountId")
+  @@index([sourceIdentityId], map: "sourceIdentityId")
+  @@index([sourceUserId], map: "sourceUserId")
+  @@index([status], map: "status")
+  @@index([storeId], map: "storeId")
+  @@index([targetAccountId], map: "targetAccountId")
+  @@index([targetContactId], map: "targetContactId")
+  @@index([targetIdentityId], map: "targetIdentityId")
+  @@index([targetUserId], map: "targetUserId")
+  @@index([type], map: "type")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+}
+
+model transactionsLogs {
+  id                   String                          @id @db.Char(36)
+  transactionId        String                          @db.Char(36)
+  userId               String?                         @db.Char(36)
+  initialStatus        transactionsLogs_initialStatus?
+  initialSourceBalance Decimal?                        @db.Decimal(12, 2)
+  initialTargetBalance Decimal?                        @db.Decimal(12, 2)
+  finalStatus          transactionsLogs_finalStatus
+  finalSourceBalance   Decimal?                        @db.Decimal(12, 2)
+  finalTargetBalance   Decimal?                        @db.Decimal(12, 2)
+  context              String                          @db.VarChar(100)
+  ip                   String?                         @db.VarChar(50)
+  agent                String?                         @db.VarChar(255)
+  params               String                          @db.Text
+  result               String                          @db.Text
+  createdAt            DateTime                        @db.DateTime(0)
+  updatedAt            DateTime                        @db.DateTime(0)
+  transactions         transactions                    @relation(fields: [transactionId], references: [id], onDelete: Cascade, map: "transactionsLogs_ibfk_51")
+  users                users?                          @relation(fields: [userId], references: [id], map: "transactionsLogs_ibfk_52")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([transactionId], map: "transactionId")
+  @@index([userId], map: "userId")
+}
+
+model transactionsWsLogs {
+  id            String                  @id @db.Char(36)
+  transactionId String                  @db.Char(36)
+  type          transactionsWsLogs_type
+  context       String                  @db.VarChar(100)
+  params        String                  @db.Text
+  result        String                  @db.Text
+  createdAt     DateTime                @db.DateTime(0)
+  updatedAt     DateTime                @db.DateTime(0)
+  transactions  transactions            @relation(fields: [transactionId], references: [id], onDelete: Cascade, map: "transactionsWsLogs_ibfk_1")
+
+  @@index([context], map: "context")
+  @@index([createdAt], map: "createdAt")
+  @@index([transactionId], map: "transactionId")
+  @@index([type], map: "type")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user_campaign_codes {
+  id             String         @id @db.Char(36)
+  userId         String         @unique(map: "unique_user_campaign") @db.Char(36)
+  campaignCodeId String         @db.Char(36)
+  code           String         @db.VarChar(50)
+  createdAt      DateTime       @default(now()) @db.DateTime(0)
+  users          users          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_campaign_codes_ibfk_1")
+  campaign_codes campaign_codes @relation(fields: [campaignCodeId], references: [id], onUpdate: NoAction, map: "user_campaign_codes_ibfk_2")
+
+  @@index([campaignCodeId], map: "idx_campaign_code_id")
+  @@index([code], map: "idx_code")
+  @@index([createdAt], map: "idx_created_at")
+  @@index([userId], map: "idx_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user_identity_spending_limits {
+  id                   String          @id @default(dbgenerated("(uuid())")) @db.Char(36)
+  userIdentityId       String          @db.Char(36)
+  profileId            String?         @db.Char(36)
+  isCustom             Boolean?        @default(false)
+  dailyTransferLimit   Decimal?        @db.Decimal(15, 2)
+  dailyBoletoLimit     Decimal?        @db.Decimal(15, 2)
+  nightlyTransferLimit Decimal?        @db.Decimal(15, 2)
+  nightlyBoletoLimit   Decimal?        @db.Decimal(15, 2)
+  nightlyStartHour     Int?            @db.TinyInt
+  nightlyEndHour       Int?            @db.TinyInt
+  limitsAr             Json?
+  limitsBr             Json?
+  createdAt            DateTime?       @default(now()) @db.DateTime(0)
+  updatedAt            DateTime?       @default(now()) @db.DateTime(0)
+  deletedAt            DateTime?       @db.DateTime(0)
+  usersIdentities      usersIdentities @relation(fields: [userIdentityId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_identity_spending_limits_ibfk_1")
+
+  @@unique([userIdentityId, deletedAt], map: "unique_identity_limit")
+  @@index([isCustom], map: "idx_user_identity_spending_limits_custom")
+  @@index([userIdentityId], map: "idx_user_identity_spending_limits_identity")
+  @@index([profileId], map: "idx_user_identity_spending_limits_profile")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user_term_acceptances {
+  id          String                            @id @db.Char(36)
+  userId      String                            @db.Char(36)
+  serviceType user_term_acceptances_serviceType
+  acceptedAt  DateTime                          @default(now()) @db.DateTime(0)
+  ipAddress   String?                           @db.VarChar(45)
+  userAgent   String?                           @db.Text
+  users       users                             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_term_acceptances_ibfk_1")
+
+  @@unique([userId, serviceType], map: "unique_user_service")
+  @@index([acceptedAt], map: "idx_accepted_at")
+  @@index([serviceType], map: "idx_service_type")
+  @@index([userId], map: "idx_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id                                                    String                  @id @db.Char(36)
+  status                                                users_status            @default(pending)
+  isBlocked                                             Boolean                 @default(false)
+  blockedAt                                             DateTime?               @db.DateTime(0)
+  blockedReason                                         String?                 @db.VarChar(255)
+  isDisabled                                            Boolean                 @default(false)
+  disabledAt                                            DateTime?               @db.DateTime(0)
+  disabledReason                                        String?                 @db.VarChar(255)
+  access                                                users_access            @default(user)
+  reference                                             String?                 @db.Text
+  name                                                  String?                 @db.VarChar(100)
+  image                                                 String?                 @db.Text
+  notes                                                 String?                 @db.Text
+  phone                                                 String?                 @db.VarChar(100)
+  email                                                 String?                 @unique(map: "email") @db.VarChar(100)
+  username                                              String?                 @unique(map: "username") @db.VarChar(50)
+  password                                              String?                 @db.VarChar(100)
+  recovery                                              String?                 @db.VarChar(100)
+  systemVersion                                         String?                 @db.VarChar(10)
+  mobileDevice                                          String?                 @db.Text
+  mobileDeviceName                                      String?                 @db.VarChar(50)
+  mobileDevicePush                                      String?                 @db.VarChar(255)
+  browserDevice                                         String?                 @db.Text
+  browserDeviceName                                     String?                 @db.VarChar(50)
+  browserDevicePush                                     String?                 @db.VarChar(255)
+  accessToken                                           String?                 @db.Text
+  unlockToken                                           String?                 @db.Text
+  verifyToken                                           String?                 @db.Text
+  defaultUserIdentityId                                 String?                 @db.Char(36)
+  defaultUserAccountId                                  String?                 @db.Char(36)
+  notificationCounter                                   Int                     @default(0)
+  createdAt                                             DateTime                @db.DateTime(0)
+  updatedAt                                             DateTime                @db.DateTime(0)
+  lastLoginAt                                           DateTime?               @db.DateTime(0)
+  deletedAt                                             DateTime?               @db.DateTime(0)
+  language                                              String                  @default("es") @db.VarChar(10)
+  validaId                                              String?                 @db.VarChar(50)
+  emailVerifiedAt                                       DateTime?               @db.DateTime(0)
+  phoneVerifiedAt                                       DateTime?               @db.DateTime(0)
+  livenessVerifiedAt                                    DateTime?               @db.DateTime(0)
+  passwordUpdatedAt                                     DateTime?               @db.DateTime(0)
+  number                                                Int                     @unique(map: "number") @default(autoincrement())
+  firstName                                             String?                 @db.VarChar(100)
+  lastName                                              String?                 @db.VarChar(100)
+  birthdate                                             DateTime?               @db.Date
+  gender                                                String?                 @db.VarChar(50)
+  livenessImage                                         String?                 @db.Text
+  maritalStatus                                         String?                 @db.VarChar(50)
+  pep                                                   String?                 @db.VarChar(10)
+  pepSince                                              DateTime?               @db.Date
+  fatherName                                            String?                 @db.VarChar(100)
+  motherName                                            String?                 @db.VarChar(100)
+  country                                               String?                 @db.VarChar(10)
+  onboardingState                                       Json?
+  accreditations                                        accreditations[]
+  cards                                                 cards[]
+  challenges                                            challenges[]
+  contacts_contacts_userIdTousers                       contacts[]              @relation("contacts_userIdTousers")
+  contacts_contacts_contactUserIdTousers                contacts[]              @relation("contacts_contactUserIdTousers")
+  credits_credits_userIdTousers                         credits[]               @relation("credits_userIdTousers")
+  credits_credits_approvalUserIdTousers                 credits[]               @relation("credits_approvalUserIdTousers")
+  devices                                               devices[]
+  exchange_rate_codes                                   exchange_rate_codes[]
+  notifications                                         notifications[]
+  ramp_operations                                       ramp_operations[]
+  spending_limit_alerts                                 spending_limit_alerts[]
+  stores                                                stores[]
+  transactions_transactions_sourceUserIdTousers         transactions[]          @relation("transactions_sourceUserIdTousers")
+  transactions_transactions_targetUserIdTousers         transactions[]          @relation("transactions_targetUserIdTousers")
+  transactions_transactions_userIdTousers               transactions[]          @relation("transactions_userIdTousers")
+  transactionsLogs                                      transactionsLogs[]
+  user_campaign_codes                                   user_campaign_codes?
+  user_term_acceptances                                 user_term_acceptances[]
+  usersAccounts                                         usersAccounts[]
+  usersIdentities_usersIdentities_userIdTousers         usersIdentities[]       @relation("usersIdentities_userIdTousers")
+  usersIdentities_usersIdentities_approvalUserIdTousers usersIdentities[]       @relation("usersIdentities_approvalUserIdTousers")
+  usersIdentitiesGrants                                 usersIdentitiesGrants[]
+  users_access_log                                      users_access_log[]
+
+  @@index([access], map: "access")
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([isBlocked], map: "idx_isBlocked")
+  @@index([isDisabled], map: "idx_isDisabled")
+  @@index([lastLoginAt], map: "idx_lastLoginAt")
+  @@index([name], map: "name")
+  @@index([phone], map: "phone")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+}
+
+model usersAccounts {
+  id                                                       String               @id @db.Char(36)
+  userId                                                   String               @db.Char(36)
+  userIdentityId                                           String               @db.Char(36)
+  number                                                   Int                  @unique(map: "number") @default(autoincrement())
+  type                                                     usersAccounts_type   @default(bind)
+  status                                                   usersAccounts_status @default(pending)
+  cvu                                                      String?              @db.VarChar(50)
+  alias                                                    String?              @db.VarChar(255)
+  balance                                                  Decimal?             @default(0.00) @db.Decimal(12, 2)
+  createdAt                                                DateTime             @db.DateTime(0)
+  updatedAt                                                DateTime             @db.DateTime(0)
+  deletedAt                                                DateTime?            @db.DateTime(0)
+  notes                                                    String?              @db.Text
+  accountNumber                                            String?              @db.VarChar(100)
+  cronosId                                                 String?              @db.VarChar(50)
+  credits                                                  credits[]
+  transactions_transactions_sourceAccountIdTousersAccounts transactions[]       @relation("transactions_sourceAccountIdTousersAccounts")
+  transactions_transactions_targetAccountIdTousersAccounts transactions[]       @relation("transactions_targetAccountIdTousersAccounts")
+  users                                                    users                @relation(fields: [userId], references: [id], onDelete: Cascade, map: "usersAccounts_ibfk_67")
+  usersIdentities                                          usersIdentities      @relation(fields: [userIdentityId], references: [id], onDelete: NoAction, map: "usersAccounts_ibfk_68")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([cronosId], map: "cronosId")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+  @@index([userIdentityId], map: "userIdentityId")
+}
+
+model usersIdentities {
+  id                                                          String                          @id @db.Char(36)
+  userId                                                      String                          @db.Char(36)
+  number                                                      Int                             @unique(map: "number") @default(autoincrement())
+  micronautaId                                                String?                         @unique(map: "micronautaId") @db.VarChar(50)
+  type                                                        usersIdentities_type            @default(personal)
+  subtype                                                     usersIdentities_subtype         @default(basic)
+  feeExempt                                                   Boolean?                        @default(false)
+  taxExempt                                                   Boolean?                        @default(false)
+  status                                                      usersIdentities_status          @default(pending)
+  name                                                        String?                         @db.VarChar(100)
+  approvalFile                                                String?                         @db.VarChar(100)
+  approvalUserId                                              String?                         @db.Char(36)
+  notes                                                       String?                         @db.Text
+  createdAt                                                   DateTime                        @db.DateTime(0)
+  updatedAt                                                   DateTime                        @db.DateTime(0)
+  deletedAt                                                   DateTime?                       @db.DateTime(0)
+  cronosId                                                    String?                         @unique(map: "cronosId") @db.VarChar(50)
+  country                                                     usersIdentities_country         @default(ar)
+  taxDocumentType                                             String?                         @db.VarChar(10)
+  taxDocumentNumber                                           String?                         @db.VarChar(50)
+  address                                                     String?                         @db.Text
+  identityDocumentType                                        String?                         @db.VarChar(10)
+  identityDocumentNumber                                      String?                         @db.VarChar(50)
+  identityDocumentIssueDate                                   DateTime?                       @db.Date
+  identityDocumentIssueState                                  String?                         @db.VarChar(50)
+  identityDocumentIssuer                                      String?                         @db.VarChar(50)
+  identityDocumentFrontImage                                  String?                         @db.Text
+  identityDocumentBackImage                                   String?                         @db.Text
+  identityDocumentImageType                                   String?                         @db.VarChar(10)
+  phone                                                       String?                         @db.VarChar(100)
+  mantecaId                                                   String?                         @db.VarChar(50)
+  cards                                                       cards[]
+  contacts                                                    contacts[]
+  credits                                                     credits[]
+  daily_spending_tracking                                     daily_spending_tracking[]
+  monthly_spending_tracking                                   monthly_spending_tracking[]
+  spending_limit_alerts                                       spending_limit_alerts[]
+  stores                                                      stores[]
+  transactions_transactions_sourceIdentityIdTousersIdentities transactions[]                  @relation("transactions_sourceIdentityIdTousersIdentities")
+  transactions_transactions_targetIdentityIdTousersIdentities transactions[]                  @relation("transactions_targetIdentityIdTousersIdentities")
+  user_identity_spending_limits                               user_identity_spending_limits[]
+  usersAccounts                                               usersAccounts[]
+  users_usersIdentities_userIdTousers                         users                           @relation("usersIdentities_userIdTousers", fields: [userId], references: [id], onDelete: Cascade, map: "usersIdentities_ibfk_1")
+  users_usersIdentities_approvalUserIdTousers                 users?                          @relation("usersIdentities_approvalUserIdTousers", fields: [approvalUserId], references: [id], map: "usersIdentities_ibfk_2")
+  usersIdentitiesGrants                                       usersIdentitiesGrants[]
+
+  @@unique([identityDocumentType, identityDocumentNumber], map: "identityDocument")
+  @@unique([taxDocumentType, taxDocumentNumber], map: "taxDcoument")
+  @@index([approvalUserId], map: "approvalUserId")
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+}
+
+model usersIdentitiesGrants {
+  id               String                       @id @db.Char(36)
+  userIdentityId   String                       @db.Char(36)
+  userId           String                       @db.Char(36)
+  transactionLimit Decimal?                     @default(0.00) @db.Decimal(12, 2)
+  monthLimit       Decimal?                     @default(0.00) @db.Decimal(12, 2)
+  sailpointId      String?                      @db.Char(36)
+  type             usersIdentitiesGrants_type   @default(full)
+  status           usersIdentitiesGrants_status @default(enable)
+  createdAt        DateTime                     @db.DateTime(0)
+  updatedAt        DateTime                     @db.DateTime(0)
+  deletedAt        DateTime?                    @db.DateTime(0)
+  usersIdentities  usersIdentities              @relation(fields: [userIdentityId], references: [id], onDelete: Cascade, map: "usersIdentitiesGrants_ibfk_76")
+  users            users                        @relation(fields: [userId], references: [id], onDelete: Cascade, map: "usersIdentitiesGrants_ibfk_77")
+  sailpoints       sailpoints?                  @relation(fields: [sailpointId], references: [id], map: "usersIdentitiesGrants_ibfk_78")
+
+  @@index([createdAt], map: "createdAt")
+  @@index([deletedAt], map: "deletedAt")
+  @@index([sailpointId], map: "sailpointId")
+  @@index([status], map: "status")
+  @@index([updatedAt], map: "updatedAt")
+  @@index([userId], map: "userId")
+  @@index([userIdentityId], map: "userIdentityId")
+}
+
+model users_access_log {
+  id          String   @id @db.Char(36)
+  userId      String   @db.Char(36)
+  ipAddress   String?  @db.VarChar(45)
+  userAgent   String?  @db.Text
+  device      String?  @db.VarChar(100)
+  finalStatus String   @db.VarChar(20)
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  users       users    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_users_access_log_user")
+
+  @@index([createdAt], map: "idx_users_access_log_createdAt")
+  @@index([userId], map: "idx_users_access_log_userId")
+}
+
+enum accreditations_status {
+  pending
+  process
+  confirm
+  reverse
+  cancel
+  error
+}
+
+enum categories_status {
+  enable
+  disable
+}
+
+enum manteca_depositors_country {
+  BR
+  AR
+}
+
+enum news_status {
+  enable
+  disable
+}
+
+enum transaction_validation_limits_currency {
+  BRL
+  ARS
+}
+
+enum users_status {
+  pending
+  process
+  enable
+  disable
+  error
+  rejected
+}
+
+enum accreditations_type {
+  bind
+  cronos
+  virtual
+}
+
+enum benefits_status {
+  enable
+  disable
+}
+
+enum branches_status {
+  enable
+  disable
+}
+
+enum notifications_status {
+  pending
+  readed
+  disable
+}
+
+enum transactionsWsLogs_type {
+  gire
+  bind
+  cronos
+  coelsa
+  renaper
+  mocronauta
+  manteca
+}
+
+enum user_term_acceptances_serviceType {
+  manteca_pix
+  manteca_exchange
+}
+
+enum benefits_type {
+  amount
+  percent
+}
+
+enum home_actions_actionType {
+  navigation
+  mode_change
+  external_url
+}
+
+enum sailpoints_status {
+  enable
+  disable
+}
+
+enum services_actions_actionType {
+  navigation
+  mode_change
+  external_url
+}
+
+enum spending_limit_alerts_alertType {
+  transfer_limit
+  boleto_limit
+  nightly_transfer_limit
+  nightly_boleto_limit
+}
+
+enum stores_status {
+  enable
+  disable
+}
+
+enum transactionsLogs_initialStatus {
+  pending
+  process
+  confirm
+  reverse
+  cancel
+  error
+}
+
+enum contacts_status {
+  enable
+  disable
+}
+
+enum ramp_operations_direction {
+  RAMP_ON
+  RAMP_OFF
+}
+
+enum usersAccounts_type {
+  bind
+  cronos
+  virtual
+}
+
+enum usersIdentities_type {
+  personal
+  business
+}
+
+enum backofficeUsers_status {
+  active
+  inactive
+}
+
+enum contacts_type {
+  internal
+  external
+}
+
+enum exchange_rate_codes_operation {
+  buy
+  sell
+}
+
+enum news_actionType {
+  deep_link
+  url
+  internal_route
+}
+
+enum ramp_operations_status {
+  STARTING
+  WAITING_DEPOSIT
+  ORDER_EXECUTED
+  WITHDRAW_REQUESTED
+  SETTLED
+  FAILED
+  CANCELLED
+}
+
+enum usersAccounts_status {
+  pending
+  process
+  enable
+  disable
+  error
+}
+
+enum usersIdentities_subtype {
+  basic
+}
+
+enum cards_status {
+  pending
+  process
+  blocked
+  enable
+  disable
+}
+
+enum ramp_operations_country {
+  BR
+  AR
+}
+
+enum transactions_type {
+  cashin
+  cashin_bind
+  cashin_cronos
+  cashin_gire
+  cashin_coelsa
+  cashin_manteca_exchange_ar
+  cashin_manteca_exchange_br
+  cashout
+  cashout_bind
+  cashout_cronos
+  cashout_cronos_qr
+  cashout_gire
+  cashout_coelsa
+  cashout_manteca_fee_ar
+  cashout_manteca_fee_br
+  cashout_manteca_qr_ar
+  cashout_manteca_qr_br
+  cashout_manteca_exchange_ar
+  cashout_manteca_exchange_br
+  cashout_atm
+  transfer
+  payment
+  payment_qr
+  payment_gire
+  payment_cronos
+  payment_credit
+  payment_micronauta
+  recharge_gire
+  recharge_cronos
+  cashback
+  accreditation
+  accreditation_credit
+  fee
+  tax
+  perception
+  retention
+  sealed
+  reverse_manteca
+  cashout_unex_exchange_ar
+  cashout_unex_exchange_br
+  cashin_unex_exchange_ar
+  cashin_unex_exchange_br
+}
+
+enum transactionsLogs_finalStatus {
+  pending
+  process
+  confirm
+  reverse
+  cancel
+  error
+}
+
+enum usersIdentitiesGrants_type {
+  full
+  source
+  target
+  query
+  sailpoint
+}
+
+enum cards_type {
+  credit
+  debit
+  prepaid
+}
+
+enum creditsTypes_status {
+  enable
+  disable
+}
+
+enum spending_limit_alerts_status {
+  pending
+  reviewed
+  approved
+  rejected
+}
+
+enum transactions_status {
+  pending
+  process
+  confirm
+  reverse
+  cancel
+  error
+}
+
+enum usersIdentitiesGrants_status {
+  enable
+  disable
+}
+
+enum cards_subType {
+  virtual
+  physical
+}
+
+enum users_access {
+  administrator
+  supervisor
+  operator
+  customer
+  user
+}
+
+enum usersIdentities_status {
+  pending
+  process
+  enable
+  disable
+  error
+  rejected
+}
+
+enum cards_mode {
+  token
+  subscription
+  micronauta
+}
+
+enum home_actions_section {
+  home
+  bottom_tab
+  menu
+  quick_action
+  services
+}
+
+enum cards_brand {
+  amex
+  argencard
+  cabal
+  cencosud
+  cetelem
+  cmr
+  cordial
+  cordobesa
+  debcabal
+  debmaster
+  debmaster_b @map("debmaster-b")
+  debvisa
+  debvisa_b   @map("debvisa-b")
+  diners
+  maestro
+  mercadopago
+  naranja
+  nativa
+  nevada
+  tarshop
+  master
+  visa
+  koko
+}
+
+enum devices_status {
+  pending
+  active
+  revoked
+}
+
+enum usersIdentities_country {
+  ar
+  br
+}
+
+enum credits_type {
+  card
+  debit
+  wallet
+}
+
+enum credits_status {
+  pending
+  proccess
+  approved
+  rejected
+}
+
+enum ramp_operations_bank_provider {
+  CRONOS
+  BINGE
+  BIND
+}
+
+enum ramp_operations_credited_by {
+  MANTECA
+  BANK
+}
