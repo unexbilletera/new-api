@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { JwtModule } from './shared/jwt/jwt.module';
+import { LoggerModule } from './shared/logger/logger.module';
 
 // Public modules (não logado)
 import { PublicAuthModule } from './public/auth/auth.module';
@@ -24,6 +25,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
+    LoggerModule, // Módulo Logger global
     PrismaModule,
     JwtModule, // Módulo JWT global
     // Public (não logado)

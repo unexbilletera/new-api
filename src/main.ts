@@ -7,6 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
+import { LoggerService } from './shared/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -26,12 +27,14 @@ async function bootstrap() {
   // Filtro global de exceções
   app.useGlobalFilters(new HttpExceptionFilter());
 
+  const logger = app.get(LoggerService);
+
   // Interceptor global de logging
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalInterceptors(new LoggingInterceptor(logger));
 
   app.enableCors();
 
   await app.listen(3000, '0.0.0.0');
-  console.log('🚀 API rodando em http://0.0.0.0:3000');
+  logger.info('API running on http://0.0.0.0:3000');
 }
 bootstrap();

@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { WorkerModule } from './worker.module';
+import { LoggerService } from '../shared/logger/logger.service';
 
 /**
  * Worker principal
@@ -7,13 +8,14 @@ import { WorkerModule } from './worker.module';
  */
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(WorkerModule);
+  const logger = app.get(LoggerService);
 
   // TODO: Implementar consumo de fila SQS
-  console.log('⚙️  Worker iniciado. Aguardando mensagens da fila...');
+  logger.info('Worker started. Waiting for messages from queue...');
 
   // Mantém o worker rodando
   process.on('SIGTERM', async () => {
-    console.log('🛑 Encerrando worker...');
+    logger.info('Shutting down worker...');
     await app.close();
     process.exit(0);
   });
