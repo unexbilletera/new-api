@@ -7,10 +7,6 @@ import { UserResponseDto } from '../dto/user-response.dto';
 @Injectable()
 export class AuthService {
   constructor(private backofficeUserModel: BackofficeUserModel) {}
-
-  /**
-   * Realiza login do usuário backoffice
-   */
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     try {
       return await this.backofficeUserModel.validateCredentials(loginDto);
@@ -21,10 +17,6 @@ export class AuthService {
       throw new UnauthorizedException('Erro ao realizar login');
     }
   }
-
-  /**
-   * Retorna dados do usuário a partir do ID
-   */
   async getUserById(userId: string): Promise<UserResponseDto> {
     const user = await this.backofficeUserModel.findById(userId);
 
