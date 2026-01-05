@@ -15,7 +15,7 @@
     "baseUrl": "./",
     "paths": {
       "@generated/prisma/*": ["./generated/prisma/*"],
-      "@generated/prisma": ["./generated/prisma/client"]
+      "@generated/prisma": ["./generated/prisma"]
     },
     "incremental": true,
     "skipLibCheck": true,
