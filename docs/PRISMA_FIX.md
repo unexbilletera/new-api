@@ -1,3 +1,0 @@
-# Moved from root
-
-...existing content...
