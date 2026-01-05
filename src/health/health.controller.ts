@@ -16,7 +16,6 @@ export class HealthController {
     
     let databaseStatus = 'up';
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
       await (this.prisma as any).$queryRaw`SELECT 1`;
     } catch (error) {
       databaseStatus = 'down';

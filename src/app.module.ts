@@ -5,46 +5,37 @@ import { PrismaModule } from './shared/prisma/prisma.module';
 import { JwtModule } from './shared/jwt/jwt.module';
 import { LoggerModule } from './shared/logger/logger.module';
 
-// Public modules (não logado)
 import { PublicAuthModule } from './public/auth/auth.module';
 import { PublicOnboardingModule } from './public/onboarding/onboarding.module';
 import { PublicUsersModule } from './public/users/users.module';
 
-// Secure modules (logado)
 import { SecureTransactionsModule } from './secure/transactions/transactions.module';
 import { SecureExchangeModule } from './secure/exchange/exchange.module';
 import { SecureLedgerModule } from './secure/ledger/ledger.module';
 import { SecureTreasuryModule } from './secure/treasury/treasury.module';
 import { SecureNotificationsModule } from './secure/notifications/notifications.module';
 
-// Backoffice modules
 import { BackofficeAuthModule } from './backoffice/auth/auth.module';
 
-// Webhooks
 import { WebhooksModule } from './webhooks/webhooks.module';
 
-// Health
 import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
-    LoggerModule, // Módulo Logger global
+    LoggerModule,
     PrismaModule,
-    JwtModule, // Módulo JWT global
+    JwtModule,
     HealthModule,
-    // Public (não logado)
     PublicAuthModule,
     PublicOnboardingModule,
     PublicUsersModule,
-    // Secure (logado)
     SecureTransactionsModule,
     SecureExchangeModule,
     SecureLedgerModule,
     SecureTreasuryModule,
     SecureNotificationsModule,
-    // Backoffice
     BackofficeAuthModule,
-    // Webhooks
     WebhooksModule,
   ],
   controllers: [AppController],

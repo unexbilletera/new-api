@@ -14,8 +14,6 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-
-  // Validação global de DTOs
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -23,13 +21,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  // Filtro global de exceções
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const logger = app.get(LoggerService);
-
-  // Interceptor global de logging
   app.useGlobalInterceptors(new LoggingInterceptor(logger));
 
   app.enableCors();
