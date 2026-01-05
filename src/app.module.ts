@@ -23,11 +23,15 @@ import { BackofficeAuthModule } from './backoffice/auth/auth.module';
 // Webhooks
 import { WebhooksModule } from './webhooks/webhooks.module';
 
+// Health
+import { HealthModule } from './health/health.module';
+
 @Module({
   imports: [
     LoggerModule, // Módulo Logger global
     PrismaModule,
     JwtModule, // Módulo JWT global
+    HealthModule,
     // Public (não logado)
     PublicAuthModule,
     PublicOnboardingModule,
