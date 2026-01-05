@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  engineType    = "node"
 }
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model accreditations {
@@ -142,7 +144,7 @@ model branches {
   link2        String?               @db.VarChar(255)
   link3        String?               @db.VarChar(255)
   link4        String?               @db.VarChar(255)
-  position     Unsupported("point")?
+  position     String?               @db.Text
   address1     String?               @db.VarChar(100)
   address2     String?               @db.VarChar(100)
   createdAt    DateTime              @db.DateTime(0)
@@ -274,7 +276,7 @@ model contacts {
   link2                               String?               @db.VarChar(255)
   link3                               String?               @db.VarChar(255)
   link4                               String?               @db.VarChar(255)
-  position                            Unsupported("point")?
+  position                            String?               @db.Text
   address1                            String?               @db.VarChar(100)
   address2                            String?               @db.VarChar(100)
   cbu                                 String?               @db.VarChar(25)
@@ -754,7 +756,7 @@ model stores {
   link2            String?               @db.VarChar(255)
   link3            String?               @db.VarChar(255)
   link4            String?               @db.VarChar(255)
-  position         Unsupported("point")?
+  position         String?               @db.Text
   address1         String?               @db.VarChar(100)
   address2         String?               @db.VarChar(100)
   createdAt        DateTime              @db.DateTime(0)
