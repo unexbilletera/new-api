@@ -15,9 +15,6 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException('Token não fornecido');
     }
-
-    // TODO: Implementar validação JWT
-    // Por enquanto, apenas verifica se o token existe
     return true;
   }
 

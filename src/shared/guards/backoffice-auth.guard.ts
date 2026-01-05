@@ -38,10 +38,7 @@ export class BackofficeAuthGuard implements CanActivate {
     }
 
     try {
-      // Valida e decodifica o token JWT
       const payload = await this.jwtService.verifyToken(token);
-
-      // Busca o usuário no banco de dados
       const user = await this.prisma.backofficeUsers.findUnique({
         where: {
           id: payload.userId,
@@ -59,8 +56,6 @@ export class BackofficeAuthGuard implements CanActivate {
       if (user.status !== 'active') {
         throw new UnauthorizedException('Usuário inativo');
       }
-
-      // Adiciona o usuário à requisição para uso nos controllers
       request.user = {
         id: user.id,
         email: user.email,
