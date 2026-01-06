@@ -14,29 +14,43 @@ import { TermsService } from '../services/terms.service';
 import { AuthGuard } from '../../../shared/guards/auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { AcceptTermDto, ServiceType } from '../dto/terms.dto';
+import {
+  TermCheckResponseDto,
+  TermAcceptanceResponseDto,
+  CheckAllRequiredResponseDto,
+  AcceptTermResponseDto,
+} from '../dto/response';
 
 @Controller('terms')
 @UseGuards(AuthGuard)
 export class TermsController {
-  constructor(private readonly termsService: TermsService) {}  @Get(':serviceType')
+  constructor(private readonly termsService: TermsService) {}
+
+  @Get(':serviceType')
   async check(
     @CurrentUser('id') userId: string,
     @Param('serviceType') serviceType: ServiceType,
-  ) {
+  ): Promise<TermCheckResponseDto> {
     return this.termsService.check(userId, serviceType);
-  }  @Get('acceptances/list')
-  async listAcceptances(@CurrentUser('id') userId: string) {
+  }
+
+  @Get('acceptances/list')
+  async listAcceptances(@CurrentUser('id') userId: string): Promise<TermAcceptanceResponseDto[]> {
     return this.termsService.listAcceptances(userId);
-  }  @Get('required/check')
-  async checkRequired(@CurrentUser('id') userId: string) {
+  }
+
+  @Get('required/check')
+  async checkRequired(@CurrentUser('id') userId: string): Promise<CheckAllRequiredResponseDto> {
     return this.termsService.checkAllRequired(userId);
-  }  @Post('accept')
+  }
+
+  @Post('accept')
   @HttpCode(HttpStatus.OK)
   async accept(
     @CurrentUser('id') userId: string,
     @Body() dto: AcceptTermDto,
     @Req() req: Request,
-  ) {
+  ): Promise<AcceptTermResponseDto> {
     const ipAddress = req.ip || req.headers['x-forwarded-for']?.toString();
     return this.termsService.accept(userId, dto, ipAddress);
   }
