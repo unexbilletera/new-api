@@ -19,47 +19,70 @@ import {
   UpdatePushTokenDto,
   TestPushDto,
 } from '../dto/notifications.dto';
+import {
+  ListNotificationsResponseDto,
+  MarkAsReadResponseDto,
+  MarkAllAsReadResponseDto,
+  DeleteNotificationResponseDto,
+  UpdatePushTokenResponseDto,
+  GetPushTokenResponseDto,
+  SendTestPushResponseDto,
+} from '../dto/response';
 
 @Controller('notifications')
 @UseGuards(AuthGuard)
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}  @Get()
+  constructor(private readonly notificationsService: NotificationsService) {}
+
+  @Get()
   async list(
     @CurrentUser('id') userId: string,
     @Query() query: ListNotificationsQueryDto,
-  ) {
+  ): Promise<ListNotificationsResponseDto> {
     return this.notificationsService.list(userId, query);
-  }  @Patch(':id/read')
+  }
+
+  @Patch(':id/read')
   async markAsRead(
     @CurrentUser('id') userId: string,
     @Param('id') notificationId: string,
-  ) {
+  ): Promise<MarkAsReadResponseDto> {
     return this.notificationsService.markAsRead(userId, notificationId);
-  }  @Patch('read-all')
-  async markAllAsRead(@CurrentUser('id') userId: string) {
+  }
+
+  @Patch('read-all')
+  async markAllAsRead(@CurrentUser('id') userId: string): Promise<MarkAllAsReadResponseDto> {
     return this.notificationsService.markAllAsRead(userId);
-  }  @Delete(':id')
+  }
+
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async delete(
     @CurrentUser('id') userId: string,
     @Param('id') notificationId: string,
-  ) {
+  ): Promise<DeleteNotificationResponseDto> {
     return this.notificationsService.delete(userId, notificationId);
-  }  @Post('push-token')
+  }
+
+  @Post('push-token')
   async updatePushToken(
     @CurrentUser('id') userId: string,
     @Body() dto: UpdatePushTokenDto,
-  ) {
+  ): Promise<UpdatePushTokenResponseDto> {
     return this.notificationsService.updatePushToken(userId, dto);
-  }  @Get('push-token')
-  async getPushToken(@CurrentUser('id') userId: string) {
+  }
+
+  @Get('push-token')
+  async getPushToken(@CurrentUser('id') userId: string): Promise<GetPushTokenResponseDto> {
     return this.notificationsService.getPushToken(userId);
-  }  @Post('test')
+  }
+
+  @Post('test')
   @HttpCode(HttpStatus.OK)
   async sendTestPush(
     @CurrentUser('id') userId: string,
     @Body() dto: TestPushDto,
-  ) {
+  ): Promise<SendTestPushResponseDto> {
     return this.notificationsService.sendTestPush(userId, dto);
   }
 }
