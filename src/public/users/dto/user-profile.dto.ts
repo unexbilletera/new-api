@@ -30,6 +30,22 @@ export class UpdateUserProfileDto {
   @IsOptional()
   @IsString()
   timezone?: string;
+
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+  @IsOptional()
+  @IsString()
+  birthdate?: string;
+
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @IsOptional()
+  @IsString()
+  maritalStatus?: string;
 }
 
 export class SignoutDto {
@@ -92,4 +108,50 @@ export class SetUserAccountAliasDto {
 
   @IsString()
   alias: string;
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  currentPassword: string;
+
+  @IsString()
+  newPassword: string;
+}
+
+export class RequestEmailChangeDto {
+  @IsString()
+  newEmail: string;
+}
+
+export class ConfirmEmailChangeDto {
+  @IsString()
+  newEmail: string;
+
+  @IsString()
+  code: string;
+}
+
+export class UpdateAddressDto {
+  @IsString()
+  zipCode: string;
+
+  @IsString()
+  street: string;
+
+  @IsString()
+  number: string;
+
+  @IsOptional()
+  @IsString()
+  neighborhood?: string;
+
+  @IsString()
+  city: string;
+
+  @IsString()
+  state: string;
+
+  @IsOptional()
+  @IsString()
+  complement?: string;
 }
