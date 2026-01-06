@@ -11,6 +11,15 @@ import { ExchangeModule } from '../../shared/exchange/exchange.module';
 import { HelpersModule } from '../../shared/helpers/helpers.module';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
+import { AuthUserModel } from './models/user.model';
+import { ValidationCodeModel } from './models/validation-code.model';
+import { SignupService } from './services/signup.service';
+import { SigninService } from './services/signin.service';
+import { EmailValidationService } from './services/email-validation.service';
+import { PhoneValidationService } from './services/phone-validation.service';
+import { PasswordRecoveryService } from './services/password-recovery.service';
+import { TokenService } from './services/token.service';
+import { AuthMapper } from './mappers/auth.mapper';
 
 @Module({
   imports: [
@@ -26,8 +35,23 @@ import { AuthService } from './services/auth.service';
     HelpersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService],
+  providers: [
+    // Models
+    AuthUserModel,
+    ValidationCodeModel,
+    // Mappers
+    AuthMapper,
+    // Services (split)
+    SignupService,
+    SigninService,
+    EmailValidationService,
+    PhoneValidationService,
+    PasswordRecoveryService,
+    TokenService,
+    // Original service (for backwards compatibility, will be refactored)
+    AuthService,
+  ],
+  exports: [AuthService, SignupService, SigninService, EmailValidationService, PhoneValidationService, PasswordRecoveryService, TokenService],
 })
 export class PublicAuthModule {}
 
