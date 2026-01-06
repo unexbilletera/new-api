@@ -6,6 +6,10 @@ import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
 import { NotificationService } from '../../../shared/notifications/notifications.service';
 import { LoggerService } from '../../../shared/logger/logger.service';
+import { EmailService } from '../../../shared/email/email.service';
+import { SmsService } from '../../../shared/sms/sms.service';
+import { AppConfigService } from '../../../shared/config/config.service';
+import { ValidaService } from '../../../shared/valida/valida.service';
 import {
   StartUserOnboardingDto,
   VerifyOnboardingCodeDto,
@@ -21,6 +25,10 @@ export class OnboardingService {
     private prisma: PrismaService,
     private notificationService: NotificationService,
     private logger: LoggerService,
+    private emailService: EmailService,
+    private smsService: SmsService,
+    private appConfigService: AppConfigService,
+    private validaService: ValidaService,
   ) {}
 
   private generateNumericCode(length = 6): string {
@@ -47,15 +55,24 @@ export class OnboardingService {
   }
 
   async startUserOnboarding(dto: StartUserOnboardingDto) {
+    this.logger.info('[ONBOARDING] Starting user onboarding', { email: dto.email });
+
     const email = this.normalizeEmail(dto.email);
+
+    const emailRegex = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    if (!emailRegex.test(email)) {
+      this.logger.warn('[ONBOARDING] Invalid email format', { email });
+      throw new BadRequestException('users.errors.invalidEmail');
+    }
 
     const existingUser = await this.prisma.users.findFirst({ where: { email } });
     if (existingUser) {
-      throw new ConflictException('Email already in use');
+      this.logger.warn('[ONBOARDING] Email already in use', { email, existingUserId: existingUser.id });
+      throw new ConflictException('users.errors.emailAlreadyInUse');
     }
 
     const onboardingState = {
-      completedSteps: ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7'],
+      completedSteps: ['1.1'],
       needsCorrection: [],
     };
 
@@ -72,19 +89,41 @@ export class OnboardingService {
       },
     });
 
+    this.logger.info('[ONBOARDING] User onboarding started successfully', {
+      userId: user.id,
+      email: user.email,
+      completedSteps: onboardingState.completedSteps,
+    });
+
     return {
-      message: 'Onboarding started',
+      success: true,
+      message: 'Onboarding iniciado com sucesso',
       userId: user.id,
       onboardingState,
+      nextStep: 'emailForm',
     };
   }
 
   async verifyOnboardingCode(dto: VerifyOnboardingCodeDto) {
-    const email = this.normalizeEmail(dto.email);
-    const phone = this.normalizePhone(dto.phone);
+    this.logger.info('[ONBOARDING] Verifying code', {
+      type: dto.type,
+      email: dto.email ? this.normalizeEmail(dto.email) : undefined,
+      phone: dto.phone ? this.normalizePhone(dto.phone) : undefined,
+    });
+
+    if (!dto.code || !dto.type) {
+      throw new BadRequestException('users.errors.codeAndTypeRequired');
+    }
+
+    const email = dto.email ? this.normalizeEmail(dto.email) : undefined;
+    const phone = dto.phone ? this.normalizePhone(dto.phone) : undefined;
+
+    if (dto.type === 'email' && !email) {
+      throw new BadRequestException('users.errors.emailRequired');
+    }
 
     if (dto.type === 'phone' && !phone) {
-      throw new BadRequestException('Phone is required for phone verification');
+      throw new BadRequestException('users.errors.phoneRequired');
     }
 
     let user = await this.prisma.users.findFirst({
@@ -92,65 +131,90 @@ export class OnboardingService {
     });
 
     if (!user) {
-      user = await this.prisma.users.create({
-        data: {
-          id: randomUUID(),
-          email,
-          phone: phone || null,
-          username: email ? email.split('@')[0] : undefined,
-          status: 'pending',
-          access: 'user',
-          onboardingState: { completedSteps: [], needsCorrection: [] },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+      this.logger.warn('[ONBOARDING] User not found for code verification', {
+        type: dto.type,
+        email,
+        phone,
       });
+      throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const onboardingState = user.onboardingState || { completedSteps: [], needsCorrection: [] };
+    const onboardingState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
 
     if (dto.type === 'email') {
-      const record = await this.prisma.email_validation_codes.findFirst({
-        where: { email, expiresAt: { gt: new Date() } },
-      });
+      try {
+        this.logger.info('[ONBOARDING] Verifying email code', { userId: user.id, email });
+        await this.emailService.verifyCode(email!, dto.code, true);
 
-      if (!record) {
-        throw new BadRequestException('Code not found or expired');
+        if (!onboardingState.completedSteps.includes('1.2')) {
+          onboardingState.completedSteps.push('1.2');
+        }
+        if (!onboardingState.completedSteps.includes('1.3')) {
+          onboardingState.completedSteps.push('1.3');
+        }
+
+        this.logger.info('[ONBOARDING] Email code verified successfully', {
+          userId: user.id,
+          completedSteps: onboardingState.completedSteps,
+        });
+      } catch (error) {
+        this.logger.error(
+          '[ONBOARDING] Email code verification failed',
+          error instanceof Error ? error : new Error('Email code verification failed'),
+          {
+            userId: user.id,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          },
+        );
+        if (error instanceof Error) {
+          if (error.message.includes('not found') || error.message.includes('expired')) {
+            throw new BadRequestException('users.errors.codeNotFoundOrExpired');
+          }
+          if (error.message.includes('Invalid')) {
+            throw new BadRequestException('users.errors.invalidCode');
+          }
+        }
+        throw error;
       }
-
-      const valid = await this.isCodeValid(dto.code, record.code);
-      if (!valid) {
-        throw new BadRequestException('Invalid code');
-      }
-
-      if (!onboardingState.completedSteps.includes('1.2')) onboardingState.completedSteps.push('1.2');
-      if (!onboardingState.completedSteps.includes('1.3')) onboardingState.completedSteps.push('1.3');
-
-      await this.prisma.email_validation_codes.update({
-        where: { email },
-        data: { verified: true, verifiedAt: new Date(), expiresAt: this.addMinutes(10) },
-      });
     } else {
-      const record = await this.prisma.phone_validation_codes.findFirst({
-        where: { phone: phone!, expiresAt: { gt: new Date() } },
-      });
-
-      if (!record) {
-        throw new BadRequestException('Code not found or expired');
+      if (!phone) {
+        throw new BadRequestException('users.errors.phoneRequired');
       }
 
-      const valid = await this.isCodeValid(dto.code, record.code);
-      if (!valid) {
-        throw new BadRequestException('Invalid code');
+      try {
+        this.logger.info('[ONBOARDING] Verifying phone code', { userId: user.id, phone });
+        await this.smsService.verifyCode(phone, dto.code);
+
+        if (!onboardingState.completedSteps.includes('1.5')) {
+          onboardingState.completedSteps.push('1.5');
+        }
+        if (!onboardingState.completedSteps.includes('1.6')) {
+          onboardingState.completedSteps.push('1.6');
+        }
+
+        this.logger.info('[ONBOARDING] Phone code verified successfully', {
+          userId: user.id,
+          completedSteps: onboardingState.completedSteps,
+        });
+      } catch (error) {
+        this.logger.error(
+          '[ONBOARDING] Phone code verification failed',
+          error instanceof Error ? error : new Error('Phone code verification failed'),
+          {
+            userId: user.id as string,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          },
+        );
+        if (error instanceof Error) {
+          if (error.message.includes('not found') || error.message.includes('expired')) {
+            throw new BadRequestException('users.errors.codeNotFoundOrExpired');
+          }
+          if (error.message.includes('Invalid')) {
+            throw new BadRequestException('users.errors.invalidCode');
+          }
+        }
+        throw error;
       }
-
-      if (!onboardingState.completedSteps.includes('1.5')) onboardingState.completedSteps.push('1.5');
-      if (!onboardingState.completedSteps.includes('1.6')) onboardingState.completedSteps.push('1.6');
-
-      await this.prisma.phone_validation_codes.update({
-        where: { phone: phone! },
-        data: { verified: true, verifiedAt: new Date(), expiresAt: this.addMinutes(10) },
-      });
     }
 
     const updated = await this.prisma.users.update({
@@ -163,20 +227,35 @@ export class OnboardingService {
       },
     });
 
+    let nextStep: string | null = null;
+    if (dto.type === 'email') {
+      nextStep = 'phoneForm';
+    } else {
+      nextStep = 'passwordForm';
+    }
+
     return {
-      message: 'Code verified successfully',
+      success: true,
+      message: 'Código verificado com sucesso',
       userId: updated.id,
       onboardingState: updated.onboardingState,
+      nextStep,
     };
   }
 
   async updateUserOnboarding(userId: string, dto: UpdateUserOnboardingDto) {
+    this.logger.info('[ONBOARDING] Updating user onboarding data', {
+      userId,
+      fields: Object.keys(dto),
+    });
+
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      this.logger.warn('[ONBOARDING] User not found', { userId });
+      throw new NotFoundException('users.errors.userNotFound');
     }
 
     const currentState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
@@ -257,23 +336,44 @@ export class OnboardingService {
     }
 
     if (dto.livenessImage) {
-      dataToUpdate.livenessImage = dto.livenessImage;
-      dataToUpdate.livenessVerifiedAt = new Date();
-      completedStep = '1.11';
-      if (!currentState.completedSteps.includes('1.11')) currentState.completedSteps.push('1.11');
-      if (!currentState.completedSteps.includes('1.12')) currentState.completedSteps.push('1.12');
+      this.logger.info('[ONBOARDING] Processing liveness verification', { userId });
 
-      if (user.email) {
-        await this.notificationService.sendEmail({
-          to: user.email,
-          subject: 'Selfie recebida',
-          text: 'Recebemos sua selfie para verificação de prova de vida.',
+      const validaEnabled = this.appConfigService.isValidaEnabled();
+
+      if (!validaEnabled) {
+        this.logger.info('[ONBOARDING] Using simple photo validation (Valida disabled)', { userId });
+        dataToUpdate.livenessImage = dto.livenessImage;
+        dataToUpdate.livenessVerifiedAt = new Date();
+        completedStep = '1.11';
+        if (!currentState.completedSteps.includes('1.11')) currentState.completedSteps.push('1.11');
+        if (!currentState.completedSteps.includes('1.12')) currentState.completedSteps.push('1.12');
+
+        if (user.email) {
+          await this.notificationService.sendEmail({
+            to: user.email,
+            subject: 'Selfie recebida',
+            text: 'Recebemos sua selfie para verificação de prova de vida.',
+          });
+        }
+
+        this.logger.info('[ONBOARDING] Simple liveness verification completed', { userId });
+      } else {
+        this.logger.info('[ONBOARDING] Valida enabled - liveness should be processed via /api/users/user/liveness', {
+          userId,
         });
       }
     }
 
     if (completedStep && !currentState.completedSteps.includes(completedStep)) {
       currentState.completedSteps.push(completedStep);
+    }
+
+    const requiredUserSteps = ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '1.10', '1.11', '1.12'];
+    const allUserStepsCompleted = requiredUserSteps.every((step) => currentState.completedSteps.includes(step));
+
+    if (allUserStepsCompleted && !currentState.completedSteps.includes('1.13')) {
+      currentState.completedSteps.push('1.13');
+      this.logger.info('[ONBOARDING] All user onboarding steps completed', { userId });
     }
 
     dataToUpdate.onboardingState = currentState;
@@ -290,7 +390,18 @@ export class OnboardingService {
       },
     });
 
-    return { user: updated };
+    this.logger.info('[ONBOARDING] User onboarding data updated successfully', {
+      userId,
+      completedStep,
+      totalCompletedSteps: currentState.completedSteps.length,
+    });
+
+    return {
+      success: true,
+      message: 'Dados atualizados com sucesso',
+      user: updated,
+      onboardingState: updated.onboardingState,
+    };
   }
 
   async startIdentityOnboarding(userId: string, dto: StartIdentityOnboardingDto) {
