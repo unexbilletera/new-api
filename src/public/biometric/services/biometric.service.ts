@@ -10,6 +10,7 @@ const bcrypt = require('bcrypt');
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { JwtService, JwtPayload } from '../../../shared/jwt/jwt.service';
 import { NotificationService } from '../../../shared/notifications/notifications.service';
+import { SmsService } from '../../../shared/sms/sms.service';
 import {
   GenerateChallengeDto,
   VerifySignatureDto,
@@ -29,6 +30,7 @@ export class BiometricService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private notificationService: NotificationService,
+    private smsService: SmsService,
   ) {}
 
   private getChallengeTTLSeconds(): number {
@@ -401,38 +403,25 @@ export class BiometricService {
       throw new NotFoundException('auth.errors.deviceNotFoundOrNotPending');
     }
 
-    const normalizedPhone = (user.phone || '').replace(/\D/g, '');
-    const code = process.env.NODE_ENV === 'development' ? '111111' : this.generateNumericCode(6);
-    const hashedCode = await bcrypt.hash(code, 10);
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-    await this.prisma.phone_validation_codes.upsert({
-      where: { phone: normalizedPhone },
-      update: {
-        code: hashedCode,
-        method: 'sms',
-        verified: false,
-        expiresAt,
-      },
-      create: {
-        id: randomUUID(),
-        phone: normalizedPhone,
-        code: hashedCode,
-        method: 'sms',
-        expiresAt,
-      },
-    });
-
-    if (process.env.NODE_ENV !== 'development') {
-      await this.notificationService.sendPhoneVerificationCode(normalizedPhone, code, 5);
+    if (!user.phone) {
+      throw new BadRequestException('users.errors.phoneRequired');
     }
 
+    // Usa serviço centralizado de SMS
+    const result = await this.smsService.sendValidationCode(
+      user.phone,
+      6, // codeLength
+      5, // expiresInMinutes
+      'sms', // method
+      user.language || undefined, // language
+    );
+
     return {
-      success: true,
-      message: 'SMS validation code sent',
-      phone: normalizedPhone,
-      expiresIn: 300,
-      debug: process.env.NODE_ENV === 'development' ? code : undefined,
+      success: result.success,
+      message: result.message,
+      phone: result.phone,
+      expiresIn: result.expiresIn,
+      debug: result.debug, // Código apenas em modo mock
     };
   }
 
@@ -451,40 +440,49 @@ export class BiometricService {
       throw new NotFoundException('auth.errors.deviceNotFoundOrNotPending');
     }
 
-    const normalizedPhone = (user.phone || '').replace(/\D/g, '');
-    const validationRecord = await this.prisma.phone_validation_codes.findFirst({
-      where: { phone: normalizedPhone, expiresAt: { gt: new Date() } },
-    });
-
-    if (!validationRecord) {
-      throw new BadRequestException('auth.errors.codeNotFound');
+    if (!user.phone) {
+      throw new BadRequestException('users.errors.phoneRequired');
     }
 
-    const isValid = await bcrypt.compare(code, validationRecord.code);
-    if (!isValid) {
-      throw new UnauthorizedException('auth.errors.invalidSmsCode');
+    try {
+      // Usa serviço centralizado de SMS para validação
+      await this.smsService.verifyCode(user.phone, code, false); // Não estende expiração
+
+      // Revoga outros dispositivos ativos
+      await this.prisma.devices.updateMany({
+        where: { userId, status: 'active' },
+        data: { status: 'revoked', revokedAt: new Date() },
+      });
+
+      // Ativa dispositivo atual
+      await this.prisma.devices.update({
+        where: { id: device.id },
+        data: { status: 'active' },
+      });
+
+      // Remove código usado
+      const normalizedPhone = this.smsService.normalizePhone(user.phone);
+      await this.prisma.phone_validation_codes.deleteMany({
+        where: { phone: normalizedPhone },
+      });
+
+      return {
+        success: true,
+        message: 'Device activated successfully',
+        deviceId: device.id,
+        status: 'active',
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Code not found or expired') {
+          throw new BadRequestException('auth.errors.codeNotFound');
+        }
+        if (error.message === 'Invalid code') {
+          throw new UnauthorizedException('auth.errors.invalidSmsCode');
+        }
+      }
+      throw error;
     }
-
-    await this.prisma.devices.updateMany({
-      where: { userId, status: 'active' },
-      data: { status: 'revoked', revokedAt: new Date() },
-    });
-
-    await this.prisma.devices.update({
-      where: { id: device.id },
-      data: { status: 'active' },
-    });
-
-    await this.prisma.phone_validation_codes.deleteMany({
-      where: { phone: normalizedPhone },
-    });
-
-    return {
-      success: true,
-      message: 'Device activated successfully',
-      deviceId: device.id,
-      status: 'active',
-    };
   }
 
   async revokeDevice(userId: string, dto: RevokeDeviceDto) {
