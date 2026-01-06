@@ -1,0 +1,141 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { PrismaService } from '../../../shared/prisma/prisma.service';
+
+@Injectable()
+export class DeviceModel {
+  constructor(private prisma: PrismaService) {}
+
+  // User operations
+  async findUserById(userId: string) {
+    return this.prisma.users.findUnique({
+      where: { id: userId },
+    });
+  }
+
+  // Device operations
+  async findDeviceByUserAndIdentifier(userId: string, deviceIdentifier: string) {
+    return this.prisma.devices.findFirst({
+      where: { userId, deviceIdentifier },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findDeviceByIdAndUser(deviceId: string, userId: string, status?: string) {
+    const where: any = { id: deviceId, userId };
+    if (status) {
+      where.status = status;
+    }
+    return this.prisma.devices.findFirst({ where });
+  }
+
+  async findActiveDeviceByUserAndIdentifier(userId: string, deviceIdentifier: string) {
+    return this.prisma.devices.findFirst({
+      where: { userId, deviceIdentifier, status: 'active' },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findPendingDevice(deviceId: string, userId: string) {
+    return this.prisma.devices.findFirst({
+      where: { id: deviceId, userId, status: 'pending' },
+    });
+  }
+
+  async findActiveDevicesByUser(userId: string) {
+    return this.prisma.devices.findMany({
+      where: { userId, status: { not: 'revoked' } },
+      select: {
+        id: true,
+        deviceIdentifier: true,
+        keyType: true,
+        platform: true,
+        status: true,
+        createdAt: true,
+        lastUsedAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createDevice(data: {
+    userId: string;
+    deviceIdentifier: string;
+    publicKeyPem: string;
+    keyType: string;
+    platform: string;
+    attestation?: string | null;
+    status: string;
+  }) {
+    return this.prisma.devices.create({
+      data: {
+        id: randomUUID(),
+        ...data,
+      },
+    });
+  }
+
+  async updateDevice(deviceId: string, data: any) {
+    return this.prisma.devices.update({
+      where: { id: deviceId },
+      data,
+    });
+  }
+
+  async updateDevicesByUserStatus(userId: string, currentStatus: string, newStatus: string, revokedAt?: Date) {
+    return this.prisma.devices.updateMany({
+      where: { userId, status: currentStatus },
+      data: { status: newStatus, ...(revokedAt && { revokedAt }) },
+    });
+  }
+
+  // Challenge operations
+  async findChallengeById(challengeId: string) {
+    return this.prisma.challenges.findUnique({
+      where: { id: challengeId },
+    });
+  }
+
+  async createChallenge(data: {
+    userId: string;
+    deviceId: string;
+    challenge: string;
+    expiresAt: Date;
+  }) {
+    return this.prisma.challenges.create({
+      data: {
+        id: randomUUID(),
+        ...data,
+      },
+    });
+  }
+
+  async updateChallenge(challengeId: string, data: any) {
+    return this.prisma.challenges.update({
+      where: { id: challengeId },
+      data,
+    });
+  }
+
+  async invalidateChallengesByDevice(deviceId: string) {
+    return this.prisma.challenges.updateMany({
+      where: { deviceId, used: false },
+      data: { used: true, usedAt: new Date() },
+    });
+  }
+
+  // Phone validation codes
+  async deletePhoneValidationCodes(phone: string) {
+    return this.prisma.phone_validation_codes.deleteMany({
+      where: { phone },
+    });
+  }
+
+  // User updates
+  async updateUserAccessToken(userId: string, accessToken: string) {
+    return this.prisma.users.update({
+      where: { id: userId },
+      data: { accessToken },
+    });
+  }
+}

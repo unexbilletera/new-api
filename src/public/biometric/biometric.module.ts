@@ -5,11 +5,32 @@ import { NotificationsModule } from '../../shared/notifications/notifications.mo
 import { SmsModule } from '../../shared/sms/sms.module';
 import { BiometricController } from './controllers/biometric.controller';
 import { BiometricService } from './services/biometric.service';
+import { DeviceModel } from './models/device.model';
+import { BiometricMapper } from './mappers/biometric.mapper';
+import { DeviceRegistrationService } from './services/device-registration.service';
+import { ChallengeVerificationService } from './services/challenge-verification.service';
+import { DeviceManagementService } from './services/device-management.service';
 
 @Module({
   imports: [PrismaModule, JwtModule, NotificationsModule, SmsModule],
   controllers: [BiometricController],
-  providers: [BiometricService],
-  exports: [BiometricService],
+  providers: [
+    // Models
+    DeviceModel,
+    // Mappers
+    BiometricMapper,
+    // Services (split)
+    DeviceRegistrationService,
+    ChallengeVerificationService,
+    DeviceManagementService,
+    // Original service (for backwards compatibility)
+    BiometricService,
+  ],
+  exports: [
+    BiometricService,
+    DeviceRegistrationService,
+    ChallengeVerificationService,
+    DeviceManagementService,
+  ],
 })
 export class BiometricModule {}
