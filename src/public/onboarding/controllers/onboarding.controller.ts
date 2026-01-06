@@ -1,4 +1,4 @@
-import { Controller, Post, Patch, Get, Body, Param } from '@nestjs/common';
+import { Controller, Post, Patch, Get, Body, Param, UseGuards } from '@nestjs/common';
 import { OnboardingService } from '../services/onboarding.service';
 import { AuthService } from '../../auth/services/auth.service';
 import { SendEmailValidationDto } from '../../auth/dto/email-validation.dto';
@@ -11,6 +11,8 @@ import {
   UpdateIdentityOnboardingDto,
   UploadArgentinaDocumentDto,
 } from '../dto/onboarding.dto';
+import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 @Controller('api/onboarding')
 export class OnboardingController {
   constructor(
@@ -65,26 +67,44 @@ export class OnboardingController {
 export class UserOnboardingController {
   constructor(private onboardingService: OnboardingService) {}
   @Get('user/onboarding/pending-data/:userIdentityId')
-  async getPendingData(@Param('userIdentityId') userIdentityId: string) {
+  @UseGuards(AuthGuard)
+  async getPendingData(
+    @CurrentUser('id') userId: string,
+    @Param('userIdentityId') userIdentityId: string,
+  ) {
     return this.onboardingService.getOnboardingPendingData(userIdentityId);
   }
   @Post('user/onboarding/update-specific-data/:userIdentityId')
+  @UseGuards(AuthGuard)
   async updateSpecificData(
+    @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
     @Body() dto: any,
   ) {
     return this.onboardingService.updateOnboardingSpecificData(userIdentityId, dto);
   }
   @Get('user/onboarding/status/:userIdentityId')
-  async getStatus(@Param('userIdentityId') userIdentityId: string) {
+  @UseGuards(AuthGuard)
+  async getStatus(
+    @CurrentUser('id') userId: string,
+    @Param('userIdentityId') userIdentityId: string,
+  ) {
     return this.onboardingService.getOnboardingStatus(userIdentityId);
   }
   @Get('user/onboarding/validate/:userIdentityId')
-  async validate(@Param('userIdentityId') userIdentityId: string) {
+  @UseGuards(AuthGuard)
+  async validate(
+    @CurrentUser('id') userId: string,
+    @Param('userIdentityId') userIdentityId: string,
+  ) {
     return this.onboardingService.validateOnboardingData(userIdentityId);
   }
   @Post('user/onboarding/retry/:userIdentityId')
-  async retry(@Param('userIdentityId') userIdentityId: string) {
+  @UseGuards(AuthGuard)
+  async retry(
+    @CurrentUser('id') userId: string,
+    @Param('userIdentityId') userIdentityId: string,
+  ) {
     return this.onboardingService.retryOnboarding(userIdentityId);
   }
 }
