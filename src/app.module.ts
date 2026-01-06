@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppService } from './app/services/app.service';
+import { AppModel } from './app/models/app.model';
+import { AppMapper } from './app/mappers/app.mapper';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { JwtModule } from './shared/jwt/jwt.module';
 import { LoggerModule } from './shared/logger/logger.module';
@@ -41,6 +43,6 @@ import { HealthModule } from './health/health.module';
     WebhooksModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppModel, AppMapper],
 })
 export class AppModule {}
