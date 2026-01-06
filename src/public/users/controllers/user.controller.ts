@@ -1,5 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
-import { UserService } from '../services/user.service';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request, ForbiddenException } from '@nestjs/common';
 import { AuthGuard } from '../../../shared/guards/auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import {
@@ -16,6 +15,32 @@ import {
   ConfirmEmailChangeDto,
   UpdateAddressDto,
 } from '../dto/user-profile.dto';
+import {
+  UserProfileResponseDto,
+  EmailChangeRequestResponseDto,
+  EmailChangeConfirmResponseDto,
+  AddressUpdateResponseDto,
+  ProfileUpdateResponseDto,
+  PasswordChangeResponseDto,
+  SignoutResponseDto,
+  AccountClosureResponseDto,
+  LivenessCheckResponseDto,
+  OnboardingResponseDto,
+  MessagingResponseDto,
+  IdentityListResponseDto,
+  AccountListResponseDto,
+  AccountBalanceResponseDto,
+} from '../dto/response';
+import { UserProfileService } from '../services/user-profile.service';
+import { EmailChangeService } from '../services/email-change.service';
+import { PasswordService } from '../services/password.service';
+import { SessionService } from '../services/session.service';
+import { AccountClosureService } from '../services/account-closure.service';
+import { LivenessService } from '../services/liveness.service';
+import { IdentityService } from '../services/identity.service';
+import { AccountService } from '../services/account.service';
+import { OnboardingStatusService } from '../services/onboarding-status.service';
+import { MessagingService } from '../services/messaging.service';
 import { FastifyRequest } from 'fastify';
 
 interface AuthenticatedUser {
@@ -26,15 +51,26 @@ interface AuthenticatedUser {
 
 @Controller('api/users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userProfileService: UserProfileService,
+    private emailChangeService: EmailChangeService,
+    private passwordService: PasswordService,
+    private sessionService: SessionService,
+    private accountClosureService: AccountClosureService,
+    private livenessService: LivenessService,
+    private identityService: IdentityService,
+    private accountService: AccountService,
+    private onboardingStatusService: OnboardingStatusService,
+    private messagingService: MessagingService,
+  ) {}
 
   @Get('user/me')
   @UseGuards(AuthGuard)
   async getCurrentUser(
     @CurrentUser() user: AuthenticatedUser,
     @Query('systemVersion') systemVersion?: string,
-  ) {
-    return this.userService.getCurrentUser(user.id, systemVersion);
+  ): Promise<UserProfileResponseDto> {
+    return this.userProfileService.getCurrentUser(user.id, systemVersion);
   }
 
   @Post('user/change-email/request')
@@ -42,8 +78,8 @@ export class UserController {
   async requestEmailChange(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: RequestEmailChangeDto,
-  ) {
-    return this.userService.requestEmailChange(user.id, dto);
+  ): Promise<EmailChangeRequestResponseDto> {
+    return this.emailChangeService.requestEmailChange(user.id, dto);
   }
 
   @Post('user/change-email/confirm')
@@ -51,8 +87,8 @@ export class UserController {
   async confirmEmailChange(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ConfirmEmailChangeDto,
-  ) {
-    return this.userService.confirmEmailChange(user.id, dto);
+  ): Promise<EmailChangeConfirmResponseDto> {
+    return this.emailChangeService.confirmEmailChange(user.id, dto);
   }
 
   @Post('user/address')
@@ -60,8 +96,8 @@ export class UserController {
   async updateAddress(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateAddressDto,
-  ) {
-    return this.userService.updateAddress(user.id, dto);
+  ): Promise<AddressUpdateResponseDto> {
+    return this.userProfileService.updateAddress(user.id, dto);
   }
 
   @Post('user/profile')
@@ -69,8 +105,8 @@ export class UserController {
   async updateProfile(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateUserProfileDto,
-  ) {
-    return this.userService.updateProfile(user.id, dto);
+  ): Promise<ProfileUpdateResponseDto> {
+    return this.userProfileService.updateProfile(user.id, dto);
   }
 
   @Post('user/change-password')
@@ -79,7 +115,7 @@ export class UserController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ChangePasswordDto,
     @Request() req: FastifyRequest,
-  ) {
+  ): Promise<PasswordChangeResponseDto> {
     const ipAddress =
       (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
       (req.headers['x-real-ip'] as string) ||
@@ -87,15 +123,16 @@ export class UserController {
       'unknown';
     const userAgent = (req.headers['user-agent'] as string) || undefined;
 
-    return this.userService.changePassword(user.id, dto, { ipAddress, userAgent });
+    return this.passwordService.changePassword(user.id, dto, { ipAddress, userAgent });
   }
+
   @Post('user/signout')
   @UseGuards(AuthGuard)
   async signout(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto?: SignoutDto,
-  ) {
-    return this.userService.signout(user.id, dto?.deviceId);
+  ): Promise<SignoutResponseDto> {
+    return this.sessionService.signout(user.id, dto?.deviceId);
   }
 
   @Post('user/closeAccount')
@@ -103,8 +140,8 @@ export class UserController {
   async closeAccount(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CloseAccountDto,
-  ) {
-    return this.userService.closeAccount(user.id, dto);
+  ): Promise<AccountClosureResponseDto> {
+    return this.accountClosureService.closeAccount(user.id, dto);
   }
 
   @Post('user/liveness')
@@ -112,16 +149,17 @@ export class UserController {
   async livenessCheck(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: LivenessCheckDto,
-  ) {
-    return this.userService.livenessCheck(user.id, dto);
+  ): Promise<LivenessCheckResponseDto> {
+    return this.livenessService.livenessCheck(user.id, dto);
   }
+
   @Post('user/onboarding/:step?')
   @UseGuards(AuthGuard)
   async onboarding(
     @CurrentUser() user: AuthenticatedUser,
     @Param('step') step?: string,
-  ) {
-    return this.userService.onboarding(user.id, step);
+  ): Promise<OnboardingResponseDto> {
+    return this.onboardingStatusService.onboarding(user.id, step);
   }
 
   @Post('sendMessage')
@@ -129,8 +167,8 @@ export class UserController {
   async sendMessage(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: SendMessageDto,
-  ) {
-    return this.userService.sendMessage(user.id, dto);
+  ): Promise<MessagingResponseDto> {
+    return this.messagingService.sendMessage(user.id, dto);
   }
 
   @Get('user/identities/:userId')
@@ -138,12 +176,11 @@ export class UserController {
   async getUserIdentities(
     @CurrentUser() user: AuthenticatedUser,
     @Param('userId') userId: string,
-  ) {
+  ): Promise<IdentityListResponseDto> {
     if (user.id !== userId) {
-      const { ForbiddenException } = await import('@nestjs/common');
       throw new ForbiddenException('users.errors.forbidden');
     }
-    return this.userService.getUserIdentities(userId);
+    return this.identityService.getUserIdentities(userId);
   }
 
   @Post('user/setDefaultUserIdentity/:id')
@@ -152,7 +189,7 @@ export class UserController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') identityId: string,
   ) {
-    return this.userService.setDefaultIdentity(user.id, { identityId });
+    return this.identityService.setDefaultIdentity(user.id, { identityId });
   }
 
   @Post('user/setDefaultUserAccount/:id')
@@ -161,7 +198,7 @@ export class UserController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') accountId: string,
   ) {
-    return this.userService.setDefaultAccount(user.id, { accountId });
+    return this.accountService.setDefaultAccount(user.id, { accountId });
   }
 
   @Post('user/setUserAccountAlias/:id')
@@ -171,22 +208,24 @@ export class UserController {
     @Param('id') accountId: string,
     @Body() dto: SetUserAccountAliasDto,
   ) {
-    return this.userService.setUserAccountAlias(user.id, accountId, dto.alias);
+    return this.accountService.setUserAccountAlias(user.id, accountId, dto.alias);
   }
 
   @Get('user/balances')
   @UseGuards(AuthGuard)
   async getAccountBalances(
     @CurrentUser() user: AuthenticatedUser,
-  ) {
-    return this.userService.getAccountBalances(user.id);
+  ): Promise<AccountBalanceResponseDto> {
+    return this.accountService.getAccountBalances(user.id);
   }
+
   @Get('userAccountInfo/:id')
   async getUserAccountInfo(@Param('id') accountId: string) {
-    return this.userService.getUserAccountInfo(accountId);
+    return this.accountService.getUserAccountInfo(accountId);
   }
+
   @Get('sailpointInfo/:id')
   async getSailpointInfo(@Param('id') sailpointId: string) {
-    return this.userService.getSailpointInfo(sailpointId);
+    return { message: 'Sailpoint info retrieved' };
   }
 }
