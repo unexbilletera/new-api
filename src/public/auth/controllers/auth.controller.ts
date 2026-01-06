@@ -44,8 +44,10 @@ export class AuthController {
     return this.authService.verifyPassword(dto);
   }
   @Post('user/unlock')
-  async unlock(@Body() dto: UnlockAccountDto) {
-    return this.authService.unlockAccount(dto);
+  async unlock(@Body() dto: UnlockAccountDto, @Req() req: Request) {
+    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+    return this.authService.unlockAccount(dto, { ipAddress, userAgent });
   }
 }
 @Controller('api/security')
