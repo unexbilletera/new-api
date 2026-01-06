@@ -8,6 +8,7 @@ import { JwtModule } from '../../shared/jwt/jwt.module';
 import { AccessLogModule } from '../../shared/access-log/access-log.module';
 import { CronosModule } from '../../shared/cronos/cronos.module';
 import { ExchangeModule } from '../../shared/exchange/exchange.module';
+import { HelpersModule } from '../../shared/helpers/helpers.module';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 
@@ -22,6 +23,7 @@ import { AuthService } from './services/auth.service';
     AccessLogModule,
     CronosModule,
     ExchangeModule,
+    HelpersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
