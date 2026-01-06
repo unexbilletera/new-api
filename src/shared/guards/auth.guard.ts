@@ -5,7 +5,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
-import { JwtService } from '../jwt/jwt.service';@Injectable()
+import { JwtService } from '../jwt/jwt.service';
+
+@Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
