@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { JwtModule } from './shared/jwt/jwt.module';
 import { LoggerModule } from './shared/logger/logger.module';
+import { AppConfigModule } from './shared/config/config.module';
 
 import { PublicAuthModule } from './public/auth/auth.module';
 import { PublicOnboardingModule } from './public/onboarding/onboarding.module';
@@ -23,6 +24,7 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
+    AppConfigModule,
     LoggerModule,
     PrismaModule,
     JwtModule,
