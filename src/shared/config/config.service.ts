@@ -23,7 +23,6 @@ export class AppConfigService implements OnModuleInit {
   }
 
   onModuleInit() {
-    this.logEnvironmentInfo();
   }
 
   private loadConfig(): AppConfig {
@@ -31,20 +30,25 @@ export class AppConfigService implements OnModuleInit {
     const isProduction = nodeEnv === 'production';
     const isDevelopment = nodeEnv === 'development';
     const isStaging = nodeEnv === 'staging';
+    const environment: EnvironmentConfig = {
+      nodeEnv,
+      environmentName: this.getEnvironmentName(nodeEnv),
+      isProduction,
+      isDevelopment,
+      isStaging,
+    };
+    const mock = this.loadMockConfig();
+    const sandbox = this.loadSandboxConfig(environment);
+    const smsMock = this.loadSmsMockConfig(mock, sandbox, environment);
+    const emailMock = this.loadEmailMockConfig(mock, environment);
 
     return {
-      mock: this.loadMockConfig(),
-      smsMock: this.loadSmsMockConfig(),
-      emailMock: this.loadEmailMockConfig(),
+      mock,
+      smsMock,
+      emailMock,
       valida: this.loadValidaConfig(),
-      sandbox: this.loadSandboxConfig(),
-      environment: {
-        nodeEnv,
-        environmentName: this.getEnvironmentName(nodeEnv),
-        isProduction,
-        isDevelopment,
-        isStaging,
-      },
+      sandbox,
+      environment,
     };
   }
 
@@ -60,10 +64,14 @@ export class AppConfigService implements OnModuleInit {
     };
   }
 
-  private loadSmsMockConfig(): SmsMockConfig {
-    const mockCodesEnabled = this.getMockConfig().enableCodes;
-    const sandboxEnabled = this.getSandboxConfig().enable;
-    const nodeEnv = this.getEnvironmentConfig().nodeEnv;
+  private loadSmsMockConfig(
+    mock: MockConfig,
+    sandbox: SandboxConfig,
+    environment: EnvironmentConfig,
+  ): SmsMockConfig {
+    const mockCodesEnabled = mock.enableCodes;
+    const sandboxEnabled = sandbox.enable;
+    const nodeEnv = environment.nodeEnv;
 
     const enabled = mockCodesEnabled || sandboxEnabled || nodeEnv !== 'production';
 
@@ -73,9 +81,12 @@ export class AppConfigService implements OnModuleInit {
     };
   }
 
-  private loadEmailMockConfig(): EmailMockConfig {
-    const mockCodesEnabled = this.getMockConfig().enableCodes;
-    const nodeEnv = this.getEnvironmentConfig().nodeEnv;
+  private loadEmailMockConfig(
+    mock: MockConfig,
+    environment: EnvironmentConfig,
+  ): EmailMockConfig {
+    const mockCodesEnabled = mock.enableCodes;
+    const nodeEnv = environment.nodeEnv;
 
     const enabled = mockCodesEnabled || nodeEnv !== 'production';
 
@@ -106,11 +117,11 @@ export class AppConfigService implements OnModuleInit {
     };
   }
 
-  private loadSandboxConfig(): SandboxConfig {
+  private loadSandboxConfig(environment: EnvironmentConfig): SandboxConfig {
     return {
       enable:
         this.configService.get<string>('WALLET_SANDBOX', '') === 'enable' ||
-        this.configService.get<string>('NODE_ENV', '') !== 'production',
+        environment.nodeEnv !== 'production',
       userId: '00000000-0000-0000-0000-000000000000',
       skipSecurity: this.configService.get<string>('WALLET_SANDBOX_SKIP_SECURITY', '') === 'enable',
       sendPush: this.configService.get<string>('WALLET_SANDBOX_SEND_PUSH', '') === 'enable',
@@ -126,66 +137,6 @@ export class AppConfigService implements OnModuleInit {
     };
 
     return envMap[nodeEnv] || `📦 ${nodeEnv.toUpperCase()}`;
-  }
-
-  private logEnvironmentInfo(): void {
-    const env = this.getEnvironmentConfig();
-    const mock = this.getMockConfig();
-    const smsMock = this.getSmsMockConfig();
-    const emailMock = this.getEmailMockConfig();
-    const valida = this.getValidaConfig();
-    const sandbox = this.getSandboxConfig();
-
-    this.logger.info('═══════════════════════════════════════════════════════════');
-    this.logger.info(`Environment: ${env.environmentName}`);
-    this.logger.info(`NODE_ENV: ${env.nodeEnv}`);
-    this.logger.info('═══════════════════════════════════════════════════════════');
-
-    if (mock.enableCodes) {
-      this.logger.warn('🔧 MOCK CODES: ENABLED');
-      this.logger.warn(`   - Código 6 dígitos: ${mock.code6Digits}`);
-      this.logger.warn(`   - Código 8 dígitos: ${mock.code8Digits}`);
-    } else {
-      this.logger.info('✅ MOCK CODES: DISABLED');
-    }
-
-    if (smsMock.enabled) {
-      this.logger.warn('📱 SMS MOCK: ENABLED (SMS não será enviado)');
-    } else {
-      this.logger.info('✅ SMS MOCK: DISABLED (SMS será enviado)');
-    }
-
-    if (emailMock.enabled) {
-      this.logger.warn('📧 EMAIL MOCK: ENABLED (Email não será enviado)');
-    } else {
-      this.logger.info('✅ EMAIL MOCK: DISABLED (Email será enviado)');
-    }
-
-    if (valida.enable) {
-      this.logger.info('🔐 VALIDA: ENABLED');
-      if (valida.logging) {
-        this.logger.info('   - Logging: ENABLED');
-      }
-    } else {
-      this.logger.info('⚪ VALIDA: DISABLED');
-    }
-
-    if (sandbox.enable) {
-      this.logger.warn('🧪 SANDBOX MODE: ENABLED');
-      if (sandbox.skipSecurity) {
-        this.logger.warn('   - Skip Security: ENABLED');
-      }
-      if (sandbox.sendPush) {
-        this.logger.info('   - Send Push: ENABLED');
-      }
-      if (sandbox.sendMail) {
-        this.logger.info('   - Send Mail: ENABLED');
-      }
-    } else {
-      this.logger.info('✅ SANDBOX MODE: DISABLED');
-    }
-
-    this.logger.info('═══════════════════════════════════════════════════════════');
   }
 
   getConfig(): AppConfig {
