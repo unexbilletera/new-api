@@ -407,13 +407,12 @@ export class BiometricService {
       throw new BadRequestException('users.errors.phoneRequired');
     }
 
-    // Usa serviço centralizado de SMS
     const result = await this.smsService.sendValidationCode(
       user.phone,
-      6, // codeLength
-      5, // expiresInMinutes
-      'sms', // method
-      user.language || undefined, // language
+      6,
+      5,
+      'sms',
+      user.language || undefined,
     );
 
     return {
@@ -421,7 +420,7 @@ export class BiometricService {
       message: result.message,
       phone: result.phone,
       expiresIn: result.expiresIn,
-      debug: result.debug, // Código apenas em modo mock
+      debug: result.debug,
     };
   }
 
@@ -445,22 +444,18 @@ export class BiometricService {
     }
 
     try {
-      // Usa serviço centralizado de SMS para validação
-      await this.smsService.verifyCode(user.phone, code, false); // Não estende expiração
+      await this.smsService.verifyCode(user.phone, code, false);
 
-      // Revoga outros dispositivos ativos
       await this.prisma.devices.updateMany({
         where: { userId, status: 'active' },
         data: { status: 'revoked', revokedAt: new Date() },
       });
 
-      // Ativa dispositivo atual
       await this.prisma.devices.update({
         where: { id: device.id },
         data: { status: 'active' },
       });
 
-      // Remove código usado
       const normalizedPhone = this.smsService.normalizePhone(user.phone);
       await this.prisma.phone_validation_codes.deleteMany({
         where: { phone: normalizedPhone },
