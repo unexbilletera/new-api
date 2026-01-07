@@ -6,14 +6,12 @@ import { PrismaService } from '../../../shared/prisma/prisma.service';
 export class DeviceModel {
   constructor(private prisma: PrismaService) {}
 
-  // User operations
   async findUserById(userId: string) {
     return this.prisma.users.findUnique({
       where: { id: userId },
     });
   }
 
-  // Device operations
   async findDeviceByUserAndIdentifier(userId: string, deviceIdentifier: string) {
     return this.prisma.devices.findFirst({
       where: { userId, deviceIdentifier },
@@ -89,7 +87,6 @@ export class DeviceModel {
     });
   }
 
-  // Challenge operations
   async findChallengeById(challengeId: string) {
     return this.prisma.challenges.findUnique({
       where: { id: challengeId },
@@ -124,14 +121,12 @@ export class DeviceModel {
     });
   }
 
-  // Phone validation codes
   async deletePhoneValidationCodes(phone: string) {
     return this.prisma.phone_validation_codes.deleteMany({
       where: { phone },
     });
   }
 
-  // User updates
   async updateUserAccessToken(userId: string, accessToken: string) {
     return this.prisma.users.update({
       where: { id: userId },

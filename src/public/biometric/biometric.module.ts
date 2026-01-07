@@ -15,15 +15,11 @@ import { DeviceManagementService } from './services/device-management.service';
   imports: [PrismaModule, JwtModule, NotificationsModule, SmsModule],
   controllers: [BiometricController],
   providers: [
-    // Models
     DeviceModel,
-    // Mappers
     BiometricMapper,
-    // Services (split)
     DeviceRegistrationService,
     ChallengeVerificationService,
     DeviceManagementService,
-    // Original service (for backwards compatibility)
     BiometricService,
   ],
   exports: [
