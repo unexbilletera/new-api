@@ -153,13 +153,21 @@ export class UserController {
     return this.livenessService.livenessCheck(user.id, dto);
   }
 
-  @Post('user/onboarding/:step?')
+  @Post('user/onboarding/:step')
+  @UseGuards(AuthGuard)
+  async onboardingWithStep(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('step') step: string,
+  ): Promise<OnboardingResponseDto> {
+    return this.onboardingStatusService.onboarding(user.id, step);
+  }
+
+  @Post('user/onboarding')
   @UseGuards(AuthGuard)
   async onboarding(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('step') step?: string,
   ): Promise<OnboardingResponseDto> {
-    return this.onboardingStatusService.onboarding(user.id, step);
+    return this.onboardingStatusService.onboarding(user.id, undefined);
   }
 
   @Post('sendMessage')
