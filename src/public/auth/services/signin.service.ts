@@ -28,7 +28,6 @@ export class SigninService {
   }
 
   async signin(dto: SigninDto, requestContext?: { ipAddress?: string; userAgent?: string }) {
-    // Validate system version
     try {
       this.systemVersionService.assertVersionValid(dto.systemVersion);
     } catch (versionError) {
@@ -37,14 +36,12 @@ export class SigninService {
       );
     }
 
-    // Get identifier (email or username)
     const identifier = (dto.identifier || (dto as any).email || '').trim();
 
     if (!identifier) {
       throw new BadRequestException('users.errors.invalidUsername');
     }
 
-    // Validate identifier format
     const usernameRegex = /^[A-Za-z0-9]{1,}[\-\_\.]?[A-Za-z0-9]{4,}$/;
     const emailRegex = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
@@ -56,7 +53,6 @@ export class SigninService {
       throw new BadRequestException('users.errors.invalidUsername');
     }
 
-    // Find user by identifier
     const where = identifier.includes('@')
       ? { email: this.normalizeEmail(identifier) }
       : { username: identifier.toLowerCase() };
@@ -91,7 +87,6 @@ export class SigninService {
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
-    // Validate password
     const isPasswordValid = await PasswordHelper.compare(dto.password, user.password);
 
     if (!isPasswordValid) {
@@ -103,7 +98,6 @@ export class SigninService {
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
-    // Check device requirement
     let deviceRequired = false;
     if (dto.deviceIdentifier) {
       const activeDevice = await this.prisma.devices.findFirst({
@@ -117,7 +111,6 @@ export class SigninService {
       deviceRequired = !anyActiveDevice;
     }
 
-    // Generate temp token if device required
     if (deviceRequired) {
       const tempPayload: JwtPayload = {
         userId: user.id,
@@ -128,7 +121,6 @@ export class SigninService {
       return this.authMapper.toSigninDeviceRequiredResponseDto(user, tempToken, 'hard');
     }
 
-    // Sync Cronos balance (non-blocking)
     try {
       const userIdentities = await this.userModel.getUserIdentities(user.id);
       const userAccounts = await this.userModel.getUserAccounts(user.id);
@@ -151,17 +143,14 @@ export class SigninService {
       this.logger.warn('Cronos sync error (non-blocking)', { error: syncError?.message });
     }
 
-    // Log success
     await this.accessLogService.logSuccess({
       userId: user.id,
       ipAddress: requestContext?.ipAddress,
       userAgent: requestContext?.userAgent,
     });
 
-    // Update last login
     await this.userModel.updateLastLogin(user.id);
 
-    // Generate JWT
     const payload: JwtPayload = {
       userId: user.id,
       email: user.email || identifier,

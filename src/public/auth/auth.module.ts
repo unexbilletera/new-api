@@ -36,19 +36,15 @@ import { AuthMapper } from './mappers/auth.mapper';
   ],
   controllers: [AuthController],
   providers: [
-    // Models
     AuthUserModel,
     ValidationCodeModel,
-    // Mappers
     AuthMapper,
-    // Services (split)
     SignupService,
     SigninService,
     EmailValidationService,
     PhoneValidationService,
     PasswordRecoveryService,
     TokenService,
-    // Original service (for backwards compatibility, will be refactored)
     AuthService,
   ],
   exports: [AuthService, SignupService, SigninService, EmailValidationService, PhoneValidationService, PasswordRecoveryService, TokenService],

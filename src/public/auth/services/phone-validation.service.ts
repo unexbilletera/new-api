@@ -27,7 +27,6 @@ export class PhoneValidationService {
     try {
       const result = await this.smsService.verifyCode(dto.phone, dto.code, true);
 
-      // Update user phone verified at
       const normalizedPhone = this.smsService.normalizePhone(dto.phone);
       const user = await this.userModel.findByUsername(normalizedPhone);
 

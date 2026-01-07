@@ -30,25 +30,21 @@ export class SignupService {
     const email = this.normalizeEmail(dto.email);
     const phone = this.normalizePhone(dto.phone);
 
-    // Check if user already exists
     const existingUser = await this.userModel.exists(email, phone);
     if (existingUser) {
       throw new BadRequestException('users.errors.userAlreadyExists');
     }
 
-    // Verify email validation
     const emailValidated = await this.validationCodeModel.getValidatedEmailCode(email);
     if (!emailValidated) {
       throw new BadRequestException('users.errors.emailValidationRequired');
     }
 
-    // Verify phone validation
     const phoneValidated = await this.validationCodeModel.getValidatedPhoneCode(phone);
     if (!phoneValidated) {
       throw new BadRequestException('users.errors.phoneValidationRequired');
     }
 
-    // Create user
     const hashedPassword = await PasswordHelper.hash(dto.password);
     const onboardingState = {
       completedSteps: ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7'],
@@ -78,11 +74,9 @@ export class SignupService {
       updatedAt: new Date(),
     });
 
-    // Clean up validation codes
     await this.validationCodeModel.deleteEmailValidationCodes(email);
     await this.validationCodeModel.deletePhoneValidationCodes(phone);
 
-    // Check device requirement
     let deviceRequired = false;
     if (dto.deviceIdentifier) {
       const existingDevice = await this.prisma.devices.findFirst({
@@ -96,7 +90,6 @@ export class SignupService {
       deviceRequired = !anyActiveDevice;
     }
 
-    // Generate JWT
     const payload: JwtPayload = {
       userId: user.id,
       email: user.email || email,
@@ -104,7 +97,6 @@ export class SignupService {
     };
     const token = await this.jwtService.generateToken(payload);
 
-    // Return response
     if (deviceRequired) {
       return this.authMapper.toSignupDeviceRequiredResponseDto(user, token, 'soft');
     }

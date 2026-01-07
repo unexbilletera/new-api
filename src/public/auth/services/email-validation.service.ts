@@ -27,7 +27,6 @@ export class EmailValidationService {
     try {
       const result = await this.emailService.verifyCode(dto.email, dto.code, true);
 
-      // Update user email verified at
       const normalizedEmail = this.emailService.normalizeEmail(dto.email);
       const user = await this.userModel.findByEmail(normalizedEmail);
 
