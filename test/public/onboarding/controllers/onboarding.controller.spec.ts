@@ -1,19 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { CanActivate } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { OnboardingController, UserOnboardingController } from '../../../../src/public/onboarding/controllers/onboarding.controller';
-import { OnboardingService } from '../../../../src/public/onboarding/services/onboarding.service';
-import { AuthService } from '../../../../src/public/auth/services/auth.service';
+import { UserOnboardingService } from '../../../../src/public/onboarding/services/user-onboarding.service';
+import { VerificationService } from '../../../../src/public/onboarding/services/verification.service';
+import { IdentityOnboardingService } from '../../../../src/public/onboarding/services/identity-onboarding.service';
+import { EmailValidationService } from '../../../../src/public/auth/services/email-validation.service';
+import { PhoneValidationService } from '../../../../src/public/auth/services/phone-validation.service';
+import { AuthGuard } from '../../../../src/shared/guards/auth.guard';
 
 describe('OnboardingController', () => {
   let controller: OnboardingController;
   let userController: UserOnboardingController;
-  let onboardingService: jest.Mocked<OnboardingService>;
-  let authService: jest.Mocked<AuthService>;
+  let userOnboardingService: jest.Mocked<UserOnboardingService>;
+  let verificationService: jest.Mocked<VerificationService>;
+  let identityOnboardingService: jest.Mocked<IdentityOnboardingService>;
+  let emailValidationService: jest.Mocked<EmailValidationService>;
+  let phoneValidationService: jest.Mocked<PhoneValidationService>;
+
+  const mockUserId = 'user-123';
+  const mockIdentityId = 'identity-456';
+  const mockUserIdentityId = 'user-identity-789';
 
   beforeEach(async () => {
-    onboardingService = {
+    userOnboardingService = {
       startUserOnboarding: jest.fn(),
-      verifyOnboardingCode: jest.fn(),
       updateUserOnboarding: jest.fn(),
+    } as unknown as jest.Mocked<UserOnboardingService>;
+
+    verificationService = {
+      verifyOnboardingCode: jest.fn(),
+    } as unknown as jest.Mocked<VerificationService>;
+
+    identityOnboardingService = {
       startIdentityOnboarding: jest.fn(),
       updateIdentityOnboarding: jest.fn(),
       uploadArgentinaDocument: jest.fn(),
@@ -22,122 +41,302 @@ describe('OnboardingController', () => {
       getOnboardingStatus: jest.fn(),
       validateOnboardingData: jest.fn(),
       retryOnboarding: jest.fn(),
-    } as unknown as jest.Mocked<OnboardingService>;
+    } as unknown as jest.Mocked<IdentityOnboardingService>;
 
-    authService = {
+    emailValidationService = {
       sendEmailValidation: jest.fn(),
+    } as unknown as jest.Mocked<EmailValidationService>;
+
+    phoneValidationService = {
       sendPhoneValidation: jest.fn(),
-    } as unknown as jest.Mocked<AuthService>;
+    } as unknown as jest.Mocked<PhoneValidationService>;
+
+    const mockJwtService = {
+      sign: jest.fn(),
+      verify: jest.fn(),
+      decode: jest.fn(),
+    } as unknown as jest.Mocked<JwtService>;
+
+    const mockAuthGuard: CanActivate = {
+      canActivate: jest.fn(() => true),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OnboardingController, UserOnboardingController],
       providers: [
-        { provide: OnboardingService, useValue: onboardingService },
-        { provide: AuthService, useValue: authService },
+        { provide: UserOnboardingService, useValue: userOnboardingService },
+        { provide: VerificationService, useValue: verificationService },
+        { provide: IdentityOnboardingService, useValue: identityOnboardingService },
+        { provide: EmailValidationService, useValue: emailValidationService },
+        { provide: PhoneValidationService, useValue: phoneValidationService },
+        { provide: JwtService, useValue: mockJwtService },
+        { provide: AuthGuard, useValue: mockAuthGuard },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .compile();
 
     controller = module.get(OnboardingController);
     userController = module.get(UserOnboardingController);
   });
 
-  it('startUserOnboarding delegates to service', async () => {
-    const dto = {} as any;
-    const payload = { message: 'Onboarding started', userId: 'u1', onboardingState: { completedSteps: [], needsCorrection: [] } };
-    onboardingService.startUserOnboarding.mockResolvedValue(payload);
-    await expect(controller.startUserOnboarding(dto)).resolves.toEqual(payload);
-    expect(onboardingService.startUserOnboarding).toHaveBeenCalledWith(dto);
+  describe('user onboarding initialization', () => {
+    it('startUserOnboarding should delegate to service', async () => {
+      const dto = { email: 'test@example.com' } as any;
+      const payload = {
+        success: true,
+        message: 'Onboarding started',
+        userId: mockUserId,
+        onboardingState: { completedSteps: [], needsCorrection: [] },
+        nextStep: 'emailForm',
+      };
+      userOnboardingService.startUserOnboarding.mockResolvedValue(payload);
+
+      const result = await controller.startUserOnboarding(dto);
+
+      expect(result).toEqual(payload);
+      expect(userOnboardingService.startUserOnboarding).toHaveBeenCalledWith(dto);
+    });
+
+    it('startUserOnboarding should return onboarding state', async () => {
+      const dto = { email: 'test@example.com' } as any;
+      const payload = {
+        success: true,
+        message: 'Onboarding started',
+        userId: mockUserId,
+        onboardingState: { completedSteps: [], needsCorrection: [] },
+        nextStep: 'emailForm',
+      };
+      userOnboardingService.startUserOnboarding.mockResolvedValue(payload);
+
+      const result = await controller.startUserOnboarding(dto);
+
+      expect(result.userId).toBeDefined();
+      expect(result.onboardingState).toBeDefined();
+    });
+
+    it('startUserOnboarding should propagate service errors', async () => {
+      const dto = { email: 'invalid' } as any;
+      userOnboardingService.startUserOnboarding.mockRejectedValue(new Error('Invalid email'));
+
+      await expect(controller.startUserOnboarding(dto)).rejects.toThrow('Invalid email');
+    });
   });
 
-  it('verifyCode delegates to service', async () => {
-    const dto = {} as any;
-    const payload = { message: 'Code verified successfully', userId: 'u1', onboardingState: { completedSteps: [], needsCorrection: [] } };
-    onboardingService.verifyOnboardingCode.mockResolvedValue(payload);
-    await expect(controller.verifyCode(dto)).resolves.toEqual(payload);
-    expect(onboardingService.verifyOnboardingCode).toHaveBeenCalledWith(dto);
+  describe('verification', () => {
+    it('verifyCode should delegate to service', async () => {
+      const dto = { email: 'test@example.com', code: '123456' } as any;
+      const payload = {
+        success: true,
+        message: 'Code verified successfully',
+        userId: mockUserId,
+        onboardingState: { completedSteps: ['email_verification'], needsCorrection: [] },
+        nextStep: 'phoneForm',
+      };
+      verificationService.verifyOnboardingCode.mockResolvedValue(payload);
+
+      const result = await controller.verifyCode(dto);
+
+      expect(result).toEqual(payload);
+      expect(verificationService.verifyOnboardingCode).toHaveBeenCalledWith(dto);
+    });
+
+    it('verifyCode should update onboarding state', async () => {
+      const dto = { email: 'test@example.com', code: '123456' } as any;
+      const payload = {
+        success: true,
+        message: 'Code verified successfully',
+        userId: mockUserId,
+        onboardingState: { completedSteps: ['email_verification'], needsCorrection: [] },
+        nextStep: 'phoneForm',
+      };
+      verificationService.verifyOnboardingCode.mockResolvedValue(payload);
+
+      const result = await controller.verifyCode(dto);
+
+      expect(result.onboardingState.completedSteps).toContain('email_verification');
+    });
+
+    it('verifyCode should propagate service errors', async () => {
+      const dto = { email: 'test@example.com', code: 'invalid' } as any;
+      verificationService.verifyOnboardingCode.mockRejectedValue(new Error('Invalid code'));
+
+      await expect(controller.verifyCode(dto)).rejects.toThrow('Invalid code');
+    });
   });
 
-  it('sendEmailValidation delegates to auth service', async () => {
-    const dto = {} as any;
-    const payload = { message: 'sent', debug: '123' };
-    authService.sendEmailValidation.mockResolvedValue(payload);
-    await expect(controller.sendEmailValidation(dto)).resolves.toEqual(payload);
-    expect(authService.sendEmailValidation).toHaveBeenCalledWith(dto);
+  describe('validation channel selection', () => {
+    it('sendEmailValidation should delegate to auth service', async () => {
+      const dto = { email: 'test@example.com' } as any;
+      const payload = { message: 'Validation code sent', debug: '123' };
+      emailValidationService.sendEmailValidation.mockResolvedValue(payload);
+
+      const result = await controller.sendEmailValidation(dto);
+
+      expect(result).toEqual(payload);
+      expect(emailValidationService.sendEmailValidation).toHaveBeenCalledWith(dto);
+    });
+
+    it('sendPhoneValidation should delegate to auth service', async () => {
+      const dto = { phone: '+5511999999999' } as any;
+      const payload = { message: 'Validation code sent', debug: '456' };
+      phoneValidationService.sendPhoneValidation.mockResolvedValue(payload);
+
+      const result = await controller.sendPhoneValidation(dto);
+
+      expect(result).toEqual(payload);
+      expect(phoneValidationService.sendPhoneValidation).toHaveBeenCalledWith(dto);
+    });
   });
 
-  it('sendPhoneValidation delegates to auth service', async () => {
-    const dto = {} as any;
-    const payload = { message: 'sent', debug: '456' };
-    authService.sendPhoneValidation.mockResolvedValue(payload);
-    await expect(controller.sendPhoneValidation(dto)).resolves.toEqual(payload);
-    expect(authService.sendPhoneValidation).toHaveBeenCalledWith(dto);
+  describe('user data management', () => {
+    it('updateUserData should delegate to service', async () => {
+      const dto = { firstName: 'John', lastName: 'Doe' } as any;
+      const payload = { user: { id: mockUserId } } as any;
+      userOnboardingService.updateUserOnboarding.mockResolvedValue(payload);
+
+      const result = await controller.updateUserData(mockUserId, dto);
+
+      expect(result).toEqual(payload);
+      expect(userOnboardingService.updateUserOnboarding).toHaveBeenCalledWith(mockUserId, dto);
+    });
+
+    it('updateUserData should propagate service errors', async () => {
+      const dto = { firstName: '' } as any;
+      userOnboardingService.updateUserOnboarding.mockRejectedValue(new Error('Invalid data'));
+
+      await expect(controller.updateUserData(mockUserId, dto)).rejects.toThrow('Invalid data');
+    });
   });
 
-  it('updateUserData delegates to service', async () => {
-    const dto = {} as any;
-    const payload = { user: { id: 'uid' } } as any;
-    onboardingService.updateUserOnboarding.mockResolvedValue(payload);
-    await expect(controller.updateUserData('uid', dto)).resolves.toEqual(payload);
-    expect(onboardingService.updateUserOnboarding).toHaveBeenCalledWith('uid', dto);
+  describe('identity onboarding', () => {
+    it('startIdentityOnboarding should delegate to service', async () => {
+      const dto = { documentType: 'CPF', countryCode: 'BR' } as any;
+      const payload = { message: 'Identity onboarding started', identityId: mockIdentityId };
+      identityOnboardingService.startIdentityOnboarding.mockResolvedValue(payload);
+
+      const result = await controller.startIdentityOnboarding(mockUserId, dto);
+
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.startIdentityOnboarding).toHaveBeenCalledWith(mockUserId, dto);
+    });
+
+    it('updateIdentity should delegate to service', async () => {
+      const dto = { firstName: 'John', documentNumber: '12345678900' } as any;
+      const payload = { message: 'Identity updated successfully', identityId: mockIdentityId };
+      identityOnboardingService.updateIdentityOnboarding.mockResolvedValue(payload);
+
+      const result = await controller.updateIdentity(mockIdentityId, dto);
+
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.updateIdentityOnboarding).toHaveBeenCalledWith(mockIdentityId, dto);
+    });
+
+    it('uploadArgentinaDocument should delegate to service', async () => {
+      const dto = { userId: mockUserId, identityId: mockIdentityId } as any;
+      const payload = {
+        message: 'Document uploaded successfully',
+        onboardingState: { completedSteps: ['document_upload'], needsCorrection: [] },
+      };
+      identityOnboardingService.uploadArgentinaDocument.mockResolvedValue(payload);
+
+      const result = await controller.uploadArgentinaDocument(dto);
+
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.uploadArgentinaDocument).toHaveBeenCalledWith(mockUserId, mockIdentityId, dto);
+    });
   });
 
-  it('startIdentityOnboarding delegates to service', async () => {
-    const dto = {} as any;
-    const payload = { message: 'Identity onboarding started', identityId: 'i1' };
-    onboardingService.startIdentityOnboarding.mockResolvedValue(payload);
-    await expect(controller.startIdentityOnboarding('uid', dto)).resolves.toEqual(payload);
-    expect(onboardingService.startIdentityOnboarding).toHaveBeenCalledWith('uid', dto);
+  describe('onboarding status and validation', () => {
+    it('getPendingData should delegate to service', async () => {
+      const payload = { pendingFields: ['firstName', 'lastName'], needsCorrection: [] };
+      identityOnboardingService.getOnboardingPendingData.mockResolvedValue(payload);
+
+      const result = await userController.getPendingData(mockUserId, mockUserIdentityId);
+
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.getOnboardingPendingData).toHaveBeenCalledWith(mockUserIdentityId);
+    });
+
+    it('getPendingData should list fields requiring attention', async () => {
+      const payload = { pendingFields: ['firstName', 'dateOfBirth'], needsCorrection: ['address'] };
+      identityOnboardingService.getOnboardingPendingData.mockResolvedValue(payload);
+
+      const result = await userController.getPendingData(mockUserId, mockUserIdentityId);
+
+      expect(Array.isArray(result.pendingFields)).toBe(true);
+      expect(Array.isArray(result.needsCorrection)).toBe(true);
+    });
+
+    it('updateSpecificData should delegate to service', async () => {
+      const dto = { field: 'firstName', value: 'John' };
+      const payload = { message: 'Onboarding data updated' };
+      identityOnboardingService.updateOnboardingSpecificData.mockResolvedValue(payload);
+
+      const result = await userController.updateSpecificData(mockUserId, mockUserIdentityId, dto);
+
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.updateOnboardingSpecificData).toHaveBeenCalledWith(mockUserIdentityId, dto);
+    });
+
+    it('getStatus should delegate to service', async () => {
+      const payload = { status: 'pending' as const, completionPercentage: 50, pendingSteps: ['identity_verification'] };
+      identityOnboardingService.getOnboardingStatus.mockResolvedValue(payload);
+
+      const result = await userController.getStatus(mockUserId, mockUserIdentityId);
+
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.getOnboardingStatus).toHaveBeenCalledWith(mockUserIdentityId);
+    });
+
+    it('getStatus should return completion percentage', async () => {
+      const payload = { status: 'pending' as const, completionPercentage: 75, pendingSteps: ['document_verification'] };
+      identityOnboardingService.getOnboardingStatus.mockResolvedValue(payload);
+
+      const result = await userController.getStatus(mockUserId, mockUserIdentityId);
+
+      expect(result.completionPercentage).toEqual(75);
+      expect(result.status).toBeDefined();
+    });
+
+    it('validate should delegate to service', async () => {
+      const payload = { isValid: true, errors: [] };
+      identityOnboardingService.validateOnboardingData.mockResolvedValue(payload);
+
+      const result = await userController.validate(mockUserId, mockUserIdentityId);
+
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.validateOnboardingData).toHaveBeenCalledWith(mockUserIdentityId);
+    });
+
+    it('validate should return validation errors if invalid', async () => {
+      const payload = { isValid: false, errors: ['Missing firstName', 'Invalid email'] };
+      identityOnboardingService.validateOnboardingData.mockResolvedValue(payload);
+
+      const result = await userController.validate(mockUserId, mockUserIdentityId);
+
+      expect(result.isValid).toBe(false);
+      expect(Array.isArray(result.errors)).toBe(true);
+      expect(result.errors.length).toBeGreaterThan(0);
+    });
   });
 
-  it('updateIdentity delegates to service', async () => {
-    const dto = {} as any;
-    const payload = { message: 'Identity updated successfully', identityId: 'iid' };
-    onboardingService.updateIdentityOnboarding.mockResolvedValue(payload);
-    await expect(controller.updateIdentity('iid', dto)).resolves.toEqual(payload);
-    expect(onboardingService.updateIdentityOnboarding).toHaveBeenCalledWith('iid', dto);
-  });
+  describe('onboarding retry', () => {
+    it('retry should delegate to service', async () => {
+      const payload = { message: 'Onboarding data resubmitted' };
+      identityOnboardingService.retryOnboarding.mockResolvedValue(payload);
 
-  it('uploadArgentinaDocument delegates to service', async () => {
-    const dto = { userId: 'u', identityId: 'i' } as any;
-    const payload = { message: 'Document uploaded successfully', onboardingState: { completedSteps: [], needsCorrection: [] } };
-    onboardingService.uploadArgentinaDocument.mockResolvedValue(payload);
-    await expect(controller.uploadArgentinaDocument(dto)).resolves.toEqual(payload);
-    expect(onboardingService.uploadArgentinaDocument).toHaveBeenCalledWith('u', 'i', dto);
-  });
+      const result = await userController.retry(mockUserId, mockUserIdentityId);
 
-  it('getPendingData delegates to service', async () => {
-    const payload = { pendingFields: [], needsCorrection: [] };
-    onboardingService.getOnboardingPendingData.mockResolvedValue(payload);
-    await expect(userController.getPendingData('id')).resolves.toEqual(payload);
-    expect(onboardingService.getOnboardingPendingData).toHaveBeenCalledWith('id');
-  });
+      expect(result).toEqual(payload);
+      expect(identityOnboardingService.retryOnboarding).toHaveBeenCalledWith(mockUserIdentityId);
+    });
 
-  it('updateSpecificData delegates to service', async () => {
-    const dto = { field: 'x' };
-    const payload = { message: 'Onboarding data updated' };
-    onboardingService.updateOnboardingSpecificData.mockResolvedValue(payload);
-    await expect(userController.updateSpecificData('id', dto)).resolves.toEqual(payload);
-    expect(onboardingService.updateOnboardingSpecificData).toHaveBeenCalledWith('id', dto);
-  });
+    it('retry should propagate service errors', async () => {
+      identityOnboardingService.retryOnboarding.mockRejectedValue(new Error('Retry failed'));
 
-  it('getStatus delegates to service', async () => {
-    const payload = { status: 'pending', completionPercentage: 50, pendingSteps: ['1'] };
-    onboardingService.getOnboardingStatus.mockResolvedValue(payload);
-    await expect(userController.getStatus('id')).resolves.toEqual(payload);
-    expect(onboardingService.getOnboardingStatus).toHaveBeenCalledWith('id');
-  });
-
-  it('validate delegates to service', async () => {
-    const payload = { isValid: true, errors: [] };
-    onboardingService.validateOnboardingData.mockResolvedValue(payload);
-    await expect(userController.validate('id')).resolves.toEqual(payload);
-    expect(onboardingService.validateOnboardingData).toHaveBeenCalledWith('id');
-  });
-
-  it('retry delegates to service', async () => {
-    const payload = { message: 'Onboarding data resubmitted' };
-    onboardingService.retryOnboarding.mockResolvedValue(payload);
-    await expect(userController.retry('id')).resolves.toEqual(payload);
-    expect(onboardingService.retryOnboarding).toHaveBeenCalledWith('id');
+      await expect(userController.retry(mockUserId, mockUserIdentityId)).rejects.toThrow('Retry failed');
+    });
   });
 });
