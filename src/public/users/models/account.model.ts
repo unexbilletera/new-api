@@ -25,7 +25,6 @@ export class AccountModel {
       select: {
         id: true,
         type: true,
-        currency: true,
         balance: true,
         alias: true,
         status: true,
