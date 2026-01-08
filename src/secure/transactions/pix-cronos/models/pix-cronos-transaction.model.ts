@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../shared/prisma/prisma.service';
 import { ErrorCodes, ErrorHelper } from '../../../../shared/errors/app-error';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import type { transactions_status } from '../../../../../generated/prisma';
 
 @Injectable()
@@ -53,7 +53,7 @@ export class PixCronosTransactionModel {
     const now = new Date();
     const transaction = await this.prisma.transactions.create({
       data: {
-        id: uuidv4(),
+        id: randomUUID(),
         date: now,
         userId: data.userId,
         type: 'cashout_cronos',
