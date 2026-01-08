@@ -24,7 +24,7 @@ export class IdentityOnboardingService {
       throw new NotFoundException('User not found');
     }
 
-    const country = (dto.country || dto.countryCode || 'br').toLowerCase();
+    const country = ((dto.country || dto.countryCode || 'br').toLowerCase() as 'ar' | 'br');
 
     const existingIdentity = await this.onboardingModel.findIdentityByUserAndCountry(userId, country);
     if (existingIdentity) {
@@ -33,7 +33,7 @@ export class IdentityOnboardingService {
 
     const identity = await this.onboardingModel.createIdentity({
       userId,
-      country,
+      country: country as 'ar' | 'br',
       status: 'pending',
     });
 
@@ -78,8 +78,12 @@ export class IdentityOnboardingService {
       updates.notes = JSON.stringify(dto.biometricData);
     }
 
-    if (!onboardingState.completedSteps.includes('2.2')) {
-      onboardingState.completedSteps.push('2.2');
+    const state = onboardingState as any;
+    if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
+      state.completedSteps = [];
+    }
+    if (!state.completedSteps.includes('2.2')) {
+      state.completedSteps.push('2.2');
     }
 
     await this.onboardingModel.updateIdentity(identityId, updates);
@@ -98,7 +102,7 @@ export class IdentityOnboardingService {
       throw new NotFoundException('User or identity not found');
     }
 
-    const onboardingState = user.onboardingState || { completedSteps: [], needsCorrection: [] };
+    const onboardingState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
 
     await this.onboardingModel.updateIdentity(identityId, {
       identityDocumentFrontImage: dto.frontImage,
@@ -117,9 +121,13 @@ export class IdentityOnboardingService {
     if (dto.pdf417Data?.gender)
       userUpdates.gender = dto.pdf417Data.gender.toLowerCase() === 'm' ? 'male' : 'female';
 
-    if (!onboardingState.completedSteps.includes('2.2')) onboardingState.completedSteps.push('2.2');
-    if (!onboardingState.completedSteps.includes('documentVerificationSuccess.ar'))
-      onboardingState.completedSteps.push('documentVerificationSuccess.ar');
+    const state = onboardingState as any;
+    if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
+      state.completedSteps = [];
+    }
+    if (!state.completedSteps.includes('2.2')) state.completedSteps.push('2.2');
+    if (!state.completedSteps.includes('documentVerificationSuccess.ar'))
+      state.completedSteps.push('documentVerificationSuccess.ar');
 
     userUpdates.onboardingState = onboardingState;
 
@@ -139,7 +147,7 @@ export class IdentityOnboardingService {
   async getOnboardingPendingData(userIdentityId: string) {
     const identity = await this.onboardingModel.getOnboardingPendingData(userIdentityId);
 
-    const state = identity.users_usersIdentities_userIdTousers?.onboardingState || {
+    const state = (identity.users_usersIdentities_userIdTousers?.onboardingState as any) || {
       completedSteps: [],
       needsCorrection: [],
     };
@@ -153,7 +161,7 @@ export class IdentityOnboardingService {
   async getOnboardingStatus(userIdentityId: string) {
     const identity = await this.onboardingModel.getOnboardingStatus(userIdentityId);
 
-    const state = identity.users_usersIdentities_userIdTousers?.onboardingState || { completedSteps: [] };
+    const state = (identity.users_usersIdentities_userIdTousers?.onboardingState as any) || { completedSteps: [] };
     const requiredSteps =
       identity.country === 'ar' ? ['2.1', '2.2', '2.3', '2.4'] : ['3.1', '3.2', '3.3', '3.4', '3.5'];
 
