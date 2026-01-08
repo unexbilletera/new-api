@@ -43,7 +43,7 @@ export class UserService {
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
       include: {
-        usersIdentities: {
+        usersIdentities_usersIdentities_userIdTousers: {
           select: {
             id: true,
             country: true,
@@ -60,15 +60,15 @@ export class UserService {
           },
         },
         usersAccounts: {
-      select: {
-        id: true,
+          select: {
+            id: true,
             number: true,
             type: true,
-        status: true,
+            status: true,
             cvu: true,
             alias: true,
             balance: true,
-        createdAt: true,
+            createdAt: true,
           },
         },
       },
@@ -123,7 +123,7 @@ export class UserService {
         phoneVerifiedAt: user.phoneVerifiedAt,
         livenessVerifiedAt: user.livenessVerifiedAt,
         onboardingState: onboardingState,
-        usersIdentities: user.usersIdentities,
+        usersIdentities: user.usersIdentities_usersIdentities_userIdTousers,
         usersAccounts: user.usersAccounts,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -632,7 +632,7 @@ export class UserService {
           let validaEnrollment;
           try {
             validaEnrollment = await this.validaService.createEnrollment({
-              refId: user.number,
+              refId: String(user.number),
               enrollmentFlow: 'l',
               baseUrl: this.configService.get<string>('APP_BASE_URL'),
               apiPath: '/api',
@@ -642,7 +642,7 @@ export class UserService {
               error: (error as Error).message,
             });
             validaEnrollment = await this.validaService.getEnrollmentStatus({
-              refId: user.number,
+              refId: String(user.number),
             });
           }
 
@@ -672,7 +672,7 @@ export class UserService {
           }
         } else if (user.validaId) {
           const validaEnrollment = await this.validaService.getEnrollmentInfo({
-            refId: user.number,
+            refId: String(user.number),
           });
 
           if (
@@ -760,7 +760,7 @@ export class UserService {
               `${new Date().toISOString()} - VALIDA ENROLLMENT CANCELED validaId: ${user.validaId}\n`;
 
             const newEnrollment = await this.validaService.createEnrollment({
-              refId: user.number,
+              refId: String(user.number),
               enrollmentFlow: 'l',
               baseUrl: this.configService.get<string>('APP_BASE_URL'),
               apiPath: '/api',
@@ -889,7 +889,6 @@ export class UserService {
       select: {
         id: true,
         type: true,
-        currency: true,
         balance: true,
         alias: true,
         status: true,
