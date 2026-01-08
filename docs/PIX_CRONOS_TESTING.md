@@ -1,97 +1,91 @@
-# Como Testar PIX Cronos no Postman
+# Testing PIX Cronos in Postman
 
-Este guia mostra como testar os endpoints de transações PIX Cronos usando o Postman.
+This guide shows how to test PIX Cronos transaction endpoints using Postman.
 
-## Pré-requisitos
+## Prerequisites
 
-1. **Configurar SQS**: Antes de testar, você precisa configurar a fila SQS e rodar o worker
-   - Ver seção [Configuração do SQS e Worker](#configuração-do-sqs-e-worker) abaixo
+1. **Configure SQS**: Before testing, you need to configure SQS queue and run worker
+   - See [SQS and Worker Configuration](#sqs-and-worker-configuration) section below
 
-2. **Obter Token JWT**: Você precisa fazer login primeiro para obter um token de autenticação.
-   - Use o endpoint `/test/auth/login` para obter um token (modo desenvolvimento)
-   - Ou use o endpoint `/backoffice/auth/login` para backoffice
+2. **Get JWT Token**: You need to login first to obtain authentication token.
+   - Use endpoint `/test/auth/login` to get token (development mode)
+   - Or use endpoint `/backoffice/auth/login` for backoffice
 
-3. **Base URL**: Configure a base URL da API no Postman (ex: `http://localhost:3000`)
+3. **Base URL**: Configure the API base URL in Postman (e.g., `http://localhost:3000`)
 
-## Configuração do SQS e Worker
+## SQS and Worker Configuration
 
-### 1. Configurar Variáveis de Ambiente
+### 1. Configure Environment Variables
 
-Adicione no seu arquivo `.env`, `env.prod` ou `env.sandbox`:
+Add to your `.env`, `env.prod` or `env.sandbox` file:
 
 ```env
-# AWS SQS Configuration
 AWS_REGION=us-east-2
-SQS_TRANSACTIONS_QUEUE_URL=https://sqs.us-east-2.amazonaws.com/SEU_ACCOUNT_ID/SEU_QUEUE_NAME
-
-# Database (já deve estar configurado)
+SQS_TRANSACTIONS_QUEUE_URL=https://sqs.us-east-2.amazonaws.com/YOUR_ACCOUNT_ID/YOUR_QUEUE_NAME
 WALLET_MYSQL_URL=mysql://user:password@host:3306/database
 ```
 
-**Nota**: Se você não tem acesso à AWS ainda, pode usar uma fila local (LocalStack) ou deixar vazio para desenvolvimento (o sistema irá apenas logar que a fila não está configurada).
+**Note**: If you don't have AWS access yet, you can use a local queue (LocalStack) or leave empty for development (system will only log that queue is not configured).
 
-### 2. Criar Fila SQS na AWS (se necessário)
+### 2. Create SQS Queue in AWS (if needed)
 
-Se você precisar criar a fila:
+If you need to create the queue:
 
 ```bash
-# Via AWS CLI
 aws sqs create-queue \
   --queue-name transactions-queue \
   --region us-east-2 \
   --attributes MessageRetentionPeriod=86400,VisibilityTimeout=60
 
-# Pegue a URL da fila e adicione no .env
+# Get queue URL and add to .env
 ```
 
-### 3. Rodar o Worker
+### 3. Run Worker
 
-O worker processa as mensagens da fila SQS em background. Você precisa rodá-lo em um terminal separado:
+Worker processes SQS queue messages in background. Run it in a separate terminal:
 
-**Desenvolvimento:**
+**Development:**
 ```bash
 npm run start:worker
-# ou
-yarn start:worker
 ```
 
-**Produção:**
+**Production:**
 ```bash
 npm run build:prod
 npm run start:prod:worker
 ```
 
-O worker irá:
-- Receber mensagens da fila SQS
-- Processar jobs de transações PIX Cronos
-- Atualizar status das transações no banco de dados
+Worker will:
+- Receive messages from SQS queue
+- Process PIX Cronos transaction jobs
+- Update transaction status in database
 
-**Importante**: Mantenha o worker rodando enquanto testa os endpoints!
+**Important**: Keep worker running while testing endpoints!
 
-### 4. Verificar se está funcionando
+### 4. Verify it's working
 
-Quando o worker estiver rodando, você deve ver logs como:
+When worker is running, you should see logs like:
 ```
 [INFO] Worker iniciado. Aguardando mensagens da fila SQS...
 [INFO] Worker iniciando...
 [INFO] Environment: development
 ```
 
-Quando uma mensagem for processada:
+When a message is processed:
 ```
 [INFO] Processando job: pix_cronos_create (MessageId: ...)
 [INFO] PIX Cronos create job processed successfully for transaction: ...
 ```
 
-## Endpoints Disponíveis
+## Available Endpoints
 
-### 1. Criar Transação PIX Cronos
+### 1. Create PIX Cronos Transaction
 
 **POST** `/transactions/pix/cronos/create`
 
 **Headers:**
 ```
-Authorization: Bearer {seu_token_jwt}
+Authorization: Bearer {your_jwt_token}
 Content-Type: application/json
 ```
 
@@ -106,14 +100,14 @@ Content-Type: application/json
 }
 ```
 
-**Campos:**
-- `sourceAccountId` (string, obrigatório): ID da conta de origem
-- `amount` (number, obrigatório): Valor da transferência (mínimo 0.01)
-- `targetKeyType` (string, obrigatório): Tipo da chave PIX (`cpf`, `cnpj`, `email`, `phone`, `evp`)
-- `targetKeyValue` (string, obrigatório): Valor da chave PIX
-- `description` (string, opcional): Descrição da transferência
+**Fields:**
+- `sourceAccountId` (string, required): Source account ID
+- `amount` (number, required): Transfer amount (minimum 0.01)
+- `targetKeyType` (string, required): PIX key type (`cpf`, `cnpj`, `email`, `phone`, `evp`)
+- `targetKeyValue` (string, required): PIX key value
+- `description` (string, optional): Transfer description
 
-**Exemplo de Resposta (200):**
+**Success Response (200):**
 ```json
 {
   "id": "uuid-da-transacao",
@@ -125,7 +119,7 @@ Content-Type: application/json
 }
 ```
 
-**Exemplo de Erro (400):**
+**Error Response (400):**
 ```json
 {
   "error": "400 transactions.errors.invalidSourceAccount",
@@ -134,15 +128,13 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. Confirmar Transação PIX Cronos
+### 2. Confirm PIX Cronos Transaction
 
 **POST** `/transactions/pix/cronos/confirm`
 
 **Headers:**
 ```
-Authorization: Bearer {seu_token_jwt}
+Authorization: Bearer {your_jwt_token}
 Content-Type: application/json
 ```
 
@@ -153,21 +145,20 @@ Content-Type: application/json
 }
 ```
 
-**Campos:**
-- `transactionId` (string, obrigatório): ID da transação criada anteriormente
+**Fields:**
+- `transactionId` (string, required): ID of previously created transaction
 
-**Exemplo de Resposta (200):**
+**Success Response (200):**
 ```json
 {
   "id": "uuid-da-transacao",
   "status": "process",
-  "message": "Transação enviada para processamento",
   "message": "200 transactions.success.confirmed",
   "code": "200 transactions.success.confirmed"
 }
 ```
 
-**Exemplo de Erro (404):**
+**Error Response (404):**
 ```json
 {
   "error": "400 transactions.errors.invalidId",
@@ -176,11 +167,9 @@ Content-Type: application/json
 }
 ```
 
----
+## Complete Test Flow
 
-## Fluxo Completo de Teste
-
-### Passo 1: Obter Token de Autenticação
+### Step 1: Get Authentication Token
 
 **POST** `/test/auth/login`
 
@@ -192,7 +181,7 @@ Content-Type: application/json
 }
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -202,18 +191,16 @@ Content-Type: application/json
 }
 ```
 
-Copie o valor do campo `token` para usar nos próximos endpoints.
+Copy the `token` value to use in next endpoints.
 
----
+### Step 2: Create PIX Transaction
 
-### Passo 2: Criar uma Transação PIX
-
-1. Configure o método como **POST**
+1. Set method to **POST**
 2. URL: `{{base_url}}/transactions/pix/cronos/create`
-3. Na aba **Headers**, adicione:
-   - `Authorization`: `Bearer {cole_o_token_aqui}`
+3. In **Headers** tab, add:
+   - `Authorization`: `Bearer {paste_token_here}`
    - `Content-Type`: `application/json`
-4. Na aba **Body**, selecione **raw** e **JSON**, cole:
+4. In **Body** tab, select **raw** and **JSON**, paste:
 ```json
 {
   "sourceAccountId": "uuid-da-sua-conta",
@@ -223,91 +210,78 @@ Copie o valor do campo `token` para usar nos próximos endpoints.
   "description": "Teste PIX"
 }
 ```
-5. Clique em **Send**
+5. Click **Send**
 
----
+### Step 3: Confirm Transaction
 
-### Passo 3: Confirmar a Transação
-
-1. Use o `id` retornado no Passo 2
-2. Configure o método como **POST**
+1. Use the `id` returned in Step 2
+2. Set method to **POST**
 3. URL: `{{base_url}}/transactions/pix/cronos/confirm`
-4. Na aba **Headers**, adicione:
-   - `Authorization`: `Bearer {cole_o_token_aqui}`
+4. In **Headers** tab, add:
+   - `Authorization`: `Bearer {paste_token_here}`
    - `Content-Type`: `application/json`
-5. Na aba **Body**, selecione **raw** e **JSON**, cole:
+5. In **Body** tab, select **raw** and **JSON**, paste:
 ```json
 {
   "transactionId": "uuid-da-transacao-do-passo-2"
 }
 ```
-6. Clique em **Send**
+6. Click **Send**
 
----
+## Postman Environment Variables
 
-## Variáveis de Ambiente no Postman
-
-Para facilitar os testes, configure as seguintes variáveis no Postman:
+Configure these variables in Postman:
 
 ```
 base_url: http://localhost:3000
-auth_token: {cole_o_token_aqui}
-transaction_id: {será_preenchido_após_criar}
+auth_token: {paste_token_here}
+transaction_id: {will_be_filled_after_creating}
 ```
 
-Então use `{{base_url}}`, `{{auth_token}}` e `{{transaction_id}}` nas suas requisições.
+Then use `{{base_url}}`, `{{auth_token}}` and `{{transaction_id}}` in your requests.
 
----
+## Supported PIX Key Types
 
-## Tipos de Chave PIX Suportados
+| Type | Description | Example |
+|------|-------------|---------|
+| `cpf` | CPF (11 digits) | `12345678900` |
+| `cnpj` | CNPJ (14 digits) | `12345678000190` |
+| `email` | Valid email | `pessoa@exemplo.com` |
+| `phone` | Phone (+5511999999999) | `+5511999999999` |
+| `evp` | Random key (UUID) | `123e4567-e89b-12d3-a456-426614174000` |
 
-| Tipo | Descrição | Exemplo |
-|------|-----------|---------|
-| `cpf` | CPF (11 dígitos) | `12345678900` |
-| `cnpj` | CNPJ (14 dígitos) | `12345678000190` |
-| `email` | E-mail válido | `pessoa@exemplo.com` |
-| `phone` | Telefone (+5511999999999) | `+5511999999999` |
-| `evp` | Chave aleatória (UUID) | `123e4567-e89b-12d3-a456-426614174000` |
+## Status Codes
 
----
+- `pending`: Transaction created, awaiting confirmation
+- `process`: Transaction confirmed, being processed
+- `confirm`: Transaction processed successfully
+- `reverse`: Transaction reversed
+- `cancel`: Transaction cancelled
+- `error`: Error processing transaction
 
-## Códigos de Status
-
-- `pending`: Transação criada, aguardando confirmação
-- `process`: Transação confirmada, sendo processada
-- `confirm`: Transação processada com sucesso
-- `reverse`: Transação estornada
-- `cancel`: Transação cancelada
-- `error`: Erro ao processar transação
-
----
-
-## Erros Comuns
+## Common Errors
 
 ### 401 Unauthorized
-**Causa**: Token inválido ou expirado  
-**Solução**: Faça login novamente para obter um novo token
+**Cause**: Invalid or expired token  
+**Solution**: Login again to get a new token
 
 ### 400 Bad Request
-**Causa**: Dados inválidos (conta inexistente, valor inválido, etc.)  
-**Solução**: Verifique os dados enviados no body
+**Cause**: Invalid data (non-existent account, invalid amount, etc.)  
+**Solution**: Verify data sent in body
 
 ### 404 Not Found
-**Causa**: Transação não encontrada  
-**Solução**: Verifique se o `transactionId` está correto
+**Cause**: Transaction not found  
+**Solution**: Verify `transactionId` is correct
 
----
+## Important Notes
 
-## Notas Importantes
+1. **Asynchronous Transactions**: After creating and confirming a transaction, it is sent for asynchronous processing via SQS. Status will be updated by a background worker.
 
-1. **Transações Assíncronas**: Após criar e confirmar uma transação, ela é enviada para processamento assíncrono via SQS. O status será atualizado por um worker em background.
+2. **Account Validation**: Source account must:
+   - Belong to authenticated user
+   - Have status `enable`
+   - Have an active identity associated
 
-2. **Validação de Conta**: A conta de origem deve:
-   - Pertencer ao usuário autenticado
-   - Estar com status `enable`
-   - Ter uma identidade ativa associada
+3. **Minimum Values**: Minimum transfer amount is `0.01`
 
-3. **Valores Mínimos**: O valor mínimo para transferência é `0.01`
-
-4. **Ambiente**: Este endpoint funciona apenas em ambiente autenticado (área logada)
-
+4. **Environment**: This endpoint works only in authenticated environment (logged area)

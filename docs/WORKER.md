@@ -1,53 +1,41 @@
-# Worker - Processamento de Mensagens SQS
+# Worker - SQS Message Processing
 
-Este worker processa mensagens da fila AWS SQS e executa ações assíncronas (como processar transações PIX).
+This worker processes messages from AWS SQS queue and executes asynchronous actions (like processing PIX transactions).
 
-## Estrutura
+## Structure
 
-- `worker.ts`: Arquivo principal que inicia o worker
-- `worker.module.ts`: Módulo NestJS do worker
-- `worker.service.ts`: Service principal que gerencia o loop de processamento
-- `handlers/`: Diretório com handlers para cada tipo de job
-  - `pix-cronos.handler.ts`: Handler para jobs PIX Cronos
+- `worker.ts`: Main file that starts the worker
+- `worker.module.ts`: NestJS worker module
+- `worker.service.ts`: Main service that manages processing loop
+- `handlers/`: Directory with handlers for each job type
+  - `pix-cronos.handler.ts`: Handler for PIX Cronos jobs
 
-## Como Rodar
+## Running
 
-### Desenvolvimento
+### Development
 ```bash
 npm run start:worker
-# ou
-yarn start:worker
 ```
 
-### Produção
+### Production
 ```bash
-# Build primeiro
 npm run build:prod
-
-# Depois rodar o worker
 npm run start:prod:worker
-# ou
-yarn start:prod:worker
 ```
 
-## Variáveis de Ambiente Necessárias
+## Required Environment Variables
 
 ```env
-# AWS SQS
 AWS_REGION=us-east-2
 SQS_TRANSACTIONS_QUEUE_URL=https://sqs.us-east-2.amazonaws.com/123456789012/transactions-queue
-
-# Database (Prisma)
 WALLET_MYSQL_URL=mysql://user:password@host:3306/database
-
-# Environment
 NODE_ENV=development|sandbox|production
 ```
 
-## Tipos de Jobs Suportados
+## Supported Job Types
 
 ### `pix_cronos_create`
-Processa a criação de uma transação PIX Cronos.
+Processes PIX Cronos transaction creation.
 
 **Payload:**
 ```json
@@ -59,17 +47,12 @@ Processa a criação de uma transação PIX Cronos.
   "amount": 100.50,
   "targetKeyType": "cpf",
   "targetKeyValue": "12345678900",
-  "description": "Transferência PIX"
+  "description": "PIX Transfer"
 }
 ```
 
-**Ações:**
-- Valida dados da transação
-- Prepara dados para envio à API da Cronos
-- Mantém status como `pending` até confirmação
-
 ### `pix_cronos_confirm`
-Processa a confirmação de uma transação PIX Cronos.
+Processes PIX Cronos transaction confirmation.
 
 **Payload:**
 ```json
@@ -79,49 +62,25 @@ Processa a confirmação de uma transação PIX Cronos.
 }
 ```
 
-**Ações:**
-- Busca transação
-- Chama API da Cronos para criar transferência
-- Atualiza transação com `cronosId`
-- Atualiza status para `confirm` ou `error`
+## Processing Flow
 
-## Fluxo de Processamento
+1. Worker receives message from SQS queue (long polling)
+2. Parse message to extract `jobType` and `payload`
+3. Route to appropriate handler based on `jobType`
+4. Process job by handler
+5. Delete message from queue if processing successful
+6. Automatic retry if error (message remains in queue)
 
-1. **Worker recebe mensagem** da fila SQS (long polling)
-2. **Parse da mensagem** para extrair `jobType` e `payload`
-3. **Roteamento** para handler apropriado baseado no `jobType`
-4. **Processamento** do job pelo handler
-5. **Deleção da mensagem** da fila se processamento for bem-sucedido
-6. **Retry automático** se houver erro (mensagem permanece na fila)
+## Adding New Handler
 
-## Adicionar Novo Handler
+1. Create file in `handlers/` (e.g., `my-handler.ts`)
+2. Implement class with methods for each job type
+3. Add handler in `worker.module.ts`
+4. Add routing in `worker.service.ts` method `routeJob()`
 
-1. Crie um arquivo em `handlers/` (ex: `meu-handler.ts`)
-2. Implemente a classe com métodos para cada tipo de job
-3. Adicione o handler em `worker.module.ts`
-4. Adicione roteamento em `worker.service.ts` método `routeJob()`
+## Notes
 
-Exemplo:
-```typescript
-@Injectable()
-export class MeuHandler {
-  async handleMeuJob(payload: any): Promise<void> {
-  }
-}
-```
-
-## Logs
-
-O worker registra todas as operações importantes:
-- Mensagens recebidas
-- Jobs processados
-- Erros encontrados
-- Status de transações atualizadas
-
-## Notas Importantes
-
-1. **Long Polling**: O worker usa long polling (20 segundos) para reduzir custos e latência
-2. **Retry**: Mensagens com erro permanecem na fila para retry automático pelo SQS
-3. **Graceful Shutdown**: O worker trata sinais SIGTERM/SIGINT para shutdown seguro
-4. **Isolamento**: Cada job é processado isoladamente - erro em um não afeta outros
-
+- Long polling (20 seconds) to reduce costs and latency
+- Retry: Messages with errors remain in queue for automatic retry
+- Graceful shutdown: Worker handles SIGTERM/SIGINT signals
+- Isolation: Each job is processed independently

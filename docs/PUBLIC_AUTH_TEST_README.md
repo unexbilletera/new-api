@@ -1,20 +1,18 @@
-# Endpoints Temporários de Teste de Autenticação
+# Temporary Test Authentication Endpoints
 
-⚠️ **ATENÇÃO**: Estes endpoints são **TEMPORÁRIOS** e devem ser **REMOVIDOS EM PRODUÇÃO**.
+WARNING: These endpoints are TEMPORARY and must be REMOVED IN PRODUCTION.
 
-Eles foram criados apenas para facilitar testes durante o desenvolvimento, permitindo fazer login real com validação de senha para obter tokens JWT.
+They were created only to facilitate testing during development, allowing real login with password validation to obtain JWT tokens.
 
----
+## Available Endpoints
 
-## 🔐 Endpoints Disponíveis
-
-### 1. Login Temporário (App/Usuários)
+### 1. Temporary Login (App/Users)
 
 **POST** `/test/auth/login`
 
-Faz login temporário para usuários do app (customers).
+Temporary login for app users (customers).
 
-#### Body (obrigatório):
+**Body (required):**
 ```json
 {
   "email": "usuario@exemplo.com",
@@ -22,7 +20,7 @@ Faz login temporário para usuários do app (customers).
 }
 ```
 
-#### Resposta de Sucesso:
+**Success Response:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -33,13 +31,13 @@ Faz login temporário para usuários do app (customers).
     "status": "active",
     "identity": { ... }
   },
-  "message": "Login temporário realizado com sucesso (apenas para testes)"
+  "message": "200 users.success.login",
+  "code": "200 users.success.login"
 }
 ```
 
-#### Exemplo de uso com cURL:
+**Example with cURL:**
 ```bash
-# Login com email e senha
 curl -X POST http://localhost:3000/test/auth/login \
   -H "Content-Type: application/json" \
   -d '{
@@ -48,15 +46,13 @@ curl -X POST http://localhost:3000/test/auth/login \
   }'
 ```
 
----
-
-### 2. Login Temporário (Backoffice)
+### 2. Temporary Login (Backoffice)
 
 **POST** `/test/auth/backoffice-login`
 
-Faz login temporário para usuários do backoffice.
+Temporary login for backoffice users.
 
-#### Body (obrigatório):
+**Body (required):**
 ```json
 {
   "email": "admin@exemplo.com",
@@ -64,7 +60,7 @@ Faz login temporário para usuários do backoffice.
 }
 ```
 
-#### Resposta de Sucesso:
+**Success Response:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -79,13 +75,13 @@ Faz login temporário para usuários do backoffice.
       "level": 3
     }
   },
-  "message": "Login backoffice temporário realizado com sucesso (apenas para testes)"
+  "message": "200 backoffice.success.login",
+  "code": "200 backoffice.success.login"
 }
 ```
 
-#### Exemplo de uso com cURL:
+**Example with cURL:**
 ```bash
-# Login com email e senha
 curl -X POST http://localhost:3000/test/auth/backoffice-login \
   -H "Content-Type: application/json" \
   -d '{
@@ -94,47 +90,37 @@ curl -X POST http://localhost:3000/test/auth/backoffice-login \
   }'
 ```
 
----
+## Using the Token
 
-## 🚀 Como Usar o Token
-
-Após obter o token, use-o no header `Authorization`:
+After obtaining the token, use it in the `Authorization` header:
 
 ```bash
-# Exemplo: acessar endpoint protegido
 curl -X GET http://localhost:3000/backoffice/auth/me \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
----
+## Important Notes
 
-## 📝 Notas Importantes
+1. Validates credentials: These endpoints validate email and password before generating token
+2. Development only: WARNING: NEVER leave these endpoints in production
+3. Valid token: Generated token is a valid JWT and can be used in any protected endpoint
+4. Required fields: Email and password are required
+5. Updates last login: User's last login is updated after successful login
 
-1. **Valida credenciais**: Estes endpoints validam email e senha antes de gerar o token
-2. **Apenas para desenvolvimento**: ⚠️ **NUNCA** deixe estes endpoints em produção
-3. **Token válido**: O token gerado é um JWT válido e pode ser usado em qualquer endpoint protegido
-4. **Campos obrigatórios**: Email e senha são obrigatórios
-5. **Atualiza último login**: O último login do usuário é atualizado após login bem-sucedido
+## Removing in Production
 
----
+To remove these temporary endpoints:
 
-## 🗑️ Como Remover em Produção
+1. Remove file: `src/public/auth/controllers/test-auth.controller.ts`
+2. Remove from module: `src/public/auth/auth.module.ts`
+   - Remove `TestAuthController` from `controllers` array
+   - Remove `TestAuthController` import
 
-Para remover estes endpoints temporários:
+## Security
 
-1. Remover o arquivo: `src/public/auth/controllers/test-auth.controller.ts`
-2. Remover do módulo: `src/public/auth/auth.module.ts`
-   - Remover `TestAuthController` do array `controllers`
-   - Remover import de `TestAuthController`
-
----
-
-## 🔒 Segurança
-
-- ✅ Tokens gerados são JWT válidos
-- ✅ Tokens seguem o mesmo padrão dos tokens reais
-- ✅ **Valida senha** usando bcrypt
-- ✅ Verifica se usuário está ativo (backoffice)
-- ✅ Atualiza último login após autenticação bem-sucedida
-- ❌ **NÃO** deve estar em produção (endpoints temporários)
-
+- Tokens generated are valid JWTs
+- Tokens follow same pattern as real tokens
+- Validates password using bcrypt
+- Checks if user is active (backoffice)
+- Updates last login after successful authentication
+- Should NOT be in production (temporary endpoints)

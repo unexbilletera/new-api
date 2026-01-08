@@ -1,89 +1,88 @@
-# Exemplo: Módulo de Autenticação Backoffice
+# Backoffice Authentication Module
 
-Este módulo serve como **exemplo completo** da arquitetura CSM (Controller → Service → Model) para os desenvolvedores.
+This module serves as a complete example of the CSM architecture (Controller → Service → Model).
 
-## 📁 Estrutura
+## Structure
 
 ```
 backoffice/auth/
 ├── controllers/
-│   └── auth.controller.ts          # Endpoints HTTP
+│   └── auth.controller.ts          # HTTP endpoints
 ├── services/
-│   └── auth.service.ts              # Lógica de negócio
+│   └── auth.service.ts              # Business logic
 ├── models/
-│   └── backoffice-user.model.ts     # Acesso ao banco (Prisma)
+│   └── backoffice-user.model.ts     # Database access (Prisma)
 ├── dto/
-│   ├── login.dto.ts                 # Validação de entrada
-│   └── login-response.dto.ts        # Formato de resposta
-├── auth.module.ts                   # Módulo NestJS
-└── README.md                        # Este arquivo
+│   ├── login.dto.ts                 # Input validation
+│   └── login-response.dto.ts        # Response format
+└── auth.module.ts                   # NestJS module
 ```
 
-## 🔄 Fluxo de Dados
+## Data Flow
 
 ```
 POST /backoffice/auth/login
     ↓
 AuthController.login()
-    ↓ (valida LoginDto)
+    ↓ (validates LoginDto)
 AuthService.login()
     ↓
 BackofficeUserModel.validateCredentials()
-    ↓ (acessa Prisma)
+    ↓ (accesses Prisma)
 Prisma → MySQL
-    ↓ (retorna dados)
-BackofficeUserModel (processa)
+    ↓ (returns data)
+BackofficeUserModel (processes)
     ↓
-AuthService (gera token)
+AuthService (generates token)
     ↓
-AuthController (retorna LoginResponseDto)
+AuthController (returns LoginResponseDto)
     ↓
 Response JSON
 ```
 
-## 📝 Componentes
+## Components
 
-### 1. DTO (Data Transfer Object)
+### DTO (Data Transfer Object)
 
 **`dto/login.dto.ts`**
-- Define estrutura de entrada
-- Valida com `class-validator`
-- Mensagens de erro personalizadas
+- Defines input structure
+- Validates with `class-validator`
+- Custom error messages
 
 **`dto/login-response.dto.ts`**
-- Define estrutura de resposta
-- Garante consistência na API
+- Defines response structure
+- Ensures API consistency
 
-### 2. Controller
+### Controller
 
 **`controllers/auth.controller.ts`**
-- Recebe requisições HTTP
-- Valida DTO automaticamente (via `ValidationPipe`)
-- Chama Service
-- Retorna resposta tipada
+- Receives HTTP requests
+- Validates DTO automatically (via `ValidationPipe`)
+- Calls Service
+- Returns typed response
 
-### 3. Service
+### Service
 
 **`services/auth.service.ts`**
-- Contém lógica de negócio
-- Orquestra chamadas ao Model
-- Trata erros de negócio
+- Contains business logic
+- Orchestrates Model calls
+- Handles business errors
 
-### 4. Model
+### Model
 
 **`models/backoffice-user.model.ts`**
-- Acessa banco de dados via Prisma
-- Métodos específicos do modelo
-- Validações de dados
+- Accesses database via Prisma
+- Model-specific methods
+- Data validations
 
-### 5. Module
+### Module
 
 **`auth.module.ts`**
-- Registra Controller, Service e Model
-- Importa dependências (PrismaModule)
-- Exporta o que for necessário
+- Registers Controller, Service and Model
+- Imports dependencies (PrismaModule)
+- Exports what is necessary
 
-## 🎯 Endpoints
+## Endpoints
 
 ### POST /backoffice/auth/login
 
@@ -112,10 +111,10 @@ Response JSON
 }
 ```
 
-**Erros:**
-- `400`: Dados inválidos (validação)
-- `401`: Email ou senha inválidos
-- `401`: Usuário inativo
+**Errors:**
+- `400`: Invalid data (validation)
+- `401`: Invalid email or password
+- `401`: User inactive
 
 ### GET /backoffice/auth/me
 
@@ -136,29 +135,20 @@ Authorization: Bearer {token}
 }
 ```
 
-## 🔐 Segurança
+## Security
 
-- Senhas são hasheadas com bcrypt
-- Validação de status do usuário (ativo/inativo)
-- Guard protege endpoints sensíveis
-- TODO: Implementar JWT completo
+- Passwords hashed with bcrypt
+- User status validation (active/inactive)
+- Guard protects sensitive endpoints
+- JWT token generation
 
-## 📚 Como Usar como Exemplo
+## Using as Example
 
-1. **Copie a estrutura de pastas** para seu novo módulo
-2. **Adapte os nomes** (auth → seu-módulo)
-3. **Siga o mesmo padrão**:
-   - DTO para validação
-   - Controller para HTTP
-   - Service para lógica
-   - Model para banco
-4. **Registre no módulo** correspondente
-
-## ⚠️ TODOs
-
-- [ ] Implementar JWT helper completo
-- [ ] Adicionar refresh token
-- [ ] Implementar logout
-- [ ] Adicionar rate limiting
-- [ ] Adicionar logs de acesso
-
+1. Copy folder structure to your new module
+2. Adapt names (auth → your-module)
+3. Follow same pattern:
+   - DTO for validation
+   - Controller for HTTP
+   - Service for logic
+   - Model for database
+4. Register in corresponding module

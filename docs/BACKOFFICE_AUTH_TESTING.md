@@ -1,14 +1,14 @@
-# Como Testar Backoffice Auth no Postman
+# Testing Backoffice Auth in Postman
 
-Este guia mostra como testar os endpoints de autenticação do backoffice usando o Postman.
+This guide shows how to test backoffice authentication endpoints using Postman.
 
-## Pré-requisitos
+## Prerequisites
 
-1. **Base URL**: Configure a base URL da API no Postman (ex: `http://localhost:3000`)
+1. **Base URL**: Configure the API base URL in Postman (e.g., `http://localhost:3000`)
 
-## Endpoints Disponíveis
+## Available Endpoints
 
-### 1. Login Backoffice
+### 1. Backoffice Login
 
 **POST** `/backoffice/auth/login`
 
@@ -25,11 +25,11 @@ Content-Type: application/json
 }
 ```
 
-**Campos:**
-- `email` (string, obrigatório): E-mail do usuário backoffice
-- `password` (string, obrigatório): Senha do usuário backoffice
+**Fields:**
+- `email` (string, required): Backoffice user email
+- `password` (string, required): Backoffice user password
 
-**Exemplo de Resposta (200):**
+**Success Response (200):**
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -48,7 +48,7 @@ Content-Type: application/json
 }
 ```
 
-**Exemplo de Erro (401):**
+**Error Response (401):**
 ```json
 {
   "error": "401 backoffice.errors.invalidCredentials",
@@ -57,19 +57,17 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. Obter Dados do Usuário Logado
+### 2. Get Logged User Data
 
 **GET** `/backoffice/auth/me`
 
 **Headers:**
 ```
-Authorization: Bearer {token_obtido_no_login}
+Authorization: Bearer {token_from_login}
 Content-Type: application/json
 ```
 
-**Exemplo de Resposta (200):**
+**Success Response (200):**
 ```json
 {
   "id": "uuid-do-usuario",
@@ -83,7 +81,7 @@ Content-Type: application/json
 }
 ```
 
-**Exemplo de Erro (401):**
+**Error Response (401):**
 ```json
 {
   "error": "401 backoffice.errors.missingToken",
@@ -92,100 +90,87 @@ Content-Type: application/json
 }
 ```
 
----
+## Complete Test Flow
 
-## Fluxo Completo de Teste
+### Step 1: Login
 
-### Passo 1: Fazer Login
-
-1. Configure o método como **POST**
+1. Set method to **POST**
 2. URL: `{{base_url}}/backoffice/auth/login`
-3. Na aba **Headers**, adicione:
+3. In **Headers** tab, add:
    - `Content-Type`: `application/json`
-4. Na aba **Body**, selecione **raw** e **JSON**, cole:
+4. In **Body** tab, select **raw** and **JSON**, paste:
 ```json
 {
   "email": "seu-email@exemplo.com",
   "password": "sua-senha"
 }
 ```
-5. Clique em **Send**
-6. Copie o valor do campo `accessToken` da resposta
+5. Click **Send**
+6. Copy the `accessToken` value from response
 
----
+### Step 2: Test Protected Endpoint (Me)
 
-### Passo 2: Testar Endpoint Protegido (Me)
-
-1. Configure o método como **GET**
+1. Set method to **GET**
 2. URL: `{{base_url}}/backoffice/auth/me`
-3. Na aba **Headers**, adicione:
-   - `Authorization`: `Bearer {cole_o_accessToken_aqui}`
+3. In **Headers** tab, add:
+   - `Authorization`: `Bearer {paste_accessToken_here}`
    - `Content-Type`: `application/json`
-4. Clique em **Send**
+4. Click **Send**
 
----
+## Postman Environment Variables
 
-## Variáveis de Ambiente no Postman
-
-Para facilitar os testes, configure as seguintes variáveis no Postman:
+Configure these variables in Postman:
 
 ```
 base_url: http://localhost:3000
-backoffice_token: {cole_o_accessToken_aqui}
+backoffice_token: {paste_accessToken_here}
 ```
 
-Então use `{{base_url}}` e `{{backoffice_token}}` nas suas requisições.
+Then use `{{base_url}}` and `{{backoffice_token}}` in your requests.
 
----
-
-## Códigos de Erro Comuns
+## Common Error Codes
 
 ### 401 Unauthorized
-**Causas possíveis:**
-- `401 backoffice.errors.missingToken`: Token não fornecido
-- `401 backoffice.errors.invalidToken`: Token inválido
-- `401 backoffice.errors.expiredToken`: Token expirado
-- `401 backoffice.errors.invalidCredentials`: Credenciais inválidas
-- `401 backoffice.errors.userInactive`: Usuário inativo
-- `401 backoffice.errors.userDeleted`: Usuário deletado
+**Possible causes:**
+- `401 backoffice.errors.missingToken`: Token not provided
+- `401 backoffice.errors.invalidToken`: Invalid token
+- `401 backoffice.errors.expiredToken`: Token expired
+- `401 backoffice.errors.invalidCredentials`: Invalid credentials
+- `401 backoffice.errors.userInactive`: User inactive
+- `401 backoffice.errors.userDeleted`: User deleted
 
-**Solução**: Verifique se o token está correto e se o usuário está ativo.
+**Solution**: Verify token is correct and user is active.
 
 ### 400 Bad Request
-**Causas possíveis:**
-- `400 backoffice.errors.invalidEmail`: E-mail inválido
-- `400 backoffice.errors.invalidPassword`: Senha inválida
+**Possible causes:**
+- `400 backoffice.errors.invalidEmail`: Invalid email
+- `400 backoffice.errors.invalidPassword`: Invalid password
 
-**Solução**: Verifique os dados enviados no body.
+**Solution**: Verify data sent in body.
 
----
+## Important Notes
 
-## Notas Importantes
+1. **JWT Token**: Token returned on login has validity. When expired, login again.
 
-1. **Token JWT**: O token retornado no login tem validade. Quando expirar, faça login novamente.
+2. **Active User**: User must have status `active` to login.
 
-2. **Usuário Ativo**: O usuário deve estar com status `active` para fazer login.
+3. **Permissions**: Token contains user role information. Use to control access to different features.
 
-3. **Permissões**: O token contém informações sobre o role do usuário. Use para controlar acesso a diferentes funcionalidades.
+4. **Security**: Never share tokens in production. Use only for testing in development.
 
-4. **Segurança**: Nunca compartilhe tokens em produção. Use apenas para testes em desenvolvimento.
+## Postman Collection Example
 
----
-
-## Exemplo de Collection Postman
-
-Você pode criar uma collection no Postman com as seguintes requests:
+Create a Postman collection with these requests:
 
 1. **Backoffice Login**
    - Method: POST
    - URL: `{{base_url}}/backoffice/auth/login`
-   - Body: JSON com email e password
-   - Tests: Salvar `accessToken` em variável
+   - Body: JSON with email and password
+   - Tests: Save `accessToken` in variable
 
 2. **Get Me**
    - Method: GET
    - URL: `{{base_url}}/backoffice/auth/me`
    - Headers: `Authorization: Bearer {{backoffice_token}}`
 
-Isso permite que você teste o fluxo completo de autenticação de forma automatizada.
-
+This allows you to test the complete authentication flow automatically.

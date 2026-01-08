@@ -1,16 +1,16 @@
-# Como Testar Auth Público (Test) no Postman
+# Testing Public Auth Endpoints in Postman
 
-Este guia mostra como testar os endpoints de autenticação públicos de teste usando o Postman.
+This guide shows how to test temporary public authentication endpoints using Postman.
 
-⚠️ **ATENÇÃO**: Estes endpoints são apenas para desenvolvimento/testes. NÃO devem ser usados em produção!
+WARNING: These endpoints are for development/testing only. They should NOT be used in production!
 
-## Pré-requisitos
+## Prerequisites
 
-1. **Base URL**: Configure a base URL da API no Postman (ex: `http://localhost:3000`)
+1. **Base URL**: Configure the API base URL in Postman (e.g., `http://localhost:3000`)
 
-## Endpoints Disponíveis
+## Available Endpoints
 
-### 1. Login de Teste (App Mobile)
+### 1. Test Login (App Mobile)
 
 **POST** `/test/auth/login`
 
@@ -27,11 +27,11 @@ Content-Type: application/json
 }
 ```
 
-**Campos:**
-- `email` (string, obrigatório): E-mail do usuário do app
-- `password` (string, obrigatório): Senha do usuário do app
+**Fields:**
+- `email` (string, required): App user email
+- `password` (string, required): App user password
 
-**Exemplo de Resposta (200):**
+**Success Response (200):**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -52,7 +52,7 @@ Content-Type: application/json
 }
 ```
 
-**Exemplo de Erro (401):**
+**Error Response (401):**
 ```json
 {
   "error": "401 users.errors.invalidCredentials",
@@ -61,9 +61,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. Login de Teste (Backoffice)
+### 2. Test Login (Backoffice)
 
 **POST** `/test/auth/backoffice-login`
 
@@ -80,11 +78,11 @@ Content-Type: application/json
 }
 ```
 
-**Campos:**
-- `email` (string, obrigatório): E-mail do usuário backoffice
-- `password` (string, obrigatório): Senha do usuário backoffice
+**Fields:**
+- `email` (string, required): Backoffice user email
+- `password` (string, required): Backoffice user password
 
-**Exemplo de Resposta (200):**
+**Success Response (200):**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -104,7 +102,7 @@ Content-Type: application/json
 }
 ```
 
-**Exemplo de Erro (401):**
+**Error Response (401):**
 ```json
 {
   "error": "401 backoffice.errors.invalidCredentials",
@@ -113,120 +111,105 @@ Content-Type: application/json
 }
 ```
 
----
+## Complete Test Flow
 
-## Fluxo Completo de Teste
+### Step 1: App Mobile Login
 
-### Passo 1: Login App Mobile
-
-1. Configure o método como **POST**
+1. Set method to **POST**
 2. URL: `{{base_url}}/test/auth/login`
-3. Na aba **Headers**, adicione:
+3. In **Headers** tab, add:
    - `Content-Type`: `application/json`
-4. Na aba **Body**, selecione **raw** e **JSON**, cole:
+4. In **Body** tab, select **raw** and **JSON**, paste:
 ```json
 {
   "email": "usuario@exemplo.com",
   "password": "sua-senha"
 }
 ```
-5. Clique em **Send**
-6. Copie o valor do campo `token` da resposta
+5. Click **Send**
+6. Copy the `token` value from response
 
----
+### Step 2: Use Token in Protected Endpoints
 
-### Passo 2: Usar Token em Endpoints Protegidos
-
-1. Use o token obtido no Passo 1
-2. Configure o método conforme o endpoint (GET, POST, etc.)
+1. Use token obtained in Step 1
+2. Set method according to endpoint (GET, POST, etc.)
 3. URL: `{{base_url}}/endpoint-protegido`
-4. Na aba **Headers**, adicione:
-   - `Authorization`: `Bearer {cole_o_token_aqui}`
+4. In **Headers** tab, add:
+   - `Authorization`: `Bearer {paste_token_here}`
    - `Content-Type`: `application/json`
-5. Clique em **Send**
+5. Click **Send**
 
----
+## Postman Environment Variables
 
-## Variáveis de Ambiente no Postman
-
-Para facilitar os testes, configure as seguintes variáveis no Postman:
+Configure these variables in Postman:
 
 ```
 base_url: http://localhost:3000
-app_token: {cole_o_token_do_app_aqui}
-backoffice_token: {cole_o_token_do_backoffice_aqui}
+app_token: {paste_app_token_here}
+backoffice_token: {paste_backoffice_token_here}
 ```
 
-Então use `{{base_url}}`, `{{app_token}}` e `{{backoffice_token}}` nas suas requisições.
+Then use `{{base_url}}`, `{{app_token}}` and `{{backoffice_token}}` in your requests.
 
----
-
-## Códigos de Erro Comuns
+## Common Error Codes
 
 ### 401 Unauthorized
-**Causas possíveis:**
-- `401 users.errors.invalidCredentials`: Credenciais inválidas
-- `401 users.errors.invalidPassword`: Senha inválida
-- `401 users.errors.userInactive`: Usuário inativo
-- `401 backoffice.errors.invalidCredentials`: Credenciais backoffice inválidas
-- `401 backoffice.errors.userInactive`: Usuário backoffice inativo
+**Possible causes:**
+- `401 users.errors.invalidCredentials`: Invalid credentials
+- `401 users.errors.invalidPassword`: Invalid password
+- `401 users.errors.userInactive`: User inactive
+- `401 backoffice.errors.invalidCredentials`: Invalid backoffice credentials
+- `401 backoffice.errors.userInactive`: Backoffice user inactive
 
-**Solução**: Verifique se o email e senha estão corretos.
+**Solution**: Verify email and password are correct.
 
 ### 400 Bad Request
-**Causas possíveis:**
-- `400 users.errors.invalidEmail`: E-mail inválido
-- `400 users.errors.invalidPassword`: Senha inválida
-- `400 backoffice.errors.invalidEmail`: E-mail backoffice inválido
-- `400 backoffice.errors.invalidPassword`: Senha backoffice inválida
+**Possible causes:**
+- `400 users.errors.invalidEmail`: Invalid email
+- `400 users.errors.invalidPassword`: Invalid password
+- `400 backoffice.errors.invalidEmail`: Invalid backoffice email
+- `400 backoffice.errors.invalidPassword`: Invalid backoffice password
 
-**Solução**: Verifique os dados enviados no body.
+**Solution**: Verify data sent in body.
 
----
+## Important Notes
 
-## Notas Importantes
+1. **FOR TESTING ONLY**: These endpoints are temporary and must be removed in production.
 
-1. **⚠️ APENAS PARA TESTES**: Estes endpoints são temporários e devem ser removidos em produção.
+2. **Real Validation**: Endpoints perform real password validation using bcrypt, so you need real user passwords.
 
-2. **Validação Real**: Os endpoints fazem validação real de senha usando bcrypt, então você precisa das senhas reais dos usuários.
+3. **JWT Token**: Returned token can be used in all protected endpoints that require authentication.
 
-3. **Token JWT**: O token retornado pode ser usado em todos os endpoints protegidos que exigem autenticação.
+4. **Active User**: 
+   - For app mobile: user must have status `enable` and not be deleted
+   - For backoffice: user must have status `active` and not be deleted
 
-4. **Usuário Ativo**: 
-   - Para app mobile: usuário deve ter status `enable` e não estar deletado
-   - Para backoffice: usuário deve ter status `active` e não estar deletado
+5. **Password**: Password must be registered in database. If user has no password, it will return error.
 
-5. **Senha**: A senha deve estar cadastrada no banco de dados. Se o usuário não tiver senha, retornará erro.
+## Postman Collection Example
 
----
-
-## Exemplo de Collection Postman
-
-Você pode criar uma collection no Postman com as seguintes requests:
+Create a Postman collection with these requests:
 
 1. **Test Login (App)**
    - Method: POST
    - URL: `{{base_url}}/test/auth/login`
-   - Body: JSON com email e password
-   - Tests: Salvar `token` em variável `app_token`
+   - Body: JSON with email and password
+   - Tests: Save `token` in `app_token` variable
 
 2. **Test Login (Backoffice)**
    - Method: POST
    - URL: `{{base_url}}/test/auth/backoffice-login`
-   - Body: JSON com email e password
-   - Tests: Salvar `token` em variável `backoffice_token`
+   - Body: JSON with email and password
+   - Tests: Save `token` in `backoffice_token` variable
 
-Isso permite que você teste o fluxo completo de autenticação de forma automatizada.
+This allows you to test the complete authentication flow automatically.
 
----
+## App vs Backoffice Differences
 
-## Diferença entre App e Backoffice
-
-| Aspecto | App Mobile | Backoffice |
-|---------|------------|------------|
-| Tabela | `users` | `backofficeUsers` |
-| Status válido | `enable` | `active` |
-| Role | `customer` (padrão) | Vem da tabela `backofficeRoles` |
-| Resposta | Inclui `identity` | Inclui `role` |
+| Aspect | App Mobile | Backoffice |
+|--------|------------|------------|
+| Table | `users` | `backofficeUsers` |
+| Valid status | `enable` | `active` |
+| Role | `customer` (default) | From `backofficeRoles` table |
+| Response | Includes `identity` | Includes `role` |
 | Endpoint | `/test/auth/login` | `/test/auth/backoffice-login` |
-

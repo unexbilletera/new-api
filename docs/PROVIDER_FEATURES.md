@@ -1,335 +1,265 @@
-# Funcionalidades por Provedor
+# Provider Features
 
-Este documento lista todas as funcionalidades/capacidades de cada provedor de pagamento, sem se preocupar com os endpoints específicos. O objetivo é entender o que cada provedor pode fazer antes de centralizar tudo em endpoints únicos.
+This document lists all features/capabilities of each payment provider, without focusing on specific endpoints. The goal is to understand what each provider can do before centralizing everything in unique endpoints.
 
----
+## CRONOS
 
-## 🏦 CRONOS
+### Financial Operations
 
-### 💰 Operações Financeiras
+1. **Cash-in (Deposit)**
+   - PIX receipt via PIX key
+   - Receipt via static/dynamic QR Code
+   - Automatic webhook when receiving money
 
-1. **Cash-in (Depósito)**
-   - Recebimento de PIX via chave PIX
-   - Recebimento via QR Code estático/dinâmico
-   - Webhook automático quando recebe dinheiro
+2. **Cash-out (Withdrawal/Send)**
+   - PIX send via PIX key
+   - Send via QR Code (dynamic QR Code)
+   - Transfer between Cronos accounts
 
-2. **Cash-out (Saque/Envio)**
-   - Envio de PIX via chave PIX
-   - Envio via QR Code (QR Code dinâmico)
-   - Transferência entre contas Cronos
+3. **Transfers**
+   - International transfer between users
+   - Support for multiple currencies (BRL, ARS)
+   - Automatic currency conversion when needed
 
-3. **Transferências**
-   - Transferência internacional entre usuários
-   - Suporte a múltiplas moedas (BRL, ARS)
-   - Conversão automática de moeda quando necessário
+4. **Payments**
+   - Bill payment (bank slip)
+   - Payment via QR Code (PIX QR Code)
+   - Support for payments in ARS and BRL
 
-4. **Pagamentos**
-   - Pagamento de boletos (boleto bancário)
-   - Pagamento via QR Code (PIX QR Code)
-   - Suporte a pagamentos em ARS e BRL
-
-5. **Recargas**
-   - Recarga de celular (pré-pago)
-   - Lista de empresas de recarga disponíveis
-   - Múltiplos modos de pagamento por empresa
+5. **Recharges**
+   - Mobile recharge (prepaid)
+   - List of available recharge companies
+   - Multiple payment methods per company
 
 6. **PIX**
-   - Cadastro de chaves PIX do usuário
-   - Remoção de chaves PIX
-   - Geração de QR Code para recebimento
-   - Leitura de QR Code para pagamento
+   - User PIX key registration
+   - PIX key removal
+   - QR Code generation for receipt
+   - QR Code reading for payment
 
-### 🔧 Funcionalidades Técnicas
+### Technical Features
 
-- **Webhook**: Recebe notificações de transações (cashin, cashout, etc.)
-- **Health Check**: Verifica status da integração
-- **Token Transacional**: Envio de token para validação de transações
-- **Statements**: Consulta de extratos bancários
-- **Accounts**: Gerenciamento de contas bancárias
+- **Webhook**: Receives transaction notifications (cashin, cashout, etc.)
+- **Health Check**: Checks integration status
+- **Transactional Token**: Sends token for transaction validation
+- **Statements**: Bank statement queries
+- **Accounts**: Bank account management
 
-### 📊 Tipos de Transação Suportados
+### Supported Transaction Types
 
-- `cashin` - Depósito padrão
-- `cashout` - Saque padrão
-- `cashout_cronos_qr` - Saque via QR Code
-- `payment` - Pagamento de boleto
-- `payment_cronos` - Pagamento via Cronos
-- `payment_qr` - Pagamento via QR Code
-- `recharge_cronos` - Recarga de celular
-- `transfer` - Transferência entre usuários
+- `cashin` - Standard deposit
+- `cashout` - Standard withdrawal
+- `cashout_cronos_qr` - Withdrawal via QR Code
+- `payment` - Bill payment
+- `payment_cronos` - Payment via Cronos
+- `payment_qr` - Payment via QR Code
+- `recharge_cronos` - Mobile recharge
+- `transfer` - Transfer between users
 
----
+## BIND
 
-## 🏦 BIND
+### Financial Operations
 
-### 💰 Operações Financeiras
+1. **Transfers**
+   - Transfer between CVUs (Virtual Unique Account - Argentina)
+   - Transfer between CBUs (Uniform Bank Key - Argentina)
+   - Transfer CVU → CBU
+   - Transfer CBU → CVU
+   - Support only for ARS currency (Argentine Pesos)
 
-1. **Transferências**
-   - Transferência entre CVUs (Conta Virtual Única - Argentina)
-   - Transferência entre CBUs (Clave Bancaria Uniforme - Argentina)
-   - Transferência CVU → CBU
-   - Transferência CBU → CVU
-   - Suporte apenas para moeda ARS (Pesos Argentinos)
+2. **Account Management**
+   - CVU creation for users
+   - Account query by CVU/CBU
+   - Account balance query
+   - CVU modification
+   - CVU deletion
+   - Account alias change
 
-2. **Gerenciamento de Contas**
-   - Criação de CVU para usuários
-   - Consulta de contas por CVU/CBU
-   - Consulta de saldo de contas
-   - Modificação de CVU existente
-   - Exclusão de CVU
-   - Alteração de alias (apelido) da conta
+3. **Cash-in (Deposit)**
+   - Receipt via Bind transfer (CVU/CBU)
+   - Automatic webhook when receiving money
 
-3. **Cash-in (Depósito)**
-   - Recebimento via transferência Bind (CVU/CBU)
-   - Webhook automático quando recebe dinheiro
+4. **Cash-out (Withdrawal/Send)**
+   - Send via Bind transfer (CVU/CBU)
+   - Support for transfers to external accounts
 
-4. **Cash-out (Saque/Envio)**
-   - Envio via transferência Bind (CVU/CBU)
-   - Suporte a transferências para contas externas
+### Technical Features
 
-### 🔧 Funcionalidades Técnicas
+- **Webhook**: Receives transfer notifications (cashin, cashout)
+- **Accounts API**: Account query and management
+- **Transfers API**: Query of performed transfers
+- **Transactions API**: Transaction queries
+- **Balance**: Balance queries
 
-- **Webhook**: Recebe notificações de transferências (cashin, cashout)
-- **Accounts API**: Consulta e gerenciamento de contas
-- **Transfers API**: Consulta de transferências realizadas
-- **Transactions API**: Consulta de transações
-- **Balance**: Consulta de saldos
+### Supported Transaction Types
 
-### 📊 Tipos de Transação Suportados
+- `cashin_bind` - Deposit via Bind (receipt)
+- `cashout_bind` - Withdrawal via Bind (send)
+- Transfers between Bind accounts (CVU/CBU)
 
-- `cashin_bind` - Depósito via Bind (recebimento)
-- `cashout_bind` - Saque via Bind (envio)
-- Transferências entre contas Bind (CVU/CBU)
+### Region
 
-### 🌍 Região
+- **Argentina only (ARS)**
+- Does not support Brazil or other currencies
 
-- **Apenas Argentina (ARS)**
-- Não suporta Brasil ou outras moedas
+## GIRE
 
----
+### Financial Operations
 
-## 🏦 GIRE
+1. **Payments**
+   - Bill payment (invoices)
+   - Bill query by barcode
+   - Bill query by company and payment method
+   - Support for multiple companies (utilities, services, etc.)
 
-### 💰 Operações Financeiras
+2. **Recharges**
+   - Mobile recharge (prepaid)
+   - List of available recharge companies
+   - Query specific recharge company
+   - Multiple payment methods per company
 
-1. **Pagamentos**
-   - Pagamento de boletos (faturas)
-   - Consulta de boletos por código de barras
-   - Consulta de boletos por empresa e modo de pagamento
-   - Suporte a múltiplas empresas (utilities, serviços, etc.)
+3. **Cash-out (Withdrawal/Send)**
+   - Withdrawal via Gire (money send)
+   - Integration with Argentine payment system
 
-2. **Recargas**
-   - Recarga de celular (pré-pago)
-   - Lista de empresas de recarga disponíveis
-   - Consulta de empresa de recarga específica
-   - Múltiplos modos de pagamento por empresa
+4. **Cash-in (Deposit)**
+   - Receipt via Gire
 
-3. **Cash-out (Saque/Envio)**
-   - Saque via Gire (envio de dinheiro)
-   - Integração com sistema de pagamentos argentino
+### Technical Features
 
-4. **Cash-in (Depósito)**
-   - Recebimento via Gire
+- **Webhook**: Receives payment and recharge notifications
+  - `cashin/consulta` - Cashin query
+  - `cashin/pago` - Payment receipt confirmation
+  - `cashout/consulta` - Cashout query
+  - `cashout/pago` - Payment send confirmation
+  - `reversa` - Transaction reversal
+- **Companies API**: Company search by name
+- **Payment Modes API**: Lists payment methods of a company
+- **Bills API**: Invoice/bill queries
+- **Operations API**: Query of performed operations
+- **Ticket**: Operation receipt generation
 
-### 🔧 Funcionalidades Técnicas
+### Supported Transaction Types
 
-- **Webhook**: Recebe notificações de pagamentos e recargas
-  - `cashin/consulta` - Consulta de cashin
-  - `cashin/pago` - Confirmação de pagamento recebido
-  - `cashout/consulta` - Consulta de cashout
-  - `cashout/pago` - Confirmação de pagamento enviado
-  - `reversa` - Reversão de transação
-- **Companies API**: Busca de empresas por nome
-- **Payment Modes API**: Lista modos de pagamento de uma empresa
-- **Bills API**: Consulta de faturas/boletos
-- **Operations API**: Consulta de operações realizadas
-- **Ticket**: Geração de comprovantes de operações
+- `cashout_gire` - Withdrawal via Gire
+- `payment_gire` - Bill payment via Gire
+- `recharge_gire` - Mobile recharge via Gire
 
-### 📊 Tipos de Transação Suportados
+### Region
 
-- `cashout_gire` - Saque via Gire
-- `payment_gire` - Pagamento de boleto via Gire
-- `recharge_gire` - Recarga de celular via Gire
+- **Argentina only (ARS)**
+- Focused on Argentine payments and services
 
-### 🌍 Região
+## MANTECA
 
-- **Apenas Argentina (ARS)**
-- Focado em pagamentos e serviços argentinos
+### Financial Operations
 
----
-
-## 🏦 MANTECA
-
-### 💰 Operações Financeiras
-
-1. **Exchange (Conversão de Moedas)**
-   - Conversão ARS → BRL (ramp-on: saída ARS, entrada BRL)
-   - Conversão BRL → ARS (ramp-off: saída BRL, entrada ARS)
-   - Cotações em tempo real
-   - Suporte a operações sintéticas (Synthetic Operations)
-   - Rastreamento de status via webhook
+1. **Exchange (Currency Conversion)**
+   - Conversion ARS → BRL (ramp-on: ARS out, BRL in)
+   - Conversion BRL → ARS (ramp-off: BRL out, ARS in)
+   - Real-time quotes
+   - Support for synthetic operations (Synthetic Operations)
+   - Status tracking via webhook
 
 2. **QR Code Payments**
-   - Pagamento via QR Code (Argentina)
-   - Pagamento via QR Code (Brasil)
-   - Suporte a QR Codes estáticos e dinâmicos
+   - Payment via QR Code (Argentina)
+   - Payment via QR Code (Brazil)
+   - Support for static and dynamic QR Codes
 
-3. **Withdraw (Saque)**
-   - Saque de criptomoedas/ativos digitais
-   - Conversão para moeda fiat (ARS/BRL)
-   - Rastreamento de status via webhook
+3. **Withdraw (Withdrawal)**
+   - Cryptocurrency/digital asset withdrawal
+   - Conversion to fiat currency (ARS/BRL)
+   - Status tracking via webhook
 
-### 🔧 Funcionalidades Técnicas
+### Technical Features
 
-- **Webhook**: Recebe notificações de múltiplos eventos:
-  - `SYNTHETIC_STATUS_UPDATE` - Atualização de status de operação sintética (exchange)
-  - `WITHDRAW_STATUS_UPDATE` - Atualização de status de saque
-  - `ORDER_STATUS_UPDATE` - Atualização de status de pedido
-- **Synthetic API**: Consulta de operações sintéticas (exchange)
-- **Withdraw API**: Consulta de saques
-- **Rates API**: Consulta de cotações de moedas
-- **Health Check**: Verifica status da integração
-- **Webhook Signature**: Geração de assinatura para validação de webhooks
-- **Check Synthetic Status**: Consulta direta do status de uma operação sintética
+- **Webhook**: Receives notifications for multiple events:
+  - `SYNTHETIC_STATUS_UPDATE` - Synthetic operation status update (exchange)
+  - `WITHDRAW_STATUS_UPDATE` - Withdrawal status update
+  - `ORDER_STATUS_UPDATE` - Order status update
+- **Synthetic API**: Synthetic operation queries (exchange)
+- **Withdraw API**: Withdrawal queries
+- **Rates API**: Currency quote queries
+- **Health Check**: Checks integration status
+- **Webhook Signature**: Signature generation for webhook validation
+- **Check Synthetic Status**: Direct status query of a synthetic operation
 
-### 📊 Tipos de Transação Suportados
+### Supported Transaction Types
 
-- `cashout_manteca_qr_ar` - Saque QR Manteca (Argentina)
-- `cashout_manteca_qr_br` - Saque QR Manteca (Brasil)
-- `cashout_manteca_exchange_ar` - Exchange Manteca (saída ARS, entrada BRL)
-- `cashout_manteca_exchange_br` - Exchange Manteca (saída BRL, entrada ARS)
-- `cashin_manteca_exchange_ar` - Cashin Exchange Manteca (recebimento ARS após exchange)
-- `cashin_manteca_exchange_br` - Cashin Exchange Manteca (recebimento BRL após exchange)
+- `cashout_manteca_qr_ar` - Manteca QR Withdrawal (Argentina)
+- `cashout_manteca_qr_br` - Manteca QR Withdrawal (Brazil)
+- `cashout_manteca_exchange_ar` - Manteca Exchange (ARS out, BRL in)
+- `cashout_manteca_exchange_br` - Manteca Exchange (BRL out, ARS in)
+- `cashin_manteca_exchange_ar` - Manteca Exchange Cashin (ARS receipt after exchange)
+- `cashin_manteca_exchange_br` - Manteca Exchange Cashin (BRL receipt after exchange)
 
-### 🌍 Região
+### Region
 
-- **Argentina e Brasil**
-- Focado em conversão de moedas e pagamentos QR
+- **Argentina and Brazil**
+- Focused on currency conversion and QR payments
 
----
+## COELSA
 
-## 🏦 COELSA
+### Financial Operations
 
-### 💰 Operações Financeiras
+1. **Cash-in (Deposit)**
+   - Receipt via Coelsa
+   - Integration with payment system
 
-1. **Cash-in (Depósito)**
-   - Recebimento via Coelsa
-   - Integração com sistema de pagamentos
+2. **Cash-out (Withdrawal/Send)**
+   - Withdrawal via Coelsa
+   - Money send
 
-2. **Cash-out (Saque/Envio)**
-   - Saque via Coelsa
-   - Envio de dinheiro
+3. **Refund**
+   - Transaction reversal
+   - Payment reversal
 
-3. **Reembolso (Refund)**
-   - Estorno de transações
-   - Reversão de pagamentos
+### Technical Features
 
-### 🔧 Funcionalidades Técnicas
+- **QR Code Decoding**: EMV QR Code decoding
+- Integration with Brazilian payment system
 
-- **QR Code Decoding**: Decodificação de QR Codes EMV
-- Integração com sistema de pagamentos brasileiro
+### Supported Transaction Types
 
-### 📊 Tipos de Transação Suportados
+- `cashin_coelsa` - Deposit via Coelsa
+- `cashout_coelsa` - Withdrawal via Coelsa
+- `refound_coelsa` - Refund via Coelsa
 
-- `cashin_coelsa` - Depósito via Coelsa
-- `cashout_coelsa` - Saque via Coelsa
-- `refound_coelsa` - Reembolso via Coelsa
+### Region
 
-### 🌍 Região
+- **Brazil**
+- Integration with Brazilian payment system
 
-- **Brasil**
-- Integração com sistema de pagamentos brasileiro
+## Comparative Summary
 
----
+| Feature | Cronos | Bind | Gire | Manteca | Coelsa |
+|---------|--------|------|------|---------|--------|
+| **Cash-in** | Yes | Yes | Yes | Yes (Exchange) | Yes |
+| **Cash-out** | Yes | Yes | Yes | Yes (QR + Exchange) | Yes |
+| **Transfers** | Yes | Yes | No | No | No |
+| **Payments (Bill)** | Yes | No | Yes | No | No |
+| **Payments (QR)** | Yes | No | No | Yes | No |
+| **Recharges** | Yes | No | Yes | No | No |
+| **Exchange (Conversion)** | No | No | No | Yes | No |
+| **PIX** | Yes | No | No | No | No |
+| **CVU/CBU** | No | Yes | No | No | No |
+| **Webhook** | Yes | Yes | Yes | Yes | No |
+| **Main Region** | BR | AR | AR | AR + BR | BR |
 
-## 📊 Resumo Comparativo
+## Common Features (Centralize)
 
-| Funcionalidade | Cronos | Bind | Gire | Manteca | Coelsa |
-|----------------|--------|------|------|---------|--------|
-| **Cash-in** | ✅ | ✅ | ✅ | ✅ (Exchange) | ✅ |
-| **Cash-out** | ✅ | ✅ | ✅ | ✅ (QR + Exchange) | ✅ |
-| **Transferências** | ✅ | ✅ | ❌ | ❌ | ❌ |
-| **Pagamentos (Boleto)** | ✅ | ❌ | ✅ | ❌ | ❌ |
-| **Pagamentos (QR)** | ✅ | ❌ | ❌ | ✅ | ❌ |
-| **Recargas** | ✅ | ❌ | ✅ | ❌ | ❌ |
-| **Exchange (Conversão)** | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **PIX** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **CVU/CBU** | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Webhook** | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **Região Principal** | BR | AR | AR | AR + BR | BR |
+### 1. Transaction Creation
+- All providers use the same flow: `createTransaction` → `confirmTransaction`
+- Difference is only in transaction `type`
 
----
+### 2. Transaction Confirmation
+- All use `confirmTransaction` after creating
+- Processing is asynchronous via webhook
 
-## 🎯 Funcionalidades Comuns (Centralizar)
+### 3. Webhooks
+- All providers send webhooks to update status
+- Asynchronous processing (SQS queue)
 
-### 1. **Criação de Transação**
-- Todos os provedores usam o mesmo fluxo: `createTransaction` → `confirmTransaction`
-- A diferença está apenas no `type` da transação
-
-### 2. **Confirmação de Transação**
-- Todos usam `confirmTransaction` após criar
-- O processamento é assíncrono via webhook
-
-### 3. **Webhooks**
-- Todos os provedores enviam webhooks para atualizar status
-- Processamento assíncrono (fila SQS)
-
-### 4. **Consulta de Transação**
-- Todos permitem consultar status de transação criada
-- Busca por ID da transação
-
----
-
-## 📝 Notas Importantes
-
-1. **Cronos** é o provedor mais completo, suportando:
-   - PIX (Brasil)
-   - Boletos
-   - QR Codes
-   - Recargas
-   - Transferências internacionais
-
-2. **Bind** é específico para Argentina:
-   - Apenas CVU/CBU (sistema argentino)
-   - Apenas ARS
-   - Focado em transferências
-
-3. **Gire** é específico para Argentina:
-   - Pagamentos de boletos/faturas
-   - Recargas
-   - Sistema de pagamentos argentino
-
-4. **Manteca** é para conversão de moedas:
-   - Exchange ARS ↔ BRL
-   - QR Codes (AR e BR)
-   - Operações sintéticas complexas
-
-5. **Coelsa** é para integração brasileira:
-   - Decodificação de QR Codes
-   - Integração com sistema de pagamentos BR
-
----
-
-## 🔄 Fluxo Centralizado Sugerido
-
-### Endpoint Único de Criação
-```
-POST /api/transactions
-Body: {
-  type: "cashout" | "cashin" | "transfer" | "payment" | "recharge" | ...
-  provider: "cronos" | "bind" | "gire" | "manteca" | "coelsa"
-  amount: number
-  currency: "BRL" | "ARS"
-}
-```
-
-### Endpoint Único de Confirmação
-```
-POST /api/transactions/:id/confirm
-```
-
-### Webhooks Centralizados
-```
-POST /api/webhooks/:provider
-```
-
+### 4. Transaction Query
+- All allow querying status of created transaction
+- Search by transaction ID
