@@ -102,46 +102,46 @@ export class AppInfoService {
 
     const news = await this.prisma.news.findMany({
       where: {
-        active: true,
+        status: 'enable',
         deletedAt: null,
         OR: [
-          { startDate: null },
-          { startDate: { lte: now } },
+          { validFrom: null },
+          { validFrom: { lte: now } },
         ],
         AND: [
           {
             OR: [
-              { endDate: null },
-              { endDate: { gte: now } },
+              { validTo: null },
+              { validTo: { gte: now } },
             ],
           },
         ],
       },
-      orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ order: 'desc' }, { createdAt: 'desc' }],
     });
 
     return news.map((n) => ({
       id: n.id,
       title: n.title,
-      message: n.message,
-      imageUrl: n.imageUrl || undefined,
-      actionUrl: n.actionUrl || undefined,
-      actionLabel: n.actionLabel || undefined,
-      priority: n.priority || 0,
-      startDate: n.startDate || undefined,
-      endDate: n.endDate || undefined,
-      active: n.active,
+      message: n.description || '',
+      imageUrl: n.image || undefined,
+      actionUrl: n.actionValue || undefined,
+      actionLabel: undefined,
+      priority: n.order || 0,
+      startDate: n.validFrom || undefined,
+      endDate: n.validTo || undefined,
+      active: n.status === 'enable',
       createdAt: n.createdAt,
     }));
   }  async getFeatures(): Promise<Record<string, boolean>> {
 
     const modules = await this.prisma.modules.findMany({
-      where: { deletedAt: null },
+      where: { isActive: 1 },
     });
 
     const features: Record<string, boolean> = {};
     modules.forEach((m) => {
-      features[m.key] = m.enabled;
+      features[m.name.toLowerCase()] = m.isActive === 1;
     });
 
     features['exchange'] = process.env.FEATURE_EXCHANGE !== 'false';
