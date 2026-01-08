@@ -8,6 +8,10 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { LoggerService } from './shared/logger/logger.service';
+import { loadEnvironmentFile } from './shared/config/env-loader';
+
+// Carrega variáveis de ambiente ANTES de inicializar a aplicação
+loadEnvironmentFile();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -34,7 +38,9 @@ async function bootstrap() {
 
   app.enableCors();
 
-  await app.listen(3000, '0.0.0.0');
-  logger.info('API running on http://0.0.0.0:3000');
+  const port = parseInt(process.env.PORT || process.env.WALLET_SERVER_PORT || '3000', 10);
+  await app.listen(port, '0.0.0.0');
+  logger.info(`API running on http://0.0.0.0:${port}`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 bootstrap();

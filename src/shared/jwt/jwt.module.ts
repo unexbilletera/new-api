@@ -1,16 +1,22 @@
 import { Global, Module } from '@nestjs/common';
 import { JwtModule as NestJwtModule } from '@nestjs/jwt';
 import { JwtService } from './jwt.service';
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
 
 @Global()
 @Module({
   imports: [
-    NestJwtModule.register({
-      secret: process.env.JWT_SECRET || 'default-secret-change-in-production',
-      signOptions: {
-        // @ts-expect-error - expiresIn accepts string like '24h' but types are strict
-        expiresIn: process.env.JWT_EXPIRES_IN || '24h',
-      },
+    ConfigModule, // Importa ConfigModule para ter acesso ao ConfigService
+    NestJwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.jwtSecret,
+        signOptions: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          expiresIn: configService.jwtExpiresIn as any,
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   providers: [JwtService],

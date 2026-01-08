@@ -1,9 +1,10 @@
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoginDto } from '../dto/login.dto';
 import { LoginResponseDto } from '../dto/login-response.dto';
 import { JwtService } from '../../../shared/jwt/jwt.service';
+import { ErrorCodes, ErrorHelper, SuccessCodes } from '../../../shared/errors/app-error';
 
 @Injectable()
 export class BackofficeUserModel {
@@ -36,11 +37,11 @@ export class BackofficeUserModel {
     const user = await this.findByEmail(loginDto.email);
 
     if (!user) {
-      throw new UnauthorizedException('Email ou senha inválidos');
+      throw ErrorHelper.unauthorized(ErrorCodes.BACKOFFICE_INVALID_CREDENTIALS);
     }
 
     if (user.status !== 'active') {
-      throw new UnauthorizedException('Usuário inativo');
+      throw ErrorHelper.unauthorized(ErrorCodes.BACKOFFICE_USER_INACTIVE);
     }
 
     const isPasswordValid = await PasswordHelper.compare(
@@ -49,7 +50,7 @@ export class BackofficeUserModel {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Email ou senha inválidos');
+      throw ErrorHelper.unauthorized(ErrorCodes.BACKOFFICE_INVALID_CREDENTIALS);
     }
 
     // Atualiza último login
@@ -77,6 +78,8 @@ export class BackofficeUserModel {
           level: user.backofficeRoles.level,
         },
       },
+      message: SuccessCodes.BACKOFFICE_LOGIN_SUCCESS,
+      code: SuccessCodes.BACKOFFICE_LOGIN_SUCCESS,
     };
   }
 
@@ -95,7 +98,7 @@ export class BackofficeUserModel {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw ErrorHelper.notFound(ErrorCodes.BACKOFFICE_USER_NOT_FOUND);
     }
 
     return user;
