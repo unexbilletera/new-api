@@ -1,4 +1,10 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthUserModel } from '../models/user.model';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
 import { JwtService, JwtPayload } from '../../../shared/jwt/jwt.service';
@@ -9,6 +15,8 @@ import { CronosService } from '../../../shared/cronos/cronos.service';
 import { AuthMapper } from '../mappers/auth.mapper';
 import { SigninDto } from '../dto/signin.dto';
 import { LoggerService } from '../../../shared/logger/logger.service';
+import { BruteForceService } from '../../../shared/security/brute-force.service';
+import { SuspiciousActivityService } from '../../../shared/security/suspicious-activity.service';
 
 @Injectable()
 export class SigninService {
@@ -21,6 +29,8 @@ export class SigninService {
     private prisma: PrismaService,
     private authMapper: AuthMapper,
     private logger: LoggerService,
+    private bruteForceService: BruteForceService,
+    private suspiciousActivityService: SuspiciousActivityService,
   ) {}
 
   private normalizeEmail(email: string): string {
@@ -65,11 +75,26 @@ export class SigninService {
       },
     });
 
+    const ipAddress = requestContext?.ipAddress;
+    const userAgent = requestContext?.userAgent;
+
+    const bruteForceCheck = await this.bruteForceService.checkAttempt(identifier, ipAddress, {
+      maxAttempts: 5,
+      windowMs: 15 * 60 * 1000,
+      lockoutDurationMs: 30 * 60 * 1000,
+    });
+
+    if (!bruteForceCheck.allowed) {
+      throw new HttpException('users.errors.tooManyAttempts', HttpStatus.TOO_MANY_REQUESTS);
+    }
+
     if (!user) {
+      await this.bruteForceService.recordFailure(identifier, undefined, ipAddress);
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
     if (user.status === 'disable') {
+      await this.bruteForceService.recordFailure(identifier, user.id, ipAddress);
       await this.accessLogService.logFailure({
         userId: user.id,
         ipAddress: requestContext?.ipAddress,
@@ -79,6 +104,7 @@ export class SigninService {
     }
 
     if (!user.password) {
+      await this.bruteForceService.recordFailure(identifier, user.id, ipAddress);
       await this.accessLogService.logFailure({
         userId: user.id,
         ipAddress: requestContext?.ipAddress,
@@ -90,6 +116,7 @@ export class SigninService {
     const isPasswordValid = await PasswordHelper.compare(dto.password, user.password);
 
     if (!isPasswordValid) {
+      await this.bruteForceService.recordFailure(identifier, user.id, ipAddress);
       await this.accessLogService.logFailure({
         userId: user.id,
         ipAddress: requestContext?.ipAddress,
@@ -121,6 +148,9 @@ export class SigninService {
       return this.authMapper.toSigninDeviceRequiredResponseDto(user, tempToken, 'hard');
     }
 
+    // Clear brute force counters after successful password validation
+    await this.bruteForceService.clearAttempts(identifier, ipAddress);
+
     try {
       const userIdentities = await this.userModel.getUserIdentities(user.id);
       const userAccounts = await this.userModel.getUserAccounts(user.id);
@@ -148,6 +178,20 @@ export class SigninService {
       ipAddress: requestContext?.ipAddress,
       userAgent: requestContext?.userAgent,
     });
+
+    // Suspicious activity detection (non-blocking)
+    this.suspiciousActivityService
+      .checkLoginActivity(
+        user.id,
+        SuspiciousActivityService.extractFingerprint(
+          userAgent,
+          ipAddress,
+          dto.deviceIdentifier,
+        ),
+      )
+      .catch((error) => {
+        this.logger.warn('Suspicious activity check failed', { error: error?.message });
+      });
 
     await this.userModel.updateLastLogin(user.id);
 

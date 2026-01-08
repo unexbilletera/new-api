@@ -21,6 +21,9 @@ import { PhoneValidationService } from './services/phone-validation.service';
 import { PasswordRecoveryService } from './services/password-recovery.service';
 import { TokenService } from './services/token.service';
 import { AuthMapper } from './mappers/auth.mapper';
+import { BruteForceService } from '../../shared/security/brute-force.service';
+import { RateLimiterService } from '../../shared/security/rate-limiter.service';
+import { SuspiciousActivityService } from '../../shared/security/suspicious-activity.service';
 
 @Module({
   imports: [
@@ -47,6 +50,9 @@ import { AuthMapper } from './mappers/auth.mapper';
     PasswordRecoveryService,
     TokenService,
     AuthService,
+    BruteForceService,
+    RateLimiterService,
+    SuspiciousActivityService,
   ],
   exports: [AuthService, SignupService, SigninService, EmailValidationService, PhoneValidationService, PasswordRecoveryService, TokenService],
 })
