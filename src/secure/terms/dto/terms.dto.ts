@@ -5,10 +5,6 @@ import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';expor
   @IsEnum(ServiceType)
   @IsNotEmpty()
   serviceType: ServiceType;
-
-  @IsString()
-  @IsOptional()
-  version?: string;
 }export class CheckTermParamDto {
   @IsEnum(ServiceType)
   @IsNotEmpty()
@@ -17,12 +13,10 @@ import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';expor
   id: string;
   userId: string;
   serviceType: string;
-  version?: string;
   acceptedAt: Date;
   ipAddress?: string;
 }export class TermCheckResponseDto {
   accepted: boolean;
   serviceType: string;
   acceptedAt?: Date;
-  version?: string;
 }
