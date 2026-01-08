@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { INestApplication } from '@nestjs/common';
+import { LoggerService } from '../../src/shared/logger/logger.service';
+
+const logger = new LoggerService();
 
 describe('Performance - Benchmark Tests', () => {
   let app: INestApplication | undefined;
@@ -37,7 +40,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(isValid).toBe(true);
       expect(duration).toBeLessThan(THRESHOLDS.emailValidation);
-      console.log(`Email validation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.emailValidation}ms)`);
+      logger.info(`Email validation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.emailValidation}ms)`);
     });
 
     it('should complete phone normalization within threshold', () => {
@@ -52,7 +55,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(normalized.length).toBeGreaterThanOrEqual(11);
       expect(duration).toBeLessThan(THRESHOLDS.phoneValidation);
-      console.log(`Phone normalization: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.phoneValidation}ms)`);
+      logger.info(`Phone normalization: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.phoneValidation}ms)`);
     });
   });
 
@@ -74,7 +77,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(token).toBeDefined();
       expect(duration).toBeLessThan(THRESHOLDS.tokenGeneration);
-      console.log(`Token generation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.tokenGeneration}ms)`);
+      logger.info(`Token generation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.tokenGeneration}ms)`);
     });
   });
 
@@ -102,7 +105,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(normalizedUsers.length).toBe(100);
       expect(avgPerUser).toBeLessThan(5);
-      console.log(`Batch normalization (100 users): ${duration.toFixed(3)}ms avg: ${avgPerUser.toFixed(3)}ms per user`);
+      logger.info(`Batch normalization (100 users): ${duration.toFixed(3)}ms avg: ${avgPerUser.toFixed(3)}ms per user`);
     });
   });
 
@@ -120,7 +123,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(validEmails.length).toBe(1000);
       expect(duration).toBeLessThan(50);
-      console.log(`1000 email validations: ${duration.toFixed(3)}ms`);
+      logger.info(`1000 email validations: ${duration.toFixed(3)}ms`);
     });
 
     it('should validate phone format efficiently', () => {
@@ -136,7 +139,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(validPhones.length).toBe(1000);
       expect(duration).toBeLessThan(50);
-      console.log(`1000 phone validations: ${duration.toFixed(3)}ms`);
+      logger.info(`1000 phone validations: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -158,7 +161,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(unread.length).toBeGreaterThan(0);
       expect(duration).toBeLessThan(100);
-      console.log(`Filter 10k notifications: ${duration.toFixed(3)}ms`);
+      logger.info(`Filter 10k notifications: ${duration.toFixed(3)}ms`);
     });
 
     it('should sort notifications efficiently', () => {
@@ -180,7 +183,7 @@ describe('Performance - Benchmark Tests', () => {
         sorted[sorted.length - 1].createdAt.getTime()
       );
       expect(duration).toBeLessThan(100);
-      console.log(`Sort 5k notifications: ${duration.toFixed(3)}ms`);
+      logger.info(`Sort 5k notifications: ${duration.toFixed(3)}ms`);
     });
 
     it('should map data transformation efficiently', () => {
@@ -205,7 +208,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(dtos.length).toBe(5000);
       expect(duration).toBeLessThan(50);
-      console.log(`Transform 5k users to DTO: ${duration.toFixed(3)}ms`);
+      logger.info(`Transform 5k users to DTO: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -232,7 +235,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(Object.keys(merged).length).toBe(1000);
       expect(duration).toBeLessThan(100);
-      console.log(`Merge 1000 validation results: ${duration.toFixed(3)}ms`);
+      logger.info(`Merge 1000 validation results: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -261,8 +264,7 @@ describe('Performance - Benchmark Tests', () => {
       expect(memoryIncrease).toBeLessThan(50);
       expect(mapped.length).toBe(5000);
 
-      console.log(`Memory usage: Initial=${(initialMemory / 1024 / 1024).toFixed(2)}MB, `
-        + `After creation=${(afterCreation / 1024 / 1024).toFixed(2)}MB (+${memoryIncrease.toFixed(2)}MB)`);
+      logger.info(`Memory usage: Initial=${(initialMemory / 1024 / 1024).toFixed(2)}MB, After creation=${(afterCreation / 1024 / 1024).toFixed(2)}MB (+${memoryIncrease.toFixed(2)}MB)`);
     });
   });
 
@@ -280,7 +282,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(valid).toBe(10000);
       expect(duration).toBeLessThan(200);
-      console.log(`10k email regex tests: ${duration.toFixed(3)}ms`);
+      logger.info(`10k email regex tests: ${duration.toFixed(3)}ms`);
     });
 
     it('should handle complex data validation regex', () => {
@@ -303,7 +305,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(valid).toBe(5000);
       expect(duration).toBeLessThan(150);
-      console.log(`5k complex validation regex: ${duration.toFixed(3)}ms`);
+      logger.info(`5k complex validation regex: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -325,7 +327,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(recent.length).toBeGreaterThan(0);
       expect(duration).toBeLessThan(100);
-      console.log(`Filter 10k notifications by date: ${duration.toFixed(3)}ms`);
+      logger.info(`Filter 10k notifications by date: ${duration.toFixed(3)}ms`);
     });
   });
 });
