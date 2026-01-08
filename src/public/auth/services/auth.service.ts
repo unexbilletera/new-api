@@ -308,7 +308,7 @@ export class AuthService {
           id: acc.id,
           type: acc.type || '',
           status: acc.status || '',
-          balance: acc.balance || '0',
+          balance: acc.balance ? (typeof acc.balance === 'string' ? acc.balance : acc.balance.toString()) : '0',
         })),
       });
     } catch (syncError: any) {
