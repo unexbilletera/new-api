@@ -72,7 +72,7 @@ export class UserModel {
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
       include: {
-        usersIdentities: {
+        usersIdentities_usersIdentities_userIdTousers: {
           select: {
             id: true,
             country: true,
@@ -107,7 +107,10 @@ export class UserModel {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    return user;
+    return {
+      ...user,
+      usersIdentities: user.usersIdentities_usersIdentities_userIdTousers,
+    } as unknown as UserWithRelations;
   }
 
   async findByIdSimple(userId: string) {
@@ -293,11 +296,11 @@ export class UserModel {
     });
   }
 
-  async updateValidaStatus(userId: string, status: string, notes: string) {
+  async updateValidaStatus(userId: string, status: 'pending' | 'process' | 'enable' | 'disable' | 'error' | 'rejected', notes: string) {
     return this.prisma.users.update({
       where: { id: userId },
       data: {
-        status,
+        status: status as any,
         notes,
       },
     });
@@ -358,7 +361,6 @@ export class UserModel {
       select: {
         id: true,
         type: true,
-        currency: true,
         balance: true,
         alias: true,
         status: true,
