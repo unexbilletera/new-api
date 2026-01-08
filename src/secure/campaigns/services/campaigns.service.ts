@@ -8,7 +8,9 @@ import {
 
 @Injectable()
 export class CampaignsService {
-  constructor(private prisma: PrismaService) {}  async validateCode(userId: string, code: string): Promise<CampaignValidationResponseDto> {
+  constructor(private prisma: PrismaService) {}
+
+  async validateCode(userId: string, code: string): Promise<CampaignValidationResponseDto> {
 
     const campaign = await this.prisma.campaign_codes.findFirst({
       where: {
@@ -24,7 +26,7 @@ export class CampaignsService {
       };
     }
 
-    if (!campaign.active) {
+    if (!campaign.isActive) {
       return {
         valid: false,
         message: 'Esta campanha não está ativa',
@@ -32,24 +34,17 @@ export class CampaignsService {
     }
 
     const now = new Date();
-    if (campaign.startDate && new Date(campaign.startDate) > now) {
+    if (campaign.validFrom && new Date(campaign.validFrom) > now) {
       return {
         valid: false,
         message: 'Esta campanha ainda não começou',
       };
     }
 
-    if (campaign.endDate && new Date(campaign.endDate) < now) {
+    if (campaign.validTo && new Date(campaign.validTo) < now) {
       return {
         valid: false,
         message: 'Esta campanha já expirou',
-      };
-    }
-
-    if (campaign.maxUses && campaign.currentUses >= campaign.maxUses) {
-      return {
-        valid: false,
-        message: 'Esta campanha atingiu o limite máximo de usos',
       };
     }
 
@@ -65,14 +60,14 @@ export class CampaignsService {
       code: campaign.code,
       name: campaign.name,
       description: campaign.description || undefined,
-      discountType: campaign.discountType || undefined,
-      discountValue: campaign.discountValue ? Number(campaign.discountValue) : undefined,
-      minAmount: campaign.minAmount ? Number(campaign.minAmount) : undefined,
-      maxUses: campaign.maxUses || undefined,
-      currentUses: campaign.currentUses || 0,
-      startDate: campaign.startDate || undefined,
-      endDate: campaign.endDate || undefined,
-      active: campaign.active,
+      discountType: undefined,
+      discountValue: undefined,
+      minAmount: undefined,
+      maxUses: undefined,
+      currentUses: 0,
+      startDate: campaign.validFrom || undefined,
+      endDate: campaign.validTo || undefined,
+      active: campaign.isActive,
     };
 
     if (userUsage) {
@@ -90,7 +85,9 @@ export class CampaignsService {
       campaign: campaignResponse,
       alreadyUsed: false,
     };
-  }  async useCode(
+  }
+
+  async useCode(
     userId: string,
     code: string,
     transactionId?: string,
@@ -112,13 +109,23 @@ export class CampaignsService {
       };
     }
 
+    const campaign = await this.prisma.campaign_codes.findUnique({
+      where: { id: validation.campaign!.id },
+    });
+
+    if (!campaign) {
+      return {
+        success: false,
+        message: 'Campanha não encontrada',
+      };
+    }
+
     const usage = await this.prisma.user_campaign_codes.create({
       data: {
         id: crypto.randomUUID(),
         userId,
         campaignCodeId: validation.campaign!.id,
-        transactionId: transactionId || null,
-        usedAt: new Date(),
+        code: campaign.code,
         createdAt: new Date(),
       },
     });
@@ -126,7 +133,6 @@ export class CampaignsService {
     await this.prisma.campaign_codes.update({
       where: { id: validation.campaign!.id },
       data: {
-        currentUses: { increment: 1 },
         updatedAt: new Date(),
       },
     });
@@ -136,7 +142,9 @@ export class CampaignsService {
       message: 'Código de campanha aplicado com sucesso',
       usageId: usage.id,
     };
-  }  async listUserCampaigns(userId: string): Promise<{
+  }
+
+  async listUserCampaigns(userId: string): Promise<{
     used: CampaignCodeResponseDto[];
   }> {
     const usages = await this.prisma.user_campaign_codes.findMany({
@@ -144,7 +152,7 @@ export class CampaignsService {
       include: {
         campaign_codes: true,
       },
-      orderBy: { usedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     const used = usages
@@ -154,19 +162,14 @@ export class CampaignsService {
         code: u.campaign_codes.code,
         name: u.campaign_codes.name,
         description: u.campaign_codes.description || undefined,
-        discountType: u.campaign_codes.discountType || undefined,
-        discountValue: u.campaign_codes.discountValue
-          ? Number(u.campaign_codes.discountValue)
-          : undefined,
-        minAmount: u.campaign_codes.minAmount
-          ? Number(u.campaign_codes.minAmount)
-          : undefined,
-        maxUses: u.campaign_codes.maxUses || undefined,
-        currentUses: u.campaign_codes.currentUses || 0,
-        startDate: u.campaign_codes.startDate || undefined,
-        endDate: u.campaign_codes.endDate || undefined,
-        active: u.campaign_codes.active,
-        usedAt: u.usedAt,
+        discountType: undefined,
+        discountValue: undefined,
+        minAmount: undefined,
+        maxUses: undefined,
+        currentUses: 0,
+        startDate: u.campaign_codes.validFrom || undefined,
+        endDate: u.campaign_codes.validTo || undefined,
+        active: u.campaign_codes.isActive,
       }));
 
     return { used };
