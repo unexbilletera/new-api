@@ -6,7 +6,7 @@ export class BackofficeUserModel {
   constructor(private prisma: PrismaService) {}
 
   async list(where: any, skip: number, take: number) {
-    return this.prisma.backoffice_users.findMany({
+    return this.prisma.backofficeUsers.findMany({
       where,
       skip,
       take,
@@ -15,24 +15,23 @@ export class BackofficeUserModel {
   }
 
   async count(where: any) {
-    return this.prisma.backoffice_users.count({ where });
+    return this.prisma.backofficeUsers.count({ where });
   }
 
   async findById(id: string) {
-    return this.prisma.backoffice_users.findUnique({
+    return this.prisma.backofficeUsers.findUnique({
       where: { id },
-      include: { roles: true },
     });
   }
 
   async findByEmail(email: string) {
-    return this.prisma.backoffice_users.findFirst({
+    return this.prisma.backofficeUsers.findFirst({
       where: { email },
     });
   }
 
   async create(data: any) {
-    return this.prisma.backoffice_users.create({
+    return this.prisma.backofficeUsers.create({
       data: {
         ...data,
         createdAt: new Date(),
@@ -42,7 +41,7 @@ export class BackofficeUserModel {
   }
 
   async update(id: string, data: any) {
-    return this.prisma.backoffice_users.update({
+    return this.prisma.backofficeUsers.update({
       where: { id },
       data: {
         ...data,
@@ -52,7 +51,7 @@ export class BackofficeUserModel {
   }
 
   async delete(id: string) {
-    return this.prisma.backoffice_users.delete({
+    return this.prisma.backofficeUsers.delete({
       where: { id },
     });
   }
