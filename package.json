@@ -41,8 +41,8 @@
     "db:push": "prisma db push",
     "db:pull": "prisma db pull",
     "db:seed": "prisma db seed",
-    "ec2-prod": "ssh -i /Users/brunosiqueira/Downloads/UNEX-PROD-PEM.pem ubuntu@18.224.174.89",
-    "ec2-sandbox": "ssh -i /Users/brunosiqueira/Downloads/UNEX-SANDBOX-PEM.pem ubuntu@13.58.89.194",
+    "ec2-prod": "ssh -i ./pem/UNEX-PROD-PEM.pem ubuntu@18.224.174.89",
+    "ec2-sandbox": "ssh -i ./pem/UNEX-SANDBOX-PEM.pem ubuntu@13.58.89.194",
     "job-zip-generate": "./lambda/build.sh production",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
@@ -57,8 +57,8 @@
     "docker:prisma:migrate": "docker exec -it unex-api npx prisma migrate dev",
     "docker:prisma:push": "docker exec -it unex-api npx prisma db push",
     "docker:prisma:studio": "npx prisma studio",
-    "prod-tunnel": "ssh -i /Users/brunosiqueira/Downloads/UNEX-PROD-PEM.pem -L 3306:unex-prod-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@18.224.174.89",
-    "sandbox-tunnel": "ssh -i /Users/brunosiqueira/Downloads/UNEX-SANDBOX-PEM.pem -L 3306:unex-sandbox-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@13.58.89.194"
+    "prod-tunnel": "ssh -i ./pem/UNEX-PROD-PEM.pem -L 3306:unex-prod-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@18.224.174.89",
+    "sandbox-tunnel": "ssh -i ./pem/UNEX-SANDBOX-PEM.pem -L 3306:unex-sandbox-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@13.58.89.194"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.960.0",
