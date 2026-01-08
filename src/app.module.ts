@@ -20,6 +20,8 @@ import { SecureTreasuryModule } from './secure/treasury/treasury.module';
 import { SecureNotificationsModule } from './secure/notifications/notifications.module';
 
 import { BackofficeAuthModule } from './backoffice/auth/auth.module';
+import { BackofficeClientsModule } from './backoffice/clients/backoffice-clients.module';
+import { BackofficeUsersModule } from './backoffice/users/backoffice-users.module';
 
 import { WebhooksModule } from './webhooks/webhooks.module';
 
@@ -42,6 +44,8 @@ import { HealthModule } from './health/health.module';
     SecureTreasuryModule,
     SecureNotificationsModule,
     BackofficeAuthModule,
+    BackofficeClientsModule,
+    BackofficeUsersModule,
     WebhooksModule,
   ],
   controllers: [AppController],
