@@ -193,7 +193,7 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 ## Onboarding Management
 
-### GET /backoffice/onboarding/users
+### GET /backoffice/onboarding/users ✅ TESTED
 **Description:** List users in onboarding  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
@@ -205,7 +205,15 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 **Response:** Onboarding user list response
 
-### GET /backoffice/onboarding/pending
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns paginated list of users in onboarding
+- Status: 200 OK
+- Response includes: data array, total count, page, limit
+- Each user includes: id, name, email, phone, status, onboardingState, country, createdAt, identities
+- Note: BackofficeOnboardingModule was added to app.module.ts
+
+### GET /backoffice/onboarding/pending ✅ TESTED
 **Description:** List pending onboarding users  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
@@ -217,13 +225,26 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 **Response:** Onboarding user list response
 
-### GET /backoffice/onboarding/users/:id
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns paginated list of pending onboarding users
+- Status: 200 OK
+- Response includes: data array, total count, page, limit
+- Each user includes: id, name, email, phone, status, onboardingState, country, createdAt, identities
+
+### GET /backoffice/onboarding/users/:id ✅ TESTED
 **Description:** Get user onboarding details  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `id` (string, UUID)
 
 **Response:** Onboarding user details response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns detailed user onboarding information
+- Status: 200 OK
+- Response includes: id, name, email, phone, status, onboardingState, country, createdAt, identities (with detailed information), accounts
 
 ### PATCH /backoffice/onboarding/users/:id
 **Description:** Update user onboarding information  
@@ -276,7 +297,7 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 ## Actions Management
 
-### GET /backoffice/actions
+### GET /backoffice/actions ✅ TESTED
 **Description:** List actions/services  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
@@ -288,18 +309,39 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 **Response:** Action list response
 
-### GET /backoffice/actions/groups
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns paginated list of actions/services
+- Status: 200 OK
+- Response includes: data array, total count, page, limit
+- Each action includes: id, name, icon, actionType, actionValue, order, enabled, translationKey, moduleName, createdAt, updatedAt
+- Note: BackofficeActionsModule was added to app.module.ts
+- Note: Query parameters page and limit must be numbers (not strings)
+
+### GET /backoffice/actions/groups ✅ TESTED
 **Description:** List action groups/modules  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Group list response
 
-### GET /backoffice/actions/:id
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns list of action groups/modules
+- Status: 200 OK
+- Response: array of group/module names (strings)
+
+### GET /backoffice/actions/:id ✅ TESTED
 **Description:** Get action by ID  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `id` (string, UUID)
 
 **Response:** Action response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns action details by ID
+- Status: 200 OK
+- Response includes: id, name, icon, actionType, actionValue, order, enabled, translationKey, moduleName, createdAt, updatedAt
 
 ### POST /backoffice/actions
 **Description:** Create action  
@@ -356,7 +398,7 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 **Response:** Success response
 
-### GET /backoffice/actions/check/:userId/:actionName
+### GET /backoffice/actions/check/:userId/:actionName ✅ TESTED
 **Description:** Check if user can perform action  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
@@ -365,9 +407,15 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 **Response:** Check response with canPerform boolean
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Checks if user can perform specific action
+- Status: 200 OK
+- Response includes: userId, actionName, canPerform (boolean)
+
 ## System Configuration
 
-### GET /backoffice/system-config
+### GET /backoffice/system-config ✅ TESTED
 **Description:** List system configurations  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
@@ -378,18 +426,38 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 **Response:** System config list response
 
-### GET /backoffice/system-config/groups
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns paginated list of system configurations
+- Status: 200 OK
+- Response includes: data array, total count, page, limit
+- Each config includes: id, key, value, description, category, isActive, createdAt, updatedAt, deletedAt
+- Note: BackofficeSystemConfigModule was added to app.module.ts
+
+### GET /backoffice/system-config/groups ✅ TESTED
 **Description:** List configuration groups  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Group list response
 
-### GET /backoffice/system-config/key/:key
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns list of configuration groups/categories
+- Status: 200 OK
+- Response: array of group/category names (strings)
+
+### GET /backoffice/system-config/key/:key ✅ TESTED
 **Description:** Get configuration by key  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `key` (string)
 
 **Response:** System config response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns configuration details by key
+- Status: 200 OK
+- Response includes: id, key, value, description, category, isActive, createdAt, updatedAt, deletedAt
 
 ### POST /backoffice/system-config
 **Description:** Create system configuration  
@@ -427,18 +495,30 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 ## Modules Management
 
-### GET /backoffice/system-config/modules
+### GET /backoffice/system-config/modules ✅ TESTED
 **Description:** List system modules  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Module list response
 
-### GET /backoffice/system-config/modules/:id
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns list of system modules
+- Status: 200 OK
+- Response: array of modules with id, name, isActive, createdAt, updatedAt
+
+### GET /backoffice/system-config/modules/:id ✅ TESTED
 **Description:** Get module by ID  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `id` (number)
 
 **Response:** Module response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns module details by ID
+- Status: 200 OK
+- Response includes: id, name, isActive, createdAt, updatedAt
 
 ### POST /backoffice/system-config/modules
 **Description:** Create module  
@@ -486,16 +566,29 @@ Backoffice endpoints that require authentication (Bearer token in Authorization 
 
 ## Roles Management
 
-### GET /backoffice/management/roles
+### GET /backoffice/management/roles ✅ TESTED
 **Description:** List backoffice roles  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Role list response
 
-### GET /backoffice/management/roles/:id
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns list of backoffice roles
+- Status: 200 OK
+- Response: array of roles with id, name, description, level, createdAt, updatedAt
+- Note: BackofficeRolesModule was added to app.module.ts
+
+### GET /backoffice/management/roles/:id ✅ TESTED
 **Description:** Get role by ID  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `id` (string, UUID)
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns role details by ID
+- Status: 200 OK
+- Response includes: id, name, description, level, createdAt, updatedAt
 
 **Response:** Role response
 

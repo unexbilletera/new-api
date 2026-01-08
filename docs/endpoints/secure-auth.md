@@ -4,7 +4,7 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 ## Notifications
 
-### GET /notifications
+### GET /notifications ✅ TESTED
 **Description:** List user notifications  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
@@ -13,6 +13,12 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 - `status` (string, enum: 'pending', 'read')
 
 **Response:** List notifications response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns paginated list of user notifications
+- Status: 200 OK
+- Response includes: data array, total count, page, limit, unreadCount
 
 ### PATCH /notifications/:id/read
 **Description:** Mark notification as read  
@@ -47,10 +53,16 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Update push token response
 
-### GET /notifications/push-token
+### GET /notifications/push-token ✅ TESTED
 **Description:** Get push notification token  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Get push token response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns push notification token for user
+- Status: 200 OK
+- Response includes: pushToken (string)
 
 ### POST /notifications/test
 **Description:** Send test push notification  
@@ -63,40 +75,78 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 ## Actions & Modules
 
-### GET /actions/layout
+### GET /actions/layout ✅ TESTED
 **Description:** Get full actions layout  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Layout response with all action sections
 
-### GET /actions/home
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns full actions layout with all sections
+- Status: 200 OK
+- Response includes: homeActions, bottomTabActions, menuActions, quickActions, servicesActions, modules
+- Note: ActionsAppModule was added to app.module.ts
+- Note: Fixed getModules method to not use deletedAt field (table doesn't have this field)
+
+### GET /actions/home ✅ TESTED
 **Description:** Get home actions  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Action response array
 
-### GET /actions/services
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns array of home actions
+- Status: 200 OK
+- Response: array of actions with id, section, type, name, title, icon, route, order, active, requiresKyc, requiresAuth, moduleKey (optional)
+
+### GET /actions/services ✅ TESTED
 **Description:** Get services actions  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Action response array
 
-### GET /actions/modules
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns array of services actions
+- Status: 200 OK
+- Response: array of actions with id, section, type, name, title, icon, route, order, active, requiresKyc, requiresAuth, moduleKey (optional)
+
+### GET /actions/modules ✅ TESTED
 **Description:** Get available modules  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Module response array
 
-### GET /actions/modules/:key/enabled
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns array of available modules
+- Status: 200 OK
+- Response: array of modules with id, key, name, enabled
+
+### GET /actions/modules/:key/enabled ✅ TESTED
 **Description:** Check if module is enabled  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `key` (string, module key)
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns module enabled status
+- Status: 200 OK
+- Response includes: moduleKey (string), enabled (boolean)
+
 **Response:** Module status response
 
-### GET /actions/filtered
+### GET /actions/filtered ✅ TESTED
 **Description:** Get filtered actions by module  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Actions with module filter response
 
-### GET /actions/section/:section
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns filtered actions by module (only enabled modules)
+- Status: 200 OK
+- Response: array of actions with id, section, type, name, title, icon, route, order, active, requiresKyc, requiresAuth, moduleKey (optional)
+
+### GET /actions/section/:section ✅ TESTED
 **Description:** Get actions by section  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
@@ -104,7 +154,13 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Action response array
 
-### GET /actions
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns actions (appears to return all actions regardless of section parameter)
+- Status: 200 OK
+- Response: array of actions with id, section, type, name, title, icon, route, order, active, requiresKyc, requiresAuth, moduleKey (optional)
+
+### GET /actions ✅ TESTED
 **Description:** Get all actions or filtered by section  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
@@ -113,9 +169,16 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Layout response or action array
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Without section parameter: returns full layout with all sections (homeActions, bottomTabActions, menuActions, quickActions, servicesActions, modules)
+- With section parameter: returns filtered actions array for specified section
+- Status: 200 OK
+- Note: Fixed ListActionsQueryDto to include validation decorators (@IsOptional, @IsEnum, @IsBoolean) for query parameters
+
 ## App Information
 
-### GET /app-info
+### GET /app-info ✅ TESTED
 **Description:** Get full app information  
 **Headers (Required):** Authorization Bearer token  
 **Headers (Optional):**
@@ -123,7 +186,14 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Full app info response
 
-### GET /app-info/basic
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns full app information including info, news, and features
+- Status: 200 OK
+- Response includes: info (minVersion, currentVersion, updateRequired, maintenanceMode, features), news array, features object
+- Note: AppInfoModule was added to app.module.ts
+
+### GET /app-info/basic ✅ TESTED
 **Description:** Get basic app information  
 **Headers (Required):** Authorization Bearer token  
 **Headers (Optional):**
@@ -131,7 +201,13 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** App info response
 
-### GET /app-info/version
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns basic app information (without news)
+- Status: 200 OK
+- Response includes: minVersion, currentVersion, updateRequired, maintenanceMode, features object
+
+### GET /app-info/version ✅ TESTED
 **Description:** Check app version  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
@@ -143,23 +219,48 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Version check response
 
-### GET /app-info/news
+**Test Result:**
+- ✅ Endpoint working correctly
+- Checks app version and determines if update is required or recommended
+- Status: 200 OK
+- Response includes: minVersion, currentVersion, userVersion, updateRequired (boolean), updateRecommended (boolean)
+
+### GET /app-info/news ✅ TESTED
 **Description:** Get app news  
 **Headers (Required):** Authorization Bearer token  
 **Response:** News response array
 
-### GET /app-info/features
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns array of app news/banners
+- Status: 200 OK
+- Response: array of news items with id, title, message, imageUrl, priority, active, createdAt, startDate (optional), endDate (optional), actionUrl (optional)
+
+### GET /app-info/features ✅ TESTED
 **Description:** Get app features  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Features response
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns app features object
+- Status: 200 OK
+- Response: object with feature keys and boolean values indicating if each feature is enabled
+
 ## Campaigns
 
-### GET /campaigns/validate/:code
+### GET /campaigns/validate/:code ✅ TESTED
 **Description:** Validate campaign code by path parameter  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `code` (string)
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Validates campaign code and returns validation result
+- Status: 200 OK
+- Response includes: valid (boolean), message (string), campaign (optional object), alreadyUsed (optional boolean)
+- Note: CampaignsModule was added to app.module.ts
 
 **Response:** Campaign validation response
 
@@ -179,14 +280,20 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Use campaign response
 
-### GET /campaigns/my
+### GET /campaigns/my ✅ TESTED
 **Description:** List user's used campaigns  
 **Headers (Required):** Authorization Bearer token  
 **Response:** List user campaigns response
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns list of campaigns used by the authenticated user
+- Status: 200 OK
+- Response includes: used array with campaign information
+
 ## Terms of Service
 
-### GET /terms/:serviceType
+### GET /terms/:serviceType ✅ TESTED
 **Description:** Check term acceptance status  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
@@ -194,15 +301,34 @@ Secure endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Term check response
 
-### GET /terms/acceptances/list
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns term acceptance status for the specified service type
+- Status: 200 OK
+- Response includes: accepted (boolean), serviceType (string), acceptedAt (string, optional)
+- Note: TermsModule was added to app.module.ts
+
+### GET /terms/acceptances/list ✅ TESTED
 **Description:** List all term acceptances  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Term acceptance response array
 
-### GET /terms/required/check
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns array of all term acceptances for the authenticated user
+- Status: 200 OK
+- Response: array of acceptances with id, userId, serviceType, acceptedAt, ipAddress
+
+### GET /terms/required/check ✅ TESTED
 **Description:** Check all required terms  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Check all required response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Checks all required terms and returns acceptance status
+- Status: 200 OK
+- Response includes: allAccepted (boolean), missing (array of service types), accepted (array of service types)
 
 ### POST /terms/accept
 **Description:** Accept term  

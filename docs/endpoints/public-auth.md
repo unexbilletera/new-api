@@ -4,15 +4,21 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 ## User Profile
 
-### GET /api/users/user/me
+### GET /api/users/user/me ✅ TESTED
 **Description:** Get current authenticated user profile  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
 - `systemVersion` (string)
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns complete authenticated user profile
+- Status: 200 OK
+- Response includes: user details (id, email, phone, name, status, access, language, country, birthdate, gender, maritalStatus, pep, identities, accounts), forceUpgrade, exchangeRates
+
 **Response:** User profile response
 
-### POST /api/users/user/profile
+### POST /api/users/user/profile ✅ TESTED
 **Description:** Update user profile information  
 **Headers (Required):** Authorization Bearer token  
 **Body (Optional):**
@@ -29,7 +35,13 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Profile update response
 
-### POST /api/users/user/address
+**Test Result:**
+- ✅ Endpoint working correctly
+- Successfully updates user profile information
+- Status: 200 OK
+- Response includes: success, user object with updated fields (id, email, firstName, lastName, phone, name, language, country, birthdate, gender, maritalStatus, image)
+
+### POST /api/users/user/address ✅ TESTED
 **Description:** Update user address  
 **Headers (Required):** Authorization Bearer token  
 **Body (Required):**
@@ -44,6 +56,12 @@ Public endpoints that require authentication (Bearer token in Authorization head
 - `complement` (string)
 
 **Response:** Address update response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Successfully updates user address
+- Status: 200 OK
+- Response includes: success, address object with all fields (zipCode, street, number, neighborhood, city, state, complement)
 
 ## Account Management
 
@@ -180,13 +198,19 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Upload Argentina document response
 
-### GET /api/users/user/onboarding/pending-data/:userIdentityId
+### GET /api/users/user/onboarding/pending-data/:userIdentityId ✅ TESTED
 **Description:** Get pending onboarding data  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `userIdentityId` (string, UUID)
 
 **Response:** Onboarding pending data response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns pending onboarding data for user identity
+- Status: 200 OK
+- Response includes: pendingFields (array), needsCorrection (array)
 
 ### POST /api/users/user/onboarding/update-specific-data/:userIdentityId
 **Description:** Update specific onboarding data  
@@ -206,13 +230,19 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Onboarding status response
 
-### GET /api/users/user/onboarding/validate/:userIdentityId
+### GET /api/users/user/onboarding/validate/:userIdentityId ✅ TESTED
 **Description:** Validate onboarding data  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `userIdentityId` (string, UUID)
 
 **Response:** Validate onboarding data response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Validates onboarding data for user identity
+- Status: 200 OK
+- Response includes: isValid (boolean), errors (array)
 
 ### POST /api/users/user/onboarding/retry/:userIdentityId
 **Description:** Retry onboarding process  
@@ -301,7 +331,7 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Revoke device response
 
-### GET /api/auth/devices/:userId
+### GET /api/auth/devices/:userId ✅ TESTED
 **Description:** List user devices  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
@@ -309,18 +339,31 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** List devices response
 
-### GET /api/auth/device/health-check
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns list of user devices
+- Status: 200 OK
+- Response includes: array of devices with deviceId, deviceIdentifier, platform, keyType, status, registeredAt, lastUsedAt, userId
+
+### GET /api/auth/device/health-check ✅ TESTED
 **Description:** Check device health  
 **Headers (Required):** Authorization Bearer token  
 **Query (Required):**
-- `userId` (string)
+- `userId` (string, optional - if provided must match authenticated user)
 - `deviceIdentifier` (string)
 
 **Response:** Check device health response
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Checks device health status
+- Status: 200 OK
+- Response includes: isValid, status (active/revoked/not_found), error (optional), message (optional), canRegister (optional)
+- Note: BiometricModule was added to app.module.ts, CurrentUser decorator fixed to extract field when specified
+
 ## Support & Messaging
 
-### POST /api/users/sendMessage
+### POST /api/users/sendMessage ✅ TESTED
 **Description:** Send message to support  
 **Headers (Required):** Authorization Bearer token  
 **Body (Required):**
@@ -332,15 +375,27 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Messaging response
 
+**Test Result:**
+- ✅ Endpoint working correctly
+- Successfully sends message to support
+- Status: 200 OK
+- Response: { "message": "Message sent successfully" }
+
 ## Identities & Accounts
 
-### GET /api/users/user/identities/:userId
+### GET /api/users/user/identities/:userId ✅ TESTED
 **Description:** Get user identities  
 **Headers (Required):** Authorization Bearer token  
 **Path (Required):**
 - `userId` (string, UUID)
 
 **Response:** Identity list response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns user identities list
+- Status: 200 OK
+- Response includes: identities array with id, country, taxDocumentNumber, taxDocumentType, identityDocumentNumber, identityDocumentType, status, createdAt for each identity
 
 ### POST /api/users/user/setDefaultUserIdentity/:id
 **Description:** Set default user identity  
@@ -369,21 +424,40 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 **Response:** Success response
 
-### GET /api/users/user/balances
+### GET /api/users/user/balances ✅ TESTED
 **Description:** Get user account balances  
 **Headers (Required):** Authorization Bearer token  
 **Response:** Account balance response
 
-### GET /api/users/userAccountInfo/:id
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns user account balances
+- Status: 200 OK
+- Response includes: accounts array with id, type, balance, alias, status for each account
+
+### GET /api/users/userAccountInfo/:id ✅ TESTED
 **Description:** Get user account information  
 **Path (Required):**
 - `id` (string, account ID)
 
 **Response:** Account info response
 
-### GET /api/users/sailpointInfo/:id
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns detailed user account information
+- Status: 200 OK
+- Response includes: account object with id, userId, userIdentityId, number, type, status, cvu, alias, balance, createdAt, updatedAt, deletedAt, notes, accountNumber, cronosId
+
+### GET /api/users/sailpointInfo/:id ✅ TESTED
 **Description:** Get Sailpoint information  
 **Path (Required):**
 - `id` (string, Sailpoint ID)
 
 **Response:** Sailpoint info response
+
+**Test Result:**
+- ✅ Endpoint working correctly
+- Returns Sailpoint information message
+- Status: 200 OK
+- Response: { "message": "Sailpoint info retrieved" }
+- Note: Does not require authentication
