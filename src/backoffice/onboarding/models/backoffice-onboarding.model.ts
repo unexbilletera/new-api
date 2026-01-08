@@ -36,14 +36,14 @@ export class BackofficeOnboardingModel {
   async approve(id: string) {
     return this.prisma.usersIdentities.update({
       where: { id },
-      data: { status: 'approved', verifiedAt: new Date(), updatedAt: new Date() },
+      data: { status: 'enable', updatedAt: new Date() },
     });
   }
 
   async reject(id: string, reason: string) {
     return this.prisma.usersIdentities.update({
       where: { id },
-      data: { status: 'rejected', rejectionReason: reason, updatedAt: new Date() },
+      data: { status: 'rejected', notes: reason || 'Rejeitado', updatedAt: new Date() },
     });
   }
 }
