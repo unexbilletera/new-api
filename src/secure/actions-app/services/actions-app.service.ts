@@ -6,16 +6,19 @@ import {
   ModuleResponseDto,
   LayoutResponseDto,
 } from '../dto/actions-app.dto';
+import {
+  ActionResponseDto as ResponseActionResponseDto,
+  ModuleResponseDto as ResponseModuleResponseDto,
+  LayoutResponseDto as ResponseLayoutResponseDto,
+} from '../dto/response';
 
 @Injectable()
 export class ActionsAppService {
-  constructor(private prisma: PrismaService) {}  async getHomeActions(activeOnly = true): Promise<ActionResponseDto[]> {
-    const where: any = {
-      deletedAt: null,
-    };
+  constructor(private prisma: PrismaService) {}  async getHomeActions(activeOnly = true): Promise<ResponseActionResponseDto[]> {
+    const where: any = {};
 
     if (activeOnly) {
-      where.active = true;
+      where.enabled = true;
     }
 
     const actions = await this.prisma.home_actions.findMany({
@@ -24,13 +27,11 @@ export class ActionsAppService {
     });
 
     return actions.map((a) => this.mapHomeAction(a));
-  }  async getServicesActions(activeOnly = true): Promise<ActionResponseDto[]> {
-    const where: any = {
-      deletedAt: null,
-    };
+  }  async getServicesActions(activeOnly = true): Promise<ResponseActionResponseDto[]> {
+    const where: any = {};
 
     if (activeOnly) {
-      where.active = true;
+      where.enabled = true;
     }
 
     const actions = await this.prisma.services_actions.findMany({
@@ -42,7 +43,7 @@ export class ActionsAppService {
   }  async getActionsBySection(
     section: ActionSection,
     activeOnly = true,
-  ): Promise<ActionResponseDto[]> {
+  ): Promise<ResponseActionResponseDto[]> {
     if (section === ActionSection.HOME) {
       return this.getHomeActions(activeOnly);
     }
@@ -53,11 +54,10 @@ export class ActionsAppService {
 
     const where: any = {
       section,
-      deletedAt: null,
     };
 
     if (activeOnly) {
-      where.active = true;
+      where.enabled = true;
     }
 
     const actions = await this.prisma.home_actions.findMany({
@@ -81,22 +81,22 @@ export class ActionsAppService {
     });
 
     return modules.map((m) => ({
-      id: m.id,
-      key: m.key,
+      id: String(m.id),
+      key: m.name.toLowerCase(),
       name: m.name,
-      description: m.description || undefined,
-      enabled: m.enabled,
+      description: undefined,
+      enabled: m.isActive === 1,
     }));
   }  async isModuleEnabled(moduleKey: string): Promise<boolean> {
     const module = await this.prisma.modules.findFirst({
       where: {
-        key: moduleKey,
-        deletedAt: null,
+        name: { contains: moduleKey },
+        isActive: 1,
       },
     });
 
-    return module?.enabled ?? false;
-  }  async getFullLayout(): Promise<LayoutResponseDto> {
+    return module?.isActive === 1;
+  }  async getFullLayout(): Promise<ResponseLayoutResponseDto> {
     const [homeActions, servicesActions, modules] = await Promise.all([
       this.getHomeActions(true),
       this.getServicesActions(true),
@@ -124,7 +124,7 @@ export class ActionsAppService {
       servicesActions,
       modules,
     };
-  }  async getActionsWithModuleFilter(): Promise<ActionResponseDto[]> {
+  }  async getActionsWithModuleFilter(): Promise<ResponseActionResponseDto[]> {
     const [homeActions, servicesActions, modules] = await Promise.all([
       this.getHomeActions(true),
       this.getServicesActions(true),
@@ -144,43 +144,43 @@ export class ActionsAppService {
     });
 
     return [...filteredHomeActions, ...filteredServicesActions];
-  }  private mapHomeAction(action: any): ActionResponseDto {
+  }  private mapHomeAction(action: any): ResponseActionResponseDto {
     return {
       id: action.id,
-      section: action.section || 'home',
-      type: action.type || 'navigation',
+      section: action.section || ActionSection.HOME,
+      type: action.actionType || 'navigation',
       name: action.name,
-      title: action.title || action.name,
+      title: action.name,
       description: action.description || undefined,
       icon: action.icon || undefined,
-      iconUrl: action.iconUrl || undefined,
-      color: action.color || undefined,
-      route: action.route || undefined,
-      externalUrl: action.externalUrl || undefined,
+      iconUrl: undefined,
+      color: undefined,
+      route: action.actionValue || undefined,
+      externalUrl: action.actionType === 'external_url' ? action.actionValue : undefined,
       order: action.order || 0,
-      active: action.active,
-      requiresKyc: action.requiresKyc || false,
-      requiresAuth: action.requiresAuth ?? true,
-      moduleKey: action.moduleKey || undefined,
+      active: action.enabled !== false,
+      requiresKyc: false,
+      requiresAuth: true,
+      moduleKey: action.moduleName || undefined,
     };
-  }  private mapServiceAction(action: any): ActionResponseDto {
+  }  private mapServiceAction(action: any): ResponseActionResponseDto {
     return {
       id: action.id,
-      section: 'services',
-      type: action.type || 'navigation',
+      section: ActionSection.SERVICES,
+      type: action.actionType || 'navigation',
       name: action.name,
-      title: action.title || action.name,
+      title: action.name,
       description: action.description || undefined,
       icon: action.icon || undefined,
-      iconUrl: action.iconUrl || undefined,
-      color: action.color || undefined,
-      route: action.route || undefined,
-      externalUrl: action.externalUrl || undefined,
+      iconUrl: undefined,
+      color: undefined,
+      route: action.actionValue || undefined,
+      externalUrl: action.actionType === 'external_url' ? action.actionValue : undefined,
       order: action.order || 0,
-      active: action.active,
-      requiresKyc: action.requiresKyc || false,
-      requiresAuth: action.requiresAuth ?? true,
-      moduleKey: action.moduleKey || undefined,
+      active: action.enabled !== false,
+      requiresKyc: false,
+      requiresAuth: true,
+      moduleKey: action.moduleName || undefined,
     };
   }
 }
