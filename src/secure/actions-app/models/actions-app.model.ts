@@ -6,13 +6,13 @@ export class ActionsAppModel {
   constructor(private prisma: PrismaService) {}
 
   async getAction(actionId: string) {
-    return this.prisma.actions_app.findUnique({
+    return this.prisma.home_actions.findUnique({
       where: { id: actionId },
     });
   }
 
   async listActions(where: any = {}, skip: number = 0, take: number = 20) {
-    return this.prisma.actions_app.findMany({
+    return this.prisma.home_actions.findMany({
       where,
       skip,
       take,
@@ -21,17 +21,17 @@ export class ActionsAppModel {
   }
 
   async countActions(where: any = {}) {
-    return this.prisma.actions_app.count({ where });
+    return this.prisma.home_actions.count({ where });
   }
 
   async createAction(data: any) {
-    return this.prisma.actions_app.create({
+    return this.prisma.home_actions.create({
       data: { ...data, createdAt: new Date(), updatedAt: new Date() },
     });
   }
 
   async updateAction(actionId: string, data: any) {
-    return this.prisma.actions_app.update({
+    return this.prisma.home_actions.update({
       where: { id: actionId },
       data: { ...data, updatedAt: new Date() },
     });
