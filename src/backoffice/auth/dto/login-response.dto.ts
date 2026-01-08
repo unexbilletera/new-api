@@ -10,5 +10,7 @@ export class LoginResponseDto {
       level: number;
     };
   };
+  message: string;
+  code: string;
 }
 

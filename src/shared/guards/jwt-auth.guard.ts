@@ -2,20 +2,37 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
+import { JwtService } from '../jwt/jwt.service';
+import { ErrorCodes, ErrorHelper } from '../errors/app-error';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest<FastifyRequest>();
+  constructor(private jwtService: JwtService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<FastifyRequest & { user?: any }>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token não fornecido');
+      throw ErrorHelper.unauthorized(ErrorCodes.USERS_MISSING_TOKEN);
     }
-    return true;
+
+    try {
+      const payload = await this.jwtService.verifyToken(token);
+      request.user = {
+        userId: payload.userId,
+        email: payload.email,
+        roleId: payload.roleId,
+      };
+      return true;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('expired')) {
+        throw ErrorHelper.unauthorized(ErrorCodes.USERS_EXPIRED_TOKEN);
+      }
+      throw ErrorHelper.unauthorized(ErrorCodes.USERS_INVALID_TOKEN);
+    }
   }
 
   private extractTokenFromHeader(request: FastifyRequest): string | undefined {

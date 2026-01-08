@@ -5,8 +5,9 @@ import { AppModel } from './app/models/app.model';
 import { AppMapper } from './app/mappers/app.mapper';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { JwtModule } from './shared/jwt/jwt.module';
+import { ConfigModule } from './shared/config/config.module';
 import { LoggerModule } from './shared/logger/logger.module';
-import { AppConfigModule } from './shared/config/config.module';
+import { SqsModule } from './shared/sqs/sqs.module';
 
 import { PublicAuthModule } from './public/auth/auth.module';
 import { PublicOnboardingModule } from './public/onboarding/onboarding.module';
@@ -26,8 +27,9 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
-    AppConfigModule,
-    LoggerModule,
+    ConfigModule, // Módulo de configuração global
+    LoggerModule, // Módulo Logger global
+    SqsModule, // Módulo SQS global
     PrismaModule,
     JwtModule,
     HealthModule,

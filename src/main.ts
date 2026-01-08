@@ -4,11 +4,14 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { LoggerService } from './shared/logger/logger.service';
+import { loadEnvironmentFile } from './shared/config/env-loader';
+
+// Carrega variáveis de ambiente ANTES de inicializar a aplicação
+loadEnvironmentFile();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -29,17 +32,9 @@ async function bootstrap() {
 
   app.enableCors();
 
-  const config = new DocumentBuilder()
-    .setTitle('UNEX API')
-    .setDescription('UNEX API Documentation')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  await app.listen(3000, '0.0.0.0');
-  logger.info('API running on http://0.0.0.0:3000');
-  logger.info('Swagger available at http://0.0.0.0:3000/api');
+  const port = parseInt(process.env.PORT || process.env.WALLET_SERVER_PORT || '3000', 10);
+  await app.listen(port, '0.0.0.0');
+  logger.info(`API running on http://0.0.0.0:${port}`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 bootstrap();

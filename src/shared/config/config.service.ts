@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService as NestConfigService } from '@nestjs/config';
 import { LoggerService } from '../logger/logger.service';
 import {
   AppConfig,
@@ -16,14 +16,13 @@ export class AppConfigService implements OnModuleInit {
   private config: AppConfig;
 
   constructor(
-    private readonly configService: ConfigService,
+    private readonly configService: NestConfigService,
     private readonly logger: LoggerService,
   ) {
     this.config = this.loadConfig();
   }
 
-  onModuleInit() {
-  }
+  onModuleInit(): void {}
 
   private loadConfig(): AppConfig {
     const nodeEnv = this.configService.get<string>('NODE_ENV', 'development');
@@ -97,10 +96,10 @@ export class AppConfigService implements OnModuleInit {
   }
 
   private loadValidaConfig(): ValidaConfig {
-    const validaEnabled = 
-      this.configService.get<string>('VALIDA_ENABLED', '').toLowerCase() === 'true' ||
+    const validaEnabled =
+      (this.configService.get<string>('VALIDA_ENABLED', '') || '').toLowerCase() === 'true' ||
       this.configService.get<string>('WALLET_VALIDA', '') === 'enable';
-    
+
     return {
       enable: validaEnabled,
       logging: this.configService.get<string>('WALLET_VALIDA_LOG', '') === 'enable',
@@ -198,5 +197,65 @@ export class AppConfigService implements OnModuleInit {
 
   getMockCode8Digits(): string {
     return this.config.mock.code8Digits;
+  }
+}
+
+@Injectable()
+export class ConfigService {
+  get databaseUrl(): string {
+    return process.env.WALLET_MYSQL_URL || '';
+  }
+
+  get jwtSecret(): string {
+    return (
+      process.env.JWT_SECRET ||
+      process.env.WALLET_TOKEN_SECRET ||
+      'default-secret-change-in-production'
+    );
+  }
+
+  get jwtExpiresIn(): string {
+    return process.env.JWT_EXPIRES_IN || process.env.WALLET_TOKEN_EXPIRE || '24h';
+  }
+
+  get serverPort(): number {
+    return parseInt(
+      process.env.PORT || process.env.WALLET_SERVER_PORT || '3000',
+      10,
+    );
+  }
+
+  get serverUrl(): string {
+    return (
+      process.env.SERVER_URL ||
+      process.env.WALLET_SERVER_URL ||
+      'http://localhost:3000'
+    );
+  }
+
+  get redisUrl(): string {
+    return process.env.REDIS_URL || process.env.WALLET_REDIS_URL || '';
+  }
+
+  get nodeEnv(): string {
+    return process.env.NODE_ENV || 'development';
+  }
+
+  get isProduction(): boolean {
+    return this.nodeEnv === 'production';
+  }
+
+  get isSandbox(): boolean {
+    return this.nodeEnv === 'sandbox';
+  }
+
+  get isDevelopment(): boolean {
+    return (
+      this.nodeEnv === 'development' || (!this.isProduction && !this.isSandbox)
+    );
+  }
+
+  get(key: string, defaultValue?: string): string | undefined {
+    return process.env[key] || defaultValue;
   }
 }

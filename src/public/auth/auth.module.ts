@@ -10,6 +10,7 @@ import { CronosModule } from '../../shared/cronos/cronos.module';
 import { ExchangeModule } from '../../shared/exchange/exchange.module';
 import { HelpersModule } from '../../shared/helpers/helpers.module';
 import { AuthController } from './controllers/auth.controller';
+import { TestAuthController } from './controllers/test-auth.controller';
 import { AuthService } from './services/auth.service';
 import { AuthUserModel } from './models/user.model';
 import { ValidationCodeModel } from './models/validation-code.model';
@@ -34,7 +35,7 @@ import { AuthMapper } from './mappers/auth.mapper';
     ExchangeModule,
     HelpersModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, TestAuthController],
   providers: [
     AuthUserModel,
     ValidationCodeModel,
@@ -50,4 +51,3 @@ import { AuthMapper } from './mappers/auth.mapper';
   exports: [AuthService, SignupService, SigninService, EmailValidationService, PhoneValidationService, PasswordRecoveryService, TokenService],
 })
 export class PublicAuthModule {}
-

@@ -1,26 +1,24 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-function loadPrismaClient() {
-  try {
-    return require('../../../generated/prisma').PrismaClient;
-  } catch {
-    try {
-      return require('../../../../generated/prisma').PrismaClient;
-    } catch {
-      return require('@prisma/client').PrismaClient;
-    }
-  }
-}
+// Import PrismaClient directly with proper types
+// Use generated/prisma which has all the types from the schema
+import { PrismaClient as GeneratedPrismaClient } from '../../../generated/prisma';
 
-const PrismaClient = loadPrismaClient();
-
+/**
+ * PrismaService com tipagem correta
+ * Estende PrismaClient para garantir type safety
+ * Usa GeneratedPrismaClient que tem todos os tipos do schema
+ */
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends GeneratedPrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     super({
       log:
         process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
       errorFormat: 'pretty',
-    } as any);
+    });
   }
 
   async onModuleInit(): Promise<void> {
