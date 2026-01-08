@@ -62,13 +62,19 @@ export class DeviceModel {
     publicKeyPem: string;
     keyType: string;
     platform: string;
-    attestation?: string | null;
-    status: string;
+    attestation?: any;
+    status: 'pending' | 'active' | 'revoked';
   }) {
     return this.prisma.devices.create({
       data: {
         id: randomUUID(),
-        ...data,
+        userId: data.userId,
+        deviceIdentifier: data.deviceIdentifier,
+        publicKeyPem: data.publicKeyPem,
+        keyType: data.keyType,
+        platform: data.platform,
+        attestation: data.attestation ? (typeof data.attestation === 'string' ? JSON.parse(data.attestation) : data.attestation) : undefined,
+        status: data.status,
       },
     });
   }
@@ -80,7 +86,7 @@ export class DeviceModel {
     });
   }
 
-  async updateDevicesByUserStatus(userId: string, currentStatus: string, newStatus: string, revokedAt?: Date) {
+  async updateDevicesByUserStatus(userId: string, currentStatus: 'pending' | 'active' | 'revoked', newStatus: 'pending' | 'active' | 'revoked', revokedAt?: Date) {
     return this.prisma.devices.updateMany({
       where: { userId, status: currentStatus },
       data: { status: newStatus, ...(revokedAt && { revokedAt }) },
