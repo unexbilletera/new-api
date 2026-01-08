@@ -1,44 +1,32 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 
-// Load PrismaClient dynamically at runtime with fallbacks
-function loadPrismaClient() {
-  try {
-    // Try to load from generated folder (dev mode with generated at root)
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
-    return require('../../../generated/prisma').PrismaClient;
-  } catch {
-    try {
-      // Try alternative path
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
-      return require('../../../../generated/prisma').PrismaClient;
-    } catch {
-      // Final fallback: load from npm package
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
-      return require('@prisma/client').PrismaClient;
-    }
-  }
-}
+// Import PrismaClient directly with proper types
+// Use generated/prisma which has all the types from the schema
+import { PrismaClient as GeneratedPrismaClient } from '../../../generated/prisma';
 
-const PrismaClient = loadPrismaClient();
-
+/**
+ * PrismaService com tipagem correta
+ * Estende PrismaClient para garantir type safety
+ * Usa GeneratedPrismaClient que tem todos os tipos do schema
+ */
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends GeneratedPrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
     super({
       log:
         process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
       errorFormat: 'pretty',
-    } as any);
+    });
   }
 
   async onModuleInit(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await this.$connect();
   }
 
   async onModuleDestroy(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await this.$disconnect();
   }
 }

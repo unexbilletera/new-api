@@ -27,7 +27,7 @@ npm install -D @types/bcrypt
 3. **Configurar variáveis de ambiente:**
    Crie um arquivo `.env` na raiz do projeto com:
    ```
-   DATABASE_URL="mysql://user:password@host:port/database"
+   WALLET_MYSQL_URL="mysql://user:password@host:port/database"
    JWT_SECRET="seu-secret-jwt-aqui"
    NODE_ENV="development"
    ```
