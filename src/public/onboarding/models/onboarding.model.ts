@@ -27,14 +27,18 @@ export class OnboardingModel {
   async createUser(data: {
     email: string;
     username: string;
-    status: string;
-    access: string;
+    status: 'pending' | 'process' | 'enable' | 'disable' | 'error' | 'rejected';
+    access: 'administrator' | 'supervisor' | 'operator' | 'customer' | 'user';
     onboardingState: any;
   }) {
     return this.prisma.users.create({
       data: {
         id: randomUUID(),
-        ...data,
+        email: data.email,
+        username: data.username,
+        status: data.status,
+        access: data.access,
+        onboardingState: data.onboardingState,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -75,7 +79,7 @@ export class OnboardingModel {
     });
   }
 
-  async findIdentityByUserAndCountry(userId: string, country: string) {
+  async findIdentityByUserAndCountry(userId: string, country: 'ar' | 'br') {
     return this.prisma.usersIdentities.findFirst({
       where: { userId, country, deletedAt: null },
     });
@@ -83,13 +87,15 @@ export class OnboardingModel {
 
   async createIdentity(data: {
     userId: string;
-    country: string;
-    status: string;
+    country: 'ar' | 'br';
+    status: 'pending' | 'process' | 'enable' | 'disable' | 'error' | 'rejected';
   }) {
     return this.prisma.usersIdentities.create({
       data: {
         id: randomUUID(),
-        ...data,
+        userId: data.userId,
+        country: data.country,
+        status: data.status,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
