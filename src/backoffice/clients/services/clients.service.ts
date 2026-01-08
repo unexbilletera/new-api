@@ -113,10 +113,9 @@ export class ClientsService {
       })),
       accounts: user.usersAccounts.map((a) => ({
         id: a.id,
-        type: a.type,
-        currency: a.currency,
+        type: a.type || null,
         balance: a.balance?.toString() || '0',
-        status: a.status,
+        status: a.status || null,
       })),
     };
   }  async update(id: string, dto: UpdateClientDto): Promise<ClientResponseDto> {
@@ -134,7 +133,7 @@ export class ClientsService {
         name: dto.name ?? user.name,
         email: dto.email ?? user.email,
         phone: dto.phone ?? user.phone,
-        status: dto.status ?? user.status,
+        status: (dto.status ?? user.status) as any,
         updatedAt: new Date(),
       },
       include: {
@@ -236,10 +235,9 @@ export class ClientsService {
 
     return accounts.map((a) => ({
       id: a.id,
-      type: a.type,
-      currency: a.currency,
+      type: a.type || null,
       balance: a.balance?.toString() || '0',
-      status: a.status,
+      status: a.status || null,
       createdAt: a.createdAt,
     }));
   }  async getLogs(id: string, query: { page?: number; limit?: number }) {
