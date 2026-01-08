@@ -1,3 +1,6 @@
+import { IsOptional, IsEnum, IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
+
 export enum ActionSection {
   HOME = 'home',
   BOTTOM_TAB = 'bottom_tab',
@@ -7,7 +10,13 @@ export enum ActionSection {
 }
 
 export class ListActionsQueryDto {
+  @IsOptional()
+  @IsEnum(ActionSection)
   section?: ActionSection;
+
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   activeOnly?: boolean;
 }
 
