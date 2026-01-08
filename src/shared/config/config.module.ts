@@ -4,10 +4,6 @@ import { AppConfigService, ConfigService } from './config.service';
 import { MockCodeValidatorHelper } from './mock-code-validator.helper';
 import { LoggerModule } from '../logger/logger.module';
 
-/**
- * Módulo de configuração global.
- * Carrega variáveis de ambiente e expõe tanto AppConfigService (legacy) quanto ConfigService (novo).
- */
 @Global()
 @Module({
   imports: [
@@ -25,5 +21,4 @@ import { LoggerModule } from '../logger/logger.module';
 })
 export class ConfigModule {}
 
-// Compatibilidade com código existente que importava AppConfigModule
 export { ConfigModule as AppConfigModule };

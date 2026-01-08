@@ -106,7 +106,6 @@ Exemplo:
 @Injectable()
 export class MeuHandler {
   async handleMeuJob(payload: any): Promise<void> {
-    // Sua lógica aqui
   }
 }
 ```

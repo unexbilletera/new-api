@@ -1,12 +1,5 @@
-/**
- * Códigos de erro padronizados seguindo o padrão da API antiga
- * Formato: {statusCode} {modulo}.errors.{codigoErro}
- * 
- * Exemplo: "400 users.errors.invalidPassword"
- */
 
 export enum ErrorCodes {
-  // ========== USERS ERRORS (400) ==========
   USERS_INVALID_PARAMETERS = '400 users.errors.invalidParameters',
   USERS_INVALID_USERNAME = '400 users.errors.invalidUsername',
   USERS_INVALID_EMAIL = '400 users.errors.invalidEmail',
@@ -18,7 +11,6 @@ export enum ErrorCodes {
   USERS_FAIL_BIND_CHANGE_ALIAS_SAME = '400 users.errors.failBindChangeAliasSame',
   USERS_FAIL_BIND_CHANGE_ALIAS_INVALID = '400 users.errors.failBindChangeAliasInvalid',
 
-  // ========== USERS ERRORS (401) ==========
   USERS_MISSING_TOKEN = '401 users.errors.missingToken',
   USERS_EXPIRED_TOKEN = '401 users.errors.expiredToken',
   USERS_INVALID_TOKEN = '401 users.errors.invalidToken',
@@ -27,14 +19,12 @@ export enum ErrorCodes {
   USERS_USER_INACTIVE = '401 users.errors.userInactive',
   USERS_USER_DELETED = '401 users.errors.userDeleted',
 
-  // ========== BACKOFFICE ERRORS (400) ==========
   BACKOFFICE_INVALID_PARAMETERS = '400 backoffice.errors.invalidParameters',
   BACKOFFICE_INVALID_EMAIL = '400 backoffice.errors.invalidEmail',
   BACKOFFICE_INVALID_PASSWORD = '400 backoffice.errors.invalidPassword',
   BACKOFFICE_USER_NOT_FOUND = '400 backoffice.errors.userNotFound',
   BACKOFFICE_INVALID_USER_ACCOUNT = '400 backoffice.errors.invalidUserAccount',
 
-  // ========== BACKOFFICE ERRORS (401) ==========
   BACKOFFICE_MISSING_TOKEN = '401 backoffice.errors.missingToken',
   BACKOFFICE_EXPIRED_TOKEN = '401 backoffice.errors.expiredToken',
   BACKOFFICE_INVALID_TOKEN = '401 backoffice.errors.invalidToken',
@@ -43,7 +33,6 @@ export enum ErrorCodes {
   BACKOFFICE_USER_DELETED = '401 backoffice.errors.userDeleted',
   BACKOFFICE_INSUFFICIENT_PERMISSIONS = '401 backoffice.errors.insufficientPermissions',
 
-  // ========== TRANSACTIONS ERRORS (400) ==========
   TRANSACTIONS_MISSING_CONTEXT_USER_ID = '400 transactions.errors.missingContextUserId',
   TRANSACTIONS_MISSING_ACTION = '400 transactions.errors.missingAction',
   TRANSACTIONS_INVALID_ACTION = '400 transactions.errors.invalidAction',
@@ -74,23 +63,16 @@ export enum ErrorCodes {
   TRANSACTIONS_SPENDING_LIMIT_EXCEEDED = '400 transactions.errors.spendingLimitExceeded',
   TRANSACTIONS_ARS_ACCOUNT_NOT_FOUND = '400 transactions.errors.arsAccountNotFound',
 
-  // ========== GENERIC ERRORS ==========
   INTERNAL_SERVER_ERROR = '500 server.errors.internalError',
   NOT_FOUND = '404 server.errors.notFound',
   FORBIDDEN = '403 server.errors.forbidden',
 }
 
-/**
- * Extrai o status code de um código de erro
- */
 export function getStatusCodeFromErrorCode(errorCode: string): number {
   const match = errorCode.match(/^(\d{3})/);
   return match ? parseInt(match[1], 10) : 500;
 }
 
-/**
- * Verifica se uma string é um código de erro no formato antigo
- */
 export function isErrorCode(error: string): boolean {
   return /^\d{3}\s+\w+\.errors\.\w+$/.test(error);
 }

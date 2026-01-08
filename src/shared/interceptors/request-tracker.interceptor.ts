@@ -9,10 +9,6 @@ import { tap } from 'rxjs/operators';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { LoggerService } from '../logger/logger.service';
 
-/**
- * Interceptor que rastreia todas as requisições HTTP
- * Registra: método, path, IP, user-agent, tempo de resposta, status, código de erro/sucesso
- */
 @Injectable()
 export class RequestTrackerInterceptor implements NestInterceptor {
   constructor(private logger: LoggerService) {}
@@ -32,7 +28,6 @@ export class RequestTrackerInterceptor implements NestInterceptor {
       'unknown';
     const userAgent = request.headers['user-agent'] || 'unknown';
 
-    // Log da requisição recebida
     this.logger.info('📥 Request received', {
       method,
       url,
@@ -47,20 +42,16 @@ export class RequestTrackerInterceptor implements NestInterceptor {
           const duration = Date.now() - startTime;
           const statusCode = response.statusCode || 200;
 
-          // Extrair código de erro/sucesso da resposta
           let responseCode: string | number | undefined;
           if (data && typeof data === 'object') {
-            // Código de sucesso
             if ('code' in data && typeof data.code === 'string') {
               responseCode = data.code;
             }
-            // Código de erro
             else if ('error' in data && typeof data.error === 'string') {
               responseCode = data.error;
             }
           }
 
-          // Log da resposta de sucesso
           this.logger.info('✅ Request completed', {
             method,
             url,
@@ -76,7 +67,6 @@ export class RequestTrackerInterceptor implements NestInterceptor {
           const statusCode =
             error?.status || error?.statusCode || response.statusCode || 500;
 
-          // Extrair código de erro
           let errorCode: string | number | undefined;
           if (error?.response) {
             const errorResponse = error.response;
@@ -93,7 +83,6 @@ export class RequestTrackerInterceptor implements NestInterceptor {
             errorCode = error.message;
           }
 
-          // Log da resposta de erro
           this.logger.error(
             '❌ Request failed',
             error instanceof Error ? error : new Error(error?.message || 'Unknown error'),

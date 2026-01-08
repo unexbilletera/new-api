@@ -8,12 +8,11 @@ import { ConfigService } from '../config/config.service';
 @Global()
 @Module({
   imports: [
-    ConfigModule, // Importa ConfigModule para ter acesso ao ConfigService
+    ConfigModule,
     NestJwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.jwtSecret,
         signOptions: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           expiresIn: configService.jwtExpiresIn as any,
         },
       }),

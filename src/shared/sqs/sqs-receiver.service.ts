@@ -8,18 +8,12 @@ import {
 import { ConfigService } from '../config/config.service';
 import { LoggerService } from '../logger/logger.service';
 
-/**
- * Interface para o body da mensagem SQS
- */
 interface SqsMessageBody {
   jobType?: string;
   payload?: Record<string, unknown>;
   timestamp?: string;
 }
 
-/**
- * Service para receber e processar mensagens da fila SQS
- */
 @Injectable()
 export class SqsReceiverService {
   private sqsClient: SQSClient;
@@ -43,11 +37,6 @@ export class SqsReceiverService {
     }
   }
 
-  /**
-   * Recebe mensagens da fila SQS
-   * @param maxMessages Número máximo de mensagens a receber (padrão: 1)
-   * @param waitTimeSeconds Tempo de espera em segundos (padrão: 20 para long polling)
-   */
   async receiveMessages(
     maxMessages: number = 1,
     waitTimeSeconds: number = 20,
@@ -60,7 +49,7 @@ export class SqsReceiverService {
       const command = new ReceiveMessageCommand({
         QueueUrl: this.queueUrl,
         MaxNumberOfMessages: maxMessages,
-        WaitTimeSeconds: waitTimeSeconds, // Long polling
+        WaitTimeSeconds: waitTimeSeconds,
         MessageAttributeNames: ['All'],
       });
 
@@ -74,9 +63,6 @@ export class SqsReceiverService {
     }
   }
 
-  /**
-   * Remove uma mensagem da fila após processamento bem-sucedido
-   */
   async deleteMessage(receiptHandle: string): Promise<void> {
     if (!this.queueUrl) {
       return;
@@ -98,9 +84,6 @@ export class SqsReceiverService {
     }
   }
 
-  /**
-   * Processa uma mensagem e retorna o payload parseado
-   */
   parseMessage(message: Message): {
     jobType: string;
     payload: Record<string, unknown>;
@@ -114,7 +97,6 @@ export class SqsReceiverService {
     try {
       const parsed: unknown = JSON.parse(message.Body);
 
-      // Validação de tipo
       if (typeof parsed !== 'object' || parsed === null) {
         this.logger.error('Body da mensagem não é um objeto válido');
         return null;

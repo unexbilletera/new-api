@@ -4,10 +4,6 @@ import { LoggerService } from '../shared/logger/logger.service';
 import { WorkerService } from './worker.service';
 import { loadEnvironmentFile } from '../shared/config/env-loader';
 
-/**
- * Worker principal
- * Processa mensagens da fila SQS e atualiza status de transações
- */
 async function bootstrap() {
   loadEnvironmentFile();
 

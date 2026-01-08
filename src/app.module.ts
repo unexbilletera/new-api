@@ -27,9 +27,9 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
-    ConfigModule, // Módulo de configuração global
-    LoggerModule, // Módulo Logger global
-    SqsModule, // Módulo SQS global
+    ConfigModule,
+    LoggerModule,
+    SqsModule,
     PrismaModule,
     JwtModule,
     HealthModule,

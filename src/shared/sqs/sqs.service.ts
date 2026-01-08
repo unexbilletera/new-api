@@ -6,9 +6,6 @@ import {
 } from '@aws-sdk/client-sqs';
 import { ConfigService } from '../config/config.service';
 
-/**
- * Service para enviar mensagens para filas SQS
- */
 @Injectable()
 export class SqsService {
   private sqsClient: SQSClient;
@@ -23,9 +20,6 @@ export class SqsService {
       '';
   }
 
-  /**
-   * Envia mensagem para fila de transações
-   */
   async sendTransactionMessage(
     jobType: string,
     payload: Record<string, any>,

@@ -12,7 +12,6 @@ export class AuthService {
     try {
       return await this.backofficeUserModel.validateCredentials(loginDto);
     } catch (error) {
-      // Se já for um AppError, re-lançar
       if (error && typeof error === 'object' && 'getStatus' in error) {
         throw error;
       }

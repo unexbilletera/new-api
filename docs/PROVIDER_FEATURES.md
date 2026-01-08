@@ -320,7 +320,6 @@ Body: {
   provider: "cronos" | "bind" | "gire" | "manteca" | "coelsa"
   amount: number
   currency: "BRL" | "ARS"
-  // ... outros campos específicos
 }
 ```
 
