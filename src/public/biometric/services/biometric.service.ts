@@ -299,7 +299,7 @@ export class BiometricService {
           publicKeyPem,
           keyType,
           platform,
-          attestation: attestation || null,
+          attestation: attestation ? (typeof attestation === 'string' ? JSON.parse(attestation) : attestation) : undefined,
           status: initialStatus,
           revokedAt: null,
         },
@@ -321,7 +321,7 @@ export class BiometricService {
         publicKeyPem,
         keyType,
         platform,
-        attestation: attestation || null,
+        attestation: attestation ? (typeof attestation === 'string' ? JSON.parse(attestation) : attestation) : undefined,
         status: initialStatus,
       },
     });
@@ -375,7 +375,7 @@ export class BiometricService {
         publicKeyPem,
         keyType,
         platform,
-        attestation: attestation || null,
+        attestation: attestation ? (typeof attestation === 'string' ? JSON.parse(attestation) : attestation) : undefined,
         status: 'active',
       },
     });
