@@ -1,5 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { LoggerService } from '../logger/logger.service';
+
+const logger = new LoggerService();
 
 export function loadEnvironmentFile(): void {
   const rootPath = process.cwd();
@@ -9,13 +12,13 @@ export function loadEnvironmentFile(): void {
     envFilePath = path.join(rootPath, process.env.ENV_FILE);
     if (fs.existsSync(envFilePath)) {
       loadDotEnvFile(envFilePath);
-      console.log(
-        `✅ Environment file loaded from ENV_FILE: ${process.env.ENV_FILE}`,
+      logger.info(
+        `Environment file loaded from ENV_FILE: ${process.env.ENV_FILE}`,
       );
       return;
     } else {
-      console.warn(
-        `⚠️  ENV_FILE specified but file not found: ${process.env.ENV_FILE}`,
+      logger.warn(
+        `ENV_FILE specified but file not found: ${process.env.ENV_FILE}`,
       );
     }
   }
@@ -36,7 +39,7 @@ export function loadEnvironmentFile(): void {
 
   if (fs.existsSync(envFilePath)) {
     loadDotEnvFile(envFilePath);
-    console.log(`✅ Environment file loaded: ${envFileName}`);
+    logger.info(`Environment file loaded: ${envFileName}`);
     return;
   }
 
@@ -44,12 +47,12 @@ export function loadEnvironmentFile(): void {
     const fallbackPath = path.join(rootPath, '.env');
     if (fs.existsSync(fallbackPath)) {
       loadDotEnvFile(fallbackPath);
-      console.log(`✅ Environment file loaded (fallback): .env`);
+      logger.info(`Environment file loaded (fallback): .env`);
       return;
     }
   }
 
-  console.warn(`⚠️  No environment file found. Tried: ${envFileName}`);
+  logger.warn(`No environment file found. Tried: ${envFileName}`);
 }
 
 function loadDotEnvFile(filePath: string): void {
@@ -80,7 +83,7 @@ function loadDotEnvFile(filePath: string): void {
 
     mapWalletVariables();
   } catch (error) {
-    console.error(`❌ Error loading environment file ${filePath}:`, error);
+    logger.error(`Error loading environment file ${filePath}:`, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
