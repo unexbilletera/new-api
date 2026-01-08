@@ -48,17 +48,9 @@ export class EmailService {
   ): Promise<SendEmailCodeResult> {
     const normalizedEmail = this.normalizeEmail(email);
     const emailMockEnabled = this.appConfigService.isEmailMockEnabled();
+    const mockCode = this.appConfigService.getMockCode8Digits();
 
-    let code: string;
-    if (emailMockEnabled) {
-      code = this.appConfigService.getMockCode8Digits();
-      this.logger.warn('[EMAIL MOCK] Using mock code for email validation', {
-        email: normalizedEmail,
-        code: code,
-      });
-    } else {
-      code = this.generateNumericCode(codeLength);
-    }
+    const code = this.generateNumericCode(codeLength);
 
     const hashedCode = bcrypt.hashSync(code, 10);
     const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
@@ -91,27 +83,20 @@ export class EmailService {
       }
     }
 
-    if (!emailMockEnabled) {
-      try {
-        await this.notificationService.sendEmailVerificationCode(
-          normalizedEmail,
-          code,
-          expiresInMinutes,
-        );
-        this.logger.info('[EMAIL] Validation code sent', {
-          email: normalizedEmail,
-        });
-      } catch (error) {
-        this.logger.error('[EMAIL] Failed to send validation code', error, {
-          email: normalizedEmail,
-        });
-        throw error;
-      }
-    } else {
-      this.logger.info('[EMAIL MOCK] Code NOT sent (mock enabled)', {
+    try {
+      await this.notificationService.sendEmailVerificationCode(
+        normalizedEmail,
+        code,
+        expiresInMinutes,
+      );
+      this.logger.info('[EMAIL] Validation code sent', {
         email: normalizedEmail,
-        code: code,
       });
+    } catch (error) {
+      this.logger.error('[EMAIL] Failed to send validation code', error, {
+        email: normalizedEmail,
+      });
+      throw error;
     }
 
     return {
@@ -119,7 +104,7 @@ export class EmailService {
       message: 'Validation code sent to email',
       email: normalizedEmail,
       expiresIn: expiresInMinutes * 60,
-      debug: emailMockEnabled ? code : undefined,
+      debug: emailMockEnabled ? mockCode : undefined,
     };
   }
 

@@ -49,18 +49,9 @@ export class SmsService {
   ): Promise<SendSmsCodeResult> {
     const normalizedPhone = this.normalizePhone(phone);
     const smsMockEnabled = this.appConfigService.isSmsMockEnabled();
+    const mockCode = this.appConfigService.getMockCode6Digits();
 
-    let code: string;
-    if (smsMockEnabled) {
-      code = this.appConfigService.getMockCode6Digits();
-      this.logger.warn('[SMS MOCK] Using mock code for phone validation', {
-        phone: normalizedPhone,
-        code: code,
-        method: method,
-      });
-    } else {
-      code = this.generateNumericCode(codeLength);
-    }
+    const code = this.generateNumericCode(codeLength);
 
     const hashedCode = bcrypt.hashSync(code, 10);
     const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
@@ -85,29 +76,21 @@ export class SmsService {
       },
     });
 
-    if (!smsMockEnabled) {
-      try {
-        await this.notificationService.sendPhoneVerificationCode(
-          normalizedPhone,
-          code,
-          expiresInMinutes,
-        );
-        this.logger.info('[SMS] Validation code sent', {
-          phone: normalizedPhone,
-          method: method,
-        });
-      } catch (error) {
-        this.logger.error('[SMS] Failed to send validation code', error, {
-          phone: normalizedPhone,
-        });
-        throw error;
-      }
-    } else {
-      this.logger.info('[SMS MOCK] Code NOT sent (mock enabled)', {
+    try {
+      await this.notificationService.sendPhoneVerificationCode(
+        normalizedPhone,
+        code,
+        expiresInMinutes,
+      );
+      this.logger.info('[SMS] Validation code sent', {
         phone: normalizedPhone,
-        code: code,
         method: method,
       });
+    } catch (error) {
+      this.logger.error('[SMS] Failed to send validation code', error, {
+        phone: normalizedPhone,
+      });
+      throw error;
     }
 
     return {
@@ -115,7 +98,7 @@ export class SmsService {
       message: 'Validation code sent to phone',
       phone: normalizedPhone,
       expiresIn: expiresInMinutes * 60,
-      debug: smsMockEnabled ? code : undefined,
+      debug: smsMockEnabled ? mockCode : undefined,
     };
   }
 
