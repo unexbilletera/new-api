@@ -1,152 +1,146 @@
-# Códigos de Erro e Sucesso da API
+# Error and Success Codes
 
-Este documento lista todos os códigos de erro e sucesso utilizados na API, seguindo o padrão: `{statusCode} {modulo}.{tipo}.{codigo}`
+This document lists all error and success codes used in the API, following the pattern: `{statusCode} {module}.{type}.{code}`
 
-## Formato
+## Format
 
-- **Erros**: `{statusCode} {modulo}.errors.{codigoErro}`
-- **Sucessos**: `{statusCode} {modulo}.success.{codigoSucesso}`
+- **Errors**: `{statusCode} {module}.errors.{errorCode}`
+- **Success**: `{statusCode} {module}.success.{successCode}`
 
----
+## Error Codes
 
-## 📋 Códigos de Erro
+### USERS ERRORS (400)
 
-### 🔴 USERS ERRORS (400)
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `400 users.errors.invalidParameters` | Invalid parameters | Invalid parameters |
+| `400 users.errors.invalidUsername` | Invalid username | Invalid username |
+| `400 users.errors.invalidEmail` | Invalid email | Invalid email |
+| `400 users.errors.invalidPassword` | Invalid password | Invalid password |
+| `400 users.errors.userNotFound` | User not found | User not found |
+| `400 users.errors.invalidUserAccount` | Invalid user account | Invalid user account |
+| `400 users.errors.failBindChangeAliasRecently` | Failed to change alias recently | Failed to change alias recently |
+| `400 users.errors.failBindChangeAliasAlreadyUsed` | Alias already in use | Alias already in use |
+| `400 users.errors.failBindChangeAliasSame` | Alias is the same | Alias is the same |
+| `400 users.errors.failBindChangeAliasInvalid` | Invalid alias | Invalid alias |
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `400 users.errors.invalidParameters` | Parâmetros inválidos | Parâmetros inválidos |
-| `400 users.errors.invalidUsername` | Username inválido | Username inválido |
-| `400 users.errors.invalidEmail` | Email inválido | Email inválido |
-| `400 users.errors.invalidPassword` | Senha inválida | Senha inválida |
-| `400 users.errors.userNotFound` | Usuário não encontrado | Usuário não encontrado |
-| `400 users.errors.invalidUserAccount` | Conta de usuário inválida | Conta de usuário inválida |
-| `400 users.errors.failBindChangeAliasRecently` | Falha ao alterar alias recentemente | Falha ao alterar alias recentemente |
-| `400 users.errors.failBindChangeAliasAlreadyUsed` | Alias já está em uso | Alias já está em uso |
-| `400 users.errors.failBindChangeAliasSame` | Alias é o mesmo | Alias é o mesmo |
-| `400 users.errors.failBindChangeAliasInvalid` | Alias inválido | Alias inválido |
+### USERS ERRORS (401)
 
-### 🔴 USERS ERRORS (401)
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `401 users.errors.missingToken` | Token not provided | Token not provided |
+| `401 users.errors.expiredToken` | Token expired | Token expired |
+| `401 users.errors.invalidToken` | Invalid token | Invalid token |
+| `401 users.errors.invalidAccess` | Invalid access | Invalid access |
+| `401 users.errors.invalidCredentials` | Invalid credentials | Invalid email or password |
+| `401 users.errors.userInactive` | User inactive | User inactive |
+| `401 users.errors.userDeleted` | User deleted | User deleted |
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `401 users.errors.missingToken` | Token não fornecido | Token não fornecido |
-| `401 users.errors.expiredToken` | Token expirado | Token expirado |
-| `401 users.errors.invalidToken` | Token inválido | Token inválido |
-| `401 users.errors.invalidAccess` | Acesso inválido | Acesso inválido |
-| `401 users.errors.invalidCredentials` | Credenciais inválidas | Email ou senha inválidos |
-| `401 users.errors.userInactive` | Usuário inativo | Usuário inativo |
-| `401 users.errors.userDeleted` | Usuário deletado | Usuário deletado |
+### BACKOFFICE ERRORS (400)
 
-### 🔴 BACKOFFICE ERRORS (400)
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `400 backoffice.errors.invalidParameters` | Invalid parameters | Invalid parameters |
+| `400 backoffice.errors.invalidEmail` | Invalid email | Invalid email |
+| `400 backoffice.errors.invalidPassword` | Invalid password | Invalid password |
+| `400 backoffice.errors.userNotFound` | User not found | User not found |
+| `400 backoffice.errors.invalidUserAccount` | Invalid user account | Invalid user account |
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `400 backoffice.errors.invalidParameters` | Parâmetros inválidos | Parâmetros inválidos |
-| `400 backoffice.errors.invalidEmail` | Email inválido | Email inválido |
-| `400 backoffice.errors.invalidPassword` | Senha inválida | Senha inválida |
-| `400 backoffice.errors.userNotFound` | Usuário não encontrado | Usuário não encontrado |
-| `400 backoffice.errors.invalidUserAccount` | Conta de usuário inválida | Conta de usuário inválida |
+### BACKOFFICE ERRORS (401)
 
-### 🔴 BACKOFFICE ERRORS (401)
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `401 backoffice.errors.missingToken` | Token not provided | Token not provided |
+| `401 backoffice.errors.expiredToken` | Token expired | Token expired |
+| `401 backoffice.errors.invalidToken` | Invalid token | Invalid token |
+| `401 backoffice.errors.invalidCredentials` | Invalid credentials | Invalid email or password |
+| `401 backoffice.errors.userInactive` | User inactive | User inactive |
+| `401 backoffice.errors.userDeleted` | User deleted | User deleted |
+| `401 backoffice.errors.insufficientPermissions` | Insufficient permissions | Insufficient permissions |
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `401 backoffice.errors.missingToken` | Token não fornecido | Token não fornecido |
-| `401 backoffice.errors.expiredToken` | Token expirado | Token expirado |
-| `401 backoffice.errors.invalidToken` | Token inválido | Token inválido |
-| `401 backoffice.errors.invalidCredentials` | Credenciais inválidas | Email ou senha inválidos |
-| `401 backoffice.errors.userInactive` | Usuário inativo | Usuário inativo |
-| `401 backoffice.errors.userDeleted` | Usuário deletado | Usuário deletado |
-| `401 backoffice.errors.insufficientPermissions` | Permissões insuficientes | Permissões insuficientes |
+### TRANSACTIONS ERRORS (400)
 
-### 🔴 TRANSACTIONS ERRORS (400)
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `400 transactions.errors.missingContextUserId` | Missing context user ID | Missing context user ID |
+| `400 transactions.errors.missingAction` | Missing action | Missing action |
+| `400 transactions.errors.invalidAction` | Invalid action | Invalid action |
+| `400 transactions.errors.missingStatus` | Missing status | Missing status |
+| `400 transactions.errors.invalidStatus` | Invalid status | Invalid status |
+| `400 transactions.errors.invalidActionStatus` | Invalid action status | Invalid action status |
+| `400 transactions.errors.invalidType` | Invalid type | Invalid type |
+| `400 transactions.errors.invalidAccountType` | Invalid account type | Invalid account type |
+| `400 transactions.errors.duplicateCoelsaId` | Duplicate Coelsa ID | Duplicate Coelsa ID |
+| `400 transactions.errors.missingId` | Missing ID | Missing ID |
+| `400 transactions.errors.invalidId` | Invalid ID | Invalid ID |
+| `400 transactions.errors.invalidStatusPending` | Invalid pending status | Invalid pending status |
+| `400 transactions.errors.invalidStatusProcess` | Invalid process status | Invalid process status |
+| `400 transactions.errors.invalidStatusFinal` | Invalid final status | Invalid final status |
+| `400 transactions.errors.invalidSourceIdentity` | Invalid source identity | Invalid source identity |
+| `400 transactions.errors.invalidSourceAccount` | Invalid source account | Invalid source account |
+| `400 transactions.errors.invalidSourceTaxDocumentNumber` | Invalid source tax document number | Invalid source tax document number |
+| `400 transactions.errors.invalidTargetIdentityId` | Invalid target identity ID | Invalid target identity ID |
+| `400 transactions.errors.invalidTargetUserAccount` | Invalid target user account | Invalid target user account |
+| `400 transactions.errors.invalidTargetTaxDocumentNumber` | Invalid target tax document number | Invalid target tax document number |
+| `400 transactions.errors.invalidSourceUser` | Invalid source user | Invalid source user |
+| `400 transactions.errors.invalidTargetUser` | Invalid target user | Invalid target user |
+| `400 transactions.errors.invalidSourceIdentityType` | Invalid source identity type | Invalid source identity type |
+| `400 transactions.errors.invalidtargetIdentity` | Invalid target identity | Invalid target identity |
+| `400 transactions.errors.invalidAccess` | Invalid access | Invalid access |
+| `400 transactions.errors.invalidGrantedTransactionLimit` | Invalid granted transaction limit | Invalid granted transaction limit |
+| `400 transactions.errors.invalidGrantedMonthLimit` | Invalid granted month limit | Invalid granted month limit |
+| `400 transactions.errors.spendingLimitExceeded` | Spending limit exceeded | Spending limit exceeded |
+| `400 transactions.errors.arsAccountNotFound` | ARS account not found | ARS account not found |
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `400 transactions.errors.missingContextUserId` | ID do usuário do contexto ausente | ID do usuário do contexto ausente |
-| `400 transactions.errors.missingAction` | Ação ausente | Ação ausente |
-| `400 transactions.errors.invalidAction` | Ação inválida | Ação inválida |
-| `400 transactions.errors.missingStatus` | Status ausente | Status ausente |
-| `400 transactions.errors.invalidStatus` | Status inválido | Status inválido |
-| `400 transactions.errors.invalidActionStatus` | Status de ação inválido | Status de ação inválido |
-| `400 transactions.errors.invalidType` | Tipo inválido | Tipo inválido |
-| `400 transactions.errors.invalidAccountType` | Tipo de conta inválido | Tipo de conta inválido |
-| `400 transactions.errors.duplicateCoelsaId` | ID Coelsa duplicado | ID Coelsa duplicado |
-| `400 transactions.errors.missingId` | ID ausente | ID ausente |
-| `400 transactions.errors.invalidId` | ID inválido | ID inválido |
-| `400 transactions.errors.invalidStatusPending` | Status pendente inválido | Status pendente inválido |
-| `400 transactions.errors.invalidStatusProcess` | Status de processamento inválido | Status de processamento inválido |
-| `400 transactions.errors.invalidStatusFinal` | Status final inválido | Status final inválido |
-| `400 transactions.errors.invalidSourceIdentity` | Identidade de origem inválida | Identidade de origem inválida |
-| `400 transactions.errors.invalidSourceAccount` | Conta de origem inválida | Conta de origem inválida |
-| `400 transactions.errors.invalidSourceTaxDocumentNumber` | Número de documento fiscal de origem inválido | Número de documento fiscal de origem inválido |
-| `400 transactions.errors.invalidTargetIdentityId` | ID de identidade de destino inválido | ID de identidade de destino inválido |
-| `400 transactions.errors.invalidTargetUserAccount` | Conta de usuário de destino inválida | Conta de usuário de destino inválida |
-| `400 transactions.errors.invalidTargetTaxDocumentNumber` | Número de documento fiscal de destino inválido | Número de documento fiscal de destino inválido |
-| `400 transactions.errors.invalidSourceUser` | Usuário de origem inválido | Usuário de origem inválido |
-| `400 transactions.errors.invalidTargetUser` | Usuário de destino inválido | Usuário de destino inválido |
-| `400 transactions.errors.invalidSourceIdentityType` | Tipo de identidade de origem inválido | Tipo de identidade de origem inválido |
-| `400 transactions.errors.invalidtargetIdentity` | Identidade de destino inválida | Identidade de destino inválida |
-| `400 transactions.errors.invalidAccess` | Acesso inválido | Acesso inválido |
-| `400 transactions.errors.invalidGrantedTransactionLimit` | Limite de transação concedido inválido | Limite de transação concedido inválido |
-| `400 transactions.errors.invalidGrantedMonthLimit` | Limite mensal concedido inválido | Limite mensal concedido inválido |
-| `400 transactions.errors.spendingLimitExceeded` | Limite de gastos excedido | Limite de gastos excedido |
-| `400 transactions.errors.arsAccountNotFound` | Conta ARS não encontrada | Conta ARS não encontrada |
+### GENERIC ERRORS
 
-### 🔴 GENERIC ERRORS
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `500 server.errors.internalError` | Internal server error | Internal server error |
+| `404 server.errors.notFound` | Resource not found | Resource not found |
+| `403 server.errors.forbidden` | Access forbidden | Access forbidden |
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `500 server.errors.internalError` | Erro interno do servidor | Erro interno do servidor |
-| `404 server.errors.notFound` | Recurso não encontrado | Recurso não encontrado |
-| `403 server.errors.forbidden` | Acesso proibido | Acesso proibido |
+## Success Codes
 
----
+### USERS SUCCESS (200)
 
-## ✅ Códigos de Sucesso
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `200 users.success.login` | Login successful | Login successful |
+| `200 users.success.logout` | Logout successful | Logout successful |
+| `200 users.success.register` | Registration successful | Registration successful |
+| `200 users.success.passwordReset` | Password reset successful | Password reset successful |
+| `200 users.success.profileUpdated` | Profile updated successfully | Profile updated successfully |
+| `200 users.success.passwordChanged` | Password changed successfully | Password changed successfully |
 
-### 🟢 USERS SUCCESS (200)
+### BACKOFFICE SUCCESS (200)
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `200 users.success.login` | Login realizado com sucesso | Login realizado com sucesso |
-| `200 users.success.logout` | Logout realizado com sucesso | Logout realizado com sucesso |
-| `200 users.success.register` | Registro realizado com sucesso | Registro realizado com sucesso |
-| `200 users.success.passwordReset` | Senha redefinida com sucesso | Senha redefinida com sucesso |
-| `200 users.success.profileUpdated` | Perfil atualizado com sucesso | Perfil atualizado com sucesso |
-| `200 users.success.passwordChanged` | Senha alterada com sucesso | Senha alterada com sucesso |
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `200 backoffice.success.login` | Login successful | Login successful |
+| `200 backoffice.success.logout` | Logout successful | Logout successful |
+| `200 backoffice.success.profileUpdated` | Profile updated successfully | Profile updated successfully |
+| `200 backoffice.success.passwordChanged` | Password changed successfully | Password changed successfully |
 
-### 🟢 BACKOFFICE SUCCESS (200)
+### TRANSACTIONS SUCCESS (200)
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `200 backoffice.success.login` | Login realizado com sucesso | Login realizado com sucesso |
-| `200 backoffice.success.logout` | Logout realizado com sucesso | Logout realizado com sucesso |
-| `200 backoffice.success.profileUpdated` | Perfil atualizado com sucesso | Perfil atualizado com sucesso |
-| `200 backoffice.success.passwordChanged` | Senha alterada com sucesso | Senha alterada com sucesso |
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `200 transactions.success.created` | Transaction created successfully | Transaction created successfully |
+| `200 transactions.success.confirmed` | Transaction confirmed successfully | Transaction confirmed successfully |
+| `200 transactions.success.cancelled` | Transaction cancelled successfully | Transaction cancelled successfully |
+| `200 transactions.success.completed` | Transaction completed successfully | Transaction completed successfully |
 
-### 🟢 TRANSACTIONS SUCCESS (200)
+### GENERIC SUCCESS
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `200 transactions.success.created` | Transação criada com sucesso | Transação criada com sucesso |
-| `200 transactions.success.confirmed` | Transação confirmada com sucesso | Transação confirmada com sucesso |
-| `200 transactions.success.cancelled` | Transação cancelada com sucesso | Transação cancelada com sucesso |
-| `200 transactions.success.completed` | Transação concluída com sucesso | Transação concluída com sucesso |
+| Code | Description | Translation |
+|------|-------------|-------------|
+| `200 server.success.operationSuccess` | Operation successful | Operation successful |
+| `200 server.success.dataRetrieved` | Data retrieved successfully | Data retrieved successfully |
 
-### 🟢 GENERIC SUCCESS
+## Response Format
 
-| Código | Descrição | Tradução |
-|--------|-----------|----------|
-| `200 server.success.operationSuccess` | Operação realizada com sucesso | Operação realizada com sucesso |
-| `200 server.success.dataRetrieved` | Dados recuperados com sucesso | Dados recuperados com sucesso |
-
----
-
-## 📝 Formato de Resposta
-
-### Resposta de Erro
+### Error Response
 
 ```json
 {
@@ -156,7 +150,7 @@ Este documento lista todos os códigos de erro e sucesso utilizados na API, segu
 }
 ```
 
-### Resposta de Sucesso
+### Success Response
 
 ```json
 {
@@ -167,15 +161,8 @@ Este documento lista todos os códigos de erro e sucesso utilizados na API, segu
 }
 ```
 
----
+## Adding New Codes
 
-## 🔄 Como Adicionar Novos Códigos
-
-1. Adicione o código no enum apropriado (`error-codes.ts` ou `success-codes.ts`)
-2. Atualize este documento com a descrição e tradução
-3. Use o código no código através de `ErrorCodes` ou `SuccessCodes`
-
----
-
-**Última atualização**: 2026-01-07
-
+1. Add code to appropriate enum (`error-codes.ts` or `success-codes.ts`)
+2. Update this document with description and translation
+3. Use code in code through `ErrorCodes` or `SuccessCodes`

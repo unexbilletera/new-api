@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: unex-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: unex
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: UnexDev@2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - unex-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: unex-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mysql://admin:UnexDev@2026@mysql:3306/unex?connection_limit=50&pool_timeout=30
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - unex-network
+    command: npm run start:dev
+
+volumes:
+  mysql_data:
+
+networks:
+  unex-network:
+    driver: bridge

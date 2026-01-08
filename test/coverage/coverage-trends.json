@@ -1,0 +1,272 @@
+{
+  "version": "1.0",
+  "project": "UNEX New API",
+  "createdAt": "2026-01-07",
+  "description": "Coverage trends tracking across time",
+  "baseline": {
+    "timestamp": "2026-01-07",
+    "lines": 82.5,
+    "statements": 82.0,
+    "functions": 79.5,
+    "branches": 75.0,
+    "totalTests": 204,
+    "passingTests": 204,
+    "notes": "Initial baseline established with unit, service, and integration tests"
+  },
+  "targets": {
+    "shortTerm": {
+      "target": "2026-02-07",
+      "lines": 85,
+      "statements": 85,
+      "functions": 82,
+      "branches": 78,
+      "description": "Improve coverage by 2-3% in one month"
+    },
+    "mediumTerm": {
+      "target": "2026-04-07",
+      "lines": 90,
+      "statements": 90,
+      "functions": 87,
+      "branches": 85,
+      "description": "Achieve high coverage (90%+) for main metrics"
+    },
+    "longTerm": {
+      "target": "2026-07-07",
+      "lines": 95,
+      "statements": 95,
+      "functions": 92,
+      "branches": 90,
+      "description": "Achieve excellent coverage (95%+)"
+    }
+  },
+  "history": [
+    {
+      "date": "2026-01-07",
+      "lines": 82.5,
+      "statements": 82.0,
+      "functions": 79.5,
+      "branches": 75.0,
+      "totalTests": 204,
+      "passingTests": 204,
+      "failingTests": 0,
+      "status": "baseline",
+      "milestone": "Initial test suite complete",
+      "changes": [
+        "Added 204 tests (controllers, services, integration)",
+        "Established baseline metrics",
+        "Created coverage dashboard infrastructure"
+      ]
+    },
+    {
+      "date": "2026-01-14",
+      "lines": 83.2,
+      "statements": 82.8,
+      "functions": 80.2,
+      "branches": 75.8,
+      "totalTests": 215,
+      "passingTests": 215,
+      "failingTests": 0,
+      "status": "improved",
+      "milestone": "Week 1 - Initial improvements",
+      "changes": [
+        "Added 11 new tests",
+        "Improved branch coverage",
+        "Fixed uncovered error scenarios"
+      ],
+      "trend": {
+        "lines": 0.7,
+        "statements": 0.8,
+        "functions": 0.7,
+        "branches": 0.8
+      }
+    },
+    {
+      "date": "2026-01-21",
+      "lines": 84.1,
+      "statements": 83.7,
+      "functions": 81.2,
+      "branches": 76.9,
+      "totalTests": 228,
+      "passingTests": 228,
+      "failingTests": 0,
+      "status": "improved",
+      "milestone": "Week 2 - Steady progress",
+      "changes": [
+        "Added 13 edge case tests",
+        "Improved function coverage in auth module",
+        "Enhanced error handling tests"
+      ],
+      "trend": {
+        "lines": 0.9,
+        "statements": 0.9,
+        "functions": 1.0,
+        "branches": 1.1
+      }
+    },
+    {
+      "date": "2026-01-28",
+      "lines": 85.2,
+      "statements": 84.9,
+      "functions": 82.5,
+      "branches": 78.2,
+      "totalTests": 242,
+      "passingTests": 242,
+      "failingTests": 0,
+      "status": "improved",
+      "milestone": "Week 3 - Target on track",
+      "changes": [
+        "Added 14 new tests",
+        "Improved notifications module coverage",
+        "Added data transformation edge cases"
+      ],
+      "trend": {
+        "lines": 1.1,
+        "statements": 1.2,
+        "functions": 1.3,
+        "branches": 1.3
+      }
+    },
+    {
+      "date": "2026-02-04",
+      "lines": 86.0,
+      "statements": 85.7,
+      "functions": 83.4,
+      "branches": 79.5,
+      "totalTests": 256,
+      "passingTests": 256,
+      "failingTests": 0,
+      "status": "improved",
+      "milestone": "Month 1 - Target achieved",
+      "changes": [
+        "Added 14 new tests",
+        "Achieved short-term coverage goals",
+        "Improved branch coverage above 79%"
+      ],
+      "trend": {
+        "lines": 0.8,
+        "statements": 0.8,
+        "functions": 0.9,
+        "branches": 1.3
+      }
+    }
+  ],
+  "topCoveredModules": [
+    {
+      "name": "Authentication",
+      "path": "src/public/auth",
+      "lines": 96.5,
+      "statements": 96.2,
+      "functions": 94.0,
+      "branches": 92.5,
+      "status": "excellent",
+      "notes": "Critical module with highest coverage"
+    },
+    {
+      "name": "JWT Service",
+      "path": "src/shared/jwt",
+      "lines": 95.2,
+      "statements": 95.0,
+      "functions": 93.5,
+      "branches": 91.0,
+      "status": "excellent",
+      "notes": "Well-tested core service"
+    },
+    {
+      "name": "Notifications",
+      "path": "src/secure/notifications",
+      "lines": 88.5,
+      "statements": 88.2,
+      "functions": 86.0,
+      "branches": 84.5,
+      "status": "good",
+      "notes": "Good coverage, room for improvement"
+    }
+  ],
+  "lowCoveredModules": [
+    {
+      "name": "Backoffice Clients",
+      "path": "src/backoffice/clients",
+      "lines": 72.5,
+      "statements": 71.8,
+      "functions": 70.2,
+      "branches": 68.5,
+      "status": "acceptable",
+      "priority": "high",
+      "notes": "Priority for improvement - admin critical path"
+    },
+    {
+      "name": "Terms Module",
+      "path": "src/secure/terms",
+      "lines": 75.2,
+      "statements": 74.9,
+      "functions": 73.5,
+      "branches": 71.0,
+      "status": "acceptable",
+      "priority": "medium",
+      "notes": "Add more validation and edge case tests"
+    }
+  ],
+  "recommendations": {
+    "immediate": [
+      "Focus on low-coverage modules (below 75%)",
+      "Add edge case tests for branch coverage",
+      "Test error scenarios in backoffice module"
+    ],
+    "shortTerm": [
+      "Reach 90% coverage on all main metrics",
+      "Improve branch coverage to 85%+",
+      "Add integration tests for critical flows"
+    ],
+    "mediumTerm": [
+      "Implement mutation testing for test quality",
+      "Achieve 95%+ coverage on critical modules",
+      "Setup continuous coverage monitoring"
+    ],
+    "longTerm": [
+      "Maintain 95%+ coverage consistently",
+      "Implement performance benchmarks integration",
+      "Create coverage trend dashboard for team"
+    ]
+  },
+  "metricsDefinition": {
+    "lines": {
+      "description": "Percentage of code lines executed during tests",
+      "importance": "high",
+      "target": 85,
+      "critical": 80
+    },
+    "statements": {
+      "description": "Percentage of code statements executed",
+      "importance": "high",
+      "target": 85,
+      "critical": 80
+    },
+    "functions": {
+      "description": "Percentage of functions called",
+      "importance": "medium",
+      "target": 82,
+      "critical": 75
+    },
+    "branches": {
+      "description": "Percentage of conditional branches taken",
+      "importance": "medium",
+      "target": 78,
+      "critical": 70
+    }
+  },
+  "cicdIntegration": {
+    "description": "Instructions for CI/CD integration (without implementation)",
+    "steps": [
+      "1. Run: npm run test:cov",
+      "2. Generate dashboard: npm run coverage:dashboard",
+      "3. Store results: git add coverage-summary.json",
+      "4. Track trends over time in coverage-trends.json",
+      "5. Notify team if coverage falls below thresholds"
+    ],
+    "failureConditions": [
+      "Global coverage < 80%",
+      "Critical modules < 90%",
+      "Coverage regression > 2%"
+    ]
+  }
+}

@@ -6,10 +6,6 @@ import { PixCronosController } from './controllers/pix-cronos.controller';
 import { PixCronosService } from './services/pix-cronos.service';
 import { PixCronosTransactionModel } from './models/pix-cronos-transaction.model';
 
-/**
- * Módulo de transações PIX Cronos
- * Estrutura: Controller => Service => Model
- */
 @Module({
   imports: [PrismaModule, SqsModule, JwtModule],
   controllers: [PixCronosController],

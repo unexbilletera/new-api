@@ -23,7 +23,6 @@ export class LoggingInterceptor implements NestInterceptor {
         const response = context.switchToHttp().getResponse();
         const delay = Date.now() - now;
         
-        // Extrair código de sucesso/erro da resposta
         let code: string | undefined;
         if (data && typeof data === 'object') {
           if ('code' in data && typeof data.code === 'string') {
@@ -40,7 +39,6 @@ export class LoggingInterceptor implements NestInterceptor {
         const response = context.switchToHttp().getResponse();
         const delay = Date.now() - now;
         
-        // Extrair código de erro
         let errorCode: string | undefined;
         if (error?.response) {
           const errorResponse = error.response;

@@ -1,66 +1,55 @@
-# Instalação e Configuração
+# Installation and Configuration
 
-## 📦 Dependências Necessárias
-
-Para que o projeto funcione completamente, instale as seguintes dependências:
+## Installation
 
 ```bash
-# Dependências de produção
-npm install bcrypt class-validator class-transformer @nestjs/jwt
-
-# Dependências de desenvolvimento
-npm install -D @types/bcrypt
+npm install
+npm run prisma:generate
 ```
 
-## 🔧 Configuração Inicial
+## Configuration
 
-1. **Instalar dependências base:**
-   ```bash
-   npm install
-   ```
+Create a `.env` file in the project root:
 
-2. **Gerar Prisma Client:**
-   ```bash
-   npm run prisma:generate
-   ```
+```env
+NODE_ENV=development
+WALLET_MYSQL_URL="mysql://user:password@host:port/database"
+DATABASE_URL="mysql://user:password@host:port/database"
+JWT_SECRET="your-jwt-secret-here"
+JWT_EXPIRES_IN=1d
+```
 
-3. **Configurar variáveis de ambiente:**
-   Crie um arquivo `.env` na raiz do projeto com:
-   ```
-   WALLET_MYSQL_URL="mysql://user:password@host:port/database"
-   JWT_SECRET="seu-secret-jwt-aqui"
-   NODE_ENV="development"
-   ```
+## Running
 
-## 🚀 Executar o Projeto
-
-### Desenvolvimento
-
+### Development
 ```bash
-# API
-npm run start:dev
-
-# Worker (em outro terminal)
-npm run start:worker
+npm run start:dev          # API with watch
+npm run start:worker       # Worker (separate terminal)
 ```
 
-### Produção
-
+### Production
 ```bash
-# Build
-npm run build
-
-# API
-npm run start:prod:api
-
-# Worker
-npm run start:prod:worker
+npm run build              # Build
+npm run start:prod:api     # API
+npm run start:prod:worker  # Worker
 ```
 
-## 📝 Próximos Passos
+### Sandbox
+```bash
+npm run start:sandbox:dev  # Sandbox API with watch
+npm run sandbox-tunnel     # SSH tunnel (separate terminal)
+```
 
-1. ✅ JWT implementado e funcional
-2. Configurar variáveis de ambiente (JWT_SECRET, JWT_EXPIRES_IN)
-3. Configurar SQS para fila de mensagens
-4. Implementar os demais módulos seguindo o exemplo do `backoffice/auth`
+### Production
+```bash
+npm run start:prod:dev     # Production API with watch
+npm run prod-tunnel        # SSH tunnel (separate terminal)
+```
 
+## Environment Variables
+
+- `WALLET_MYSQL_URL`: Database connection URL (Prisma)
+- `DATABASE_URL`: Alternative database URL
+- `JWT_SECRET`: Secret for JWT signing
+- `JWT_EXPIRES_IN`: Token expiration time (e.g., 1d, 24h)
+- `NODE_ENV`: Environment (development, sandbox, production)

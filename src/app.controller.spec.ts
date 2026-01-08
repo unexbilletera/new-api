@@ -1,22 +1,42 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppService } from './app/services/app.service';
+import { AppGreetingResponseDto } from './app/dto/response';
 
 describe('AppController', () => {
-  let appController: AppController;
+  let controller: AppController;
+  let service: jest.Mocked<AppService>;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    service = {
+      getHello: jest.fn(),
+    } as unknown as jest.Mocked<AppService>;
+
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [{ provide: AppService, useValue: service }],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    controller = module.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getHello', () => {
+    it('should delegate to service', () => {
+      const response: AppGreetingResponseDto = { message: 'Hello World!' };
+      service.getHello.mockReturnValue(response);
+
+      expect(controller.getHello()).toEqual(response);
+      expect(service.getHello).toHaveBeenCalled();
+    });
+
+    it('should return the service response', () => {
+      const response: AppGreetingResponseDto = { message: 'Application is running' };
+      service.getHello.mockReturnValue(response);
+
+      const result = controller.getHello();
+
+      expect(result).toEqual(response);
+      expect(result.message).toEqual('Application is running');
     });
   });
 });

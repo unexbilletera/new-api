@@ -6,10 +6,6 @@ import { ConfigModule } from '../shared/config/config.module';
 import { WorkerService } from './worker.service';
 import { PixCronosHandler } from './handlers/pix-cronos.handler';
 
-/**
- * Módulo Worker
- * Responsável por: processar fila SQS, atualizar status de transações
- */
 @Module({
   imports: [PrismaModule, SqsModule, LoggerModule, ConfigModule],
   controllers: [],

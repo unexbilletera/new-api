@@ -19,18 +19,11 @@ interface CurrentUserPayload {
   roleId: string;
 }
 
-/**
- * Controller para transações PIX Cronos
- */
 @Controller('transactions/pix/cronos')
 @UseGuards(JwtAuthGuard)
 export class PixCronosController {
   constructor(private pixCronosService: PixCronosService) {}
 
-  /**
-   * Cria uma transação PIX Cronos
-   * POST /transactions/pix/cronos/create
-   */
   @Post('create')
   @HttpCode(HttpStatus.OK)
   async create(
@@ -49,10 +42,6 @@ export class PixCronosController {
     };
   }
 
-  /**
-   * Confirma uma transação PIX Cronos
-   * POST /transactions/pix/cronos/confirm
-   */
   @Post('confirm')
   @HttpCode(HttpStatus.OK)
   async confirm(

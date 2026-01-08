@@ -1,14 +1,24 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigService } from './config.service';
+import { ConfigModule as NestConfigModule } from '@nestjs/config';
+import { AppConfigService, ConfigService } from './config.service';
+import { MockCodeValidatorHelper } from './mock-code-validator.helper';
+import { LoggerModule } from '../logger/logger.module';
 
-/**
- * Módulo de configuração global
- * Mapeia variáveis de ambiente WALLET_* para nomes mais padrão
- */
 @Global()
 @Module({
-  providers: [ConfigService],
-  exports: [ConfigService],
+  imports: [
+    NestConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'development'}`,
+        '.env',
+      ],
+    }),
+    LoggerModule,
+  ],
+  providers: [AppConfigService, ConfigService, MockCodeValidatorHelper],
+  exports: [AppConfigService, ConfigService, MockCodeValidatorHelper],
 })
 export class ConfigModule {}
 
+export { ConfigModule as AppConfigModule };
