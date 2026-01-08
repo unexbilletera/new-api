@@ -60,8 +60,14 @@ export class AuthUserModel {
   }
 
   async updatePhoneVerified(phone: string) {
-    return this.prisma.users.update({
+    const user = await this.prisma.users.findFirst({
       where: { phone },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return this.prisma.users.update({
+      where: { id: user.id },
       data: { phoneVerifiedAt: new Date(), updatedAt: new Date() },
     });
   }
