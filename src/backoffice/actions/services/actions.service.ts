@@ -70,7 +70,7 @@ export class ActionsService {
         id: crypto.randomUUID(),
         name: dto.code,
         icon: dto.metadata?.icon || 'default',
-        actionType: 'internal',
+        actionType: 'navigation',
         actionValue: dto.description,
         order: dto.metadata?.order || 0,
         enabled: dto.isActive ?? true,
