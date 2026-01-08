@@ -67,12 +67,10 @@ export class ActionsAppService {
 
     return actions.map((a) => this.mapHomeAction(a));
   }  async getModules(enabledOnly = false): Promise<ModuleResponseDto[]> {
-    const where: any = {
-      deletedAt: null,
-    };
+    const where: any = {};
 
     if (enabledOnly) {
-      where.enabled = true;
+      where.isActive = 1;
     }
 
     const modules = await this.prisma.modules.findMany({
