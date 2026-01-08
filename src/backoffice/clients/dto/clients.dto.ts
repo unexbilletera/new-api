@@ -78,7 +78,6 @@ export class ClientDetailsDto extends ClientResponseDto {
   accounts: {
     id: string;
     type: string | null;
-    currency: string | null;
     balance: string | null;
     status: string | null;
   }[];
