@@ -49,8 +49,8 @@ export class ExchangeRatesService {
     }
 
     try {
-      const config = await this.prisma.systemConfigurations.findFirst({
-        where: { key },
+      const config = await this.prisma.system_config.findFirst({
+        where: { key, isActive: true, deletedAt: null },
       });
       const value = config?.value ?? defaultValue;
       this.configCache.set(key, { value, timestamp: Date.now() });
