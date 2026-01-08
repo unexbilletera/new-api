@@ -9,7 +9,9 @@ import {
 
 @Injectable()
 export class TermsService {
-  constructor(private prisma: PrismaService) {}  async check(userId: string, serviceType: ServiceType): Promise<TermCheckResponseDto> {
+  constructor(private prisma: PrismaService) {}
+
+  async check(userId: string, serviceType: ServiceType): Promise<TermCheckResponseDto> {
     const acceptance = await this.prisma.user_term_acceptances.findFirst({
       where: {
         userId,
@@ -29,9 +31,10 @@ export class TermsService {
       accepted: true,
       serviceType,
       acceptedAt: acceptance.acceptedAt,
-      version: acceptance.version || undefined,
     };
-  }  async accept(
+  }
+
+  async accept(
     userId: string,
     dto: AcceptTermDto,
     ipAddress?: string,
@@ -53,7 +56,6 @@ export class TermsService {
           id: existing.id,
           userId: existing.userId,
           serviceType: existing.serviceType,
-          version: existing.version || undefined,
           acceptedAt: existing.acceptedAt,
           ipAddress: existing.ipAddress || undefined,
         },
@@ -65,7 +67,6 @@ export class TermsService {
         id: crypto.randomUUID(),
         userId,
         serviceType: dto.serviceType,
-        version: dto.version || '1.0',
         acceptedAt: new Date(),
         ipAddress: ipAddress || null,
       },
@@ -78,12 +79,13 @@ export class TermsService {
         id: acceptance.id,
         userId: acceptance.userId,
         serviceType: acceptance.serviceType,
-        version: acceptance.version || undefined,
         acceptedAt: acceptance.acceptedAt,
         ipAddress: acceptance.ipAddress || undefined,
       },
     };
-  }  async listAcceptances(userId: string): Promise<TermAcceptanceResponseDto[]> {
+  }
+
+  async listAcceptances(userId: string): Promise<TermAcceptanceResponseDto[]> {
     const acceptances = await this.prisma.user_term_acceptances.findMany({
       where: { userId },
       orderBy: { acceptedAt: 'desc' },
@@ -93,11 +95,12 @@ export class TermsService {
       id: a.id,
       userId: a.userId,
       serviceType: a.serviceType,
-      version: a.version || undefined,
       acceptedAt: a.acceptedAt,
       ipAddress: a.ipAddress || undefined,
     }));
-  }  async checkAllRequired(userId: string): Promise<{
+  }
+
+  async checkAllRequired(userId: string): Promise<{
     allAccepted: boolean;
     missing: string[];
     accepted: string[];
