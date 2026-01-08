@@ -59,7 +59,7 @@ export class ClientModel {
       where: { id },
       data: {
         isBlocked: true,
-        blockReason: reason,
+        blockedReason: reason,
         blockedAt: new Date(),
         updatedAt: new Date(),
       },
@@ -71,7 +71,7 @@ export class ClientModel {
       where: { id },
       data: {
         isBlocked: false,
-        blockReason: null,
+        blockedReason: null,
         blockedAt: null,
         updatedAt: new Date(),
       },
