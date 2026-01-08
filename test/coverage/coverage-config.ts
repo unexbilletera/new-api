@@ -215,7 +215,7 @@ export function generateBadgeUrl(coverage: number): string {
   const status = getCoverageStatus(coverage);
   const color = COVERAGE_STATUS[status].color;
   const label = `coverage-${coverage.toFixed(1)}%`;
-  return `https://img.shields.io/badge/${label}-${color}`;
+  return `https://img.shields.io/badge/${label}-${color}.svg`;
 }
 
 export const JEST_COVERAGE_CONFIG = {

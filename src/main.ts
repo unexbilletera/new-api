@@ -10,7 +10,6 @@ import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { LoggerService } from './shared/logger/logger.service';
 import { loadEnvironmentFile } from './shared/config/env-loader';
 
-// Carrega variáveis de ambiente ANTES de inicializar a aplicação
 loadEnvironmentFile();
 
 async function bootstrap() {

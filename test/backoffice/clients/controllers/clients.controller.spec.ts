@@ -124,11 +124,16 @@ describe('ClientsController', () => {
 
   describe('getAccounts', () => {
     it('should delegate to service', async () => {
-      const response = {
-        accounts: [
-          { id: 'acc-1', type: 'checking', balance: 5000, currency: 'BRL' },
-        ],
-      };
+      const response = [
+        {
+          id: 'acc-1',
+          type: 'checking' as any,
+          balance: '5000',
+          currency: 'BRL',
+          status: 'active' as any,
+          createdAt: new Date(),
+        },
+      ];
       service.getAccounts.mockResolvedValue(response);
 
       const result = await controller.getAccounts(mockClientId);
@@ -138,18 +143,30 @@ describe('ClientsController', () => {
     });
 
     it('should return list of client accounts', async () => {
-      const response = {
-        accounts: [
-          { id: 'acc-1', type: 'checking', balance: 5000, currency: 'BRL' },
-          { id: 'acc-2', type: 'savings', balance: 10000, currency: 'BRL' },
-        ],
-      };
+      const response = [
+        {
+          id: 'acc-1',
+          type: 'checking' as any,
+          balance: '5000',
+          currency: 'BRL',
+          status: 'active' as any,
+          createdAt: new Date(),
+        },
+        {
+          id: 'acc-2',
+          type: 'savings' as any,
+          balance: '10000',
+          currency: 'BRL',
+          status: 'active' as any,
+          createdAt: new Date(),
+        },
+      ];
       service.getAccounts.mockResolvedValue(response);
 
       const result = await controller.getAccounts(mockClientId);
 
-      expect(Array.isArray(result.accounts)).toBe(true);
-      expect(result.accounts.length).toBeGreaterThan(0);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
     });
   });
 
@@ -159,7 +176,15 @@ describe('ClientsController', () => {
       const limit = 20;
       const response = {
         data: [
-          { id: 'log-1', action: 'login', timestamp: new Date().toISOString() },
+          {
+            id: 'log-1',
+            userId: mockClientId,
+            createdAt: new Date(),
+            ipAddress: '192.168.1.1',
+            userAgent: 'Mozilla/5.0',
+            device: 'desktop',
+            finalStatus: 'success',
+          } as any,
         ],
         total: 1,
         page,
@@ -176,8 +201,24 @@ describe('ClientsController', () => {
     it('should return paginated access logs', async () => {
       const response = {
         data: [
-          { id: 'log-1', action: 'login', timestamp: new Date().toISOString(), ipAddress: '192.168.1.1' },
-          { id: 'log-2', action: 'logout', timestamp: new Date().toISOString(), ipAddress: '192.168.1.1' },
+          {
+            id: 'log-1',
+            userId: mockClientId,
+            createdAt: new Date(),
+            ipAddress: '192.168.1.1',
+            userAgent: 'Mozilla/5.0',
+            device: 'desktop',
+            finalStatus: 'success',
+          } as any,
+          {
+            id: 'log-2',
+            userId: mockClientId,
+            createdAt: new Date(),
+            ipAddress: '192.168.1.2',
+            userAgent: 'Mozilla/5.0',
+            device: 'mobile',
+            finalStatus: 'success',
+          } as any,
         ],
         total: 2,
         page: 1,
@@ -197,7 +238,15 @@ describe('ClientsController', () => {
       const limit = 20;
       const response = {
         data: [
-          { id: 'txn-1', amount: 100, type: 'debit', timestamp: new Date().toISOString() },
+          {
+            id: 'txn-1',
+            number: 1,
+            date: new Date(),
+            userId: mockClientId,
+            type: 'debit' as any,
+            status: 'completed' as any,
+            createdAt: new Date(),
+          } as any,
         ],
         total: 1,
         page,
@@ -214,8 +263,24 @@ describe('ClientsController', () => {
     it('should return paginated transaction history', async () => {
       const response = {
         data: [
-          { id: 'txn-1', amount: 100, type: 'debit', status: 'completed' },
-          { id: 'txn-2', amount: 50, type: 'credit', status: 'completed' },
+          {
+            id: 'txn-1',
+            number: 1,
+            date: new Date(),
+            userId: mockClientId,
+            type: 'debit' as any,
+            status: 'completed' as any,
+            createdAt: new Date(),
+          } as any,
+          {
+            id: 'txn-2',
+            number: 2,
+            date: new Date(),
+            userId: mockClientId,
+            type: 'credit' as any,
+            status: 'completed' as any,
+            createdAt: new Date(),
+          } as any,
         ],
         total: 2,
         page: 1,
