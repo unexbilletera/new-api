@@ -40,7 +40,7 @@ export class NotificationModel {
   async markAsRead(notificationId: string) {
     return this.prisma.notifications.update({
       where: { id: notificationId },
-      data: { readAt: new Date(), updatedAt: new Date() },
+      data: { readedAt: new Date(), updatedAt: new Date() },
     });
   }
 }
