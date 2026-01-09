@@ -17,7 +17,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { CampaignsService } from '../services/campaigns.service';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { ValidateCampaignCodeDto } from '../dto/campaigns.dto';
 import {
@@ -29,7 +29,7 @@ import {
 @ApiTags('campaigns')
 @ApiBearerAuth('JWT-auth')
 @Controller('campaigns')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class CampaignsController {
   constructor(private readonly campaignsService: CampaignsService) {}
 

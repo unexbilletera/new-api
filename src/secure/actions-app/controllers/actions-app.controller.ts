@@ -14,7 +14,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ActionsAppService } from '../services/actions-app.service';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { ActionSection, ListActionsQueryDto } from '../dto/actions-app.dto';
 import {
   LayoutResponseDto,
@@ -27,7 +27,7 @@ import {
 @ApiTags('actions')
 @ApiBearerAuth('JWT-auth')
 @Controller('actions')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class ActionsAppController {
   constructor(private readonly actionsAppService: ActionsAppService) {}
 

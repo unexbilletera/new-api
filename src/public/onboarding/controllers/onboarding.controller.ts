@@ -17,7 +17,7 @@ import {
   UpdateIdentityOnboardingDto,
   UploadArgentinaDocumentDto,
 } from '../dto/onboarding.dto';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { UserOnboardingService } from '../services/user-onboarding.service';
 import { VerificationService } from '../services/verification.service';
@@ -236,7 +236,7 @@ export class UserOnboardingController {
   constructor(private identityOnboardingService: IdentityOnboardingService) {}
 
   @Get('user/onboarding/pending-data/:userIdentityId')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get pending onboarding data',
     description: 'Returns the data that still needs to be provided to complete onboarding',
@@ -267,7 +267,7 @@ export class UserOnboardingController {
   }
 
   @Post('user/onboarding/update-specific-data/:userIdentityId')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Update specific onboarding data',
     description: 'Updates only the pending onboarding fields',
@@ -298,7 +298,7 @@ export class UserOnboardingController {
   }
 
   @Get('user/onboarding/status/:userIdentityId')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get onboarding status',
     description: 'Returns the current status of the user\'s onboarding process',
@@ -329,7 +329,7 @@ export class UserOnboardingController {
   }
 
   @Get('user/onboarding/validate/:userIdentityId')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Validate onboarding data',
     description: 'Validates that all onboarding data was correctly provided',
@@ -360,7 +360,7 @@ export class UserOnboardingController {
   }
 
   @Post('user/onboarding/retry/:userIdentityId')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Retry onboarding',

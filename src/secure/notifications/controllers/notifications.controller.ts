@@ -20,7 +20,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { NotificationsService } from '../services/notifications.service';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import {
   ListNotificationsQueryDto,
@@ -40,7 +40,7 @@ import {
 @ApiTags('notifications')
 @ApiBearerAuth('JWT-auth')
 @Controller('notifications')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 

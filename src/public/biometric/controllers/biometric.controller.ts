@@ -16,7 +16,7 @@ import {
   VerifySmsChallengeDto,
   RevokeDeviceDto,
 } from '../dto/biometric.dto';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { DeviceRegistrationService } from '../services/device-registration.service';
 import { ChallengeVerificationService } from '../services/challenge-verification.service';
@@ -36,7 +36,7 @@ import {
 @ApiTags('biometric')
 @ApiBearerAuth('JWT-auth')
 @Controller('api/auth')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class BiometricController {
   constructor(
     private deviceRegistrationService: DeviceRegistrationService,

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import {
   UpdateUserProfileDto,
@@ -68,7 +68,7 @@ export class UserController {
   ) {}
 
   @Get('user/me')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get current user data',
     description: 'Returns complete information about the authenticated user\'s profile',
@@ -91,7 +91,7 @@ export class UserController {
   }
 
   @Post('user/change-email/request')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Request email change',
     description: 'Initiates the user email change process',
@@ -110,7 +110,7 @@ export class UserController {
   }
 
   @Post('user/change-email/confirm')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Confirm email change',
     description: 'Confirms the email change with the sent code',
@@ -129,7 +129,7 @@ export class UserController {
   }
 
   @Post('user/address')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Update address',
     description: 'Updates the user\'s registered address',
@@ -148,7 +148,7 @@ export class UserController {
   }
 
   @Post('user/profile')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Update profile',
     description: 'Updates the user\'s profile information',
@@ -167,7 +167,7 @@ export class UserController {
   }
 
   @Post('user/change-password')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Change password',
     description: 'Changes the authenticated user\'s password',
@@ -194,7 +194,7 @@ export class UserController {
   }
 
   @Post('user/signout')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Logout',
     description: 'Ends the authenticated user\'s session',
@@ -213,7 +213,7 @@ export class UserController {
   }
 
   @Post('user/closeAccount')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Close account',
     description: 'Initiates the user account closure process',
@@ -232,7 +232,7 @@ export class UserController {
   }
 
   @Post('user/liveness')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Liveness verification',
     description: 'Performs user liveness verification',
@@ -251,7 +251,7 @@ export class UserController {
   }
 
   @Post('user/onboarding/:step')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Advance onboarding by step',
     description: 'Advances the onboarding process to a specific step',
@@ -273,7 +273,7 @@ export class UserController {
   }
 
   @Post('user/onboarding')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Update onboarding status',
     description: 'Updates the user\'s overall onboarding status',
@@ -290,7 +290,7 @@ export class UserController {
   }
 
   @Post('sendMessage')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Send message',
     description: 'Sends a user message through the system',
@@ -309,7 +309,7 @@ export class UserController {
   }
 
   @Get('user/identities/:userId')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'List user identities',
     description: 'Returns all registered identities of the user',
@@ -334,7 +334,7 @@ export class UserController {
   }
 
   @Post('user/setDefaultUserIdentity/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Set default identity',
     description: 'Sets an identity as default for the user',
@@ -355,7 +355,7 @@ export class UserController {
   }
 
   @Post('user/setDefaultUserAccount/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Set default account',
     description: 'Sets an account as default for the user',
@@ -376,7 +376,7 @@ export class UserController {
   }
 
   @Post('user/setUserAccountAlias/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Set account alias',
     description: 'Sets a custom alias for the user account',
@@ -399,7 +399,7 @@ export class UserController {
   }
 
   @Get('user/balances')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get account balances',
     description: 'Returns the balances of all user accounts',

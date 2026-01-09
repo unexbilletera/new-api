@@ -19,7 +19,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { TermsService } from '../services/terms.service';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { AcceptTermDto, ServiceType } from '../dto/terms.dto';
 import {
@@ -32,7 +32,7 @@ import {
 @ApiTags('terms')
 @ApiBearerAuth('JWT-auth')
 @Controller('terms')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class TermsController {
   constructor(private readonly termsService: TermsService) {}
 

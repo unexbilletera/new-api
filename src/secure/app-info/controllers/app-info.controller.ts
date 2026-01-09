@@ -14,7 +14,7 @@ import {
   ApiHeader,
 } from '@nestjs/swagger';
 import { AppInfoService } from '../services/app-info.service';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CheckVersionQueryDto } from '../dto/app-info.dto';
 import {
   FullAppInfoResponseDto,
@@ -27,7 +27,7 @@ import {
 @ApiTags('app-info')
 @ApiBearerAuth('JWT-auth')
 @Controller('app-info')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class AppInfoController {
   constructor(private readonly appInfoService: AppInfoService) {}
 
