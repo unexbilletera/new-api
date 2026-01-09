@@ -32,10 +32,9 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Configurar Swagger/OpenAPI
   const config = new DocumentBuilder()
     .setTitle('Unex API')
-    .setDescription('API para gerenciamento de transações financeiras')
+    .setDescription('API for financial transaction management')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -43,14 +42,30 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'JWT',
-        description: 'Enter JWT token',
+        description: 'Enter JWT token in format: Bearer <token>',
         in: 'header',
       },
-      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+      'JWT-auth',
     )
-    .addTag('transactions', 'Endpoints relacionados a transações')
-    .addTag('auth', 'Endpoints de autenticação')
-    .addTag('backoffice', 'Endpoints do backoffice')
+    .addTag('auth', 'User authentication')
+    .addTag('users', 'User profile and data management')
+    .addTag('onboarding', 'Onboarding process and identity verification')
+    .addTag('biometric', 'Biometric authentication and devices')
+    .addTag('transactions', 'Financial transactions')
+    .addTag('notifications', 'Push and system notifications')
+    .addTag('campaigns', 'Campaigns and promotional codes')
+    .addTag('terms', 'Terms and conditions of service')
+    .addTag('actions', 'Application actions and features')
+    .addTag('app-info', 'Application information')
+    .addTag('backoffice-auth', 'Backoffice user authentication')
+    .addTag('backoffice-users', 'Backoffice user management')
+    .addTag('backoffice-clients', 'Client and account management')
+    .addTag('backoffice-roles', 'Roles and permissions')
+    .addTag('backoffice-onboarding', 'Onboarding management')
+    .addTag('backoffice-actions', 'Action and permission management')
+    .addTag('backoffice-system-config', 'System configuration')
+    .addTag('backoffice-logs', 'System logs and audit')
+    .addTag('health', 'API health check')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

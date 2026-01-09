@@ -1,5 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
+import { CronosService } from '../../../shared/cronos/cronos.service';
+import { BindService } from '../../../shared/bind/bind.service';
+import { MantecaService } from '../../../shared/manteca/manteca.service';
 import {
   ListOnboardingQueryDto,
   RejectUserDto,
@@ -7,10 +10,18 @@ import {
   RequestCorrectionDto,
   OnboardingUserDto,
 } from '../dto/onboarding.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class OnboardingService {
-  constructor(private prisma: PrismaService) {}  async listUsers(query: ListOnboardingQueryDto): Promise<{
+  private readonly logger = new Logger(OnboardingService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private cronosService: CronosService,
+    private bindService: BindService,
+    private mantecaService: MantecaService,
+  ) {}  async listUsers(query: ListOnboardingQueryDto): Promise<{
     data: OnboardingUserDto[];
     total: number;
     page: number;
@@ -87,7 +98,7 @@ export class OnboardingService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     return {
@@ -110,11 +121,11 @@ export class OnboardingService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     if (user.status !== 'pending' && user.status !== 'process') {
-      throw new BadRequestException('Usuário não está em processo de onboarding');
+      throw new BadRequestException('User is not in onboarding process');
     }
 
     await this.prisma.users.update({
@@ -130,14 +141,14 @@ export class OnboardingService {
       data: { status: 'enable', updatedAt: new Date() },
     });
 
-    return { success: true, message: 'Usuário aprovado com sucesso' };
+    return { success: true, message: 'User approved successfully' };
   }  async rejectUser(userId: string, dto: RejectUserDto): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     const currentState = (user.onboardingState as any) || {};
@@ -157,14 +168,14 @@ export class OnboardingService {
       },
     });
 
-    return { success: true, message: 'Usuário rejeitado, aguardando correções' };
+    return { success: true, message: 'User rejected, awaiting corrections' };
   }  async requestCorrection(userId: string, dto: RequestCorrectionDto): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     const currentState = (user.onboardingState as any) || {};
@@ -183,14 +194,14 @@ export class OnboardingService {
       },
     });
 
-    return { success: true, message: 'Correção solicitada com sucesso' };
+    return { success: true, message: 'Correction requested successfully' };
   }  async updateUserInfo(userId: string, data: any): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     const updateData: any = { updatedAt: new Date() };
@@ -204,6 +215,6 @@ export class OnboardingService {
       data: updateData,
     });
 
-    return { success: true, message: 'Informações atualizadas com sucesso' };
+    return { success: true, message: 'Information updated successfully' };
   }
 }

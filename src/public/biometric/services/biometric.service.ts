@@ -569,7 +569,7 @@ export class BiometricService {
         isValid: false,
         status: 'revoked',
         error: 'auth.errors.deviceRevoked',
-        message: 'Sua conta foi acessada em outro dispositivo.',
+        message: 'Your account was accessed on another device.',
         canRegister: true,
         deviceId: device.id,
       };

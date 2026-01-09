@@ -2,7 +2,7 @@ import { IsNotEmpty, IsString, IsOptional, IsNumber, Min, Max } from 'class-vali
 
 export class CreateRoleDto {
   @IsString()
-  @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @IsNotEmpty({ message: 'Nome is required' })
   name: string;
 
   @IsString()
@@ -10,7 +10,7 @@ export class CreateRoleDto {
   description?: string;
 
   @IsNumber()
-  @Min(1, { message: 'Nível mínimo é 1' })
+  @Min(1, { message: 'Minimum level is 1' })
   @Max(10, { message: 'Nível máximo é 10' })
   level: number;
 }
@@ -26,7 +26,7 @@ export class UpdateRoleDto {
 
   @IsNumber()
   @IsOptional()
-  @Min(1, { message: 'Nível mínimo é 1' })
+  @Min(1, { message: 'Minimum level is 1' })
   @Max(10, { message: 'Nível máximo é 10' })
   level?: number;
 }

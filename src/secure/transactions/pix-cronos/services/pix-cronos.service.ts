@@ -4,7 +4,7 @@ import { CronosService } from '../../../../shared/cronos/cronos.service';
 import { PixCronosTransactionModel } from '../models/pix-cronos-transaction.model';
 import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ErrorCodes, ErrorHelper } from '../../../../shared/errors/app-error';
-import { ColoredLogger } from '../../../../shared/utils/logger-colors';
+import { LoggerService } from '../../../../shared/logger/logger.service';
 
 @Injectable()
 export class PixCronosService {
@@ -12,15 +12,9 @@ export class PixCronosService {
     private transactionModel: PixCronosTransactionModel,
     private sqsService: SqsService,
     private cronosService: CronosService,
+    private logger: LoggerService,
   ) {}
 
-  /**
-   * Cria uma transação PIX Cronos
-   * Busca informações do destinatário na API da Cronos e salva a transação como 'pending'
-   * O envio para SQS só acontece quando o usuário confirmar através do endpoint /confirm
-   *
-   * Fluxo: Service => Model (criar) => Controller
-   */
   async createTransaction(
     userId: string,
     dto: CreatePixCronosDto,
@@ -37,20 +31,17 @@ export class PixCronosService {
     targetAccountNumber?: string;
   }> {
     try {
-      // 1. Validar conta de origem (usa Model)
       const { identity } = await this.transactionModel.findSourceAccount(
         userId,
         dto.sourceAccountId,
       );
 
-      // Garantir que identity não é null (já validado no Model, mas TypeScript precisa de confirmação)
       if (!identity || !identity.id) {
         throw ErrorHelper.badRequest(
           ErrorCodes.TRANSACTIONS_INVALID_SOURCE_IDENTITY,
         );
       }
 
-      // 2. Buscar informações do destinatário na API da Cronos
       let targetInfo: {
         targetName?: string;
         targetAlias?: string;
@@ -85,21 +76,17 @@ export class PixCronosService {
           };
         }
       } catch (error) {
-        // Se falhar ao buscar informações do destinatário, lançar erro
-        ColoredLogger.errorWithStack(
-          '[PixCronosService] ❌ ERRO CRÍTICO',
-          'Erro ao buscar informações do destinatário na API da Cronos',
+        this.logger.errorWithStack(
+          '[PixCronosService] CRITICAL',
+          'Failed to fetch recipient info from Cronos API',
           error,
         );
         throw ErrorHelper.badRequest(
           ErrorCodes.TRANSACTIONS_INVALID_TARGET_USER_ACCOUNT,
-          'Erro ao buscar informações do destinatário na API da Cronos',
+          'Error fetching recipient information from Cronos API',
         );
       }
 
-      // 3. Criar transação no banco (usa Model)
-      // IMPORTANTE: Não envia para SQS aqui. O envio para SQS só acontece quando
-      // o usuário confirmar a transação através do endpoint /confirm
       const transaction = await this.transactionModel.create({
         userId,
         amount: dto.amount,
@@ -128,9 +115,9 @@ export class PixCronosService {
 
       return response;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[PixCronosService] ❌ ERRO CRÍTICO',
-        'Erro ao criar transação PIX',
+      this.logger.errorWithStack(
+        '[PixCronosService] CRITICAL',
+        'Failed to create PIX transaction',
         error,
       );
       throw error;
@@ -146,26 +133,22 @@ export class PixCronosService {
     message: string;
   }> {
     try {
-      // 1. Buscar transação pendente (usa Model)
       const transaction = await this.transactionModel.findPendingById(
         transactionId,
         userId,
       );
 
-      // 2. Atualizar status para 'process' (aguardando processamento) (usa Model)
       await this.transactionModel.updateStatus(transaction.id, 'process');
 
-      // 3. Enviar mensagem para SQS para processamento assíncrono (lógica de negócio)
       try {
         await this.sqsService.sendTransactionMessage('pix_cronos_confirm', {
           transactionId: transactionId,
-          userId: userId,
+          userId:           userId,
         });
       } catch (error) {
-        // Se falhar ao enviar para SQS, reverter status para 'pending' (usa Model)
-        ColoredLogger.errorWithStack(
-          '[PixCronosService] ❌ ERRO CRÍTICO',
-          'Erro ao enviar confirmação para SQS',
+        this.logger.errorWithStack(
+          '[PixCronosService] CRITICAL',
+          'Failed to send confirmation to SQS',
           error,
         );
 
@@ -173,19 +156,19 @@ export class PixCronosService {
 
         throw ErrorHelper.internalServerError(
           ErrorCodes.INTERNAL_SERVER_ERROR,
-          'Erro ao enviar confirmação para processamento',
+          'Error sending confirmation for processing',
         );
       }
 
       return {
         id: transactionId,
         status: 'process',
-        message: 'Transação enviada para processamento',
+        message: 'Transaction sent for processing',
       };
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[PixCronosService] ❌ ERRO CRÍTICO',
-        'Erro ao confirmar transação PIX',
+      this.logger.errorWithStack(
+        '[PixCronosService] CRITICAL',
+        'Failed to confirm PIX transaction',
         error,
       );
       throw error;

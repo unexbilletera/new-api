@@ -33,6 +33,14 @@ export class ApproveUserDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsUUID()
+  @IsOptional()
+  identityId?: string;
+
+  @IsString()
+  @IsOptional()
+  country?: string;
 }
 
 export class RequestCorrectionDto {

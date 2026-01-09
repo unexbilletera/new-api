@@ -148,7 +148,6 @@ export class SigninService {
       return this.authMapper.toSigninDeviceRequiredResponseDto(user, tempToken, 'hard');
     }
 
-    // Clear brute force counters after successful password validation
     await this.bruteForceService.clearAttempts(identifier, ipAddress);
 
     try {
@@ -179,7 +178,6 @@ export class SigninService {
       userAgent: requestContext?.userAgent,
     });
 
-    // Suspicious activity detection (non-blocking)
     this.suspiciousActivityService
       .checkLoginActivity(
         user.id,

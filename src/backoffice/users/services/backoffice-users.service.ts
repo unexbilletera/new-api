@@ -64,7 +64,7 @@ export class BackofficeUsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     return this.mapToResponse(user);
@@ -83,7 +83,7 @@ export class BackofficeUsersService {
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     const hashedPassword = await PasswordHelper.hash(dto.password);
@@ -109,7 +109,7 @@ export class BackofficeUsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     if (dto.email && dto.email.toLowerCase() !== user.email) {
@@ -126,7 +126,7 @@ export class BackofficeUsersService {
         where: { id: dto.roleId },
       });
       if (!role) {
-        throw new NotFoundException('Role não encontrada');
+        throw new NotFoundException('Role not found');
       }
     }
 
@@ -155,7 +155,7 @@ export class BackofficeUsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     await this.prisma.backofficeUsers.update({
@@ -163,7 +163,7 @@ export class BackofficeUsersService {
       data: { deletedAt: new Date() },
     });
 
-    return { success: true, message: 'Usuário deletado com sucesso' };
+    return { success: true, message: 'User deleted successfully' };
   }
 
   private mapToResponse(user: any): BackofficeUserResponseDto {

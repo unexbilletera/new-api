@@ -57,7 +57,15 @@ export class ClientsService {
 
     const [data, total] = await Promise.all([
       this.prisma.users.findMany({
-        where,
+        where: {
+          ...where,
+          usersAccounts: {
+            some: {
+              deletedAt: null,
+              status: 'enable',
+            },
+          },
+        },
         skip,
         take: limit,
         orderBy: { lastLoginAt: 'desc' },
@@ -72,9 +80,39 @@ export class ClientsService {
               status: true,
             },
           },
+          usersAccounts: {
+            where: {
+              deletedAt: null,
+              status: 'enable',
+            },
+            select: {
+              id: true,
+              type: true,
+              status: true,
+              userIdentityId: true,
+            },
+            include: {
+              usersIdentities: {
+                select: {
+                  country: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
       }),
-      this.prisma.users.count({ where }),
+      this.prisma.users.count({
+        where: {
+          ...where,
+          usersAccounts: {
+            some: {
+              deletedAt: null,
+              status: 'enable',
+            },
+          },
+        },
+      }),
     ]);
 
     return {
@@ -91,13 +129,16 @@ export class ClientsService {
           where: { deletedAt: null },
         },
         usersAccounts: {
-          where: { deletedAt: null },
+          where: {
+            deletedAt: null,
+            status: 'enable',
+          },
         },
       },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     const baseResponse = this.mapToResponse(user);
@@ -111,12 +152,14 @@ export class ClientsService {
         status: i.status,
         createdAt: i.createdAt,
       })),
-      accounts: user.usersAccounts.map((a) => ({
-        id: a.id,
-        type: a.type || null,
-        balance: a.balance?.toString() || '0',
-        status: a.status || null,
-      })),
+      accounts: user.usersAccounts
+        .filter((a) => a.status === 'enable')
+        .map((a) => ({
+          id: a.id,
+          type: a.type || null,
+          balance: a.balance?.toString() || '0',
+          status: a.status || null,
+        })),
     };
   }  async update(id: string, dto: UpdateClientDto): Promise<ClientResponseDto> {
     const user = await this.prisma.users.findFirst({
@@ -124,7 +167,7 @@ export class ClientsService {
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     const updated = await this.prisma.users.update({
@@ -150,7 +193,7 @@ export class ClientsService {
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -162,14 +205,14 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente bloqueado com sucesso' };
+    return { success: true, message: 'Client blocked successfully' };
   }  async unblock(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -181,14 +224,14 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente desbloqueado com sucesso' };
+    return { success: true, message: 'Client unblocked successfully' };
   }  async disable(id: string, dto: BlockClientDto): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -200,14 +243,14 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente desabilitado com sucesso' };
+    return { success: true, message: 'Client disabled successfully' };
   }  async enable(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -219,18 +262,22 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente habilitado com sucesso' };
+    return { success: true, message: 'Client enabled successfully' };
   }  async getAccounts(id: string) {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     const accounts = await this.prisma.usersAccounts.findMany({
-      where: { userId: id, deletedAt: null },
+      where: {
+        userId: id,
+        deletedAt: null,
+        status: 'enable',
+      },
     });
 
     return accounts.map((a) => ({
@@ -277,6 +324,16 @@ export class ClientsService {
   private mapToResponse(user: any): ClientResponseDto {
     const identities = user.usersIdentities_usersIdentities_userIdTousers || [];
     const enabledIdentities = identities.filter((i: any) => i.status === 'enable');
+    
+    const activeAccounts = (user.usersAccounts || []).filter((a: any) => a.status === 'enable');
+    
+    const accountOriginsFromAccounts = activeAccounts
+      .map((a: any) => a.usersIdentities?.country)
+      .filter(Boolean);
+    
+    const accountTypesFromAccounts = activeAccounts
+      .map((a: any) => a.type)
+      .filter(Boolean);
 
     return {
       id: user.id,
@@ -285,8 +342,8 @@ export class ClientsService {
       username: user.username,
       phone: user.phone,
       clientOrigin: user.country,
-      accountTypes: [...new Set(enabledIdentities.map((i: any) => i.type).filter(Boolean))] as string[],
-      accountOrigins: [...new Set(enabledIdentities.map((i: any) => i.country).filter(Boolean))] as string[],
+      accountTypes: [...new Set(accountTypesFromAccounts)] as string[],
+      accountOrigins: [...new Set(accountOriginsFromAccounts)] as string[],
       documentNumbers: identities
         .filter((i: any) => i.taxDocumentNumber)
         .map((i: any) => ({ country: i.country, number: i.taxDocumentNumber })),

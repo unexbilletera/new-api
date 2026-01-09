@@ -9,6 +9,10 @@ import { ConfigModule } from './shared/config/config.module';
 import { LoggerModule } from './shared/logger/logger.module';
 import { SqsModule } from './shared/sqs/sqs.module';
 import { CronosModule } from './shared/cronos/cronos.module';
+import { RenaperModule } from './shared/renaper/renaper.module';
+import { BindModule } from './shared/bind/bind.module';
+import { StorageModule } from './shared/storage/storage.module';
+import { MantecaModule } from './shared/manteca/manteca.module';
 
 import { PublicAuthModule } from './public/auth/auth.module';
 import { PublicOnboardingModule } from './public/onboarding/onboarding.module';
@@ -39,10 +43,14 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
-    ConfigModule, // Módulo de configuração global
-    LoggerModule, // Módulo Logger global
-    SqsModule, // Módulo SQS global
-    CronosModule, // Módulo Cronos global
+    ConfigModule,
+    LoggerModule,
+    SqsModule,
+    CronosModule,
+    RenaperModule,
+    BindModule,
+    StorageModule,
+    MantecaModule,
     PrismaModule,
     JwtModule,
     HealthModule,

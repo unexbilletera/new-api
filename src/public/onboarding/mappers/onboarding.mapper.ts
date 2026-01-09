@@ -20,7 +20,7 @@ export class OnboardingMapper {
   ): StartUserOnboardingResponseDto {
     return {
       success: true,
-      message: 'Onboarding iniciado com sucesso',
+      message: 'Onboarding started successfully',
       userId,
       onboardingState,
       nextStep: 'emailForm',
@@ -34,7 +34,7 @@ export class OnboardingMapper {
   ): VerifyOnboardingCodeResponseDto {
     return {
       success: true,
-      message: 'Código verificado com sucesso',
+      message: 'Code verified successfully',
       userId,
       onboardingState,
       nextStep,
@@ -44,7 +44,7 @@ export class OnboardingMapper {
   toUpdateUserOnboardingResponseDto(user: any, onboardingState: any): UpdateUserOnboardingResponseDto {
     return {
       success: true,
-      message: 'Dados atualizados com sucesso',
+      message: 'Data updated successfully',
       user: {
         id: user.id,
         email: user.email,

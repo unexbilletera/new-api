@@ -71,23 +71,25 @@ export class EmailService {
       },
     });
 
-    if (updateUserRecovery) {
-      const existingUser = await this.prisma.users.findFirst({
-        where: { email: normalizedEmail },
+    const existingUser = await this.prisma.users.findFirst({
+      where: { email: normalizedEmail },
+    });
+
+    if (updateUserRecovery && existingUser) {
+      await this.prisma.users.update({
+        where: { id: existingUser.id },
+        data: { recovery: hashedCode, updatedAt: new Date() },
       });
-      if (existingUser) {
-        await this.prisma.users.update({
-          where: { id: existingUser.id },
-          data: { recovery: hashedCode, updatedAt: new Date() },
-        });
-      }
     }
+
+    const language = existingUser?.language || undefined;
 
     try {
       await this.notificationService.sendEmailVerificationCode(
         normalizedEmail,
         code,
         expiresInMinutes,
+        language,
       );
       this.logger.info('[EMAIL] Validation code sent', {
         email: normalizedEmail,

@@ -53,7 +53,7 @@ export class PasswordRecoveryService {
 
     await this.userModel.storeRecoveryCode(email, hashed);
 
-    await this.notificationService.sendPasswordRecovery(email, code);
+    await this.notificationService.sendPasswordRecovery(email, code, user.language);
 
     return this.authMapper.toForgotPasswordResponseDto(
       'Password reset code sent to email',

@@ -194,7 +194,7 @@ export class UserOnboardingService {
         await this.notificationService.sendEmail({
           to: user.email,
           subject: 'Selfie recebida',
-          text: 'Recebemos sua selfie para verificação de prova de vida.',
+          text: 'We received your selfie for proof-of-life verification.',
         });
       }
 
