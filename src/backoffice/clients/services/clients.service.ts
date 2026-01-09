@@ -97,7 +97,7 @@ export class ClientsService {
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     const baseResponse = this.mapToResponse(user);
@@ -124,7 +124,7 @@ export class ClientsService {
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     const updated = await this.prisma.users.update({
@@ -150,7 +150,7 @@ export class ClientsService {
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -162,14 +162,14 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente bloqueado com sucesso' };
+    return { success: true, message: 'Client blocked successfully' };
   }  async unblock(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -181,14 +181,14 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente desbloqueado com sucesso' };
+    return { success: true, message: 'Client unblocked successfully' };
   }  async disable(id: string, dto: BlockClientDto): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -200,14 +200,14 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente desabilitado com sucesso' };
+    return { success: true, message: 'Client disabled successfully' };
   }  async enable(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     await this.prisma.users.update({
@@ -219,14 +219,14 @@ export class ClientsService {
       },
     });
 
-    return { success: true, message: 'Cliente habilitado com sucesso' };
+    return { success: true, message: 'Client enabled successfully' };
   }  async getAccounts(id: string) {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Cliente não encontrado');
+      throw new NotFoundException('Client not found');
     }
 
     const accounts = await this.prisma.usersAccounts.findMany({
