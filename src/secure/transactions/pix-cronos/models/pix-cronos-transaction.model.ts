@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../shared/prisma/prisma.service';
 import { ErrorCodes, ErrorHelper } from '../../../../shared/errors/app-error';
-import { ColoredLogger } from '../../../../shared/utils/logger-colors';
+import { LoggerService } from '../../../../shared/logger/logger.service';
 import { randomUUID } from 'crypto';
 import type { transactions_status } from '../../../../../generated/prisma';
 
 @Injectable()
 export class PixCronosTransactionModel {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private logger: LoggerService,
+  ) {}
 
   async findSourceAccount(userId: string, accountId: string) {
     try {
@@ -24,11 +27,10 @@ export class PixCronosTransactionModel {
       });
 
       if (!sourceAccount) {
-        ColoredLogger.error(
-          '[PixCronosTransactionModel] ❌',
-          `Conta não encontrada - userId: ${userId}, accountId: ${accountId}`,
+        this.logger.error(
+          '[PixCronosTransactionModel] ERROR',
+          `Account not found - userId: ${userId}, accountId: ${accountId}`,
         );
-        // Tentar buscar sem filtrar por userId para debug
         const accountWithoutUserFilter =
           await this.prisma.usersAccounts.findFirst({
             where: {
@@ -42,14 +44,14 @@ export class PixCronosTransactionModel {
           });
 
         if (accountWithoutUserFilter) {
-          ColoredLogger.warning(
-            '[PixCronosTransactionModel] ⚠️',
-            `Conta encontrada mas userId não corresponde - accountUserId: ${accountWithoutUserFilter.userId}, requestUserId: ${userId}`,
+          this.logger.warn(
+            '[PixCronosTransactionModel] WARNING',
+            `Account found but userId mismatch - accountUserId: ${accountWithoutUserFilter.userId}, requestUserId: ${userId}`,
           );
         } else {
-          ColoredLogger.error(
-            '[PixCronosTransactionModel] ❌',
-            `Conta não encontrada mesmo sem filtro de userId`,
+          this.logger.error(
+            '[PixCronosTransactionModel] ERROR',
+            `Account not found even without userId filter`,
           );
         }
 
@@ -58,16 +60,16 @@ export class PixCronosTransactionModel {
         );
       }
 
-      ColoredLogger.debug(
+      this.logger.debug(
         '[PixCronosTransactionModel]',
-        `Conta encontrada - accountId: ${sourceAccount.id}, userIdentityId: ${sourceAccount.userIdentityId}`,
+        `Account found - accountId: ${sourceAccount.id}, userIdentityId: ${sourceAccount.userIdentityId}`,
       );
 
       const sourceIdentity = sourceAccount.usersIdentities;
       if (!sourceIdentity) {
-        ColoredLogger.error(
-          '[PixCronosTransactionModel] ❌',
-          `Identidade não encontrada para conta - accountId: ${sourceAccount.id}, userIdentityId: ${sourceAccount.userIdentityId}`,
+        this.logger.error(
+          '[PixCronosTransactionModel] ERROR',
+          `Identity not found for account - accountId: ${sourceAccount.id}, userIdentityId: ${sourceAccount.userIdentityId}`,
         );
         throw ErrorHelper.badRequest(
           ErrorCodes.TRANSACTIONS_INVALID_SOURCE_IDENTITY,
@@ -75,9 +77,9 @@ export class PixCronosTransactionModel {
       }
 
       if (sourceIdentity.status !== 'enable') {
-        ColoredLogger.warning(
-          '[PixCronosTransactionModel] ⚠️',
-          `Identidade não está habilitada - identityId: ${sourceIdentity.id}, status: ${sourceIdentity.status}`,
+        this.logger.warn(
+          '[PixCronosTransactionModel] WARNING',
+          `Identity is not enabled - identityId: ${sourceIdentity.id}, status: ${sourceIdentity.status}`,
         );
         throw ErrorHelper.badRequest(
           ErrorCodes.TRANSACTIONS_INVALID_SOURCE_IDENTITY,
@@ -89,9 +91,9 @@ export class PixCronosTransactionModel {
         identity: sourceIdentity,
       };
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[PixCronosTransactionModel] ❌ ERRO CRÍTICO',
-        'Erro ao buscar conta de origem',
+      this.logger.errorWithStack(
+        '[PixCronosTransactionModel] CRITICAL',
+        'Failed to fetch source account',
         error,
       );
       throw error;
