@@ -222,7 +222,7 @@ describe('TermsController', () => {
       const dto = { serviceType: ServiceType.MANTECA_EXCHANGE, version: '1.5.0' } as any;
       const response = {
         success: true,
-        message: 'Termo aceito com sucesso',
+        message: 'Term accepted successfully',
         data: {
           id: 'acceptance-2',
           userId: mockUserId,
@@ -243,7 +243,7 @@ describe('TermsController', () => {
       const requestWithoutIp = { headers: { 'x-forwarded-for': '10.0.0.5' } } as any;
       const response = {
         success: true,
-        message: 'Termo aceito com sucesso',
+        message: 'Term accepted successfully',
         data: {
           id: 'acceptance-1',
           userId: mockUserId,
@@ -263,7 +263,7 @@ describe('TermsController', () => {
       const dto = { serviceType: ServiceType.MANTECA_PIX, version: '1.0.0' } as any;
       const response = {
         success: true,
-        message: 'Termo aceito com sucesso',
+        message: 'Term accepted successfully',
         data: {
           id: 'acceptance-1',
           userId: mockUserId,
@@ -293,7 +293,7 @@ describe('TermsController', () => {
       const requestWithNullIp = { ip: null, headers: {} } as any;
       const response = {
         success: true,
-        message: 'Termo aceito com sucesso',
+        message: 'Term accepted successfully',
         data: {
           id: 'acceptance-1',
           userId: mockUserId,
