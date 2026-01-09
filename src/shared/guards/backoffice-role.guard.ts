@@ -26,13 +26,13 @@ export class BackofficeRoleGuard implements CanActivate {
     const user = request.user;
 
     if (!user) {
-      throw new ForbiddenException('Usuário não autenticado');
+      throw new ForbiddenException('User not authenticated');
     }
 
     const userLevel = user.role?.level || user.level || 0;
 
     if (userLevel < minLevel) {
-      throw new ForbiddenException('Permissão insuficiente para esta ação');
+      throw new ForbiddenException('Insufficient permission for this action');
     }
 
     return true;

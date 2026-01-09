@@ -16,14 +16,14 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token não fornecido');
+      throw new UnauthorizedException('Token not provided');
     }
 
     try {
       const payload = await this.jwtService.verifyToken(token);
 
       if (!payload || !payload.userId) {
-        throw new UnauthorizedException('Token inválido');
+        throw new UnauthorizedException('Invalid token');
       }
 
       (request as any).user = {
@@ -34,7 +34,7 @@ export class AuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Token inválido ou expirado');
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 
