@@ -1,8 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ServiceUnavailableException } from '@nestjs/common';
 import { OnboardingModel } from '../models/onboarding.model';
 import { OnboardingMapper } from '../mappers/onboarding.mapper';
 import { LoggerService } from '../../../shared/logger/logger.service';
 import { NotificationService } from '../../../shared/notifications/notifications.service';
+import { RenaperService } from '../../../shared/renaper/renaper.service';
+import { Pdf417ParserService } from '../../../shared/renaper/pdf417-parser.service';
+import { S3Service } from '../../../shared/storage/s3.service';
 import {
   StartIdentityOnboardingDto,
   UpdateIdentityOnboardingDto,
@@ -16,6 +19,9 @@ export class IdentityOnboardingService {
     private onboardingMapper: OnboardingMapper,
     private logger: LoggerService,
     private notificationService: NotificationService,
+    private renaperService: RenaperService,
+    private pdf417Parser: Pdf417ParserService,
+    private s3Service: S3Service,
   ) {}
 
   async startIdentityOnboarding(userId: string, dto: StartIdentityOnboardingDto) {
@@ -102,34 +108,144 @@ export class IdentityOnboardingService {
       throw new NotFoundException('User or identity not found');
     }
 
+    if (identity.country !== 'ar') {
+      throw new BadRequestException('This endpoint is only for Argentine documents');
+    }
+
+    if (!dto.frontImage || !dto.backImage) {
+      throw new BadRequestException('Front and back images are required');
+    }
+
+    if (!dto.pdf417Data) {
+      throw new BadRequestException('PDF417 data is required');
+    }
+
+    const { documentNumber, gender, dateOfBirth, firstName, lastName } = dto.pdf417Data;
+    if (!documentNumber || !gender || !dateOfBirth || !firstName || !lastName) {
+      throw new BadRequestException('PDF417 data incomplete (documentNumber, gender, dateOfBirth, firstName, lastName are required)');
+    }
+
+    let renaperValidation;
+    try {
+      renaperValidation = await this.renaperService.validateDocument({
+        documentNumber,
+        gender,
+        tramite: dto.pdf417Data.documentExpiration || '',
+        userId: user.id,
+        userImage: user.image || undefined,
+      });
+      this.logger.info(`RENAPER validation: ${renaperValidation.message}`);
+    } catch (renaperError: any) {
+      this.logger.error('RENAPER validation failed', renaperError);
+
+      const isForbiddenError =
+        renaperError.isForbidden ||
+        renaperError.code === 'RENAPER_FORBIDDEN' ||
+        renaperError.response?.status === 403 ||
+        renaperError.message?.includes('IP não autorizado');
+
+      if (isForbiddenError) {
+        this.logger.error('Error 403: IP not on RENAPER API whitelist');
+        throw new ServiceUnavailableException({
+          success: false,
+          error: 'Serviço de validação temporariamente indisponível',
+          message: 'O serviço de validação de documentos está temporariamente indisponível. Por favor, tente novamente mais tarde.',
+          details: {
+            code: 'RENAPER_FORBIDDEN',
+            type: 'infrastructure_error',
+            error: 'IP não autorizado na API RENAPER',
+          },
+        });
+      }
+
+      throw new BadRequestException({
+        success: false,
+        error: renaperError.message || 'Documento inválido',
+        details: {
+          code: renaperError.code || renaperError.response?.status,
+          error: renaperError.error || renaperError.response?.data,
+        },
+      });
+    }
+
+    if (!renaperValidation.success) {
+      throw new BadRequestException({
+        success: false,
+        error: renaperValidation.message || 'Invalid document',
+      });
+    }
+
+    this.logger.info('Uploading images to S3...');
+
+    const frontFileName = `${identityId}_dni_front.jpg`;
+    const backFileName = `${identityId}_dni_back.jpg`;
+
+    let frontImageUrl: string;
+    let backImageUrl: string;
+
+    try {
+      frontImageUrl = await this.s3Service.uploadBase64({
+        base64: dto.frontImage,
+        name: frontFileName,
+      });
+      this.logger.info(`Front image uploaded: ${frontImageUrl}`);
+
+      backImageUrl = await this.s3Service.uploadBase64({
+        base64: dto.backImage,
+        name: backFileName,
+      });
+      this.logger.info(`Back image uploaded: ${backImageUrl}`);
+    } catch (uploadError) {
+      this.logger.error('S3 upload error', uploadError);
+      throw new BadRequestException('Failed to upload images');
+    }
+
+    const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    const formattedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+    const formattedFullName = `${formattedFirstName} ${formattedLastName}`.trim();
+
+    const userUpdates: any = {
+      firstName: formattedFirstName,
+      lastName: formattedLastName,
+      name: formattedFullName,
+      gender: gender.toLowerCase() === 'm' ? 'male' : 'female',
+      birthdate: new Date(dateOfBirth),
+    };
+
+    if (!user.username) {
+      userUpdates.username = formattedFirstName;
+    }
+
+    if (!user.country) {
+      userUpdates.country = 'ar';
+    }
+
     const onboardingState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
-
-    await this.onboardingModel.updateIdentity(identityId, {
-      identityDocumentFrontImage: dto.frontImage,
-      identityDocumentBackImage: dto.backImage,
-      identityDocumentType: 'dni',
-      identityDocumentNumber: dto.pdf417Data?.documentNumber,
-      identityDocumentIssueDate: dto.pdf417Data?.dateOfBirth
-        ? new Date(dto.pdf417Data.dateOfBirth)
-        : identity.identityDocumentIssueDate,
-    });
-
-    const userUpdates: any = {};
-    if (dto.pdf417Data?.firstName) userUpdates.firstName = dto.pdf417Data.firstName;
-    if (dto.pdf417Data?.lastName) userUpdates.lastName = dto.pdf417Data.lastName;
-    if (dto.pdf417Data?.dateOfBirth) userUpdates.birthdate = new Date(dto.pdf417Data.dateOfBirth);
-    if (dto.pdf417Data?.gender)
-      userUpdates.gender = dto.pdf417Data.gender.toLowerCase() === 'm' ? 'male' : 'female';
-
     const state = onboardingState as any;
     if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
       state.completedSteps = [];
     }
-    if (!state.completedSteps.includes('2.2')) state.completedSteps.push('2.2');
-    if (!state.completedSteps.includes('documentVerificationSuccess.ar'))
+
+    if (!state.completedSteps.includes('2.2')) {
+      state.completedSteps.push('2.2');
+    }
+
+    if (!state.completedSteps.includes('documentVerificationSuccess.ar')) {
       state.completedSteps.push('documentVerificationSuccess.ar');
+    }
 
     userUpdates.onboardingState = onboardingState;
+
+    await this.onboardingModel.updateIdentity(identityId, {
+      name: formattedFullName,
+      identityDocumentType: 'dni',
+      identityDocumentNumber: documentNumber,
+      identityDocumentIssueDate: new Date(dto.pdf417Data.documentExpiration || dateOfBirth),
+      identityDocumentIssuer: dto.pdf417Data.documentExpiration || '',
+      identityDocumentFrontImage: frontImageUrl,
+      identityDocumentBackImage: backImageUrl,
+      identityDocumentImageType: 'dni',
+    });
 
     await this.onboardingModel.updateUserOnboardingComplete(userId, userUpdates);
 
