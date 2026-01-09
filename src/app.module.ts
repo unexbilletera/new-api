@@ -6,6 +6,7 @@ import { JwtModule } from './shared/jwt/jwt.module';
 import { ConfigModule } from './shared/config/config.module';
 import { LoggerModule } from './shared/logger/logger.module';
 import { SqsModule } from './shared/sqs/sqs.module';
+import { CronosModule } from './shared/cronos/cronos.module';
 
 // Public modules (não logado)
 import { PublicAuthModule } from './public/auth/auth.module';
@@ -33,6 +34,7 @@ import { HealthModule } from './health/health.module';
     ConfigModule, // Módulo de configuração global
     LoggerModule, // Módulo Logger global
     SqsModule, // Módulo SQS global
+    CronosModule, // Módulo Cronos global
     PrismaModule,
     JwtModule, // Módulo JWT global
     HealthModule,

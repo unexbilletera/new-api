@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IsString, IsNumber, IsOptional, Min, IsEnum } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * Tipos de chave PIX suportados pela Cronos
@@ -16,19 +17,42 @@ export enum PixKeyType {
  * DTO para criar transação PIX Cronos
  */
 export class CreatePixCronosDto {
+  @ApiProperty({
+    description: 'ID da conta de origem',
+    example: 'uuid-da-conta-origem',
+  })
   @IsString()
   sourceAccountId: string;
 
+  @ApiProperty({
+    description: 'Valor da transferência (mínimo 0.01)',
+    example: 100.5,
+    minimum: 0.01,
+  })
   @IsNumber()
   @Min(0.01)
   amount: number;
 
+  @ApiProperty({
+    description: 'Tipo da chave PIX do destinatário',
+    enum: PixKeyType,
+    example: 'cpf',
+  })
   @IsEnum(PixKeyType)
   targetKeyType: PixKeyType;
 
+  @ApiProperty({
+    description: 'Valor da chave PIX do destinatário',
+    example: '12345678900',
+  })
   @IsString()
   targetKeyValue: string;
 
+  @ApiProperty({
+    description: 'Descrição da transferência (opcional)',
+    example: 'Transferência PIX teste',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   description?: string;

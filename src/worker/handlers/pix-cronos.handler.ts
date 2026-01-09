@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { LoggerService } from '../../shared/logger/logger.service';
+import { CronosService } from '../../shared/cronos/cronos.service';
+import { ColoredLogger } from '../../shared/utils/logger-colors';
 import type { transactions_status } from '../../../generated/prisma';
 
 /**
@@ -11,6 +13,7 @@ export class PixCronosHandler {
   constructor(
     private prisma: PrismaService,
     private logger: LoggerService,
+    private cronosService: CronosService,
   ) {}
 
   /**
@@ -118,33 +121,200 @@ export class PixCronosHandler {
         return;
       }
 
-      // Aqui você deve:
-      // 1. Buscar dados necessários (conta, identidade, chave PIX)
-      // 2. Chamar API da Cronos para criar a transferência PIX
-      // 3. Atualizar transação com cronosId retornado
-      // 4. Atualizar status para 'confirm' ou 'error'
+      // Validar dados necessários
+      if (!transaction.cronosId) {
+        ColoredLogger.error(
+          '[PixCronosHandler] ❌',
+          `Transação ${payload.transactionId} não possui cronosId. A transferência PIX deve ser criada primeiro.`,
+        );
+        await this.prisma.transactions.update({
+          where: { id: payload.transactionId },
+          data: {
+            status: 'error' as transactions_status,
+            updatedAt: new Date(),
+          },
+        });
+        return;
+      }
 
-      // TODO: Implementar integração com API da Cronos
-      // Por enquanto, apenas simulamos sucesso após 2 segundos
-      this.logger.info(`Simulating PIX transfer to Cronos API...`);
+      if (!transaction.sourceTaxDocumentNumber) {
+        ColoredLogger.error(
+          '[PixCronosHandler] ❌',
+          `Transação ${payload.transactionId} não possui sourceTaxDocumentNumber.`,
+        );
+        await this.prisma.transactions.update({
+          where: { id: payload.transactionId },
+          data: {
+            status: 'error' as transactions_status,
+            updatedAt: new Date(),
+          },
+        });
+        return;
+      }
 
-      // Simulação: aguardar um pouco (simular chamada à API)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!transaction.amount) {
+        ColoredLogger.error(
+          '[PixCronosHandler] ❌',
+          `Transação ${payload.transactionId} não possui amount.`,
+        );
+        await this.prisma.transactions.update({
+          where: { id: payload.transactionId },
+          data: {
+            status: 'error' as transactions_status,
+            updatedAt: new Date(),
+          },
+        });
+        return;
+      }
 
-      // TODO: Substituir por chamada real à API da Cronos
-      const cronosId = `cronos-${Date.now()}`;
+      // Chamar API da Cronos para confirmar a transferência PIX
+      ColoredLogger.info(
+        '[PixCronosHandler]',
+            `Confirmando transferência PIX na API da Cronos - transactionId: ${payload.transactionId}, cronosId: ${transaction.cronosId}`,
+      );
 
-      // Atualizar transação com cronosId e status
-      await this.prisma.transactions.update({
-        where: { id: payload.transactionId },
-        data: {
-          cronosId,
-          status: 'confirm' as transactions_status,
-          updatedAt: new Date(),
-        },
-      });
+      try {
+            // 1. Criar token transacional (requesttoken) - igual API antiga
+            ColoredLogger.info(
+              '[PixCronosHandler]',
+              `Criando token transacional na Cronos - document: ${transaction.sourceTaxDocumentNumber}, amount: ${Number(transaction.amount)}`,
+            );
+            await this.cronosService.createTransactionalToken({
+              document: transaction.sourceTaxDocumentNumber,
+              amount: Number(transaction.amount),
+              lat: 0,
+              lon: 0,
+            });
 
-      this.logger.info(`PIX Cronos confirm job processed successfully for transaction: ${payload.transactionId}. CronosId: ${cronosId}`);
+            // 2. Confirmar senha transacional (pass) - igual API antiga
+            ColoredLogger.info(
+              '[PixCronosHandler]',
+              `Confirmando senha transacional na Cronos - document: ${transaction.sourceTaxDocumentNumber}`,
+            );
+            await this.cronosService.confirmTransactionPassword({
+              document: transaction.sourceTaxDocumentNumber,
+            });
+
+            // 3. Confirmar transferência PIX (confirmartransferencia)
+        const confirmResult = await this.cronosService.confirmTransferPix({
+          document: transaction.sourceTaxDocumentNumber,
+          id: transaction.cronosId,
+          amount: Number(transaction.amount),
+          description: transaction.reason || 'Transferência PIX',
+        });
+
+        // Validar resposta da API
+        if (!confirmResult || confirmResult.success === false) {
+          ColoredLogger.error(
+            '[PixCronosHandler] ❌',
+            `API da Cronos retornou erro ao confirmar transferência: ${JSON.stringify(confirmResult)}`,
+          );
+          await this.prisma.transactions.update({
+            where: { id: payload.transactionId },
+            data: {
+              status: 'error' as transactions_status,
+              updatedAt: new Date(),
+            },
+          });
+          return;
+        }
+
+        // Debitar saldo da conta de origem e atualizar transação como confirm
+        if (!transaction.sourceAccountId) {
+          ColoredLogger.error(
+            '[PixCronosHandler] ❌',
+            `Transação ${payload.transactionId} não possui sourceAccountId. Não é possível debitar saldo.`,
+          );
+          await this.prisma.transactions.update({
+            where: { id: payload.transactionId },
+            data: {
+              status: 'error' as transactions_status,
+              updatedAt: new Date(),
+            },
+          });
+          return;
+        }
+
+        // Buscar conta de origem para obter saldo atual
+        const sourceAccount = await this.prisma.usersAccounts.findUnique({
+          where: { id: transaction.sourceAccountId },
+        });
+
+        if (!sourceAccount) {
+          ColoredLogger.error(
+            '[PixCronosHandler] ❌',
+            `Conta de origem não encontrada para transactionId: ${payload.transactionId}, sourceAccountId: ${transaction.sourceAccountId}`,
+          );
+          await this.prisma.transactions.update({
+            where: { id: payload.transactionId },
+            data: {
+              status: 'error' as transactions_status,
+              updatedAt: new Date(),
+            },
+          });
+          return;
+        }
+
+        const currentBalance = Number(sourceAccount.balance ?? 0);
+        const transactionAmount = Number(transaction.amount);
+
+        if (Number.isNaN(currentBalance) || Number.isNaN(transactionAmount)) {
+          ColoredLogger.error(
+            '[PixCronosHandler] ❌',
+            `Saldo ou valor da transação inválidos. balance=${sourceAccount.balance}, amount=${transaction.amount}`,
+          );
+          await this.prisma.transactions.update({
+            where: { id: payload.transactionId },
+            data: {
+              status: 'error' as transactions_status,
+              updatedAt: new Date(),
+            },
+          });
+          return;
+        }
+
+        const newBalance = currentBalance - transactionAmount;
+
+        // Atualizar saldo e status da transação de forma atômica
+        await this.prisma.$transaction([
+          this.prisma.usersAccounts.update({
+            where: { id: sourceAccount.id },
+            data: {
+              balance: newBalance,
+              updatedAt: new Date(),
+            },
+          }),
+          this.prisma.transactions.update({
+            where: { id: payload.transactionId },
+            data: {
+              status: 'confirm' as transactions_status,
+              updatedAt: new Date(),
+            },
+          }),
+        ]);
+
+        ColoredLogger.success(
+          '[PixCronosHandler] ✅',
+          `Transferência PIX confirmada com sucesso - transactionId: ${payload.transactionId}, cronosId: ${transaction.cronosId}`,
+        );
+      } catch (error) {
+        // Se falhar ao confirmar, atualizar transação com erro
+        ColoredLogger.errorWithStack(
+          '[PixCronosHandler] ❌ ERRO CRÍTICO',
+          `Erro ao confirmar transferência PIX na API da Cronos - transactionId: ${payload.transactionId}`,
+          error,
+        );
+
+        await this.prisma.transactions.update({
+          where: { id: payload.transactionId },
+          data: {
+            status: 'error' as transactions_status,
+            updatedAt: new Date(),
+          },
+        });
+
+        throw error;
+      }
     } catch (error) {
       this.logger.error(`Error processing PIX Cronos confirm job: ${error instanceof Error ? error.message : 'Unknown error'}`);
       

@@ -13,6 +13,8 @@ Este guia mostra como testar os endpoints de transações PIX Cronos usando o Po
 
 3. **Base URL**: Configure a base URL da API no Postman (ex: `http://localhost:3000`)
 
+4. **Documentação Swagger**: Acesse `http://localhost:3000/api/docs` para ver a documentação interativa da API
+
 ## Configuração do SQS e Worker
 
 ### 1. Configurar Variáveis de Ambiente
@@ -120,10 +122,28 @@ Content-Type: application/json
   "status": "pending",
   "amount": 100.5,
   "createdAt": "2026-01-07T20:00:00.000Z",
+  "targetName": "NOME DO DESTINATÁRIO",
+  "targetAlias": "cpf 12345678900",
+  "targetTaxDocumentNumber": "12345678900",
+  "targetTaxDocumentType": "CPF",
+  "targetBank": "Banco do Destinatário",
+  "targetAccountNumber": "{\"bank\":\"001\",\"agency\":\"0001\",\"number\":\"12345\"}",
   "message": "200 transactions.success.created",
   "code": "200 transactions.success.created"
 }
 ```
+
+**Campos Retornados:**
+- `id`: ID único da transação criada
+- `status`: Status da transação (`pending` inicialmente)
+- `amount`: Valor da transferência
+- `createdAt`: Data de criação da transação
+- `targetName`: Nome do destinatário (obtido da API Cronos)
+- `targetAlias`: Alias/identificação do destinatário
+- `targetTaxDocumentNumber`: CPF/CNPJ do destinatário
+- `targetTaxDocumentType`: Tipo do documento (CPF/CNPJ)
+- `targetBank`: Nome do banco do destinatário
+- `targetAccountNumber`: Dados da conta do destinatário (JSON stringificado)
 
 **Exemplo de Erro (400):**
 ```json
@@ -310,4 +330,46 @@ Então use `{{base_url}}`, `{{auth_token}}` e `{{transaction_id}}` nas suas requ
 3. **Valores Mínimos**: O valor mínimo para transferência é `0.01`
 
 4. **Ambiente**: Este endpoint funciona apenas em ambiente autenticado (área logada)
+
+---
+
+## Documentação Swagger
+
+A API possui documentação interativa Swagger disponível em:
+
+**URL**: `http://localhost:3000/api/docs`
+
+### Como usar o Swagger:
+
+1. **Acesse a URL**: Abra `http://localhost:3000/api/docs` no navegador
+2. **Autenticação**: 
+   - Clique no botão **"Authorize"** no topo da página
+   - Cole seu token JWT no campo (sem o prefixo "Bearer")
+   - Clique em **"Authorize"** e depois **"Close"**
+3. **Testar Endpoints**:
+   - Expanda o endpoint desejado (ex: `POST /transactions/pix/cronos/create`)
+   - Clique em **"Try it out"**
+   - Preencha os campos do body
+   - Clique em **"Execute"**
+   - Veja a resposta abaixo
+
+### Vantagens do Swagger:
+
+- ✅ Documentação interativa e sempre atualizada
+- ✅ Teste direto no navegador sem precisar do Postman
+- ✅ Exemplos de request/response
+- ✅ Validação automática de campos
+- ✅ Autenticação JWT integrada
+
+### Instalação
+
+Para habilitar o Swagger, instale a dependência:
+
+```bash
+npm install @nestjs/swagger
+# ou
+yarn add @nestjs/swagger
+```
+
+Após instalar, reinicie o servidor e acesse `http://localhost:3000/api/docs`.
 
