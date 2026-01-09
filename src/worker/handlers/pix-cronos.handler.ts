@@ -23,7 +23,9 @@ export class PixCronosHandler {
     targetKeyValue: string;
     description?: string;
   }): Promise<void> {
-    this.logger.info(`Processing PIX Cronos create for transaction: ${payload.transactionId}`);
+    this.logger.info(
+      `Processing PIX Cronos create for transaction: ${payload.transactionId}`,
+    );
 
     try {
       const transaction = await this.prisma.transactions.findUnique({
@@ -36,15 +38,20 @@ export class PixCronosHandler {
       }
 
       if (transaction.status !== 'pending') {
-        this.logger.warn(`Transaction ${payload.transactionId} is not pending. Status: ${transaction.status}`);
+        this.logger.warn(
+          `Transaction ${payload.transactionId} is not pending. Status: ${transaction.status}`,
+        );
         return;
       }
 
-
-      this.logger.info(`PIX Cronos create job processed successfully for transaction: ${payload.transactionId}`);
+      this.logger.info(
+        `PIX Cronos create job processed successfully for transaction: ${payload.transactionId}`,
+      );
     } catch (error) {
-      this.logger.error(`Error processing PIX Cronos create job: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      
+      this.logger.error(
+        `Error processing PIX Cronos create job: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+
       try {
         await this.prisma.transactions.update({
           where: { id: payload.transactionId },
@@ -54,9 +61,11 @@ export class PixCronosHandler {
           },
         });
       } catch (updateError) {
-        this.logger.error(`Error updating transaction status: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`);
+        this.logger.error(
+          `Error updating transaction status: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`,
+        );
       }
-      
+
       throw error;
     }
   }
@@ -65,7 +74,9 @@ export class PixCronosHandler {
     transactionId: string;
     userId: string;
   }): Promise<void> {
-    this.logger.info(`Processing PIX Cronos confirm for transaction: ${payload.transactionId}`);
+    this.logger.info(
+      `Processing PIX Cronos confirm for transaction: ${payload.transactionId}`,
+    );
 
     try {
       const transaction = await this.prisma.transactions.findFirst({
@@ -92,7 +103,9 @@ export class PixCronosHandler {
       }
 
       if (transaction.status !== 'process') {
-        this.logger.warn(`Transaction ${payload.transactionId} is not in process status. Status: ${transaction.status}`);
+        this.logger.warn(
+          `Transaction ${payload.transactionId} is not in process status. Status: ${transaction.status}`,
+        );
         return;
       }
 
@@ -145,38 +158,38 @@ export class PixCronosHandler {
       // Chamar API da Cronos para confirmar a transferência PIX
       ColoredLogger.info(
         '[PixCronosHandler]',
-            `Confirmando transferência PIX na API da Cronos - transactionId: ${payload.transactionId}, cronosId: ${transaction.cronosId}`,
+        `Confirmando transferência PIX na API da Cronos - transactionId: ${payload.transactionId}, cronosId: ${transaction.cronosId}`,
       );
 
       try {
-            // 1. Criar token transacional (requesttoken) - igual API antiga
-            ColoredLogger.info(
-              '[PixCronosHandler]',
-              `Criando token transacional na Cronos - document: ${transaction.sourceTaxDocumentNumber}, amount: ${Number(transaction.amount)}`,
-            );
-            await this.cronosService.createTransactionalToken({
-              document: transaction.sourceTaxDocumentNumber,
-              amount: Number(transaction.amount),
-              lat: 0,
-              lon: 0,
-            });
+        // 1. Criar token transacional (requesttoken) - igual API antiga
+        ColoredLogger.info(
+          '[PixCronosHandler]',
+          `Criando token transacional na Cronos - document: ${transaction.sourceTaxDocumentNumber}, amount: ${Number(transaction.amount)}`,
+        );
+        await this.cronosService.createTransactionalToken({
+          document: transaction.sourceTaxDocumentNumber,
+          amount: Number(transaction.amount),
+          lat: 0,
+          lon: 0,
+        });
 
-            // 2. Confirmar senha transacional (pass) - igual API antiga
-            ColoredLogger.info(
-              '[PixCronosHandler]',
-              `Confirmando senha transacional na Cronos - document: ${transaction.sourceTaxDocumentNumber}`,
-            );
-            await this.cronosService.confirmTransactionPassword({
-              document: transaction.sourceTaxDocumentNumber,
-            });
+        // 2. Confirmar senha transacional (pass) - igual API antiga
+        ColoredLogger.info(
+          '[PixCronosHandler]',
+          `Confirmando senha transacional na Cronos - document: ${transaction.sourceTaxDocumentNumber}`,
+        );
+        await this.cronosService.confirmTransactionPassword({
+          document: transaction.sourceTaxDocumentNumber,
+        });
 
-            // 3. Confirmar transferência PIX (confirmartransferencia)
-        const confirmResult = await this.cronosService.confirmTransferPix({
+        // 3. Confirmar transferência PIX (confirmartransferencia)
+        const confirmResult = (await this.cronosService.confirmTransferPix({
           document: transaction.sourceTaxDocumentNumber,
           id: transaction.cronosId,
           amount: Number(transaction.amount),
           description: transaction.reason || 'Transferência PIX',
-        });
+        })) as { success?: boolean };
 
         // Validar resposta da API
         if (!confirmResult || confirmResult.success === false) {
@@ -236,7 +249,7 @@ export class PixCronosHandler {
         if (Number.isNaN(currentBalance) || Number.isNaN(transactionAmount)) {
           ColoredLogger.error(
             '[PixCronosHandler] ❌',
-            `Saldo ou valor da transação inválidos. balance=${sourceAccount.balance}, amount=${transaction.amount}`,
+            `Saldo ou valor da transação inválidos. balance=${sourceAccount.balance?.toString() ?? 'null'}, amount=${transaction.amount?.toString() ?? 'null'}`,
           );
           await this.prisma.transactions.update({
             where: { id: payload.transactionId },
@@ -291,8 +304,10 @@ export class PixCronosHandler {
         throw error;
       }
     } catch (error) {
-      this.logger.error(`Error processing PIX Cronos confirm job: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      
+      this.logger.error(
+        `Error processing PIX Cronos confirm job: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+
       try {
         await this.prisma.transactions.update({
           where: { id: payload.transactionId },
@@ -302,11 +317,12 @@ export class PixCronosHandler {
           },
         });
       } catch (updateError) {
-        this.logger.error(`Error updating transaction status: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`);
+        this.logger.error(
+          `Error updating transaction status: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`,
+        );
       }
-      
+
       throw error;
     }
   }
 }
-

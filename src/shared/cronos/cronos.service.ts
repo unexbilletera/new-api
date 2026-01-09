@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 import { LoggerService } from '../logger/logger.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { ColoredLogger } from '../utils/logger-colors';
 import fetch, { Response } from 'node-fetch';
 import { SocksProxyAgent } from 'socks-proxy-agent';
@@ -78,6 +79,7 @@ export class CronosService implements OnModuleInit {
   constructor(
     private configService: ConfigService,
     private logger: LoggerService,
+    private prisma: PrismaService,
   ) {}
 
   onModuleInit() {
@@ -1101,6 +1103,377 @@ export class CronosService implements OnModuleInit {
         error,
       );
       throw error;
+    }
+  }
+
+  /**
+   * Obtém o saldo da conta na API da Cronos
+   *
+   * Equivalente ao helper antigo: getAccountBalance
+   *
+   * @param document - CPF/CNPJ do usuário
+   * @returns Saldo da conta
+   */
+  async getAccountBalance(params: {
+    document: string;
+  }): Promise<{ amount?: number; balance?: number; saldo?: number }> {
+    try {
+      if (!params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+
+      if (this.config.logging) {
+        ColoredLogger.info(
+          '[CronosService]',
+          `Buscando saldo da conta - document: ${params.document}`,
+        );
+      }
+
+      const result = (await this.request({
+        method: 'GET',
+        action: '/api/v1/account/balance',
+        document: params.document,
+        useUserAuth: true,
+      })) as { amount?: number; balance?: number; saldo?: number };
+
+      if (this.config.logging) {
+        ColoredLogger.success(
+          '[CronosService] ✅',
+          'Saldo da conta obtido com sucesso na API da Cronos',
+        );
+      }
+
+      return result;
+    } catch (error) {
+      ColoredLogger.errorWithStack(
+        '[CronosService] ❌ ERRO CRÍTICO',
+        'Erro ao obter saldo da conta na API da Cronos',
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Obtém transações/extratos da conta na API da Cronos
+   *
+   * Equivalente ao helper antigo: getTransactions
+   *
+   * @param document - CPF/CNPJ do usuário
+   * @param startDate - Data inicial (formato: YYYY-MM-DD HH:mm:ss)
+   * @param endDate - Data final (formato: YYYY-MM-DD HH:mm:ss)
+   * @param searchtext - Texto de busca (opcional)
+   * @param type_transaction - Tipo de transação (opcional)
+   * @param limit - Limite de resultados (opcional)
+   * @returns Transações/extratos
+   */
+  async getTransactions(params: {
+    document: string;
+    startDate?: string;
+    endDate?: string;
+    searchtext?: string;
+    type_transaction?: string;
+    limit?: string;
+  }): Promise<any> {
+    try {
+      if (!params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+
+      const queryParams = new URLSearchParams();
+      if (params.startDate) queryParams.append('startDate', params.startDate);
+      if (params.endDate) queryParams.append('endDate', params.endDate);
+      if (params.searchtext)
+        queryParams.append('searchtext', params.searchtext);
+      if (params.type_transaction)
+        queryParams.append('type_transaction', params.type_transaction);
+      if (params.limit) queryParams.append('limit', params.limit);
+
+      const action = `/api/v1/statements${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+
+      if (this.config.logging) {
+        ColoredLogger.info(
+          '[CronosService]',
+          `Buscando transações - document: ${params.document}`,
+        );
+      }
+
+      const result = await this.request({
+        method: 'GET',
+        action,
+        document: params.document,
+        useUserAuth: true,
+      });
+
+      if (this.config.logging) {
+        ColoredLogger.success(
+          '[CronosService] ✅',
+          'Transações obtidas com sucesso na API da Cronos',
+        );
+      }
+
+      return result;
+    } catch (error) {
+      ColoredLogger.errorWithStack(
+        '[CronosService] ❌ ERRO CRÍTICO',
+        'Erro ao obter transações na API da Cronos',
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Sincroniza o saldo da conta Cronos com o saldo na API da Cronos
+   *
+   * Equivalente ao middleware antigo: syncCronosBalance
+   *
+   * @param userId - ID do usuário
+   * @param userIdentities - Identidades do usuário
+   * @param userAccounts - Contas do usuário
+   */
+  async syncCronosBalance(params: {
+    userId: string;
+    userIdentities: Array<{
+      country: string;
+      status: string;
+      taxDocumentNumber: string;
+    }>;
+    userAccounts: Array<{
+      id: string;
+      type: string;
+      status: string;
+      balance: string;
+    }>;
+  }): Promise<void> {
+    try {
+      if (!params || !params.userId) {
+        throw new Error('Missing userId for balance sync');
+      }
+
+      ColoredLogger.info(
+        '[CronosService] 🔄',
+        `Iniciando sincronização de saldo para usuário: ${params.userId}`,
+      );
+
+      // Buscar identidade BR
+      const brIdentity = params.userIdentities?.find(
+        (id) => id.country === 'br' && id.status === 'enable',
+      );
+
+      if (!brIdentity) {
+        ColoredLogger.warning(
+          '[CronosService] ⚠️',
+          'Usuário não possui identidade BR ativa',
+        );
+        return;
+      }
+
+      // Buscar conta Cronos (BRL)
+      const cronosAccount = params.userAccounts?.find(
+        (acc) => acc.type === 'cronos' && acc.status === 'enable',
+      );
+
+      if (!cronosAccount) {
+        ColoredLogger.warning(
+          '[CronosService] ⚠️',
+          'Usuário não possui conta Cronos ativa',
+        );
+        return;
+      }
+
+      const unexBalance = parseFloat(cronosAccount.balance || '0');
+
+      ColoredLogger.info('[CronosService] 💰', 'Saldo Unex (Cronos):', {
+        accountId: cronosAccount.id,
+        balance: unexBalance,
+        document: brIdentity.taxDocumentNumber,
+      });
+
+      // Buscar saldo atual na Cronos API
+      let cronosBalance: number | null = null;
+      try {
+        const cronosResponse = await this.getAccountBalance({
+          document: brIdentity.taxDocumentNumber,
+        });
+        cronosBalance =
+          parseFloat(
+            String(
+              cronosResponse?.amount ||
+                cronosResponse?.balance ||
+                cronosResponse?.saldo ||
+                0,
+            ),
+          ) || 0;
+
+        ColoredLogger.info('[CronosService] 💰', 'Saldo Cronos (API):', {
+          balance: cronosBalance,
+          document: brIdentity.taxDocumentNumber,
+        });
+      } catch (cronosError: any) {
+        ColoredLogger.error(
+          '[CronosService] ❌',
+          `Erro ao consultar saldo Cronos: ${cronosError?.message || String(cronosError)}`,
+        );
+        return; // Não bloqueia por erro na API
+      }
+
+      // Detectar discrepância
+      const difference = Math.abs(unexBalance - cronosBalance);
+      const tolerance = 0.01; // 1 centavo de diferença é aceitável
+
+      if (difference > tolerance) {
+        ColoredLogger.warning('[CronosService] ⚠️', 'DISCREPÂNCIA DETECTADA:', {
+          unexBalance,
+          cronosBalance,
+          difference,
+          discrepancyPercentage: `${(
+            (difference / Math.max(unexBalance, cronosBalance)) *
+            100
+          ).toFixed(2)}%`,
+        });
+
+        // Se Cronos está zerado mas Unex tem saldo, buscar statements recentes
+        if (cronosBalance === 0 && unexBalance > 0) {
+          ColoredLogger.info(
+            '[CronosService] 🔍',
+            'Verificando statements recentes para reconciliar...',
+          );
+
+          try {
+            const endDate = new Date()
+              .toISOString()
+              .slice(0, 19)
+              .replace('T', ' ');
+            const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .slice(0, 19)
+              .replace('T', ' ');
+
+            const statements = await this.getTransactions({
+              document: brIdentity.taxDocumentNumber,
+              startDate,
+              endDate,
+              limit: '100',
+            });
+
+            ColoredLogger.info(
+              '[CronosService] 📋',
+              'Statements recentes encontrados:',
+              {
+                count: (statements?.statements || []).length,
+                startDate,
+                endDate,
+              },
+            );
+
+            // Procurar por cashin_cronos pendentes que não foram processados
+            const pendingCashins = await this.prisma.transactions.findMany({
+              where: {
+                type: 'cashin_cronos',
+                status: 'pending',
+                sourceUserId: params.userId,
+                createdAt: {
+                  gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                },
+              },
+            });
+
+            if (pendingCashins?.length > 0) {
+              ColoredLogger.warning(
+                '[CronosService] ⚠️',
+                `Encontrados ${pendingCashins.length} cashin_cronos pendentes:`,
+                {
+                  transactions: pendingCashins.map((tx) => ({
+                    id: tx.id,
+                    amount: tx.amount,
+                    createdAt: tx.createdAt,
+                    status: tx.status,
+                  })),
+                },
+              );
+            }
+
+            // Procurar por exchange pendentes
+            const pendingExchanges = await this.prisma.ramp_operations.findMany(
+              {
+                where: {
+                  user_id: params.userId,
+                  status: {
+                    in: ['STARTING', 'WAITING_DEPOSIT', 'ORDER_EXECUTED'],
+                  },
+                  created_at: {
+                    gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                  },
+                },
+              },
+            );
+
+            if (pendingExchanges?.length > 0) {
+              ColoredLogger.warning(
+                '[CronosService] ⚠️',
+                `Encontradas ${pendingExchanges.length} operações de exchange pendentes:`,
+                {
+                  operations: pendingExchanges.map((op) => ({
+                    id: op.id,
+                    direction: op.direction,
+                    status: op.status,
+                    depositAmount: op.deposit_amount,
+                    createdAt: op.created_at,
+                  })),
+                },
+              );
+            }
+          } catch (stmtError: any) {
+            ColoredLogger.error(
+              '[CronosService] ⚠️',
+              `Erro ao verificar statements: ${stmtError?.message || String(stmtError)}`,
+            );
+          }
+        }
+      } else {
+        ColoredLogger.success('[CronosService] ✅', 'Saldos sincronizados:', {
+          unexBalance,
+          cronosBalance,
+          difference,
+        });
+      }
+
+      // Se há discrepância, ajustar o saldo da conta BRL (Cronos)
+      if (Math.abs(difference) > 0.01) {
+        try {
+          ColoredLogger.info('[CronosService] 🔧', 'Iniciando ajuste de saldo');
+          const balanceBefore = cronosAccount.balance;
+
+          await this.prisma.usersAccounts.update({
+            where: { id: cronosAccount.id },
+            data: { balance: cronosBalance },
+          });
+
+          ColoredLogger.success(
+            '[CronosService] 💾',
+            'Saldo BRL ajustado com sucesso:',
+            {
+              accountId: cronosAccount.id,
+              userId: params.userId,
+              balanceBefore,
+              balanceAfter: cronosBalance,
+              difference: parseFloat(balanceBefore || '0') - cronosBalance,
+            },
+          );
+        } catch (adjustError: any) {
+          ColoredLogger.error(
+            '[CronosService] ❌',
+            `Erro ao ajustar saldo: ${adjustError?.message || String(adjustError)}`,
+          );
+        }
+      }
+    } catch (error: any) {
+      ColoredLogger.error(
+        '[CronosService] ❌',
+        `Erro geral na sincronização: ${error?.message || String(error)}`,
+      );
+      // Não rejeita para não bloquear o login
     }
   }
 
