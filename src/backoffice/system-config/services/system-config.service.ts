@@ -51,7 +51,7 @@ export class SystemConfigService {
     });
 
     if (!config) {
-      throw new NotFoundException(`Configuração '${key}' não encontrada`);
+      throw new NotFoundException(`Configuration '${key}' not found`);
     }
 
     return config;
@@ -63,7 +63,7 @@ export class SystemConfigService {
     });
 
     if (existing) {
-      throw new ConflictException(`Configuração '${dto.key}' já existe`);
+      throw new ConflictException(`Configuration '${dto.key}' already exists`);
     }
 
     return this.prisma.system_config.create({
@@ -83,7 +83,7 @@ export class SystemConfigService {
     });
 
     if (!config) {
-      throw new NotFoundException('Configuração não encontrada');
+      throw new NotFoundException('Configuration not found');
     }
 
     return this.prisma.system_config.update({
@@ -103,7 +103,7 @@ export class SystemConfigService {
     });
 
     if (!config) {
-      throw new NotFoundException('Configuração não encontrada');
+      throw new NotFoundException('Configuration not found');
     }
 
     await this.prisma.system_config.update({
@@ -111,7 +111,7 @@ export class SystemConfigService {
       data: { deletedAt: new Date() },
     });
 
-    return { success: true, message: 'Configuração deletada com sucesso' };
+    return { success: true, message: 'Configuration deleted successfully' };
   }
 
   async listGroups() {
@@ -136,7 +136,7 @@ export class SystemConfigService {
     });
 
     if (!module) {
-      throw new NotFoundException('Módulo não encontrado');
+      throw new NotFoundException('Module not found');
     }
 
     return module;
@@ -148,7 +148,7 @@ export class SystemConfigService {
     });
 
     if (existing) {
-      throw new ConflictException(`Módulo '${dto.name}' já existe`);
+      throw new ConflictException(`Module '${dto.name}' already exists`);
     }
 
     return this.prisma.modules.create({
@@ -165,7 +165,7 @@ export class SystemConfigService {
     });
 
     if (!module) {
-      throw new NotFoundException('Módulo não encontrado');
+      throw new NotFoundException('Module not found');
     }
 
     return this.prisma.modules.update({
@@ -184,14 +184,14 @@ export class SystemConfigService {
     });
 
     if (!module) {
-      throw new NotFoundException('Módulo não encontrado');
+      throw new NotFoundException('Module not found');
     }
 
     await this.prisma.modules.delete({
       where: { id },
     });
 
-    return { success: true, message: 'Módulo deletado com sucesso' };
+    return { success: true, message: 'Module deleted successfully' };
   }
 
   async toggleModule(id: number, isActive: boolean) {
@@ -200,7 +200,7 @@ export class SystemConfigService {
     });
 
     if (!module) {
-      throw new NotFoundException('Módulo não encontrado');
+      throw new NotFoundException('Module not found');
     }
 
     return this.prisma.modules.update({
