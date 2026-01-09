@@ -1360,4 +1360,615 @@ export class CronosService implements OnModuleInit {
 
     return mapping[keyType.toLowerCase()] || keyType.toLowerCase();
   }
+
+  async onboardingStart(params: { document: string }): Promise<{ individual_id: string }> {
+    try {
+      if (!params || !params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+
+      const result = (await this.request({
+        method: 'POST',
+        action: '/api/v1/register/individual',
+        body: {
+          document: params.document,
+        },
+      })) as { individual_id: string };
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStart error', error);
+      throw error;
+    }
+  }
+
+  async onboardingStep1(params: {
+    cronosId: string;
+    name: string;
+    email: string;
+  }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+      if (!params || !params.name) {
+        throw new Error('Missing name. Invalid parameters');
+      }
+      if (!params || !params.email) {
+        throw new Error('Missing email. Invalid parameters');
+      }
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/register/individual/step1',
+        body: {
+          individual_id: params.cronosId,
+          full_name: params.name,
+          email: params.email,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep1 error', error);
+      throw error;
+    }
+  }
+
+  async onboardingStep2(params: {
+    cronosId: string;
+    phonePrefix: string;
+    phoneNumber: string;
+    code?: string;
+  }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+      if (!params || !params.phonePrefix) {
+        throw new Error('Missing phonePrefix. Invalid parameters');
+      }
+      if (!params || !params.phoneNumber) {
+        throw new Error('Missing phoneNumber. Invalid parameters');
+      }
+
+      const result = await this.request({
+        method: params.code ? 'PUT' : 'POST',
+        action: '/api/v1/register/individual/step2',
+        body: {
+          individual_id: params.cronosId,
+          phone_prefix: params.phonePrefix,
+          phone_number: params.phoneNumber,
+          code: params.code,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep2 error', error);
+      throw error;
+    }
+  }
+
+  async onboardingStep3(params: {
+    cronosId: string;
+    documentType: string;
+    documentFace: string;
+    fileUrl: string;
+  }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+      if (!params || !params.documentType) {
+        throw new Error('Missing documentType. Invalid parameters');
+      }
+      if (!params || !params.documentFace) {
+        throw new Error('Missing documentFace. Invalid parameters');
+      }
+      if (!params || !params.fileUrl) {
+        throw new Error('Missing fileUrl. Invalid parameters');
+      }
+
+      const fetch = (await import('node-fetch')).default;
+      const fileStream = await fetch(params.fileUrl).then((res) => res.body);
+
+      const FormData = (await import('form-data')).default;
+      const formData = new FormData();
+      formData.append('individual_id', params.cronosId);
+      formData.append('image_type', params.documentType);
+      formData.append('document_type', params.documentFace);
+      formData.append('file', fileStream, {
+        filename: `${params.cronosId}_${params.documentType}_${params.documentFace}`,
+      });
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/register/individual/step3',
+        body: formData as any,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep3 error', error);
+      throw error;
+    }
+  }
+
+  async onboardingStep4(params: {
+    cronosId: string;
+    documentType?: string;
+    documentNumber?: string;
+    documentState?: string;
+    documentIssuance?: string;
+    documentIssuanceDate?: string;
+    gender?: string;
+    birthDate?: string;
+    maritalStatus?: string;
+    nationality?: string;
+    nationalityState?: string;
+    motherName?: string;
+    fatherName?: string;
+    pep?: string;
+    pepSince?: string;
+    monthlyIncome?: string;
+  }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+
+      const cronosGender: Record<string, string> = {
+        male: 'M',
+        female: 'F',
+      };
+
+      const cronosMaritalStatus: Record<string, number> = {
+        single: 0,
+        married: 1,
+        divorced: 2,
+        widowed: 3,
+        cohabiting: 4,
+        separated: 5,
+      };
+
+      const body: any = {
+        individual_id: params.cronosId,
+      };
+
+      if (params.documentType) {
+        body.document_name = params.documentType.toString().trim().toUpperCase();
+      }
+      if (params.documentNumber) body.document_number = params.documentNumber;
+      if (params.documentState) body.document_state = params.documentState;
+      if (params.documentIssuance) body.document_issuance = params.documentIssuance;
+      if (params.documentIssuanceDate) body.issuance_date = params.documentIssuanceDate;
+      if (params.gender) {
+        body.gender = cronosGender[params.gender.toLowerCase()] || params.gender;
+      }
+      if (params.birthDate) body.birth_date = params.birthDate;
+      if (params.maritalStatus) {
+        body.marital_status =
+          cronosMaritalStatus[params.maritalStatus.toLowerCase()] ?? params.maritalStatus;
+      }
+      if (params.nationality) body.nationality = params.nationality;
+      if (params.nationalityState) body.nationality_state = params.nationalityState;
+      if (params.motherName) body.mother_name = params.motherName;
+      if (params.fatherName) body.father_name = params.fatherName;
+      if (params.pep !== undefined) body.pep = params.pep;
+      if (params.pepSince) body.pep_since = params.pepSince;
+      if (params.monthlyIncome) body.renda_mensal = params.monthlyIncome;
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/register/individual/step4',
+        body,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep4 error', error);
+      throw error;
+    }
+  }
+
+  async onboardingStep5(params: { cronosId: string; fileUrl: string }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+      if (!params || !params.fileUrl) {
+        throw new Error('Missing fileUrl. Invalid parameters');
+      }
+
+      const fetch = (await import('node-fetch')).default;
+      const fileStream = await fetch(params.fileUrl).then((res) => res.body);
+
+      const FormData = (await import('form-data')).default;
+      const formData = new FormData();
+      formData.append('individual_id', params.cronosId);
+      formData.append('image_type', 'foto_selfie');
+      formData.append('file', fileStream, {
+        filename: `${params.cronosId}_selfie`,
+      });
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/register/individual/step5',
+        body: formData as any,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep5 error', error);
+      throw error;
+    }
+  }
+
+  async onboardingStep6(params: {
+    cronosId: string;
+    zipCode: string;
+    addressTypeId?: string;
+    street: string;
+    number: string;
+    neighborhood: string;
+    state: string;
+    city: string;
+    country: string;
+    complement?: string;
+  }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+      if (!params || !params.zipCode) {
+        throw new Error('Missing zipCode. Invalid parameters');
+      }
+      if (!params || !params.street) {
+        throw new Error('Missing street. Invalid parameters');
+      }
+      if (!params || !params.number) {
+        throw new Error('Missing number. Invalid parameters');
+      }
+      if (!params || !params.neighborhood) {
+        throw new Error('Missing neighborhood. Invalid parameters');
+      }
+      if (!params || !params.state) {
+        throw new Error('Missing state. Invalid parameters');
+      }
+      if (!params || !params.city) {
+        throw new Error('Missing city. Invalid parameters');
+      }
+      if (!params || !params.country) {
+        throw new Error('Missing country. Invalid parameters');
+      }
+
+      const cronosAddressType: Record<string, number> = {
+        own: 1,
+        rent: 2,
+        financed: 3,
+        company: 4,
+        parents: 5,
+      };
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/register/individual/step6',
+        body: {
+          individual_id: params.cronosId,
+          postal_code: params.zipCode,
+          address_type_id: cronosAddressType[params.addressTypeId || 'own'] || 1,
+          street: params.street,
+          number: params.number,
+          neighborhood: params.neighborhood,
+          state: params.state,
+          city: params.city,
+          country: params.country,
+          complement: params.complement,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep6 error', error);
+      throw error;
+    }
+  }
+
+  async onboardingStep7(params: { cronosId: string }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/register/individual/step7',
+        body: {
+          individual_id: params.cronosId,
+          password: this.config.userPassword,
+          confirm_password: this.config.userPassword,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep7 error', error);
+      throw error;
+    }
+  }
+
+  async getOnboardingStatus(params: { cronosId: string }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+
+      const result = await this.request({
+        method: 'GET',
+        action: `/api/v1/register/individual/${params.cronosId}`,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'getOnboardingStatus error', error);
+      throw error;
+    }
+  }
+
+  async getAccount(params: { document: string }): Promise<any> {
+    try {
+      if (!params || !params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+
+      const result = await this.request({
+        method: 'GET',
+        action: '/api/v1/account/',
+        document: params.document,
+        useUserAuth: true,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'getAccount error', error);
+      throw error;
+    }
+  }
+
+  async getPixKeys(params: { document: string }): Promise<any> {
+    try {
+      if (!params || !params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+
+      const result = await this.request({
+        method: 'GET',
+        action: '/api/v1/pix/chaves',
+        document: params.document,
+        useUserAuth: true,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'getPixKeys error', error);
+      throw error;
+    }
+  }
+
+  async getAlias(params: { document: string }): Promise<any> {
+    try {
+      if (!params || !params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+
+      const pixKeys = await this.getPixKeys(params);
+
+      const result: any = {};
+      const chaves = pixKeys?.chaves || [];
+
+      const cpf = chaves.find((key: any) => key.chave_tipo === 'cpf');
+      const cnpj = chaves.find((key: any) => key.chave_tipo === 'cnpj');
+      const email = chaves.find((key: any) => key.chave_tipo === 'email');
+      const telefone = chaves.find((key: any) => key.chave_tipo === 'telefone');
+      const evp = chaves.find((key: any) => key.chave_tipo === 'evp');
+
+      if (cpf) result.cpf = cpf.chave;
+      if (cnpj) result.cnpj = cnpj.chave;
+      if (email) result.email = email.chave;
+      if (telefone) result.telefone = telefone.chave;
+      if (evp) result.evp = evp.chave;
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'getAlias error', error);
+      return {};
+    }
+  }
+
+  async addPixKey(params: { document: string; type: string; key: string }): Promise<any> {
+    try {
+      if (!params || !params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+      if (!params || !params.type) {
+        throw new Error('Missing type. Invalid parameters');
+      }
+      if (!params || !params.key) {
+        throw new Error('Missing key. Invalid parameters');
+      }
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/pix/chaves/cadastrar',
+        document: params.document,
+        useUserAuth: true,
+        body: {
+          tipo_chave: params.type,
+          chave: params.key,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'addPixKey error', error);
+      throw error;
+    }
+  }
+
+  async onboarding(params: {
+    cronosId: string;
+    name: string;
+    email: string;
+    phone: string;
+    motherName?: string;
+    fatherName?: string;
+    gender?: string;
+    birthdate?: string;
+    nationality?: string;
+    nationalityState?: string;
+    maritalStatus?: string;
+    pep?: string;
+    documentType?: string;
+    documentNumber?: string;
+    documentState?: string;
+    documentIssuance?: string;
+    documentIssuanceDate?: string;
+    selfie?: string;
+    zipCode?: string;
+    addressTypeId?: string;
+    street?: string;
+    number?: string;
+    neighborhood?: string;
+    state?: string;
+    city?: string;
+    country?: string;
+    complement?: string;
+    rgFrente?: string;
+    rgVerso?: string;
+    cnhFrente?: string;
+    cnhVerso?: string;
+    rneFrente?: string;
+    rneVerso?: string;
+  }): Promise<any> {
+    try {
+      if (!params || !params.cronosId) {
+        throw new Error('Missing cronosId. Invalid parameters');
+      }
+
+      const cronosGender: Record<string, string> = {
+        male: 'M',
+        female: 'F',
+      };
+
+      const cronosMaritalStatus: Record<string, number> = {
+        single: 0,
+        married: 1,
+        divorced: 2,
+        widowed: 3,
+        cohabiting: 4,
+        separated: 5,
+      };
+
+      const cronosAddressType: Record<string, number> = {
+        own: 1,
+        rent: 2,
+        financed: 3,
+        company: 4,
+        parents: 5,
+      };
+
+      const toCronosDate = (value: any): string | undefined => {
+        if (!value) return undefined;
+        const date = value instanceof Date ? value : new Date(value);
+        if (Number.isNaN(date.getTime())) return undefined;
+        return date.toISOString().slice(0, 10);
+      };
+
+      const toUpper = (value: any): string | undefined => {
+        return value ? value.toString().trim().toUpperCase() || undefined : undefined;
+      };
+
+      const cleanPostalCode = (value: any): string | undefined => {
+        if (!value) return undefined;
+        return value.toString().trim().replace(/[^0-9A-Z]/gi, '');
+      };
+
+      const mapEnum = (value: any, mapping: Record<string, any>): any => {
+        if (value === null || value === undefined) return undefined;
+        if (typeof value === 'string') {
+          const normalized = value.trim().toLowerCase();
+          if (Object.prototype.hasOwnProperty.call(mapping, normalized)) {
+            return mapping[normalized];
+          }
+        }
+        return value;
+      };
+
+      const normalizedGender = (() => {
+        if (!params.gender) return undefined;
+        const genderValue = params.gender.toString().trim();
+        const mapped = mapEnum(genderValue, cronosGender);
+        if (mapped === 'M' || mapped === 'F') return mapped;
+        if (/^m$/i.test(genderValue) || /^masculino$/i.test(genderValue)) return 'M';
+        if (/^f$/i.test(genderValue) || /^feminino$/i.test(genderValue)) return 'F';
+        return undefined;
+      })();
+
+      const payload: any = {
+        name: params.name,
+        email: params.email,
+        phone: params.phone,
+        rg_frente: params.rgFrente,
+        rg_verso: params.rgVerso,
+        cnh_frente: params.cnhFrente,
+        cnh_verso: params.cnhVerso,
+        rne_frente: params.rneFrente,
+        rne_verso: params.rneVerso,
+        mother_name: params.motherName,
+        father_name: params.fatherName,
+        gender: normalizedGender,
+        birth_date: toCronosDate(params.birthdate),
+        nationality: toUpper(params.nationality || params.country),
+        nationality_state: toUpper(params.nationalityState),
+        document_name: params.documentType ? params.documentType.toString().trim() : undefined,
+        document_number: params.documentNumber,
+        document_state: toUpper(params.documentState),
+        document_issuance: params.documentIssuance
+          ? params.documentIssuance.toString().trim().toUpperCase()
+          : undefined,
+        issuance_date: toCronosDate(params.documentIssuanceDate),
+        marital_status: mapEnum(params.maritalStatus, cronosMaritalStatus),
+        pep: params.pep === 'no' || params.pep === '0' || (typeof params.pep === 'number' && params.pep === 0) ? 0 : 1,
+        selfie: params.selfie,
+        postal_code: cleanPostalCode(params.zipCode),
+        address_type_id: mapEnum(params.addressTypeId, cronosAddressType),
+        street: params.street,
+        number: params.number,
+        neighborhood: params.neighborhood,
+        state: toUpper(params.state),
+        city: params.city,
+        country: toUpper(params.country),
+        complement: params.complement,
+        password: this.config.userPassword,
+      };
+
+      Object.keys(payload).forEach((key) => {
+        if (payload[key] === undefined || payload[key] === null || payload[key] === '') {
+          delete payload[key];
+        }
+      });
+
+      const result = await this.request({
+        method: 'POST',
+        action: `/api/v1/register/simplify/${params.cronosId}`,
+        body: payload,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack('[CronosService] ERROR', 'onboarding error', error);
+      throw error;
+    }
+  }
 }
