@@ -32,7 +32,7 @@ export class SqsReceiverService {
 
     if (!this.queueUrl) {
       this.logger.warn(
-        'SQS_TRANSACTIONS_QUEUE_URL não configurada. Worker não irá processar mensagens.',
+        'SQS_TRANSACTIONS_QUEUE_URL is not configured. Worker will not process messages.',
       );
     }
   }
@@ -57,7 +57,7 @@ export class SqsReceiverService {
       return response.Messages || [];
     } catch (error) {
       this.logger.error(
-        `Erro ao receber mensagens do SQS: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error receiving messages from SQS: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
       return [];
     }
@@ -75,10 +75,10 @@ export class SqsReceiverService {
       });
 
       await this.sqsClient.send(command);
-      this.logger.debug('Mensagem deletada da fila SQS');
+      this.logger.debug('Message deleted from SQS queue');
     } catch (error) {
       this.logger.error(
-        `Erro ao deletar mensagem do SQS: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error deleting message from SQS: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
       throw error;
     }
@@ -98,7 +98,7 @@ export class SqsReceiverService {
       const parsed: unknown = JSON.parse(message.Body);
 
       if (typeof parsed !== 'object' || parsed === null) {
-        this.logger.error('Body da mensagem não é um objeto válido');
+        this.logger.error('Message body is not a valid object');
         return null;
       }
 
@@ -115,7 +115,7 @@ export class SqsReceiverService {
       };
     } catch (error) {
       this.logger.error(
-        `Erro ao fazer parse da mensagem: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error parsing message: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
       return null;
     }
