@@ -1,5 +1,13 @@
 import { Controller, Post, Get, Body, Param, Query, UseGuards, ForbiddenException } from '@nestjs/common';
 import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
+import {
   GenerateChallengeDto,
   VerifySignatureDto,
   RegisterDeviceDto,
@@ -25,6 +33,8 @@ import {
   CheckDeviceHealthResponseDto,
 } from '../dto/response';
 
+@ApiTags('biometric')
+@ApiBearerAuth('JWT-auth')
 @Controller('api/auth')
 @UseGuards(AuthGuard)
 export class BiometricController {
@@ -35,6 +45,19 @@ export class BiometricController {
   ) {}
 
   @Post('challenge')
+  @ApiOperation({
+    summary: 'Generate biometric challenge',
+    description: 'Generates a new challenge for biometric authentication',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Desafio gerado com sucesso',
+    type: GenerateChallengeResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token inválido ou expirado',
+  })
   async generateChallenge(
     @CurrentUser('id') userId: string,
     @Body() dto: GenerateChallengeDto,
@@ -43,6 +66,23 @@ export class BiometricController {
   }
 
   @Post('verify')
+  @ApiOperation({
+    summary: 'Verify biometric signature',
+    description: 'Verifies the biometric signature of the challenge',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Signature verified successfully',
+    type: VerifySignatureResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid or malformed signature',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
   async verifySignature(
     @CurrentUser('id') userId: string,
     @Body() dto: VerifySignatureDto,
@@ -51,6 +91,23 @@ export class BiometricController {
   }
 
   @Post('register-device')
+  @ApiOperation({
+    summary: 'Register device with biometrics',
+    description: 'Registers a new device with biometric authentication enabled',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Device registered successfully',
+    type: RegisterDeviceResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid data for device registration',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
   async registerDevice(
     @CurrentUser('id') userId: string,
     @Body() dto: RegisterDeviceDto & { userId?: string },
@@ -59,6 +116,23 @@ export class BiometricController {
   }
 
   @Post('register-device-soft')
+  @ApiOperation({
+    summary: 'Register device with soft authentication',
+    description: 'Registers a device with soft biometric authentication (less secure)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Device registered successfully',
+    type: RegisterDeviceSoftResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid data for device registration',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
   async registerDeviceSoft(
     @CurrentUser('id') userId: string,
     @Body() dto: RegisterDeviceSoftDto & { userId?: string },
@@ -67,6 +141,23 @@ export class BiometricController {
   }
 
   @Post('device/send-sms-validation')
+  @ApiOperation({
+    summary: 'Send SMS validation to device',
+    description: 'Sends an SMS validation code to the registered device',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Validation SMS sent successfully',
+    type: SendDeviceSmsValidationResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid data or device not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
   async sendDeviceSmsValidation(
     @CurrentUser('id') userId: string,
     @Body() dto: SendDeviceSmsValidationDto & { userId?: string },
@@ -75,6 +166,23 @@ export class BiometricController {
   }
 
   @Post('device/verify-sms-and-activate')
+  @ApiOperation({
+    summary: 'Verify SMS and activate device',
+    description: 'Verifies the SMS code and activates the device for authentication',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Device activated successfully',
+    type: VerifySmsChallengeResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid or expired SMS code',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
   async verifySmsAndActivate(
     @CurrentUser('id') userId: string,
     @Body() dto: VerifySmsChallengeDto & { userId?: string },
@@ -83,6 +191,23 @@ export class BiometricController {
   }
 
   @Post('revoke-device')
+  @ApiOperation({
+    summary: 'Revoke device',
+    description: 'Removes a device from the list of authenticated devices',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Device revoked successfully',
+    type: RevokeDeviceResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Device not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
   async revokeDevice(
     @CurrentUser('id') userId: string,
     @Body() dto: RevokeDeviceDto & { userId?: string },
@@ -91,6 +216,28 @@ export class BiometricController {
   }
 
   @Get('devices/:userId')
+  @ApiOperation({
+    summary: 'List registered devices',
+    description: 'Returns a list of registered biometric devices for the user',
+  })
+  @ApiParam({
+    name: 'userId',
+    type: String,
+    description: 'User identifier',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Device list retrieved successfully',
+    type: [ListDevicesResponseDto],
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - cannot access another user\'s data',
+  })
   async listDevices(
     @CurrentUser('id') authUserId: string,
     @Param('userId') userId: string,
@@ -102,6 +249,35 @@ export class BiometricController {
   }
 
   @Get('device/health-check')
+  @ApiOperation({
+    summary: 'Check device health',
+    description: 'Checks the status and availability of a biometric device',
+  })
+  @ApiQuery({
+    name: 'userId',
+    type: String,
+    required: false,
+    description: 'User identifier',
+  })
+  @ApiQuery({
+    name: 'deviceIdentifier',
+    type: String,
+    required: false,
+    description: 'Device unique identifier',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Device status retrieved successfully',
+    type: CheckDeviceHealthResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied',
+  })
   async healthCheck(
     @CurrentUser('id') authUserId: string,
     @Query('userId') userId: string,
