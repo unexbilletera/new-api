@@ -446,7 +446,7 @@ export class AuthService {
       data: { recovery: hashed, updatedAt: new Date() },
     });
 
-    await this.notificationService.sendPasswordRecovery(email, code);
+    await this.notificationService.sendPasswordRecovery(email, code, user.language);
 
     return {
       message: 'Password reset code sent to email',

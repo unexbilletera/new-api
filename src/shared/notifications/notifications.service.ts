@@ -10,6 +10,8 @@ import {
   SmsAdapter,
   SmsMessage,
 } from './notifications.types';
+import { renderCodeEmailTemplate } from './templates/code-template';
+import { getEmailCopy } from './templates/email-translations';
 
 @Injectable()
 export class NotificationService {
@@ -31,12 +33,21 @@ export class NotificationService {
     await this.pushAdapter.send(message);
   }
 
-  async sendEmailVerificationCode(email: string, code: string, expiresInMinutes = 5) {
+  async sendEmailVerificationCode(email: string, code: string, expiresInMinutes = 5, language?: string) {
+    const copy = getEmailCopy('userEmailVerification', language);
+    const { html, text } = renderCodeEmailTemplate({
+      code,
+      message: `${copy.message} ${code}.`,
+      actionText: '',
+      actionUrl: '',
+      logoUrl: process.env.WALLET_LOGO_IMAGE_ULR,
+    });
+
     await this.sendEmail({
       to: email,
-      subject: 'Código de verificação',
-      text: `Seu código de verificação é ${code}. Ele expira em ${expiresInMinutes} minutos.`,
-      html: `<p>Use o código abaixo para validar seu email:</p><p><strong>${code}</strong></p><p>Ele expira em ${expiresInMinutes} minutos.</p>`,
+      subject: copy.subject,
+      text,
+      html,
     });
   }
 
@@ -47,21 +58,39 @@ export class NotificationService {
     });
   }
 
-  async sendPasswordRecovery(email: string, code: string) {
+  async sendPasswordRecovery(email: string, code: string, language?: string) {
+    const copy = getEmailCopy('userForgot', language);
+    const { html, text } = renderCodeEmailTemplate({
+      code,
+      message: `${copy.message} ${code}.`,
+      actionText: '',
+      actionUrl: '',
+      logoUrl: process.env.WALLET_LOGO_IMAGE_ULR,
+    });
+
     await this.sendEmail({
       to: email,
-      subject: 'Recuperação de senha',
-      text: `Use o código ${code} para recuperar sua senha.`,
-      html: `<p>Use o código abaixo para recuperar sua senha:</p><p><strong>${code}</strong></p>`,
+      subject: copy.subject,
+      text,
+      html,
     });
   }
 
-  async sendUnlockAccount(email: string, code: string) {
+  async sendUnlockAccount(email: string, code: string, language?: string) {
+    const copy = getEmailCopy('userUnlock', language);
+    const { html, text } = renderCodeEmailTemplate({
+      code,
+      message: `${copy.message} ${code}.`,
+      actionText: '',
+      actionUrl: '',
+      logoUrl: process.env.WALLET_LOGO_IMAGE_ULR,
+    });
+
     await this.sendEmail({
       to: email,
-      subject: 'Account Unlock',
-      text: `Use code ${code} to unlock your account.`,
-      html: `<p>Use the code below to unlock your account:</p><p><strong>${code}</strong></p>`,
+      subject: copy.subject,
+      text,
+      html,
     });
   }
 
