@@ -43,7 +43,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async getLayout(): Promise<LayoutResponseDto> {
     return this.actionsAppService.getFullLayout();
@@ -61,7 +61,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async getHomeActions(): Promise<ActionResponseDto[]> {
     return this.actionsAppService.getHomeActions(true);
@@ -79,7 +79,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async getServicesActions(): Promise<ActionResponseDto[]> {
     return this.actionsAppService.getServicesActions(true);
@@ -97,7 +97,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async getModules(): Promise<ModuleResponseDto[]> {
     return this.actionsAppService.getModules(false);
@@ -120,7 +120,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async checkModuleEnabled(@Param('key') moduleKey: string): Promise<ModuleStatusResponseDto> {
     const enabled = await this.actionsAppService.isModuleEnabled(moduleKey);
@@ -139,7 +139,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async getFilteredActions(): Promise<ActionResponseDto[]> {
     return this.actionsAppService.getActionsWithModuleFilter();
@@ -162,7 +162,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async getActionsBySection(@Param('section') section: ActionSection): Promise<ActionResponseDto[]> {
     return this.actionsAppService.getActionsBySection(section, true);
@@ -192,7 +192,7 @@ export class ActionsAppController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async getAllActions(@Query() query: ListActionsQueryDto): Promise<LayoutResponseDto | ActionResponseDto[]> {
     if (query.section) {
