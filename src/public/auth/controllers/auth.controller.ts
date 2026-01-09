@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, getSchemaPath } from '@nestjs/swagger';
 import { Request } from 'express';
 import { SignupService } from '../services/signup.service';
 import { SigninService } from '../services/signin.service';
@@ -27,7 +27,7 @@ import {
   TokenResponseDto,
 } from '../dto/response';
 
-@ApiTags('Autenticação')
+@ApiTags('Authentication')
 @Controller('api/users')
 export class AuthController {
   constructor(
@@ -40,17 +40,22 @@ export class AuthController {
 
   @Post('user/signup')
   @ApiOperation({
-    summary: 'Registro de novo usuário',
-    description: 'Cria uma nova conta de usuário no sistema com os dados fornecidos',
+    summary: 'Register new user',
+    description: 'Creates a new user account in the system with the provided data',
   })
   @ApiResponse({
     status: 201,
-    description: 'Usuário registrado com sucesso',
-    type: SignupResponseDto,
+    description: 'User registered successfully',
+    schema: {
+      oneOf: [
+        { $ref: getSchemaPath(SignupResponseDto) },
+        { $ref: getSchemaPath(SignupDeviceRequiredResponseDto) },
+      ],
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'Dados inválidos ou usuário já existe',
+    description: 'Invalid data or user already exists',
   })
   @ApiBody({ type: SignupDto })
   async signup(@Body() dto: SignupDto): Promise<SignupResponseDto | SignupDeviceRequiredResponseDto> {
@@ -59,17 +64,22 @@ export class AuthController {
 
   @Post('user/signin')
   @ApiOperation({
-    summary: 'Login de usuário',
-    description: 'Autentica um usuário existente e retorna os tokens de acesso',
+    summary: 'User login',
+    description: 'Authenticates an existing user and returns access tokens',
   })
   @ApiResponse({
     status: 200,
-    description: 'Login realizado com sucesso',
-    type: SigninResponseDto,
+    description: 'Login successful',
+    schema: {
+      oneOf: [
+        { $ref: getSchemaPath(SigninResponseDto) },
+        { $ref: getSchemaPath(SigninDeviceRequiredResponseDto) },
+      ],
+    },
   })
   @ApiResponse({
     status: 401,
-    description: 'Credenciais inválidas',
+    description: 'Invalid credentials',
   })
   @ApiBody({ type: SigninDto })
   async signin(@Body() dto: SigninDto, @Req() req: Request): Promise<SigninResponseDto | SigninDeviceRequiredResponseDto> {
@@ -80,12 +90,12 @@ export class AuthController {
 
   @Post('user/sendEmailValidation')
   @ApiOperation({
-    summary: 'Enviar código de validação por e-mail',
-    description: 'Envia um código de validação para o e-mail do usuário',
+    summary: 'Send validation code via email',
+    description: 'Sends a validation code to the user\'s email',
   })
   @ApiResponse({
     status: 200,
-    description: 'Código enviado com sucesso',
+    description: 'Code sent successfully',
     type: EmailValidationResponseDto,
   })
   @ApiBody({ type: SendEmailValidationDto })
@@ -95,17 +105,17 @@ export class AuthController {
 
   @Post('user/verifyEmailCode')
   @ApiOperation({
-    summary: 'Verificar código de e-mail',
-    description: 'Valida o código de verificação enviado por e-mail',
+    summary: 'Verify email code',
+    description: 'Validates the verification code sent via email',
   })
   @ApiResponse({
     status: 200,
-    description: 'Código verificado com sucesso',
+    description: 'Code verified successfully',
     type: EmailCodeVerificationResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Código inválido ou expirado',
+    description: 'Invalid or expired code',
   })
   @ApiBody({ type: VerifyEmailCodeDto })
   async verifyEmailCode(@Body() dto: VerifyEmailCodeDto): Promise<EmailCodeVerificationResponseDto> {
@@ -114,12 +124,12 @@ export class AuthController {
 
   @Post('user/sendPhoneValidation')
   @ApiOperation({
-    summary: 'Enviar código de validação por SMS',
-    description: 'Envia um código de validação para o telefone do usuário via SMS',
+    summary: 'Send validation code via SMS',
+    description: 'Sends a validation code to the user\'s phone via SMS',
   })
   @ApiResponse({
     status: 200,
-    description: 'Código enviado com sucesso',
+    description: 'Code sent successfully',
     type: PhoneValidationResponseDto,
   })
   @ApiBody({ type: SendPhoneValidationDto })
@@ -129,17 +139,17 @@ export class AuthController {
 
   @Post('user/verifyPhoneCode')
   @ApiOperation({
-    summary: 'Verificar código de telefone',
-    description: 'Valida o código de verificação enviado por SMS',
+    summary: 'Verify phone code',
+    description: 'Validates the verification code sent via SMS',
   })
   @ApiResponse({
     status: 200,
-    description: 'Código verificado com sucesso',
+    description: 'Code verified successfully',
     type: PhoneCodeVerificationResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Código inválido ou expirado',
+    description: 'Invalid or expired code',
   })
   @ApiBody({ type: VerifyPhoneCodeDto })
   async verifyPhoneCode(@Body() dto: VerifyPhoneCodeDto): Promise<PhoneCodeVerificationResponseDto> {
@@ -148,12 +158,12 @@ export class AuthController {
 
   @Post('user/forgot')
   @ApiOperation({
-    summary: 'Recuperação de senha',
-    description: 'Inicia o processo de recuperação de senha do usuário',
+    summary: 'Password recovery',
+    description: 'Initiates the user password recovery process',
   })
   @ApiResponse({
     status: 200,
-    description: 'E-mail de recuperação enviado com sucesso',
+    description: 'Recovery email sent successfully',
     type: ForgotPasswordResponseDto,
   })
   @ApiBody({ type: ForgotPasswordDto })
@@ -163,17 +173,17 @@ export class AuthController {
 
   @Post('user/verify')
   @ApiOperation({
-    summary: 'Verificar código de recuperação',
-    description: 'Valida o código de recuperação de senha',
+    summary: 'Verify recovery code',
+    description: 'Validates the password recovery code',
   })
   @ApiResponse({
     status: 200,
-    description: 'Código verificado com sucesso',
+    description: 'Code verified successfully',
     type: VerifyPasswordResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Código inválido ou expirado',
+    description: 'Invalid or expired code',
   })
   @ApiBody({ type: VerifyPasswordDto })
   async verify(@Body() dto: VerifyPasswordDto): Promise<VerifyPasswordResponseDto> {
@@ -182,12 +192,12 @@ export class AuthController {
 
   @Post('user/unlock')
   @ApiOperation({
-    summary: 'Desbloquear conta',
-    description: 'Desbloqueia a conta do usuário após verificação bem-sucedida',
+    summary: 'Unlock account',
+    description: 'Unlocks the user account after successful verification',
   })
   @ApiResponse({
     status: 200,
-    description: 'Conta desbloqueada com sucesso',
+    description: 'Account unlocked successfully',
     type: UnlockAccountResponseDto,
   })
   @ApiBody({ type: UnlockAccountDto })
@@ -198,19 +208,19 @@ export class AuthController {
   }
 }
 
-@ApiTags('Segurança')
+@ApiTags('Security')
 @Controller('api/security')
 export class SecurityController {
   constructor(private tokenService: TokenService) {}
 
   @Post('token')
   @ApiOperation({
-    summary: 'Obter token de segurança',
-    description: 'Gera um novo token de segurança para operações públicas',
+    summary: 'Get security token',
+    description: 'Generates a new security token for public operations',
   })
   @ApiResponse({
     status: 200,
-    description: 'Token gerado com sucesso',
+    description: 'Token generated successfully',
     type: TokenResponseDto,
   })
   async getToken(): Promise<TokenResponseDto> {

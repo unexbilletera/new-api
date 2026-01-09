@@ -19,7 +19,7 @@ export class SignupDto {
 
   @ApiPropertyOptional({
     description: 'User first name',
-    example: 'João',
+    example: 'John',
   })
   @IsString()
   @IsOptional()

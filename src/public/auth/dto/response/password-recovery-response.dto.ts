@@ -3,7 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class ForgotPasswordResponseDto {
   @ApiProperty({
     description: 'Informational message',
-    example: 'Código de recuperação enviado para o e-mail',
+    example: 'Recovery code sent to email',
   })
   message: string;
 
@@ -17,7 +17,7 @@ export class ForgotPasswordResponseDto {
 export class VerifyPasswordResponseDto {
   @ApiProperty({
     description: 'Informational message',
-    example: 'Senha alterada com sucesso',
+    example: 'Password changed successfully',
   })
   message: string;
 }
@@ -38,7 +38,7 @@ export class UnlockAccountUserDto {
 
   @ApiProperty({
     description: 'User first name',
-    example: 'João',
+    example: 'John',
     nullable: true,
   })
   firstName: string | null;
@@ -73,31 +73,34 @@ export class UnlockAccountUserDto {
 export class UnlockAccountResponseDto {
   @ApiProperty({
     description: 'Authenticated user data',
-    type: UnlockAccountUserDto,
+    type: () => UnlockAccountUserDto,
   })
   user: UnlockAccountUserDto;
 
   @ApiProperty({
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
   })
   accessToken: string;
 
   @ApiProperty({
     description: 'Refresh token (optional)',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
   })
   refreshToken: string;
 
   @ApiProperty({
     description: 'Token expiration time in seconds',
     example: 3600,
+    type: Number,
   })
   expiresIn: number;
 
   @ApiProperty({
     description: 'Informational message',
-    example: 'Conta desbloqueada com sucesso',
+    example: 'Account unlocked successfully',
   })
   message: string;
 }

@@ -16,7 +16,7 @@ export class SigninUserDto {
 
   @ApiProperty({
     description: 'User first name',
-    example: 'João',
+    example: 'John',
     nullable: true,
   })
   firstName: string | null;
@@ -39,25 +39,28 @@ export class SigninUserDto {
 export class SigninResponseDto {
   @ApiProperty({
     description: 'Authenticated user data',
-    type: SigninUserDto,
+    type: () => SigninUserDto,
   })
   user: SigninUserDto;
 
   @ApiProperty({
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
   })
   accessToken: string;
 
   @ApiPropertyOptional({
     description: 'Refresh token (optional)',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
   })
   refreshToken?: string;
 
   @ApiProperty({
     description: 'Token expiration time in seconds',
     example: 3600,
+    type: Number,
   })
   expiresIn: number;
 }
@@ -77,7 +80,7 @@ export class SigninDeviceRequiredResponseDto {
 
   @ApiProperty({
     description: 'Informational message',
-    example: 'É necessário cadastrar um dispositivo para continuar',
+    example: 'It is necessary to register a device to continue',
   })
   message: string;
 
@@ -90,12 +93,13 @@ export class SigninDeviceRequiredResponseDto {
   @ApiProperty({
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
   })
   accessToken: string;
 
   @ApiProperty({
     description: 'Authenticated user data',
-    type: SigninUserDto,
+    type: () => SigninUserDto,
   })
   user: SigninUserDto;
 }

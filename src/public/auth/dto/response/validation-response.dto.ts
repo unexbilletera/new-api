@@ -3,7 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class EmailValidationResponseDto {
   @ApiProperty({
     description: 'Informational message',
-    example: 'Código de validação enviado para o e-mail',
+    example: 'Validation code sent to email',
   })
   message: string;
 
@@ -17,7 +17,7 @@ export class EmailValidationResponseDto {
 export class EmailCodeVerificationResponseDto {
   @ApiProperty({
     description: 'Informational message',
-    example: 'E-mail verificado com sucesso',
+    example: 'Email verified successfully',
   })
   message: string;
 
@@ -37,7 +37,7 @@ export class EmailCodeVerificationResponseDto {
 export class PhoneValidationResponseDto {
   @ApiProperty({
     description: 'Informational message',
-    example: 'Código de validação enviado por SMS',
+    example: 'Validation code sent by SMS',
   })
   message: string;
 
@@ -51,7 +51,7 @@ export class PhoneValidationResponseDto {
 export class PhoneCodeVerificationResponseDto {
   @ApiProperty({
     description: 'Informational message',
-    example: 'Telefone verificado com sucesso',
+    example: 'Phone verified successfully',
   })
   message: string;
 
