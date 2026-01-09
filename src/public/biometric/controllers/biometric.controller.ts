@@ -51,12 +51,12 @@ export class BiometricController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Desafio gerado com sucesso',
+    description: 'Challenge generated successfully',
     type: GenerateChallengeResponseDto,
   })
   @ApiResponse({
     status: 401,
-    description: 'Token inválido ou expirado',
+    description: 'Invalid or expired token',
   })
   async generateChallenge(
     @CurrentUser('id') userId: string,

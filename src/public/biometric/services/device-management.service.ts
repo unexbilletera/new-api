@@ -95,7 +95,7 @@ export class DeviceManagementService {
         'revoked',
         device.id,
         'auth.errors.deviceRevoked',
-        'Sua conta foi acessada em outro dispositivo.',
+        'Your account was accessed on another device.',
         true,
       );
     }
