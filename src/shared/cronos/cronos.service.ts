@@ -102,7 +102,7 @@ export class CronosService implements OnModuleInit {
     if (this.config.logging) {
       this.logger.info(
         '[CronosService]',
-        `Configuração inicializada - NODE_ENV: ${process.env.NODE_ENV || 'not set'}, URL: ${apiUrl || 'NÃO CONFIGURADA'}, Enable: ${this.config.enable}`,
+        `Configuration initialized - NODE_ENV: ${process.env.NODE_ENV || 'not set'}, URL: ${apiUrl || 'NOT CONFIGURED'}, Enable: ${this.config.enable}`,
       );
     }
 
@@ -138,7 +138,7 @@ export class CronosService implements OnModuleInit {
 
         this.logger.warn(
           '[CronosService] WARNING',
-          `SOCKS proxy enabled - localhost:${proxyPort} (igual à API antiga)`,
+          `SOCKS proxy enabled - localhost:${proxyPort} (same as old API)`,
         );
       } catch (error) {
         this.logger.error(
@@ -191,7 +191,7 @@ export class CronosService implements OnModuleInit {
       if (!response.ok) {
         this.logger.error(
           '[CronosService] ERROR',
-          `Erro ao obter token da aplicação: ${response.status} - ${responseText}`,
+          `Error getting application token: ${response.status} - ${responseText}`,
         );
         throw new Error(
           `Cronos API error: ${response.status} - ${responseText}`,
@@ -206,7 +206,7 @@ export class CronosService implements OnModuleInit {
           parseError instanceof Error ? parseError.message : String(parseError);
         this.logger.error(
           '[CronosService] ERROR',
-          `Erro ao fazer parse da resposta do token da aplicação: ${parseErrorMessage}`,
+          `Error parsing application token response: ${parseErrorMessage}`,
         );
         throw new Error(
           `Invalid JSON response from Cronos API: ${responseText.substring(
@@ -221,7 +221,7 @@ export class CronosService implements OnModuleInit {
       if (!result || !result.token) {
         this.logger.error(
           '[CronosService] ERROR',
-          `Token não encontrado na resposta: ${JSON.stringify(result)}`,
+          `Token not found in response: ${JSON.stringify(result)}`,
         );
         throw new Error('Invalid response from Cronos API - missing token');
       }
@@ -234,7 +234,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.success(
           '[CronosService] SUCCESS',
-          'Token da aplicação obtido com sucesso',
+          'Application token obtained successfully',
         );
       }
 
@@ -242,7 +242,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao obter token da aplicação',
+        'Error obtaining application token',
         error,
       );
       throw error;
@@ -271,7 +271,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.info(
           '[CronosService]',
-          `Fazendo login do usuário na Cronos - document: ${document}, userPassword configurado: ${this.config.userPassword ? 'SIM' : 'NÃO'}`,
+          `Logging in user to Cronos - document: ${document}, userPassword configured: ${this.config.userPassword ? 'YES' : 'NO'}`,
         );
       }
 
@@ -336,7 +336,7 @@ export class CronosService implements OnModuleInit {
       if (!response.ok) {
         this.logger.error(
           '[CronosService] ERROR',
-          `Erro ao obter token do usuário: ${response.status} - ${responseText}`,
+          `Error getting user token: ${response.status} - ${responseText}`,
         );
         throw new Error(
           `Cronos API error: ${response.status} - ${responseText}`,
@@ -350,7 +350,7 @@ export class CronosService implements OnModuleInit {
       } catch (parseError) {
         this.logger.error(
           '[CronosService] ERROR',
-          `Erro ao fazer parse da resposta: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+          `Error parsing response: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
         );
         this.logger.error(
           '[CronosService] ERROR',
@@ -364,7 +364,7 @@ export class CronosService implements OnModuleInit {
       if (!result || !result.token) {
         this.logger.error(
           '[CronosService] ERROR',
-          `Token não encontrado na resposta: ${JSON.stringify(result)}`,
+          `Token not found in response: ${JSON.stringify(result)}`,
         );
         throw new Error('Invalid response from Cronos API - missing token');
       }
@@ -380,7 +380,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.success(
           '[CronosService] SUCCESS',
-          `Token do usuário obtido com sucesso para documento: ${document}`,
+          `User token obtained successfully for document: ${document}`,
         );
       }
 
@@ -388,7 +388,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        `Erro ao obter token do usuário para documento: ${document}`,
+        `Error obtaining user token for document: ${document}`,
         error,
       );
       throw error;
@@ -446,7 +446,7 @@ export class CronosService implements OnModuleInit {
         );
         this.logger.info(
           '[CronosService]',
-          `📤 REQUISIÇÃO: ${params.method} ${requestUrl}`,
+          `📤 REQUEST: ${params.method} ${requestUrl}`,
         );
         this.logger.info(
           '[CronosService]',
@@ -535,7 +535,7 @@ export class CronosService implements OnModuleInit {
       ) {
         this.logger.error(
           '[CronosService] CRITICAL ERROR',
-          `API retornou HTML ao invés de JSON - Status: ${response.status}`,
+          `API returned HTML instead of JSON - Status: ${response.status}`,
         );
         this.logger.error(
           '[CronosService] ERROR',
@@ -551,16 +551,16 @@ export class CronosService implements OnModuleInit {
         );
         this.logger.error(
           '[CronosService] ERROR',
-          `Response Body (primeiros 2000 caracteres): ${responseText.substring(0, 2000)}`,
+          `Response Body (first 2000 characters): ${responseText.substring(0, 2000)}`,
         );
         if (responseText.length > 2000) {
           this.logger.error(
             '[CronosService] ERROR',
-            `... (total de ${responseText.length} caracteres)`,
+            `... (total of ${responseText.length} characters)`,
           );
         }
         throw new Error(
-          `Cronos API retornou HTML ao invés de JSON. Status: ${response.status}. Verifique a URL e autenticação.`,
+          `Cronos API returned HTML instead of JSON. Status: ${response.status}. Check URL and authentication.`,
         );
       }
 
@@ -579,7 +579,7 @@ export class CronosService implements OnModuleInit {
       } catch (parseError) {
         this.logger.error(
           '[CronosService] CRITICAL ERROR',
-          `Erro ao fazer parse do JSON - Status: ${response.status}`,
+          `Error parsing JSON - Status: ${response.status}`,
         );
         this.logger.error(
           '[CronosService] ERROR',
@@ -591,16 +591,16 @@ export class CronosService implements OnModuleInit {
         );
         this.logger.error(
           '[CronosService] ERROR',
-          `Response Body (primeiros 2000 caracteres): ${responseText.substring(0, 2000)}`,
+          `Response Body (first 2000 characters): ${responseText.substring(0, 2000)}`,
         );
         if (responseText.length > 2000) {
           this.logger.error(
             '[CronosService] ERROR',
-            `... (total de ${responseText.length} caracteres)`,
+            `... (total of ${responseText.length} characters)`,
           );
         }
         throw new Error(
-          `Cronos API retornou resposta inválida. Status: ${response.status}. Body: ${responseText.substring(0, 500)}`,
+          `Cronos API returned invalid response. Status: ${response.status}. Body: ${responseText.substring(0, 500)}`,
         );
       }
 
@@ -610,15 +610,15 @@ export class CronosService implements OnModuleInit {
           (result &&
             result.message &&
             typeof result.message === 'string' &&
-            (result.message.includes('autorização') ||
+            (result.message.includes('authorization') ||
               result.message.includes('authorization') ||
-              result.message.includes('Sem autorização')))) &&
+              result.message.includes('Sem authorization')))) &&
         params.useUserAuth &&
         params.document
       ) {
         this.logger.warn(
           '[CronosService] WARNING',
-          `Erro de autorização detectado. Limpando cache e regenerando token do usuário para documento: ${params.document}`,
+          `Authorization error detected. Clearing cache and regenerating user token for document: ${params.document}`,
         );
 
         if (this.userAuth && this.userAuth[params.document]) {
@@ -630,7 +630,7 @@ export class CronosService implements OnModuleInit {
         if (this.config.logging) {
           this.logger.info(
             '[CronosService]',
-            `Reenviando requisição com novo token do usuário...`,
+            `Resending request with new user token...`,
           );
         }
 
@@ -654,10 +654,10 @@ export class CronosService implements OnModuleInit {
         ) {
           this.logger.error(
             '[CronosService] CRITICAL ERROR',
-            `API retornou HTML ao invés de JSON após retry - Status: ${retryResponse.status}`,
+            `API returned HTML instead of JSON after retry - Status: ${retryResponse.status}`,
           );
           throw new Error(
-            `Cronos API retornou HTML ao invés de JSON após retry. Status: ${retryResponse.status}.`,
+            `Cronos API returned HTML instead of JSON after retry. Status: ${retryResponse.status}.`,
           );
         }
 
@@ -671,10 +671,10 @@ export class CronosService implements OnModuleInit {
         } catch (parseError) {
           this.logger.error(
             '[CronosService] CRITICAL ERROR',
-            `Erro ao fazer parse do JSON após retry: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+            `Error parsing JSON after retry: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
           );
           throw new Error(
-            `Cronos API retornou resposta inválida após retry. Status: ${retryResponse.status}.`,
+            `Cronos API returned invalid response after retry. Status: ${retryResponse.status}.`,
           );
         }
 
@@ -711,7 +711,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao fazer requisição à API da Cronos',
+        'Error making request to Cronos API',
         error,
       );
       throw error;
@@ -755,7 +755,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.info(
           '[CronosService]',
-          `Criando transferência PIX - document: ${params.document}, keyType: ${params.keyType}, keyValue: ${params.keyValue}`,
+          `Creating PIX transfer - document: ${params.document}, keyType: ${params.keyType}, keyValue: ${params.keyValue}`,
         );
       }
 
@@ -791,7 +791,7 @@ export class CronosService implements OnModuleInit {
         if (this.config.logging) {
           this.logger.success(
             '[CronosService] SUCCESS',
-            'Transferência PIX criada usando token do usuário',
+            'PIX transfer created using user token',
           );
         }
       } catch (userAuthError) {
@@ -799,7 +799,7 @@ export class CronosService implements OnModuleInit {
         if (this.config.logging) {
           this.logger.warn(
             '[CronosService] WARNING',
-            `Falha ao usar token do usuário, tentando com token da aplicação: ${userAuthError instanceof Error ? userAuthError.message : String(userAuthError)}`,
+            `Failed to use user token, trying with application token: ${userAuthError instanceof Error ? userAuthError.message : String(userAuthError)}`,
           );
         }
 
@@ -817,7 +817,7 @@ export class CronosService implements OnModuleInit {
         if (this.config.logging) {
           this.logger.success(
             '[CronosService] SUCCESS',
-            'Transferência PIX criada usando token da aplicação',
+            'PIX Transfer criada usando token da aplicação',
           );
         }
       }
@@ -851,7 +851,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao criar transferência PIX',
+        'Error creating PIX transfer',
         error,
       );
       throw error;
@@ -879,7 +879,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.info(
           '[CronosService]',
-          `Confirmando transferência PIX - document: ${params.document}, id_pagamento: ${params.id}, amount: ${params.amount}`,
+          `Confirming PIX transfer - document: ${params.document}, id_pagamento: ${params.id}, amount: ${params.amount}`,
         );
       }
 
@@ -899,7 +899,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.success(
           '[CronosService] SUCCESS',
-          'Transferência PIX confirmada com sucesso na API da Cronos',
+          'PIX transfer confirmed successfully in Cronos API',
         );
       }
 
@@ -907,7 +907,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao confirmar transferência PIX',
+        'Error confirming PIX transfer',
         error,
       );
       throw error;
@@ -932,7 +932,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.info(
           '[CronosService]',
-          `Criando token transacional - document: ${params.document}, amount: ${params.amount}, lat: ${params.lat || 0}, lon: ${params.lon || 0}`,
+          `Creating transactional token - document: ${params.document}, amount: ${params.amount}, lat: ${params.lat || 0}, lon: ${params.lon || 0}`,
         );
       }
 
@@ -951,7 +951,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.success(
           '[CronosService] SUCCESS',
-          'Token transacional criado com sucesso na API da Cronos',
+          'Transactional token created successfully in Cronos API',
         );
       }
 
@@ -959,7 +959,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao criar token transacional na API da Cronos',
+        'Error creating transactional token in Cronos API',
         error,
       );
       throw error;
@@ -980,7 +980,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.info(
           '[CronosService]',
-          `Confirmando senha transacional na Cronos - document: ${params.document}`,
+          `Confirming transactional password in Cronos - document: ${params.document}`,
         );
       }
 
@@ -997,7 +997,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.success(
           '[CronosService] SUCCESS',
-          'Senha transacional confirmada com sucesso na API da Cronos',
+          'Transactional password confirmed successfully in Cronos API',
         );
       }
 
@@ -1005,7 +1005,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao confirmar senha transacional na API da Cronos',
+        'Error confirming transactional password in Cronos API',
         error,
       );
       throw error;
@@ -1024,7 +1024,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.info(
           '[CronosService]',
-          `Buscando saldo da conta - document: ${params.document}`,
+          `Fetching account balance - document: ${params.document}`,
         );
       }
 
@@ -1038,7 +1038,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.success(
           '[CronosService] SUCCESS',
-          'Saldo da conta obtido com sucesso na API da Cronos',
+          'Account balance obtained successfully from Cronos API',
         );
       }
 
@@ -1046,7 +1046,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao obter saldo da conta na API da Cronos',
+        'Error obtaining account balance from Cronos API',
         error,
       );
       throw error;
@@ -1081,7 +1081,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.info(
           '[CronosService]',
-          `Buscando transações - document: ${params.document}`,
+          `Fetching transactions - document: ${params.document}`,
         );
       }
 
@@ -1095,7 +1095,7 @@ export class CronosService implements OnModuleInit {
       if (this.config.logging) {
         this.logger.success(
           '[CronosService] SUCCESS',
-          'Transações obtidas com sucesso na API da Cronos',
+          'Transactions obtained successfully from Cronos API',
         );
       }
 
@@ -1103,7 +1103,7 @@ export class CronosService implements OnModuleInit {
     } catch (error) {
       this.logger.errorWithStack(
         '[CronosService] CRITICAL ERROR',
-        'Erro ao obter transações na API da Cronos',
+        'Error obtaining transactions from Cronos API',
         error,
       );
       throw error;
@@ -1132,7 +1132,7 @@ export class CronosService implements OnModuleInit {
 
       this.logger.info(
         '[CronosService] 🔄',
-        `Iniciando sincronização de saldo para usuário: ${params.userId}`,
+        `Starting balance sync for user: ${params.userId}`,
       );
 
       const brIdentity = params.userIdentities?.find(
@@ -1161,7 +1161,7 @@ export class CronosService implements OnModuleInit {
 
       const unexBalance = parseFloat(cronosAccount.balance || '0');
 
-      this.logger.info('[CronosService] 💰', 'Saldo Unex (Cronos):', {
+      this.logger.info('[CronosService] 💰', 'Unex Balance (Cronos):', {
         accountId: cronosAccount.id,
         balance: unexBalance,
         document: brIdentity.taxDocumentNumber,
@@ -1182,14 +1182,14 @@ export class CronosService implements OnModuleInit {
             ),
           ) || 0;
 
-        this.logger.info('[CronosService] 💰', 'Saldo Cronos (API):', {
+        this.logger.info('[CronosService] 💰', 'Cronos Balance (API):', {
           balance: cronosBalance,
           document: brIdentity.taxDocumentNumber,
         });
       } catch (cronosError: any) {
         this.logger.error(
           '[CronosService] ERROR',
-          `Erro ao consultar saldo Cronos: ${cronosError?.message || String(cronosError)}`,
+          `Error querying Cronos balance: ${cronosError?.message || String(cronosError)}`,
         );
         return;
       }
@@ -1284,7 +1284,7 @@ export class CronosService implements OnModuleInit {
             if (pendingExchanges?.length > 0) {
               this.logger.warn(
                 '[CronosService] WARNING',
-                `Encontradas ${pendingExchanges.length} operações de exchange pendentes:`,
+                `Found ${pendingExchanges.length} pending exchange operations:`,
                 {
                   operations: pendingExchanges.map((op) => ({
                     id: op.id,
@@ -1304,7 +1304,7 @@ export class CronosService implements OnModuleInit {
           }
         }
       } else {
-        this.logger.success('[CronosService] SUCCESS', 'Saldos sincronizados:', {
+        this.logger.success('[CronosService] SUCCESS', 'Balances synchronized:', {
           unexBalance,
           cronosBalance,
           difference,
@@ -1313,7 +1313,7 @@ export class CronosService implements OnModuleInit {
 
       if (Math.abs(difference) > 0.01) {
         try {
-          this.logger.info('[CronosService] 🔧', 'Iniciando ajuste de saldo');
+          this.logger.info('[CronosService] 🔧', 'Starting balance adjustment');
           const balanceBefore = cronosAccount.balance;
 
           await this.prisma.usersAccounts.update({
@@ -1323,7 +1323,7 @@ export class CronosService implements OnModuleInit {
 
           this.logger.success(
             '[CronosService] 💾',
-            'Saldo BRL ajustado com sucesso:',
+            'BRL balance adjusted successfully:',
             {
               accountId: cronosAccount.id,
               userId: params.userId,
@@ -1335,14 +1335,14 @@ export class CronosService implements OnModuleInit {
         } catch (adjustError: any) {
           this.logger.error(
             '[CronosService] ERROR',
-            `Erro ao ajustar saldo: ${adjustError?.message || String(adjustError)}`,
+            `Error adjusting balance: ${adjustError?.message || String(adjustError)}`,
           );
         }
       }
     } catch (error: any) {
       this.logger.error(
         '[CronosService] ERROR',
-        `Erro geral na sincronização: ${error?.message || String(error)}`,
+        `General synchronization error: ${error?.message || String(error)}`,
       );
 
     }
