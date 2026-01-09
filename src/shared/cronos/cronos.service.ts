@@ -2,7 +2,6 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 import { LoggerService } from '../logger/logger.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { ColoredLogger } from '../utils/logger-colors';
 import fetch, { Response } from 'node-fetch';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 
@@ -29,13 +28,6 @@ interface UserAuth {
   };
 }
 
-/**
- * Service para integração com API da Cronos
- * Responsável por chamadas à API externa da Cronos
- * Segue o padrão de autenticação da API antiga:
- * - Basic Auth (username:password) para obter token da aplicação
- * - User Auth (document:userPassword) para obter token do usuário
- */
 @Injectable()
 export class CronosService implements OnModuleInit {
   private config: CronosConfig;
@@ -43,9 +35,6 @@ export class CronosService implements OnModuleInit {
   private userAuth: UserAuth = {};
   private fetchAgent: SocksProxyAgent | null = null;
 
-  /**
-   * Helper para fazer requisições fetch com suporte a proxy SOCKS
-   */
   private fetchWithProxy(
     url: string,
     options: {
@@ -68,7 +57,6 @@ export class CronosService implements OnModuleInit {
       fetchOptions.body = options.body;
     }
 
-    // Adicionar agent se proxy estiver configurado
     if (this.fetchAgent) {
       fetchOptions.agent = this.fetchAgent;
     }
@@ -111,36 +99,32 @@ export class CronosService implements OnModuleInit {
         '',
     };
 
-    // Log de configuração para debug (só se logging estiver ativado)
     if (this.config.logging) {
-      ColoredLogger.info(
+      this.logger.info(
         '[CronosService]',
         `Configuração inicializada - NODE_ENV: ${process.env.NODE_ENV || 'not set'}, URL: ${apiUrl || 'NÃO CONFIGURADA'}, Enable: ${this.config.enable}`,
       );
     }
 
     if (!this.config.enable) {
-      ColoredLogger.warning(
-        '[CronosService] ⚠️',
-        'Cronos está desabilitado. Configure WALLET_CRONOS=enable',
+      this.logger.warn(
+        '[CronosService] WARNING',
+        'Cronos is disabled. Set WALLET_CRONOS=enable',
       );
     }
 
     if (!apiUrl) {
-      ColoredLogger.error(
-        '[CronosService] ❌',
-        'WALLET_CRONOS_URL não configurada!',
+      this.logger.error(
+        '[CronosService] ERROR',
+        'WALLET_CRONOS_URL not configured!',
       );
     } else if (apiUrl.includes('stage')) {
-      ColoredLogger.warning(
-        '[CronosService] ⚠️',
-        `ATENÇÃO: Usando URL de SANDBOX (stage): ${apiUrl}`,
+      this.logger.warn(
+        '[CronosService] WARNING',
+        `WARNING: Using SANDBOX URL (stage): ${apiUrl}`,
       );
     }
 
-    // Configurar proxy SOCKS se habilitado (igual à API antiga)
-    // Na API antiga, o axios usa proxy quando USE_SOCKS_PROXY === 'true' ou WALLET_CRONOS_PROXY === 'enable'
-    // Usamos node-fetch que suporta agent customizado para proxy SOCKS
     const useProxy =
       this.config.proxy ||
       process.env.USE_SOCKS_PROXY === 'true' ||
@@ -152,28 +136,25 @@ export class CronosService implements OnModuleInit {
         const proxyUrl = `socks5h://localhost:${proxyPort}`;
         this.fetchAgent = new SocksProxyAgent(proxyUrl);
 
-        ColoredLogger.warning(
-          '[CronosService] ⚠️',
-          `Proxy SOCKS habilitado - localhost:${proxyPort} (igual à API antiga)`,
+        this.logger.warn(
+          '[CronosService] WARNING',
+          `SOCKS proxy enabled - localhost:${proxyPort} (igual à API antiga)`,
         );
       } catch (error) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
-          `Erro ao configurar proxy SOCKS: ${error instanceof Error ? error.message : String(error)}`,
+        this.logger.error(
+          '[CronosService] ERROR',
+          `Failed to configure SOCKS proxy: ${error instanceof Error ? error.message : String(error)}`,
         );
-        // Continua sem proxy se houver erro
+
         this.fetchAgent = null;
       }
     }
   }
 
-  /**
-   * Obtém token da aplicação usando Basic Auth
-   * Token é cacheado por 1 hora
-   */
+  
   private async getAppToken(): Promise<string> {
     try {
-      // Verificar cache (token válido por 1 hora)
+
       if (
         this.appAuth &&
         this.appAuth.token &&
@@ -190,7 +171,6 @@ export class CronosService implements OnModuleInit {
         throw new Error('Cronos API credentials not configured');
       }
 
-      // Basic Auth
       const basicAuth = Buffer.from(
         `${this.config.username}:${this.config.password}`,
       ).toString('base64');
@@ -209,8 +189,8 @@ export class CronosService implements OnModuleInit {
       const responseText: string = await response.text();
 
       if (!response.ok) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Erro ao obter token da aplicação: ${response.status} - ${responseText}`,
         );
         throw new Error(
@@ -224,8 +204,8 @@ export class CronosService implements OnModuleInit {
       } catch (parseError) {
         const parseErrorMessage =
           parseError instanceof Error ? parseError.message : String(parseError);
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Erro ao fazer parse da resposta do token da aplicação: ${parseErrorMessage}`,
         );
         throw new Error(
@@ -239,30 +219,29 @@ export class CronosService implements OnModuleInit {
       const result = parsed as { token?: string };
 
       if (!result || !result.token) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Token não encontrado na resposta: ${JSON.stringify(result)}`,
         );
         throw new Error('Invalid response from Cronos API - missing token');
       }
 
-      // Cache do token
       this.appAuth = {
         token: result.token,
         time: Date.now(),
       };
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           'Token da aplicação obtido com sucesso',
         );
       }
 
       return result.token;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao obter token da aplicação',
         error,
       );
@@ -270,18 +249,13 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Obtém token do usuário usando document e userPassword
-   * Token é cacheado por 1 hora por documento
-   * IMPORTANTE: Este endpoint requer o token da aplicação no header (não useUserAuth)
-   */
+  
   private async getUserToken(document: string): Promise<string> {
     try {
       if (!document) {
         throw new Error('Missing document parameter');
       }
 
-      // Verificar cache (token válido por 1 hora)
       if (
         this.userAuth[document] &&
         this.userAuth[document].token &&
@@ -294,16 +268,13 @@ export class CronosService implements OnModuleInit {
         throw new Error('Cronos userPassword not configured');
       }
 
-      // IMPORTANTE: O endpoint /api/v1/user/auth requer o token da aplicação no header
-      // Na API antiga, getUserToken chama helper.request SEM useUserAuth, então usa app token
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `Fazendo login do usuário na Cronos - document: ${document}, userPassword configurado: ${this.config.userPassword ? 'SIM' : 'NÃO'}`,
         );
       }
 
-      // Obter token da aplicação primeiro
       const appToken = await this.getAppToken();
 
       const requestUrl = `${this.config.apiUrl}/api/v1/user/auth`;
@@ -313,14 +284,14 @@ export class CronosService implements OnModuleInit {
       };
 
       if (this.config.logging) {
-        ColoredLogger.debug('[CronosService]', `POST ${requestUrl}`);
-        ColoredLogger.debug(
+        this.logger.debug('[CronosService]', `POST ${requestUrl}`);
+        this.logger.debug(
           '[CronosService]',
-          `Request Body: ${JSON.stringify({ ...requestBody, password: '***' }, null, 2)}`, // Não logar senha
+          `Request Body: ${JSON.stringify({ ...requestBody, password: '***' }, null, 2)}`,
         );
-        ColoredLogger.debug(
+        this.logger.debug(
           '[CronosService]',
-          `Headers: Authorization: Bearer ${appToken.substring(0, 20)}...`, // Logar apenas início do token
+          `Headers: Authorization: Bearer ${appToken.substring(0, 20)}...`,
         );
       }
 
@@ -328,16 +299,15 @@ export class CronosService implements OnModuleInit {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${appToken}`, // Requer token da aplicação
+          Authorization: `Bearer ${appToken}`,
         },
         body: JSON.stringify(requestBody),
       });
 
-      // Ler resposta como texto primeiro para poder logar antes de fazer parse
       const responseText: string = await response.text();
 
       if (this.config.logging) {
-        ColoredLogger.debug(
+        this.logger.debug(
           '[CronosService]',
           `Response Status: ${response.status} ${response.statusText}`,
         );
@@ -345,18 +315,18 @@ export class CronosService implements OnModuleInit {
         response.headers.forEach((value, key) => {
           headersObject[key] = value;
         });
-        ColoredLogger.debug(
+        this.logger.debug(
           '[CronosService]',
           `Response Headers: ${JSON.stringify(headersObject)}`,
         );
         try {
           const responseJson = JSON.parse(responseText) as unknown;
-          ColoredLogger.debug(
+          this.logger.debug(
             '[CronosService]',
             `Response Body: ${JSON.stringify(responseJson, null, 2)}`,
           );
         } catch {
-          ColoredLogger.debug(
+          this.logger.debug(
             '[CronosService]',
             `Response Body (text): ${responseText.substring(0, 500)}${responseText.length > 500 ? '...' : ''}`,
           );
@@ -364,8 +334,8 @@ export class CronosService implements OnModuleInit {
       }
 
       if (!response.ok) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Erro ao obter token do usuário: ${response.status} - ${responseText}`,
         );
         throw new Error(
@@ -378,12 +348,12 @@ export class CronosService implements OnModuleInit {
         const parsed = JSON.parse(responseText) as unknown;
         result = parsed as { token?: string };
       } catch (parseError) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Erro ao fazer parse da resposta: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Response Text: ${responseText.substring(0, 500)}`,
         );
         throw new Error(
@@ -392,14 +362,13 @@ export class CronosService implements OnModuleInit {
       }
 
       if (!result || !result.token) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Token não encontrado na resposta: ${JSON.stringify(result)}`,
         );
         throw new Error('Invalid response from Cronos API - missing token');
       }
 
-      // Cache do token
       if (!this.userAuth) {
         this.userAuth = {};
       }
@@ -409,16 +378,16 @@ export class CronosService implements OnModuleInit {
       };
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           `Token do usuário obtido com sucesso para documento: ${document}`,
         );
       }
 
       return result.token;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         `Erro ao obter token do usuário para documento: ${document}`,
         error,
       );
@@ -426,9 +395,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Faz uma requisição à API da Cronos
-   */
+  
   private async request(params: {
     method: string;
     action: string;
@@ -457,7 +424,6 @@ export class CronosService implements OnModuleInit {
         throw new Error('Missing document. Invalid parameters');
       }
 
-      // Obter token apropriado
       const token = params.useUserAuth
         ? await this.getUserToken(params.document!)
         : await this.getAppToken();
@@ -466,57 +432,53 @@ export class CronosService implements OnModuleInit {
         throw new Error('Invalid authorization token');
       }
 
-      // IMPORTANTE: O token usado aqui é o token da Cronos obtido via getUserToken (quando useUserAuth: true)
-      // ou o token da aplicação obtido via getAppToken (quando useUserAuth: false)
-      // Ambos são tokens da Cronos, não tokens do nosso app
       const requestUrl = `${this.config.apiUrl}${params.action}`;
       const requestHeaders: Record<string, string> = {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`, // Token da Cronos (obtido do login na Cronos)
+        Authorization: `Bearer ${token}`,
       };
       const requestBody = params.body ? JSON.stringify(params.body) : undefined;
 
-      // Log de requisição completa se habilitado
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           '═══════════════════════════════════════════════════════',
         );
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `📤 REQUISIÇÃO: ${params.method} ${requestUrl}`,
         );
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           '───────────────────────────────────────────────────────',
         );
-        ColoredLogger.debug(
+        this.logger.debug(
           '[CronosService]',
           `Token Type: ${params.useUserAuth ? 'USER_TOKEN (Cronos)' : 'APP_TOKEN (Cronos)'}`,
         );
         if (params.useUserAuth && params.document) {
-          ColoredLogger.debug(
+          this.logger.debug(
             '[CronosService]',
             `User Document: ${params.document} | Token Cached: ${this.userAuth && this.userAuth[params.document] ? 'YES' : 'NO'}`,
           );
         }
-        ColoredLogger.debug(
+        this.logger.debug(
           '[CronosService]',
           `Authorization: Bearer ${token.substring(0, 30)}...${token.substring(token.length - 10)}`,
         );
-        ColoredLogger.debug(
+        this.logger.debug(
           '[CronosService]',
           `Headers:\n${JSON.stringify(requestHeaders, null, 2)}`,
         );
         if (requestBody) {
-          ColoredLogger.debug(
+          this.logger.debug(
             '[CronosService]',
             `Request Body:\n${JSON.stringify(params.body, null, 2)}`,
           );
         } else {
-          ColoredLogger.debug('[CronosService]', 'Request Body: (empty)');
+          this.logger.debug('[CronosService]', 'Request Body: (empty)');
         }
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           '───────────────────────────────────────────────────────',
         );
@@ -528,16 +490,14 @@ export class CronosService implements OnModuleInit {
         body: requestBody,
       });
 
-      // Ler o body como texto primeiro para verificar se é JSON
       let responseText: string = await response.text();
 
-      // Log de resposta completa se habilitado
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `📥 RESPOSTA: ${response.status} ${response.statusText}`,
         );
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           '───────────────────────────────────────────────────────',
         );
@@ -545,58 +505,57 @@ export class CronosService implements OnModuleInit {
         response.headers.forEach((value, key) => {
           headersObject[key] = value;
         });
-        ColoredLogger.debug(
+        this.logger.debug(
           '[CronosService]',
           `Response Headers:\n${JSON.stringify(headersObject, null, 2)}`,
         );
         try {
           const responseJson = JSON.parse(responseText) as unknown;
-          ColoredLogger.debug(
+          this.logger.debug(
             '[CronosService]',
             `Response Body:\n${JSON.stringify(responseJson, null, 2)}`,
           );
         } catch {
-          ColoredLogger.debug(
+          this.logger.debug(
             '[CronosService]',
             `Response Body (text):\n${responseText.substring(0, 1000)}${
               responseText.length > 1000 ? '\n... (truncated)' : ''
             }`,
           );
         }
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           '═══════════════════════════════════════════════════════',
         );
       }
 
-      // Verificar se a resposta é HTML (erro do servidor)
       if (
         responseText.trim().startsWith('<!DOCTYPE') ||
         responseText.trim().startsWith('<html')
       ) {
-        ColoredLogger.error(
-          '[CronosService] ❌ ERRO CRÍTICO',
+        this.logger.error(
+          '[CronosService] CRITICAL ERROR',
           `API retornou HTML ao invés de JSON - Status: ${response.status}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `URL: ${params.method} ${this.config.apiUrl}${params.action}`,
         );
         const headersObject: Record<string, string> = {};
         response.headers.forEach((value, key) => {
           headersObject[key] = value;
         });
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Response Headers: ${JSON.stringify(headersObject)}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Response Body (primeiros 2000 caracteres): ${responseText.substring(0, 2000)}`,
         );
         if (responseText.length > 2000) {
-          ColoredLogger.error(
-            '[CronosService] ❌',
+          this.logger.error(
+            '[CronosService] ERROR',
             `... (total de ${responseText.length} caracteres)`,
           );
         }
@@ -605,7 +564,6 @@ export class CronosService implements OnModuleInit {
         );
       }
 
-      // Tentar fazer parse do JSON
       let result: {
         success?: boolean;
         message?: unknown;
@@ -619,25 +577,25 @@ export class CronosService implements OnModuleInit {
           [key: string]: unknown;
         };
       } catch (parseError) {
-        ColoredLogger.error(
-          '[CronosService] ❌ ERRO CRÍTICO',
+        this.logger.error(
+          '[CronosService] CRITICAL ERROR',
           `Erro ao fazer parse do JSON - Status: ${response.status}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Erro de parse: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `URL: ${params.method} ${this.config.apiUrl}${params.action}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Response Body (primeiros 2000 caracteres): ${responseText.substring(0, 2000)}`,
         );
         if (responseText.length > 2000) {
-          ColoredLogger.error(
-            '[CronosService] ❌',
+          this.logger.error(
+            '[CronosService] ERROR',
             `... (total de ${responseText.length} caracteres)`,
           );
         }
@@ -646,7 +604,6 @@ export class CronosService implements OnModuleInit {
         );
       }
 
-      // Se houver erro de autorização E estivermos usando userAuth, tentar regenerar o token e retry
       if (
         (!response.ok || (result && result.success === false)) &&
         (response.status === 401 ||
@@ -659,27 +616,24 @@ export class CronosService implements OnModuleInit {
         params.useUserAuth &&
         params.document
       ) {
-        ColoredLogger.warning(
-          '[CronosService] ⚠️',
+        this.logger.warn(
+          '[CronosService] WARNING',
           `Erro de autorização detectado. Limpando cache e regenerando token do usuário para documento: ${params.document}`,
         );
 
-        // Limpar cache do token do usuário para forçar regeneração
         if (this.userAuth && this.userAuth[params.document]) {
           delete this.userAuth[params.document];
         }
 
-        // Obter novo token
         const newToken = await this.getUserToken(params.document);
 
         if (this.config.logging) {
-          ColoredLogger.info(
+          this.logger.info(
             '[CronosService]',
             `Reenviando requisição com novo token do usuário...`,
           );
         }
 
-        // Tentar novamente com o novo token
         const retryResponse: Response = await this.fetchWithProxy(
           `${this.config.apiUrl}${params.action}`,
           {
@@ -694,13 +648,12 @@ export class CronosService implements OnModuleInit {
 
         const retryResponseText: string = await retryResponse.text();
 
-        // Verificar HTML novamente
         if (
           retryResponseText.trim().startsWith('<!DOCTYPE') ||
           retryResponseText.trim().startsWith('<html')
         ) {
-          ColoredLogger.error(
-            '[CronosService] ❌ ERRO CRÍTICO',
+          this.logger.error(
+            '[CronosService] CRITICAL ERROR',
             `API retornou HTML ao invés de JSON após retry - Status: ${retryResponse.status}`,
           );
           throw new Error(
@@ -716,8 +669,8 @@ export class CronosService implements OnModuleInit {
             [key: string]: unknown;
           };
         } catch (parseError) {
-          ColoredLogger.error(
-            '[CronosService] ❌ ERRO CRÍTICO',
+          this.logger.error(
+            '[CronosService] CRITICAL ERROR',
             `Erro ao fazer parse do JSON após retry: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
           );
           throw new Error(
@@ -725,22 +678,21 @@ export class CronosService implements OnModuleInit {
           );
         }
 
-        // Usar a resposta do retry
         response = retryResponse;
         responseText = retryResponseText;
       }
 
       if (!response.ok || (result && result.success === false)) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Erro na resposta: ${response.status} - ${JSON.stringify(result, null, 2)}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `URL: ${params.method} ${this.config.apiUrl}${params.action}`,
         );
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Request Body: ${JSON.stringify(params.body || {}, null, 2)}`,
         );
         throw new Error(
@@ -749,16 +701,16 @@ export class CronosService implements OnModuleInit {
       }
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           `Resposta recebida: ${JSON.stringify(result)}`,
         );
       }
 
       return result;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao fazer requisição à API da Cronos',
         error,
       );
@@ -766,15 +718,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Busca informações do destinatário PIX na API da Cronos
-   * Retorna dados do recebedor (nome, documento, banco, conta, etc.)
-   *
-   * @param document - CPF/CNPJ do pagador
-   * @param keyType - Tipo da chave PIX (cpf, cnpj, email, phone, evp)
-   * @param keyValue - Valor da chave PIX
-   * @returns Dados do recebedor retornados pela API da Cronos
-   */
+  
   async transferPix(params: {
     document: string;
     keyType: string;
@@ -806,25 +750,15 @@ export class CronosService implements OnModuleInit {
         throw new Error('Missing keyValue. Invalid parameters');
       }
 
-      // Mapear tipos de chave PIX para o formato da Cronos
       const cronosKeyType = this.mapKeyTypeToCronos(params.keyType);
 
-      // NOTA: A API antiga usa useUserAuth: true, o que requer fazer login do usuário
-      // na Cronos usando document + userPassword. Se isso falhar, pode ser porque:
-      // 1. O userPassword configurado está incorreto
-      // 2. A senha do usuário na Cronos é diferente do userPassword configurado
-      // Se não funcionar, podemos tentar usar apenas o token da aplicação (useUserAuth: false)
-      // mas isso pode não funcionar dependendo dos requisitos da API da Cronos
-
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `Criando transferência PIX - document: ${params.document}, keyType: ${params.keyType}, keyValue: ${params.keyValue}`,
         );
       }
 
-      // Tentar primeiro com useUserAuth (como na API antiga)
-      // Se falhar, tentar apenas com token da aplicação
       let result: {
         id_pagamento?: string;
         recebedor?: {
@@ -847,7 +781,7 @@ export class CronosService implements OnModuleInit {
           method: 'POST',
           action: '/api/v1/pix/criartransferencia',
           document: params.document,
-          useUserAuth: true, // Usa token do usuário (requer getUserToken que faz login)
+          useUserAuth: true,
           body: {
             key_type: cronosKeyType,
             key_value: params.keyValue,
@@ -855,16 +789,16 @@ export class CronosService implements OnModuleInit {
         })) as typeof result;
 
         if (this.config.logging) {
-          ColoredLogger.success(
-            '[CronosService] ✅',
+          this.logger.success(
+            '[CronosService] SUCCESS',
             'Transferência PIX criada usando token do usuário',
           );
         }
       } catch (userAuthError) {
-        // Se falhar com useUserAuth (ex: credenciais inválidas), tentar apenas com token da aplicação
+
         if (this.config.logging) {
-          ColoredLogger.warning(
-            '[CronosService] ⚠️',
+          this.logger.warn(
+            '[CronosService] WARNING',
             `Falha ao usar token do usuário, tentando com token da aplicação: ${userAuthError instanceof Error ? userAuthError.message : String(userAuthError)}`,
           );
         }
@@ -872,23 +806,22 @@ export class CronosService implements OnModuleInit {
         result = (await this.request({
           method: 'POST',
           action: '/api/v1/pix/criartransferencia',
-          useUserAuth: false, // Usa apenas token da aplicação
+          useUserAuth: false,
           body: {
             key_type: cronosKeyType,
             key_value: params.keyValue,
-            document: params.document, // Passar document no body se necessário
+            document: params.document,
           },
         })) as typeof result;
 
         if (this.config.logging) {
-          ColoredLogger.success(
-            '[CronosService] ✅',
+          this.logger.success(
+            '[CronosService] SUCCESS',
             'Transferência PIX criada usando token da aplicação',
           );
         }
       }
 
-      // Validar resposta da API
       if (
         !result ||
         !result.id_pagamento ||
@@ -916,8 +849,8 @@ export class CronosService implements OnModuleInit {
         },
       };
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao criar transferência PIX',
         error,
       );
@@ -925,15 +858,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Confirma uma transferência PIX na API da Cronos
-   *
-   * @param document - CPF/CNPJ do pagador
-   * @param id - ID do pagamento (id_pagamento) retornado pelo transferPix
-   * @param amount - Valor da transferência
-   * @param description - Descrição da transferência (opcional)
-   * @returns Resultado da confirmação
-   */
+  
   async confirmTransferPix(params: {
     document: string;
     id: string;
@@ -952,40 +877,36 @@ export class CronosService implements OnModuleInit {
       }
 
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `Confirmando transferência PIX - document: ${params.document}, id_pagamento: ${params.id}, amount: ${params.amount}`,
         );
       }
 
-      // IMPORTANTE: O formato do body deve seguir a documentação da API da Cronos
-      // Documentação: valor deve ser string, save_as_favorite deve ser number
-      // Na API antiga (linha 1954-1957), passa params.amount (número), mas o axios converte automaticamente para string no JSON
-      // Para garantir compatibilidade com a documentação, vamos passar como string explicitamente
       const result = (await this.request({
         method: 'POST',
         action: '/api/v1/pix/confirmartransferencia',
         document: params.document,
-        useUserAuth: true, // IMPORTANTE: Deve usar o mesmo token do usuário usado no transferPix
+        useUserAuth: true,
         body: {
-          id_pagamento: params.id, // A API usa id_pagamento (ID retornado pelo transferPix)
-          valor: params.amount, // Na API antiga é passado como número (params.amount), axios serializa automaticamente
-          description: params.description || '', // String vazia se não tiver descrição (igual API antiga)
-          save_as_favorite: 0, // Sempre 0 (número) - não salvar como favorito
+          id_pagamento: params.id,
+          valor: params.amount,
+          description: params.description || '',
+          save_as_favorite: 0,
         },
       })) as unknown;
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           'Transferência PIX confirmada com sucesso na API da Cronos',
         );
       }
 
       return result;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao confirmar transferência PIX',
         error,
       );
@@ -993,16 +914,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Cria um token transacional na API da Cronos
-   *
-   * Equivalente ao helper antigo: createTransactionalToken
-   *
-   * @param document - CPF/CNPJ do pagador
-   * @param amount - Valor da transação
-   * @param lat - Latitude (opcional)
-   * @param lon - Longitude (opcional)
-   */
+  
   async createTransactionalToken(params: {
     document: string;
     amount: number;
@@ -1018,7 +930,7 @@ export class CronosService implements OnModuleInit {
       }
 
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `Criando token transacional - document: ${params.document}, amount: ${params.amount}, lat: ${params.lat || 0}, lon: ${params.lon || 0}`,
         );
@@ -1037,16 +949,16 @@ export class CronosService implements OnModuleInit {
       });
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           'Token transacional criado com sucesso na API da Cronos',
         );
       }
 
       return result;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao criar token transacional na API da Cronos',
         error,
       );
@@ -1054,13 +966,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Confirma a senha transacional na API da Cronos
-   *
-   * Equivalente ao helper antigo: confirmTransactionPassword
-   *
-   * @param document - CPF/CNPJ do pagador
-   */
+  
   async confirmTransactionPassword(params: { document: string }): Promise<any> {
     try {
       if (!params.document) {
@@ -1072,7 +978,7 @@ export class CronosService implements OnModuleInit {
       }
 
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `Confirmando senha transacional na Cronos - document: ${params.document}`,
         );
@@ -1089,16 +995,16 @@ export class CronosService implements OnModuleInit {
       });
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           'Senha transacional confirmada com sucesso na API da Cronos',
         );
       }
 
       return result;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao confirmar senha transacional na API da Cronos',
         error,
       );
@@ -1106,14 +1012,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Obtém o saldo da conta na API da Cronos
-   *
-   * Equivalente ao helper antigo: getAccountBalance
-   *
-   * @param document - CPF/CNPJ do usuário
-   * @returns Saldo da conta
-   */
+  
   async getAccountBalance(params: {
     document: string;
   }): Promise<{ amount?: number; balance?: number; saldo?: number }> {
@@ -1123,7 +1022,7 @@ export class CronosService implements OnModuleInit {
       }
 
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `Buscando saldo da conta - document: ${params.document}`,
         );
@@ -1137,16 +1036,16 @@ export class CronosService implements OnModuleInit {
       })) as { amount?: number; balance?: number; saldo?: number };
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           'Saldo da conta obtido com sucesso na API da Cronos',
         );
       }
 
       return result;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao obter saldo da conta na API da Cronos',
         error,
       );
@@ -1154,19 +1053,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Obtém transações/extratos da conta na API da Cronos
-   *
-   * Equivalente ao helper antigo: getTransactions
-   *
-   * @param document - CPF/CNPJ do usuário
-   * @param startDate - Data inicial (formato: YYYY-MM-DD HH:mm:ss)
-   * @param endDate - Data final (formato: YYYY-MM-DD HH:mm:ss)
-   * @param searchtext - Texto de busca (opcional)
-   * @param type_transaction - Tipo de transação (opcional)
-   * @param limit - Limite de resultados (opcional)
-   * @returns Transações/extratos
-   */
+  
   async getTransactions(params: {
     document: string;
     startDate?: string;
@@ -1192,7 +1079,7 @@ export class CronosService implements OnModuleInit {
       const action = `/api/v1/statements${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
       if (this.config.logging) {
-        ColoredLogger.info(
+        this.logger.info(
           '[CronosService]',
           `Buscando transações - document: ${params.document}`,
         );
@@ -1206,16 +1093,16 @@ export class CronosService implements OnModuleInit {
       });
 
       if (this.config.logging) {
-        ColoredLogger.success(
-          '[CronosService] ✅',
+        this.logger.success(
+          '[CronosService] SUCCESS',
           'Transações obtidas com sucesso na API da Cronos',
         );
       }
 
       return result;
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[CronosService] ❌ ERRO CRÍTICO',
+      this.logger.errorWithStack(
+        '[CronosService] CRITICAL ERROR',
         'Erro ao obter transações na API da Cronos',
         error,
       );
@@ -1223,15 +1110,7 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  /**
-   * Sincroniza o saldo da conta Cronos com o saldo na API da Cronos
-   *
-   * Equivalente ao middleware antigo: syncCronosBalance
-   *
-   * @param userId - ID do usuário
-   * @param userIdentities - Identidades do usuário
-   * @param userAccounts - Contas do usuário
-   */
+  
   async syncCronosBalance(params: {
     userId: string;
     userIdentities: Array<{
@@ -1251,46 +1130,43 @@ export class CronosService implements OnModuleInit {
         throw new Error('Missing userId for balance sync');
       }
 
-      ColoredLogger.info(
+      this.logger.info(
         '[CronosService] 🔄',
         `Iniciando sincronização de saldo para usuário: ${params.userId}`,
       );
 
-      // Buscar identidade BR
       const brIdentity = params.userIdentities?.find(
         (id) => id.country === 'br' && id.status === 'enable',
       );
 
       if (!brIdentity) {
-        ColoredLogger.warning(
-          '[CronosService] ⚠️',
-          'Usuário não possui identidade BR ativa',
+        this.logger.warn(
+          '[CronosService] WARNING',
+          'User does not have an active BR identity',
         );
         return;
       }
 
-      // Buscar conta Cronos (BRL)
       const cronosAccount = params.userAccounts?.find(
         (acc) => acc.type === 'cronos' && acc.status === 'enable',
       );
 
       if (!cronosAccount) {
-        ColoredLogger.warning(
-          '[CronosService] ⚠️',
-          'Usuário não possui conta Cronos ativa',
+        this.logger.warn(
+          '[CronosService] WARNING',
+          'User does not have an active Cronos account',
         );
         return;
       }
 
       const unexBalance = parseFloat(cronosAccount.balance || '0');
 
-      ColoredLogger.info('[CronosService] 💰', 'Saldo Unex (Cronos):', {
+      this.logger.info('[CronosService] 💰', 'Saldo Unex (Cronos):', {
         accountId: cronosAccount.id,
         balance: unexBalance,
         document: brIdentity.taxDocumentNumber,
       });
 
-      // Buscar saldo atual na Cronos API
       let cronosBalance: number | null = null;
       try {
         const cronosResponse = await this.getAccountBalance({
@@ -1306,24 +1182,23 @@ export class CronosService implements OnModuleInit {
             ),
           ) || 0;
 
-        ColoredLogger.info('[CronosService] 💰', 'Saldo Cronos (API):', {
+        this.logger.info('[CronosService] 💰', 'Saldo Cronos (API):', {
           balance: cronosBalance,
           document: brIdentity.taxDocumentNumber,
         });
       } catch (cronosError: any) {
-        ColoredLogger.error(
-          '[CronosService] ❌',
+        this.logger.error(
+          '[CronosService] ERROR',
           `Erro ao consultar saldo Cronos: ${cronosError?.message || String(cronosError)}`,
         );
-        return; // Não bloqueia por erro na API
+        return;
       }
 
-      // Detectar discrepância
       const difference = Math.abs(unexBalance - cronosBalance);
-      const tolerance = 0.01; // 1 centavo de diferença é aceitável
+      const tolerance = 0.01;
 
       if (difference > tolerance) {
-        ColoredLogger.warning('[CronosService] ⚠️', 'DISCREPÂNCIA DETECTADA:', {
+        this.logger.warn('[CronosService] WARNING', 'DISCREPANCY DETECTED:', {
           unexBalance,
           cronosBalance,
           difference,
@@ -1333,9 +1208,8 @@ export class CronosService implements OnModuleInit {
           ).toFixed(2)}%`,
         });
 
-        // Se Cronos está zerado mas Unex tem saldo, buscar statements recentes
         if (cronosBalance === 0 && unexBalance > 0) {
-          ColoredLogger.info(
+          this.logger.info(
             '[CronosService] 🔍',
             'Verificando statements recentes para reconciliar...',
           );
@@ -1357,7 +1231,7 @@ export class CronosService implements OnModuleInit {
               limit: '100',
             });
 
-            ColoredLogger.info(
+            this.logger.info(
               '[CronosService] 📋',
               'Statements recentes encontrados:',
               {
@@ -1367,7 +1241,6 @@ export class CronosService implements OnModuleInit {
               },
             );
 
-            // Procurar por cashin_cronos pendentes que não foram processados
             const pendingCashins = await this.prisma.transactions.findMany({
               where: {
                 type: 'cashin_cronos',
@@ -1380,8 +1253,8 @@ export class CronosService implements OnModuleInit {
             });
 
             if (pendingCashins?.length > 0) {
-              ColoredLogger.warning(
-                '[CronosService] ⚠️',
+              this.logger.warn(
+                '[CronosService] WARNING',
                 `Encontrados ${pendingCashins.length} cashin_cronos pendentes:`,
                 {
                   transactions: pendingCashins.map((tx) => ({
@@ -1394,7 +1267,6 @@ export class CronosService implements OnModuleInit {
               );
             }
 
-            // Procurar por exchange pendentes
             const pendingExchanges = await this.prisma.ramp_operations.findMany(
               {
                 where: {
@@ -1410,8 +1282,8 @@ export class CronosService implements OnModuleInit {
             );
 
             if (pendingExchanges?.length > 0) {
-              ColoredLogger.warning(
-                '[CronosService] ⚠️',
+              this.logger.warn(
+                '[CronosService] WARNING',
                 `Encontradas ${pendingExchanges.length} operações de exchange pendentes:`,
                 {
                   operations: pendingExchanges.map((op) => ({
@@ -1425,24 +1297,23 @@ export class CronosService implements OnModuleInit {
               );
             }
           } catch (stmtError: any) {
-            ColoredLogger.error(
-              '[CronosService] ⚠️',
+            this.logger.error(
+              '[CronosService] WARNING',
               `Erro ao verificar statements: ${stmtError?.message || String(stmtError)}`,
             );
           }
         }
       } else {
-        ColoredLogger.success('[CronosService] ✅', 'Saldos sincronizados:', {
+        this.logger.success('[CronosService] SUCCESS', 'Saldos sincronizados:', {
           unexBalance,
           cronosBalance,
           difference,
         });
       }
 
-      // Se há discrepância, ajustar o saldo da conta BRL (Cronos)
       if (Math.abs(difference) > 0.01) {
         try {
-          ColoredLogger.info('[CronosService] 🔧', 'Iniciando ajuste de saldo');
+          this.logger.info('[CronosService] 🔧', 'Iniciando ajuste de saldo');
           const balanceBefore = cronosAccount.balance;
 
           await this.prisma.usersAccounts.update({
@@ -1450,7 +1321,7 @@ export class CronosService implements OnModuleInit {
             data: { balance: cronosBalance },
           });
 
-          ColoredLogger.success(
+          this.logger.success(
             '[CronosService] 💾',
             'Saldo BRL ajustado com sucesso:',
             {
@@ -1462,24 +1333,22 @@ export class CronosService implements OnModuleInit {
             },
           );
         } catch (adjustError: any) {
-          ColoredLogger.error(
-            '[CronosService] ❌',
+          this.logger.error(
+            '[CronosService] ERROR',
             `Erro ao ajustar saldo: ${adjustError?.message || String(adjustError)}`,
           );
         }
       }
     } catch (error: any) {
-      ColoredLogger.error(
-        '[CronosService] ❌',
+      this.logger.error(
+        '[CronosService] ERROR',
         `Erro geral na sincronização: ${error?.message || String(error)}`,
       );
-      // Não rejeita para não bloquear o login
+
     }
   }
 
-  /**
-   * Mapeia o tipo de chave PIX para o formato esperado pela Cronos
-   */
+  
   private mapKeyTypeToCronos(keyType: string): string {
     const mapping: Record<string, string> = {
       cpf: 'cpf',
