@@ -32,7 +32,6 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Configurar Swagger/OpenAPI
   const config = new DocumentBuilder()
     .setTitle('Unex API')
     .setDescription('API para gerenciamento de transações financeiras')
@@ -46,7 +45,7 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+      'JWT-auth',
     )
     .addTag('transactions', 'Endpoints relacionados a transações')
     .addTag('auth', 'Endpoints de autenticação')
