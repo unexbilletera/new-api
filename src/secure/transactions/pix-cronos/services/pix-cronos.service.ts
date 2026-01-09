@@ -83,7 +83,7 @@ export class PixCronosService {
         );
         throw ErrorHelper.badRequest(
           ErrorCodes.TRANSACTIONS_INVALID_TARGET_USER_ACCOUNT,
-          'Erro ao buscar informações do destinatário na API da Cronos',
+          'Error fetching recipient information from Cronos API',
         );
       }
 
@@ -156,14 +156,14 @@ export class PixCronosService {
 
         throw ErrorHelper.internalServerError(
           ErrorCodes.INTERNAL_SERVER_ERROR,
-          'Erro ao enviar confirmação para processamento',
+          'Error sending confirmation for processing',
         );
       }
 
       return {
         id: transactionId,
         status: 'process',
-        message: 'Transação enviada para processamento',
+        message: 'Transaction sent for processing',
       };
     } catch (error) {
       this.logger.errorWithStack(

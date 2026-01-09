@@ -131,7 +131,7 @@ export class PixCronosTransactionModel {
         sourceIdentityId: data.sourceIdentityId,
         sourceTaxDocumentNumber: data.sourceTaxDocumentNumber,
         reference: `${data.targetKeyType}:${data.targetKeyValue}`,
-        reason: data.description || 'Transferência PIX',
+        reason: data.description || 'PIX Transfer',
         targetName: data.targetName || null,
         targetAlias: data.targetAlias || null,
         targetTaxDocumentNumber: data.targetTaxDocumentNumber || null,

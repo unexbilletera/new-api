@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ConfirmPixCronosDto {
   @ApiProperty({
-    description: 'ID da transação a ser confirmada',
+    description: 'Transaction ID to be confirmed',
     example: 'uuid-da-transacao',
   })
   @IsString()

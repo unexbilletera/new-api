@@ -18,7 +18,7 @@ export class CreatePixCronosDto {
   sourceAccountId: string;
 
   @ApiProperty({
-    description: 'Valor da transferência (mínimo 0.01)',
+    description: 'Transfer amount (minimum 0.01)',
     example: 100.5,
     minimum: 0.01,
   })
@@ -27,7 +27,7 @@ export class CreatePixCronosDto {
   amount: number;
 
   @ApiProperty({
-    description: 'Tipo da chave PIX do destinatário',
+    description: 'Recipient PIX key type',
     enum: PixKeyType,
     example: 'cpf',
   })
@@ -35,15 +35,15 @@ export class CreatePixCronosDto {
   targetKeyType: PixKeyType;
 
   @ApiProperty({
-    description: 'Valor da chave PIX do destinatário',
+    description: 'Recipient PIX key value',
     example: '12345678900',
   })
   @IsString()
   targetKeyValue: string;
 
   @ApiProperty({
-    description: 'Descrição da transferência (opcional)',
-    example: 'Transferência PIX teste',
+    description: 'Transfer description (optional)',
+    example: 'PIX transfer test',
     required: false,
   })
   @IsString()
