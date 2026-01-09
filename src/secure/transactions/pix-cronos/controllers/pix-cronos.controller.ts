@@ -19,7 +19,7 @@ import { PixCronosService } from '../services/pix-cronos.service';
 import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ConfirmPixCronosDto } from '../dto/confirm-pix-cronos.dto';
 import { SuccessCodes } from '../../../../shared/errors/app-error';
-import { ColoredLogger } from '../../../../shared/utils/logger-colors';
+import { LoggerService } from '../../../../shared/logger/logger.service';
 
 interface CurrentUserPayload {
   userId: string;
@@ -27,15 +27,15 @@ interface CurrentUserPayload {
   roleId: string;
 }
 
-/**
- * Controller para transações PIX Cronos
- */
 @ApiTags('transactions')
 @Controller('transactions/pix/cronos')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class PixCronosController {
-  constructor(private pixCronosService: PixCronosService) {}
+  constructor(
+    private pixCronosService: PixCronosService,
+    private logger: LoggerService,
+  ) {}
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
@@ -96,9 +96,9 @@ export class PixCronosController {
         code: SuccessCodes.TRANSACTIONS_CREATED,
       };
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[PixCronosController] ❌ ERRO CRÍTICO',
-        'Erro ao criar transação',
+      this.logger.errorWithStack(
+        '[PixCronosController] CRITICAL',
+        'Failed to create transaction',
         error,
       );
       throw error;
@@ -153,9 +153,9 @@ export class PixCronosController {
         code: SuccessCodes.TRANSACTIONS_CONFIRMED,
       };
     } catch (error) {
-      ColoredLogger.errorWithStack(
-        '[PixCronosController] ❌ ERRO CRÍTICO',
-        'Erro ao confirmar transação',
+      this.logger.errorWithStack(
+        '[PixCronosController] CRITICAL',
+        'Failed to confirm transaction',
         error,
       );
       throw error;
