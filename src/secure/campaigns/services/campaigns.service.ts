@@ -22,14 +22,14 @@ export class CampaignsService {
     if (!campaign) {
       return {
         valid: false,
-        message: 'Código de campanha não encontrado',
+        message: 'Campaign code not found',
       };
     }
 
     if (!campaign.isActive) {
       return {
         valid: false,
-        message: 'Esta campanha não está ativa',
+        message: 'This campaign is not active',
       };
     }
 
@@ -37,14 +37,14 @@ export class CampaignsService {
     if (campaign.validFrom && new Date(campaign.validFrom) > now) {
       return {
         valid: false,
-        message: 'Esta campanha ainda não começou',
+        message: 'This campaign has not started yet',
       };
     }
 
     if (campaign.validTo && new Date(campaign.validTo) < now) {
       return {
         valid: false,
-        message: 'Esta campanha já expirou',
+        message: 'This campaign has already expired',
       };
     }
 
@@ -73,7 +73,7 @@ export class CampaignsService {
     if (userUsage) {
       return {
         valid: true,
-        message: 'Código válido, mas você já utilizou esta campanha',
+        message: 'Valid code, but you have already used this campaign',
         campaign: campaignResponse,
         alreadyUsed: true,
       };
@@ -81,7 +81,7 @@ export class CampaignsService {
 
     return {
       valid: true,
-      message: 'Código de campanha válido',
+      message: 'Valid campaign code',
       campaign: campaignResponse,
       alreadyUsed: false,
     };
@@ -105,7 +105,7 @@ export class CampaignsService {
     if (validation.alreadyUsed) {
       return {
         success: false,
-        message: 'Você já utilizou este código de campanha',
+        message: 'You have already used this campaign code',
       };
     }
 
@@ -116,7 +116,7 @@ export class CampaignsService {
     if (!campaign) {
       return {
         success: false,
-        message: 'Campanha não encontrada',
+        message: 'Campaign not found',
       };
     }
 
@@ -139,7 +139,7 @@ export class CampaignsService {
 
     return {
       success: true,
-      message: 'Código de campanha aplicado com sucesso',
+      message: 'Campaign code applied successfully',
       usageId: usage.id,
     };
   }
