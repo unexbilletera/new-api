@@ -1,23 +1,23 @@
-# Comando curl para testar na EC2
+# curl Command for Testing on EC2
 
-## Opção 1: Comando completo em uma linha (copiar e colar)
+## Option 1: Complete command in one line (copy and paste)
 
 ```bash
 APP_TOKEN=$(curl -s -X GET "https://apibr.unex.ar/api/v1/application/token" -H "Content-Type: application/json" -H "Authorization: Basic $(echo -n 'pub_EwERFOBmKy78wm12FFERGydHzTTojIGdUNlazfOh:priv_jstjv2TBDmsuWsIOUzhgG3yW4hTWOFjIi5PQbgcz' | base64)" | jq -r '.token') && USER_TOKEN=$(curl -s -X POST "https://apibr.unex.ar/api/v1/user/auth" -H "Content-Type: application/json" -H "Authorization: Bearer ${APP_TOKEN}" -d '{"document":"46087750819","password":"abc123$!"}' | jq -r '.token') && curl -v -X POST "https://apibr.unex.ar/api/v1/pix/confirmartransferencia" -H "Content-Type: application/json" -H "Authorization: Bearer ${USER_TOKEN}" -d '{"id_pagamento":"99b85d20-3b6e-4bcf-a133-fb62797592ea","valor":"0.11","description":"Transferência PIX teste","save_as_favorite":0}'
 ```
 
-## Opção 2: Comando completo criando id_pagamento antes (recomendado)
+## Option 2: Complete command creating id_pagamento first (recommended)
 
-Este comando cria um novo `id_pagamento` e depois confirma imediatamente:
+This command creates a new `id_pagamento` and then confirms immediately:
 
 ```bash
-APP_TOKEN=$(curl -s -X GET "https://apibr.unex.ar/api/v1/application/token" -H "Content-Type: application/json" -H "Authorization: Basic $(echo -n 'pub_EwERFOBmKy78wm12FFERGydHzTTojIGdUNlazfOh:priv_jstjv2TBDmsuWsIOUzhgG3yW4hTWOFjIi5PQbgcz' | base64)" | jq -r '.token') && USER_TOKEN=$(curl -s -X POST "https://apibr.unex.ar/api/v1/user/auth" -H "Content-Type: application/json" -H "Authorization: Bearer ${APP_TOKEN}" -d '{"document":"46087750819","password":"abc123$!"}' | jq -r '.token') && ID_PAGAMENTO=$(curl -s -X POST "https://apibr.unex.ar/api/v1/pix/criartransferencia" -H "Content-Type: application/json" -H "Authorization: Bearer ${USER_TOKEN}" -d '{"key_type":"cpf","key_value":"12345678900"}' | jq -r '.id_pagamento') && echo "id_pagamento criado: ${ID_PAGAMENTO}" && curl -v -X POST "https://apibr.unex.ar/api/v1/pix/confirmartransferencia" -H "Content-Type: application/json" -H "Authorization: Bearer ${USER_TOKEN}" -d "{\"id_pagamento\":\"${ID_PAGAMENTO}\",\"valor\":\"0.11\",\"description\":\"Transferência PIX teste\",\"save_as_favorite\":0}"
+APP_TOKEN=$(curl -s -X GET "https://apibr.unex.ar/api/v1/application/token" -H "Content-Type: application/json" -H "Authorization: Basic $(echo -n 'pub_EwERFOBmKy78wm12FFERGydHzTTojIGdUNlazfOh:priv_jstjv2TBDmsuWsIOUzhgG3yW4hTWOFjIi5PQbgcz' | base64)" | jq -r '.token') && USER_TOKEN=$(curl -s -X POST "https://apibr.unex.ar/api/v1/user/auth" -H "Content-Type: application/json" -H "Authorization: Bearer ${APP_TOKEN}" -d '{"document":"46087750819","password":"abc123$!"}' | jq -r '.token') && ID_PAGAMENTO=$(curl -s -X POST "https://apibr.unex.ar/api/v1/pix/criartransferencia" -H "Content-Type: application/json" -H "Authorization: Bearer ${USER_TOKEN}" -d '{"key_type":"cpf","key_value":"12345678900"}' | jq -r '.id_pagamento') && echo "id_pagamento created: ${ID_PAGAMENTO}" && curl -v -X POST "https://apibr.unex.ar/api/v1/pix/confirmartransferencia" -H "Content-Type: application/json" -H "Authorization: Bearer ${USER_TOKEN}" -d "{\"id_pagamento\":\"${ID_PAGAMENTO}\",\"valor\":\"0.11\",\"description\":\"Transferência PIX teste\",\"save_as_favorite\":0}"
 ```
 
-## Opção 3: Passo a passo (para debug)
+## Option 3: Step by step (for debugging)
 
 ```bash
-# 1. Obter token da aplicação
+# 1. Get application token
 APP_TOKEN=$(curl -s -X GET "https://apibr.unex.ar/api/v1/application/token" \
   -H "Content-Type: application/json" \
   -H "Authorization: Basic $(echo -n 'pub_EwERFOBmKy78wm12FFERGydHzTTojIGdUNlazfOh:priv_jstjv2TBDmsuWsIOUzhgG3yW4hTWOFjIi5PQbgcz' | base64)" \
@@ -25,7 +25,7 @@ APP_TOKEN=$(curl -s -X GET "https://apibr.unex.ar/api/v1/application/token" \
 
 echo "APP_TOKEN: ${APP_TOKEN}"
 
-# 2. Obter token do usuário
+# 2. Get user token
 USER_TOKEN=$(curl -s -X POST "https://apibr.unex.ar/api/v1/user/auth" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${APP_TOKEN}" \
@@ -34,16 +34,16 @@ USER_TOKEN=$(curl -s -X POST "https://apibr.unex.ar/api/v1/user/auth" \
 
 echo "USER_TOKEN: ${USER_TOKEN}"
 
-# 3. Criar id_pagamento (opcional - para testar com id_pagamento fresco)
+# 3. Create id_pagamento (optional - to test with fresh id_pagamento)
 ID_PAGAMENTO=$(curl -s -X POST "https://apibr.unex.ar/api/v1/pix/criartransferencia" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${USER_TOKEN}" \
   -d '{"key_type":"cpf","key_value":"12345678900"}' \
   | jq -r '.id_pagamento')
 
-echo "ID_PAGAMENTO criado: ${ID_PAGAMENTO}"
+echo "ID_PAGAMENTO created: ${ID_PAGAMENTO}"
 
-# 4. Confirmar transferência PIX
+# 4. Confirm PIX transfer
 curl -v -X POST "https://apibr.unex.ar/api/v1/pix/confirmartransferencia" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${USER_TOKEN}" \
@@ -55,19 +55,18 @@ curl -v -X POST "https://apibr.unex.ar/api/v1/pix/confirmartransferencia" \
   }"
 ```
 
-## O que observar:
+## What to observe:
 
-✅ **Se funcionar na EC2:**
-- O problema NÃO é IP
-- Pode ser:
-  - Token diferente na nova API (criar vs confirmar)
-  - id_pagamento expirado quando o worker tenta confirmar
-  - Timing entre criação e confirmação
+**If it works on EC2:**
+- The problem is NOT IP
+- Could be:
+  - Different token in new API (create vs confirm)
+  - id_pagamento expired when worker tries to confirm
+  - Timing between creation and confirmation
 
-❌ **Se não funcionar na EC2:**
-- Pode ser:
-  - id_pagamento inválido ou expirado
-  - Token inválido
-  - Formato do body incorreto
-  - Alguma validação adicional necessária
-
+**If it doesn't work on EC2:**
+- Could be:
+  - Invalid or expired id_pagamento
+  - Invalid token
+  - Incorrect body format
+  - Some additional validation needed
