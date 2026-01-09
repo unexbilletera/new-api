@@ -51,7 +51,7 @@ export class TermsService {
 
       return {
         success: true,
-        message: 'Termo já aceito anteriormente',
+        message: 'Term already accepted previously',
         data: {
           id: existing.id,
           userId: existing.userId,
@@ -74,7 +74,7 @@ export class TermsService {
 
     return {
       success: true,
-      message: 'Termo aceito com sucesso',
+      message: 'Term accepted successfully',
       data: {
         id: acceptance.id,
         userId: acceptance.userId,
