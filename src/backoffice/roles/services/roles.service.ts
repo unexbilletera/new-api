@@ -17,7 +17,7 @@ export class RolesService {
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     return this.mapToResponse(role);
@@ -28,7 +28,7 @@ export class RolesService {
     });
 
     if (existing) {
-      throw new ConflictException('Já existe uma role com este nome');
+      throw new ConflictException('A role with this name already exists');
     }
 
     const role = await this.prisma.backofficeRoles.create({
@@ -49,7 +49,7 @@ export class RolesService {
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     if (dto.name && dto.name !== role.name) {
@@ -57,7 +57,7 @@ export class RolesService {
         where: { name: dto.name },
       });
       if (existing) {
-        throw new ConflictException('Já existe uma role com este nome');
+        throw new ConflictException('A role with this name already exists');
       }
     }
 
@@ -78,7 +78,7 @@ export class RolesService {
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     const usersWithRole = await this.prisma.backofficeUsers.count({
@@ -87,7 +87,7 @@ export class RolesService {
 
     if (usersWithRole > 0) {
       throw new ConflictException(
-        `Não é possível deletar. ${usersWithRole} usuário(s) usando esta role`,
+        `Cannot delete. ${usersWithRole} user(s) using this role`,
       );
     }
 
@@ -95,7 +95,7 @@ export class RolesService {
       where: { id },
     });
 
-    return { success: true, message: 'Role deletada com sucesso' };
+    return { success: true, message: 'Role deleted successfully' };
   }
 
   private mapToResponse(role: any): RoleResponseDto {
