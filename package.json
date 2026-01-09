@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.960.0",
+    "@aws-sdk/client-ses": "^3.960.0",
     "@fastify/static": "^9.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
