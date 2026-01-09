@@ -5,7 +5,7 @@ import { BiometricController } from '../../../../src/public/biometric/controller
 import { DeviceRegistrationService } from '../../../../src/public/biometric/services/device-registration.service';
 import { ChallengeVerificationService } from '../../../../src/public/biometric/services/challenge-verification.service';
 import { DeviceManagementService } from '../../../../src/public/biometric/services/device-management.service';
-import { AuthGuard } from '../../../../src/shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../../src/shared/guards/jwt-auth.guard';
 
 describe('BiometricController', () => {
   let controller: BiometricController;
@@ -53,10 +53,10 @@ describe('BiometricController', () => {
         { provide: ChallengeVerificationService, useValue: challengeVerificationService },
         { provide: DeviceManagementService, useValue: deviceManagementService },
         { provide: JwtService, useValue: mockJwtService },
-        { provide: AuthGuard, useValue: mockAuthGuard },
+        { provide: JwtAuthGuard, useValue: mockAuthGuard },
       ],
     })
-      .overrideGuard(AuthGuard)
+      .overrideGuard(JwtAuthGuard)
       .useValue(mockAuthGuard)
       .compile();
 

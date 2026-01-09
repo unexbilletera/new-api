@@ -249,7 +249,7 @@ describe('NotificationsService', () => {
 
       prisma.users.update.mockResolvedValue({
         id: mockUserId,
-        pushToken: 'fcm_token_123',
+        mobileDevicePush: 'fcm_token_123',
       } as any);
 
       const result = await service.updatePushToken(mockUserId, dto);
@@ -260,7 +260,8 @@ describe('NotificationsService', () => {
 
     it('getPushToken should retrieve stored token', async () => {
       const mockToken = {
-        pushToken: 'fcm_token_456',
+        mobileDevicePush: 'fcm_token_456',
+        browserDevicePush: null,
       };
 
       prisma.users.findUnique.mockResolvedValue(mockToken as any);
@@ -270,6 +271,7 @@ describe('NotificationsService', () => {
       expect(prisma.users.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: mockUserId },
+          select: { mobileDevicePush: true, browserDevicePush: true },
         })
       );
       expect(result.pushToken).toBe('fcm_token_456');
@@ -287,7 +289,7 @@ describe('NotificationsService', () => {
   describe('sendTestPush', () => {
     it('should send test push notification', async () => {
       const dto = { title: 'Test', message: 'Test push' } as any;
-      const mockUser = { pushToken: 'fcm_token_123' };
+      const mockUser = { mobileDevicePush: 'fcm_token_123', browserDevicePush: null };
 
       prisma.users.findUnique.mockResolvedValue(mockUser as any);
       prisma.notifications.create.mockResolvedValue({} as any);
@@ -303,7 +305,7 @@ describe('NotificationsService', () => {
     it('should fail gracefully if user has no push token', async () => {
       const dto = { title: 'Test', message: 'Test push' } as any;
 
-      prisma.users.findUnique.mockResolvedValue(null);
+      prisma.users.findUnique.mockResolvedValue({ mobileDevicePush: null, browserDevicePush: null } as any);
 
       const result = await service.sendTestPush(mockUserId, dto);
 
@@ -312,7 +314,7 @@ describe('NotificationsService', () => {
 
     it('should create notification when push token exists', async () => {
       const dto = { title: 'Test', message: 'Test push' } as any;
-      const mockUser = { pushToken: 'fcm_token_123' };
+      const mockUser = { mobileDevicePush: 'fcm_token_123', browserDevicePush: null };
 
       prisma.users.findUnique.mockResolvedValue(mockUser as any);
       prisma.notifications.create.mockResolvedValue({} as any);

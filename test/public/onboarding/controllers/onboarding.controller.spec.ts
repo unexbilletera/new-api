@@ -7,7 +7,7 @@ import { VerificationService } from '../../../../src/public/onboarding/services/
 import { IdentityOnboardingService } from '../../../../src/public/onboarding/services/identity-onboarding.service';
 import { EmailValidationService } from '../../../../src/public/auth/services/email-validation.service';
 import { PhoneValidationService } from '../../../../src/public/auth/services/phone-validation.service';
-import { AuthGuard } from '../../../../src/shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../../src/shared/guards/jwt-auth.guard';
 
 describe('OnboardingController', () => {
   let controller: OnboardingController;
@@ -70,10 +70,10 @@ describe('OnboardingController', () => {
         { provide: EmailValidationService, useValue: emailValidationService },
         { provide: PhoneValidationService, useValue: phoneValidationService },
         { provide: JwtService, useValue: mockJwtService },
-        { provide: AuthGuard, useValue: mockAuthGuard },
+        { provide: JwtAuthGuard, useValue: mockAuthGuard },
       ],
     })
-      .overrideGuard(AuthGuard)
+      .overrideGuard(JwtAuthGuard)
       .useValue(mockAuthGuard)
       .compile();
 

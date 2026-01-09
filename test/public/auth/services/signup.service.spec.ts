@@ -9,11 +9,11 @@ import { PrismaService } from '../../../../src/shared/prisma/prisma.service';
 
 describe('SignupService', () => {
   let service: SignupService;
-  let userModel: jest.Mocked<AuthUserModel>;
-  let validationCodeModel: jest.Mocked<ValidationCodeModel>;
-  let jwtService: jest.Mocked<JwtService>;
-  let prisma: jest.Mocked<PrismaService>;
-  let authMapper: jest.Mocked<AuthMapper>;
+  let userModel: any;
+  let validationCodeModel: any;
+  let jwtService: any;
+  let prisma: any;
+  let authMapper: any;
 
   const mockSignupDto = {
     email: 'newuser@example.com',
@@ -39,30 +39,30 @@ describe('SignupService', () => {
       exists: jest.fn(),
       create: jest.fn(),
       findByEmail: jest.fn(),
-    } as unknown as jest.Mocked<AuthUserModel>;
+    };
 
     validationCodeModel = {
       getValidatedEmailCode: jest.fn(),
       getValidatedPhoneCode: jest.fn(),
       deleteEmailValidationCodes: jest.fn(),
       deletePhoneValidationCodes: jest.fn(),
-    } as unknown as jest.Mocked<ValidationCodeModel>;
+    };
 
     jwtService = {
       generateToken: jest.fn(),
       verifyToken: jest.fn(),
-    } as unknown as jest.Mocked<JwtService>;
+    };
 
     prisma = {
       devices: {
         findFirst: jest.fn().mockResolvedValue(null),
       },
-    } as unknown as jest.Mocked<PrismaService>;
+    };
 
     authMapper = {
       toSignupResponseDto: jest.fn(),
       toSignupDeviceRequiredResponseDto: jest.fn(),
-    } as unknown as jest.Mocked<AuthMapper>;
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

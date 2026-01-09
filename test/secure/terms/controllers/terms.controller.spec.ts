@@ -3,7 +3,7 @@ import { CanActivate } from '@nestjs/common';
 import { TermsController } from '../../../../src/secure/terms/controllers/terms.controller';
 import { TermsService } from '../../../../src/secure/terms/services/terms.service';
 import { ServiceType } from '../../../../src/secure/terms/dto/terms.dto';
-import { AuthGuard } from '../../../../src/shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../../src/shared/guards/jwt-auth.guard';
 
 describe('TermsController', () => {
   let controller: TermsController;
@@ -28,10 +28,10 @@ describe('TermsController', () => {
       controllers: [TermsController],
       providers: [
         { provide: TermsService, useValue: service },
-        { provide: AuthGuard, useValue: mockAuthGuard },
+        { provide: JwtAuthGuard, useValue: mockAuthGuard },
       ],
     })
-      .overrideGuard(AuthGuard)
+      .overrideGuard(JwtAuthGuard)
       .useValue(mockAuthGuard)
       .compile();
 

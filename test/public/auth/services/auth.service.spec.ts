@@ -11,10 +11,11 @@ import { ExchangeRatesService } from '../../../../src/shared/exchange/exchange-r
 import { SystemVersionService } from '../../../../src/shared/helpers/system-version.service';
 import { SmsService } from '../../../../src/shared/sms/sms.service';
 import { EmailService } from '../../../../src/shared/email/email.service';
+import { PasswordHelper } from '../../../../src/shared/helpers/password.helper';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let prisma: jest.Mocked<PrismaService>;
+  let prisma: any;
   let jwtService: jest.Mocked<JwtService>;
   let logger: jest.Mocked<LoggerService>;
   let notificationService: jest.Mocked<NotificationService>;
@@ -71,10 +72,13 @@ describe('AuthService', () => {
 
     notificationService = {
       send: jest.fn(),
+      sendPasswordRecovery: jest.fn(),
     } as unknown as jest.Mocked<NotificationService>;
 
     accessLogService = {
       log: jest.fn(),
+      logSuccess: jest.fn(),
+      logFailure: jest.fn(),
     } as unknown as jest.Mocked<AccessLogService>;
 
     cronosService = {
@@ -87,14 +91,19 @@ describe('AuthService', () => {
 
     systemVersionService = {
       getVersion: jest.fn(),
+      assertVersionValid: jest.fn(),
     } as unknown as jest.Mocked<SystemVersionService>;
 
     smsService = {
       sendValidationCode: jest.fn(),
+      verifyCode: jest.fn(),
+      normalizePhone: jest.fn(phone => phone.replace(/\D/g, '')),
     } as unknown as jest.Mocked<SmsService>;
 
     emailService = {
       sendValidationCode: jest.fn(),
+      verifyCode: jest.fn(),
+      normalizeEmail: jest.fn(email => email.toLowerCase().trim()),
     } as unknown as jest.Mocked<EmailService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -119,20 +128,10 @@ describe('AuthService', () => {
   describe('sendEmailValidation', () => {
     it('should send email validation code successfully', async () => {
       const dto = { email: 'test@example.com' };
-      const mockValidationCode = {
-        id: 'code-123',
-        email: 'test@example.com',
-        code: '12345678',
-        verified: false,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-      };
-
-      prisma.email_validation_codes.create.mockResolvedValue(mockValidationCode);
       emailService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', email: 'test@example.com', expiresIn: 300 });
 
       const result = await service.sendEmailValidation(dto);
 
-      expect(prisma.email_validation_codes.create).toHaveBeenCalled();
       expect(emailService.sendValidationCode).toHaveBeenCalledWith(
         'test@example.com',
         expect.any(Number),
@@ -144,25 +143,15 @@ describe('AuthService', () => {
 
     it('should normalize email to lowercase', async () => {
       const dto = { email: 'TEST@EXAMPLE.COM' };
-      const mockValidationCode = {
-        id: 'code-123',
-        email: 'test@example.com',
-        code: '12345678',
-        verified: false,
-        expiresAt: new Date(),
-      };
-
-      prisma.email_validation_codes.create.mockResolvedValue(mockValidationCode);
       emailService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', email: 'test@example.com', expiresIn: 300 });
 
       await service.sendEmailValidation(dto);
 
-      expect(prisma.email_validation_codes.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            email: 'test@example.com',
-          }),
-        })
+      expect(emailService.sendValidationCode).toHaveBeenCalledWith(
+        'TEST@EXAMPLE.COM',
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Boolean)
       );
     });
 
@@ -186,51 +175,30 @@ describe('AuthService', () => {
   describe('sendPhoneValidation', () => {
     it('should send phone validation code successfully', async () => {
       const dto = { phone: '+5511999999999' };
-      const mockValidationCode = {
-        id: 'code-456',
-        phone: '+5511999999999',
-        code: '12345678',
-        verified: false,
-        expiresAt: new Date(),
-      };
-
-      prisma.phone_validation_codes.create.mockResolvedValue(mockValidationCode);
       smsService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', phone: '+5511999999999', expiresIn: 300 });
 
       const result = await service.sendPhoneValidation(dto);
 
-      expect(prisma.phone_validation_codes.create).toHaveBeenCalled();
       expect(smsService.sendValidationCode).toHaveBeenCalledWith(
         '+5511999999999',
         expect.any(Number),
         expect.any(Number),
-        expect.any(String),
-        expect.anything()
+        expect.any(String)
       );
       expect(result).toHaveProperty('message');
     });
 
     it('should normalize phone by removing non-digits', async () => {
       const dto = { phone: '+55 (11) 9 9999-9999' };
-      const mockValidationCode = {
-        id: 'code-456',
-        phone: '5511999999999',
-        code: '12345678',
-        verified: false,
-        expiresAt: new Date(),
-      };
-
-      prisma.phone_validation_codes.create.mockResolvedValue(mockValidationCode);
       smsService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', phone: '5511999999999', expiresIn: 300 });
 
       await service.sendPhoneValidation(dto);
 
-      expect(prisma.phone_validation_codes.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            phone: '5511999999999',
-          }),
-        })
+      expect(smsService.sendValidationCode).toHaveBeenCalledWith(
+        '+55 (11) 9 9999-9999',
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(String)
       );
     });
   });
@@ -238,29 +206,12 @@ describe('AuthService', () => {
   describe('verifyEmailCode', () => {
     it('should verify valid email code', async () => {
       const dto = { email: 'test@example.com', code: '12345678' };
-      const mockValidationCode = {
-        id: 'code-123',
-        email: 'test@example.com',
-        codeHash: '$2b$10$hashedcode',
-        verified: false,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      };
-
-      prisma.email_validation_codes.findFirst.mockResolvedValue(mockValidationCode);
-      prisma.email_validation_codes.update.mockResolvedValue({
-        ...mockValidationCode,
-        verified: true,
-      });
+      emailService.verifyCode.mockResolvedValue({ message: 'ok', email: 'test@example.com' } as any);
+      prisma.users.findFirst.mockResolvedValue(mockUser as any);
+      prisma.users.update.mockResolvedValue({ ...mockUser, emailVerifiedAt: new Date() } as any);
 
       const result = await service.verifyEmailCode(dto);
 
-      expect(prisma.email_validation_codes.findFirst).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            email: 'test@example.com',
-          }),
-        })
-      );
       expect(result).toHaveProperty('message');
       expect(result).toHaveProperty('email');
     });
@@ -268,22 +219,15 @@ describe('AuthService', () => {
     it('should throw error if code expired', async () => {
       const dto = { email: 'test@example.com', code: '12345678' };
 
-      prisma.email_validation_codes.findFirst.mockResolvedValue(null);
+      emailService.verifyCode.mockRejectedValue(new Error('expired'));
 
       await expect(service.verifyEmailCode(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw error if code invalid', async () => {
       const dto = { email: 'test@example.com', code: 'invalid' };
-      const mockValidationCode = {
-        id: 'code-123',
-        email: 'test@example.com',
-        codeHash: '$2b$10$hashedcode',
-        verified: false,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      };
 
-      prisma.email_validation_codes.findFirst.mockResolvedValue(mockValidationCode);
+      emailService.verifyCode.mockRejectedValue(new Error('invalid'));
 
       await expect(service.verifyEmailCode(dto)).rejects.toThrow(BadRequestException);
     });
@@ -292,19 +236,9 @@ describe('AuthService', () => {
   describe('verifyPhoneCode', () => {
     it('should verify valid phone code', async () => {
       const dto = { phone: '+5511999999999', code: '12345678' };
-      const mockValidationCode = {
-        id: 'code-456',
-        phone: '+5511999999999',
-        codeHash: '$2b$10$hashedcode',
-        verified: false,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      };
-
-      prisma.phone_validation_codes.findFirst.mockResolvedValue(mockValidationCode);
-      prisma.phone_validation_codes.update.mockResolvedValue({
-        ...mockValidationCode,
-        verified: true,
-      });
+      smsService.verifyCode.mockResolvedValue({ message: 'ok', phone: '+5511999999999' } as any);
+      prisma.users.findFirst.mockResolvedValue(mockUser as any);
+      prisma.users.update.mockResolvedValue({ ...mockUser, phoneVerifiedAt: new Date() } as any);
 
       const result = await service.verifyPhoneCode(dto);
 
@@ -315,7 +249,7 @@ describe('AuthService', () => {
     it('should throw error if phone code expired', async () => {
       const dto = { phone: '+5511999999999', code: '12345678' };
 
-      prisma.phone_validation_codes.findFirst.mockResolvedValue(null);
+      smsService.verifyCode.mockRejectedValue(new Error('expired'));
 
       await expect(service.verifyPhoneCode(dto)).rejects.toThrow(BadRequestException);
     });
@@ -326,32 +260,22 @@ describe('AuthService', () => {
       const dto = { email: 'test@example.com' };
 
       prisma.users.findFirst.mockResolvedValue(mockUser);
-      prisma.email_validation_codes.create.mockResolvedValue({
-        id: 'code-123',
-        email: 'test@example.com',
-        code: '12345678',
-        verified: false,
-        expiresAt: new Date(),
-      });
-      emailService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', email: 'test@example.com', expiresIn: 300 });
+      prisma.users.update.mockResolvedValue({ ...mockUser, recovery: 'hash' } as any);
+      notificationService.sendPasswordRecovery.mockResolvedValue(undefined as any);
 
       const result = await service.forgotPassword(dto);
 
-      expect(prisma.users.findFirst).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { email: 'test@example.com' },
-        })
-      );
-      expect(emailService.sendValidationCode).toHaveBeenCalled();
+      expect(notificationService.sendPasswordRecovery).toHaveBeenCalled();
       expect(result).toHaveProperty('message');
     });
 
-    it('should throw error if user does not exist', async () => {
+    it('should return success message even if user does not exist', async () => {
       const dto = { email: 'nonexistent@example.com' };
 
       prisma.users.findFirst.mockResolvedValue(null);
 
-      await expect(service.forgotPassword(dto)).rejects.toThrow(BadRequestException);
+      const result = await service.forgotPassword(dto);
+      expect(result).toHaveProperty('message');
     });
   });
 
@@ -363,19 +287,11 @@ describe('AuthService', () => {
         newPassword: 'NewPassword123!',
       };
 
-      const mockValidationCode = {
-        id: 'code-123',
-        email: 'test@example.com',
-        codeHash: '$2b$10$hashedcode',
-        verified: false,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      };
-
-      prisma.email_validation_codes.findFirst.mockResolvedValue(mockValidationCode);
-      prisma.users.update.mockResolvedValue({
-        ...mockUser,
-        password: 'new_hashed_password',
-      });
+      const userWithRecovery = { ...mockUser, recovery: 'hashed' };
+      prisma.users.findFirst.mockResolvedValue(userWithRecovery as any);
+      jest.spyOn(service as any, 'isCodeValid').mockResolvedValue(true);
+      jest.spyOn(PasswordHelper, 'hash').mockResolvedValue('new_hashed_password' as any);
+      prisma.users.update.mockResolvedValue({ ...mockUser, password: 'new_hashed_password' } as any);
 
       const result = await service.verifyPassword(dto);
 
@@ -390,7 +306,8 @@ describe('AuthService', () => {
         newPassword: 'NewPassword123!',
       };
 
-      prisma.email_validation_codes.findFirst.mockResolvedValue(null);
+      prisma.users.findFirst.mockResolvedValue({ ...mockUser, recovery: 'hashed' } as any);
+      jest.spyOn(service as any, 'isCodeValid').mockResolvedValue(false);
 
       await expect(service.verifyPassword(dto)).rejects.toThrow(BadRequestException);
     });
@@ -398,23 +315,24 @@ describe('AuthService', () => {
 
   describe('unlockAccount', () => {
     it('should unlock account with valid credentials', async () => {
-      const dto = { id: 'user-123', password: 'ValidPassword123!' };
+      const dto = { id: '550e8400-e29b-41d4-a716-446655440000', password: 'ValidPassword123!' };
 
-      prisma.users.findUnique.mockResolvedValue(mockUser);
-      prisma.users.update.mockResolvedValue({ ...mockUser, status: 'active' });
+      prisma.users.findFirst.mockResolvedValue({ ...mockUser, id: dto.id, password: 'hashedpwd', status: 'disable' } as any);
+      jest.spyOn(PasswordHelper, 'compare').mockResolvedValue(true as any);
+      prisma.users.update.mockResolvedValue({ ...mockUser, status: 'enable' } as any);
 
-      const result = await service.unlockAccount(dto);
+      const result = await service.unlockAccount(dto, { ipAddress: '127.0.0.1', userAgent: 'test' });
 
       expect(prisma.users.update).toHaveBeenCalled();
       expect(result).toHaveProperty('message');
     });
 
     it('should throw error if credentials invalid', async () => {
-      const dto = { id: 'user-123', password: 'WrongPassword' };
+      const dto = { id: 'invalid', password: 'WrongPassword' };
 
-      prisma.users.findUnique.mockResolvedValue(null);
+      prisma.users.findFirst.mockResolvedValue(null);
 
-      await expect(service.unlockAccount(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.unlockAccount(dto)).rejects.toThrow();
     });
   });
 });

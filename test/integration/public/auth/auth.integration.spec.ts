@@ -1,8 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { AuthController } from '../../../../src/public/auth/controllers/auth.controller';
-import { AuthService } from '../../../../src/public/auth/services/auth.service';
 import { SignupService } from '../../../../src/public/auth/services/signup.service';
+import { SigninService } from '../../../../src/public/auth/services/signin.service';
+import { EmailValidationService } from '../../../../src/public/auth/services/email-validation.service';
+import { PhoneValidationService } from '../../../../src/public/auth/services/phone-validation.service';
+import { PasswordRecoveryService } from '../../../../src/public/auth/services/password-recovery.service';
+import { TokenService } from '../../../../src/public/auth/services/token.service';
 import { PrismaService } from '../../../../src/shared/prisma/prisma.service';
 import { JwtService } from '../../../../src/shared/jwt/jwt.service';
 import { EmailService } from '../../../../src/shared/email/email.service';
@@ -19,9 +23,15 @@ import { AuthMapper } from '../../../../src/public/auth/mappers/auth.mapper';
 
 describe('Auth Integration Tests (Controller + Service)', () => {
   let controller: AuthController;
-  let authService: AuthService;
   let signupService: SignupService;
-  let prisma: jest.Mocked<PrismaService>;
+  let userModel: jest.Mocked<AuthUserModel>;
+  let validationCodeModel: jest.Mocked<ValidationCodeModel>;
+  let signinService: jest.Mocked<SigninService>;
+  let emailValidationService: jest.Mocked<EmailValidationService>;
+  let phoneValidationService: jest.Mocked<PhoneValidationService>;
+  let passwordRecoveryService: jest.Mocked<PasswordRecoveryService>;
+  let tokenService: jest.Mocked<TokenService>;
+  let prisma: any;
   let jwtService: jest.Mocked<JwtService>;
   let emailService: jest.Mocked<EmailService>;
   let smsService: jest.Mocked<SmsService>;
@@ -45,6 +55,27 @@ describe('Auth Integration Tests (Controller + Service)', () => {
     createdAt: new Date(),
   };
 
+  const prismaUser: any = {
+    number: 1,
+    id: mockNewUser.id,
+    email: mockNewUser.email,
+    phone: mockNewUser.phone,
+    name: `${mockNewUser.firstName} ${mockNewUser.lastName}`,
+    firstName: mockNewUser.firstName,
+    lastName: mockNewUser.lastName,
+    status: 'pending',
+    access: 'user',
+    isBlocked: false,
+    blockedAt: null,
+    blockedReason: null,
+    isDisabled: false,
+    disableReason: null,
+    language: 'pt',
+    onboardingState: { completedSteps: [], needsCorrection: [] },
+    createdAt: mockNewUser.createdAt,
+    updatedAt: new Date(),
+  };
+
   beforeEach(async () => {
     prisma = {
       users: {
@@ -52,6 +83,9 @@ describe('Auth Integration Tests (Controller + Service)', () => {
         findUnique: jest.fn(),
         create: jest.fn(),
         update: jest.fn(),
+      },
+      devices: {
+        findFirst: jest.fn(),
       },
       email_validation_codes: {
         findFirst: jest.fn(),
@@ -65,7 +99,7 @@ describe('Auth Integration Tests (Controller + Service)', () => {
         update: jest.fn(),
         deleteMany: jest.fn(),
       },
-    } as unknown as jest.Mocked<PrismaService>;
+    } as any;
 
     jwtService = {
       generateToken: jest.fn(),
@@ -107,28 +141,50 @@ describe('Auth Integration Tests (Controller + Service)', () => {
       getVersion: jest.fn(),
     } as unknown as jest.Mocked<SystemVersionService>;
 
-    const userModel = {
+    userModel = {
       exists: jest.fn(),
       create: jest.fn(),
       findByEmail: jest.fn(),
     } as unknown as jest.Mocked<AuthUserModel>;
+    userModel.exists.mockResolvedValue(false as any);
+    userModel.create.mockResolvedValue(mockNewUser as any);
 
-    const validationCodeModel = {
+    validationCodeModel = {
       getValidatedEmailCode: jest.fn(),
       getValidatedPhoneCode: jest.fn(),
       deleteEmailValidationCodes: jest.fn(),
       deletePhoneValidationCodes: jest.fn(),
     } as unknown as jest.Mocked<ValidationCodeModel>;
+    validationCodeModel.getValidatedEmailCode.mockResolvedValue({ verified: true } as any);
+    validationCodeModel.getValidatedPhoneCode.mockResolvedValue({ verified: true } as any);
+    prisma.devices.findFirst.mockResolvedValue(null as any);
 
     const authMapper = {
       toSignupResponseDto: jest.fn(),
+      toSignupDeviceRequiredResponseDto: jest.fn(),
     } as unknown as jest.Mocked<AuthMapper>;
+    authMapper.toSignupResponseDto.mockReturnValue({ user: mockNewUser, accessToken: 'token', expiresIn: 3600 } as any);
+    authMapper.toSignupDeviceRequiredResponseDto.mockReturnValue({ user: mockNewUser, accessToken: 'token', expiresIn: 3600, deviceRequired: true } as any);
+
+    signinService = { signin: jest.fn() } as unknown as jest.Mocked<SigninService>;
+    emailValidationService = { sendEmailValidation: jest.fn(), verifyEmailCode: jest.fn() } as unknown as jest.Mocked<EmailValidationService>;
+    phoneValidationService = { sendPhoneValidation: jest.fn(), verifyPhoneCode: jest.fn() } as unknown as jest.Mocked<PhoneValidationService>;
+    passwordRecoveryService = {
+      forgotPassword: jest.fn(),
+      verifyPassword: jest.fn(),
+      unlockAccount: jest.fn(),
+    } as unknown as jest.Mocked<PasswordRecoveryService>;
+    tokenService = { getToken: jest.fn() } as unknown as jest.Mocked<TokenService>;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
-        AuthService,
         SignupService,
+        { provide: SigninService, useValue: signinService },
+        { provide: EmailValidationService, useValue: emailValidationService },
+        { provide: PhoneValidationService, useValue: phoneValidationService },
+        { provide: PasswordRecoveryService, useValue: passwordRecoveryService },
+        { provide: TokenService, useValue: tokenService },
         { provide: PrismaService, useValue: prisma },
         { provide: JwtService, useValue: jwtService },
         { provide: EmailService, useValue: emailService },
@@ -146,27 +202,30 @@ describe('Auth Integration Tests (Controller + Service)', () => {
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
     signupService = module.get<SignupService>(SignupService);
   });
 
   describe('Signup flow (Controller → Service → Prisma)', () => {
     it('should complete full signup flow successfully', async () => {
-      prisma.users.findFirst.mockResolvedValue(null);
+      userModel.exists?.mockResolvedValue?.(false as any);
+      userModel.create?.mockResolvedValue?.(prismaUser as any);
+      prisma.users.findFirst.mockResolvedValue(null as any);
 
       prisma.email_validation_codes.findFirst.mockResolvedValue({
         email: 'newuser@example.com',
         verified: true,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      });
+      } as any);
 
       prisma.phone_validation_codes.findFirst.mockResolvedValue({
         phone: '+5511999999999',
         verified: true,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      });
+      } as any);
 
-      prisma.users.create.mockResolvedValue(mockNewUser);
+      prisma.users.create.mockResolvedValue(prismaUser as any);
+      prisma.users.create.mockResolvedValue(prismaUser as any);
+      prisma.users.create.mockResolvedValue(prismaUser as any);
 
       jwtService.generateToken.mockResolvedValue('jwt_token_123');
 
@@ -176,17 +235,19 @@ describe('Auth Integration Tests (Controller + Service)', () => {
       expect(result).toHaveProperty('user');
       expect(result).toHaveProperty('accessToken');
 
-      expect(prisma.users.create).toHaveBeenCalled();
-      expect(prisma.email_validation_codes.deleteMany).toHaveBeenCalled();
-      expect(prisma.phone_validation_codes.deleteMany).toHaveBeenCalled();
+      expect(userModel.create).toHaveBeenCalled();
+      expect(validationCodeModel.deleteEmailValidationCodes).toHaveBeenCalledWith('newuser@example.com');
+      expect(validationCodeModel.deletePhoneValidationCodes).toHaveBeenCalledWith('5511999999999');
 
       expect(jwtService.generateToken).toHaveBeenCalled();
     });
 
     it('should validate email before signup', async () => {
-      prisma.users.findFirst.mockResolvedValue(null);
+      userModel.exists?.mockResolvedValue?.(false as any);
+      prisma.users.findFirst.mockResolvedValue(null as any);
 
-      prisma.email_validation_codes.findFirst.mockResolvedValue(null);
+      validationCodeModel.getValidatedEmailCode.mockResolvedValue(null as any);
+      validationCodeModel.getValidatedPhoneCode.mockResolvedValue({ verified: true } as any);
 
       await expect(controller.signup(mockSignupDto)).rejects.toThrow(BadRequestException);
 
@@ -194,14 +255,11 @@ describe('Auth Integration Tests (Controller + Service)', () => {
     });
 
     it('should validate phone before signup', async () => {
-      prisma.users.findFirst.mockResolvedValue(null);
+      userModel.exists?.mockResolvedValue?.(false as any);
+      prisma.users.findFirst.mockResolvedValue(null as any);
 
-      prisma.email_validation_codes.findFirst.mockResolvedValue({
-        verified: true,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      });
-
-      prisma.phone_validation_codes.findFirst.mockResolvedValue(null);
+      validationCodeModel.getValidatedEmailCode.mockResolvedValue({ verified: true } as any);
+      validationCodeModel.getValidatedPhoneCode.mockResolvedValue(null as any);
 
       await expect(controller.signup(mockSignupDto)).rejects.toThrow(BadRequestException);
 
@@ -209,7 +267,10 @@ describe('Auth Integration Tests (Controller + Service)', () => {
     });
 
     it('should prevent duplicate user registration', async () => {
-      prisma.users.findFirst.mockResolvedValue(mockNewUser);
+      userModel.exists?.mockResolvedValue?.(true as any);
+      validationCodeModel.getValidatedEmailCode.mockResolvedValue({ verified: true } as any);
+      validationCodeModel.getValidatedPhoneCode.mockResolvedValue({ verified: true } as any);
+      prisma.users.findFirst.mockResolvedValue(mockNewUser as any);
 
       await expect(controller.signup(mockSignupDto)).rejects.toThrow(BadRequestException);
 
@@ -217,26 +278,24 @@ describe('Auth Integration Tests (Controller + Service)', () => {
     });
 
     it('should clean up validation codes after signup', async () => {
-      prisma.users.findFirst.mockResolvedValue(null);
+      userModel.exists?.mockResolvedValue?.(false as any);
+      userModel.create?.mockResolvedValue?.(prismaUser as any);
+      prisma.users.findFirst.mockResolvedValue(null as any);
       prisma.email_validation_codes.findFirst.mockResolvedValue({
         verified: true,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      });
+      } as any);
       prisma.phone_validation_codes.findFirst.mockResolvedValue({
         verified: true,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      });
-      prisma.users.create.mockResolvedValue(mockNewUser);
+      } as any);
+      userModel.create.mockResolvedValue(prismaUser);
       jwtService.generateToken.mockResolvedValue('jwt_token_123');
 
       await controller.signup(mockSignupDto);
 
-      expect(prisma.email_validation_codes.deleteMany).toHaveBeenCalledWith({
-        where: { email: 'newuser@example.com' },
-      });
-      expect(prisma.phone_validation_codes.deleteMany).toHaveBeenCalledWith({
-        where: { phone: '+5511999999999' },
-      });
+      expect(validationCodeModel.deleteEmailValidationCodes).toHaveBeenCalledWith('newuser@example.com');
+      expect(validationCodeModel.deletePhoneValidationCodes).toHaveBeenCalledWith('5511999999999');
     });
 
     it('should normalize email and phone in signup flow', async () => {
@@ -246,30 +305,24 @@ describe('Auth Integration Tests (Controller + Service)', () => {
         phone: '+55 (11) 9 9999-9999',
       };
 
-      prisma.users.findFirst.mockResolvedValue(null);
+      userModel.exists?.mockResolvedValue?.(false as any);
+      userModel.create?.mockResolvedValue?.(prismaUser as any);
+      prisma.users.findFirst.mockResolvedValue(null as any);
       prisma.email_validation_codes.findFirst.mockResolvedValue({
         verified: true,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      });
+      } as any);
       prisma.phone_validation_codes.findFirst.mockResolvedValue({
         verified: true,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      });
-      prisma.users.create.mockResolvedValue(mockNewUser);
+      } as any);
+      userModel.create.mockResolvedValue(prismaUser as any);
+      userModel.create.mockResolvedValue(prismaUser as any);
       jwtService.generateToken.mockResolvedValue('jwt_token_123');
 
       await controller.signup(dtoWithFormattedData);
 
-      expect(prisma.users.findFirst).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            OR: expect.arrayContaining([
-              expect.objectContaining({ email: 'newuser@example.com' }),
-              expect.objectContaining({ phone: '5511999999999' }),
-            ]),
-          }),
-        })
-      );
+      expect(userModel.exists).toHaveBeenCalledWith('newuser@example.com', '5511999999999');
     });
   });
 
@@ -277,29 +330,11 @@ describe('Auth Integration Tests (Controller + Service)', () => {
     it('should send email validation code via service', async () => {
       const dto = { email: 'test@example.com' };
 
-      prisma.email_validation_codes.create.mockResolvedValue({
-        id: 'code-123',
-        email: 'test@example.com',
-        code: '12345678',
-        verified: false,
-        expiresAt: new Date(),
-      });
-      emailService.sendValidationCode.mockResolvedValue({ 
-        success: true, 
-        message: 'Sent', 
-        email: 'test@example.com', 
-        expiresIn: 300 
-      });
+      emailValidationService.sendEmailValidation.mockResolvedValue({ message: 'Sent', debug: '123' } as any);
 
       const result = await controller.sendEmailValidation(dto);
 
-      expect(prisma.email_validation_codes.create).toHaveBeenCalled();
-      expect(emailService.sendValidationCode).toHaveBeenCalledWith(
-        'test@example.com',
-        expect.any(Number),
-        expect.any(Number),
-        expect.any(Boolean)
-      );
+      expect(emailValidationService.sendEmailValidation).toHaveBeenCalledWith(dto);
       expect(result).toHaveProperty('message');
     });
   });
@@ -308,30 +343,11 @@ describe('Auth Integration Tests (Controller + Service)', () => {
     it('should send phone validation code via service', async () => {
       const dto = { phone: '+5511999999999' };
 
-      prisma.phone_validation_codes.create.mockResolvedValue({
-        id: 'code-456',
-        phone: '+5511999999999',
-        code: '12345678',
-        verified: false,
-        expiresAt: new Date(),
-      });
-      smsService.sendValidationCode.mockResolvedValue({ 
-        success: true, 
-        message: 'Sent', 
-        phone: '+5511999999999', 
-        expiresIn: 300 
-      });
+      phoneValidationService.sendPhoneValidation.mockResolvedValue({ message: 'Sent', debug: '456' } as any);
 
       const result = await controller.sendPhoneValidation(dto);
 
-      expect(prisma.phone_validation_codes.create).toHaveBeenCalled();
-      expect(smsService.sendValidationCode).toHaveBeenCalledWith(
-        '+5511999999999',
-        expect.any(Number),
-        expect.any(Number),
-        expect.any(String),
-        expect.anything()
-      );
+      expect(phoneValidationService.sendPhoneValidation).toHaveBeenCalledWith(dto);
       expect(result).toHaveProperty('message');
     });
   });

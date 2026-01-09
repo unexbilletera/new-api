@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClientsController } from '../../../../src/backoffice/clients/controllers/clients.controller';
 import { ClientsService } from '../../../../src/backoffice/clients/services/clients.service';
+import { BackofficeAuthGuard } from '../../../../src/shared/guards/backoffice-auth.guard';
 
 describe('ClientsController', () => {
   let controller: ClientsController;
@@ -25,7 +26,10 @@ describe('ClientsController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ClientsController],
       providers: [{ provide: ClientsService, useValue: service }],
-    }).compile();
+    })
+      .overrideGuard(BackofficeAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get(ClientsController);
   });

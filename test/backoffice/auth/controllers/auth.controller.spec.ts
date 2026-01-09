@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../../../../src/backoffice/auth/controllers/auth.controller';
 import { AuthService } from '../../../../src/backoffice/auth/services/auth.service';
+import { BackofficeAuthGuard } from '../../../../src/shared/guards/backoffice-auth.guard';
 
 describe('BackofficeAuthController', () => {
   let controller: AuthController;
@@ -39,7 +40,10 @@ describe('BackofficeAuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [{ provide: AuthService, useValue: service }],
-    }).compile();
+    })
+      .overrideGuard(BackofficeAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get(AuthController);
   });
@@ -51,6 +55,8 @@ describe('BackofficeAuthController', () => {
         accessToken: 'jwt_token_123',
         expiresIn: 3600,
         user: mockUserResponse,
+        message: 'Login performed successfully',
+        code: 'LOGIN_SUCCESS',
       };
       service.login.mockResolvedValue(response);
 
@@ -66,6 +72,8 @@ describe('BackofficeAuthController', () => {
         accessToken: 'jwt_token_abc',
         expiresIn: 3600,
         user: mockUserResponse,
+        message: 'Login performed successfully',
+        code: 'LOGIN_SUCCESS',
       };
       service.login.mockResolvedValue(response);
 
@@ -82,6 +90,8 @@ describe('BackofficeAuthController', () => {
         accessToken: 'jwt_token_123',
         expiresIn: 3600,
         user: mockUserResponse,
+        message: 'Login performed successfully',
+        code: 'LOGIN_SUCCESS',
       };
       service.login.mockResolvedValue(response);
 
@@ -104,6 +114,8 @@ describe('BackofficeAuthController', () => {
         accessToken: 'jwt_token_123',
         expiresIn: 3600,
         user: mockUserResponse,
+        message: 'Login performed successfully',
+        code: 'LOGIN_SUCCESS',
       };
       service.login.mockResolvedValue(response);
 

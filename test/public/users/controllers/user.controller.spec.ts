@@ -12,7 +12,7 @@ import { IdentityService } from '../../../../src/public/users/services/identity.
 import { AccountService } from '../../../../src/public/users/services/account.service';
 import { OnboardingStatusService } from '../../../../src/public/users/services/onboarding-status.service';
 import { MessagingService } from '../../../../src/public/users/services/messaging.service';
-import { AuthGuard } from '../../../../src/shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../../src/shared/guards/jwt-auth.guard';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -107,11 +107,11 @@ describe('UserController', () => {
         { provide: AccountService, useValue: accountService },
         { provide: OnboardingStatusService, useValue: onboardingStatusService },
         { provide: MessagingService, useValue: messagingService },
-        { provide: AuthGuard, useValue: mockAuthGuard },
+        { provide: JwtAuthGuard, useValue: mockAuthGuard },
         { provide: JwtService, useValue: mockJwtService },
       ],
     })
-      .overrideGuard(AuthGuard)
+      .overrideGuard(JwtAuthGuard)
       .useValue(mockAuthGuard)
       .compile();
 
@@ -451,7 +451,7 @@ describe('UserController', () => {
       };
       onboardingStatusService.onboarding.mockResolvedValue(response);
 
-      const result = await controller.onboarding(mockUser, step);
+      const result = await controller.onboardingWithStep(mockUser, step);
 
       expect(result).toEqual(response);
       expect(onboardingStatusService.onboarding).toHaveBeenCalledWith(mockUser.id, step);

@@ -1,29 +1,43 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
 import { AuthController, SecurityController } from '../../../../src/public/auth/controllers/auth.controller';
-import { AuthService } from '../../../../src/public/auth/services/auth.service';
+import { SignupService } from '../../../../src/public/auth/services/signup.service';
+import { SigninService } from '../../../../src/public/auth/services/signin.service';
+import { EmailValidationService } from '../../../../src/public/auth/services/email-validation.service';
+import { PhoneValidationService } from '../../../../src/public/auth/services/phone-validation.service';
+import { PasswordRecoveryService } from '../../../../src/public/auth/services/password-recovery.service';
+import { TokenService } from '../../../../src/public/auth/services/token.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let security: SecurityController;
-  let service: jest.Mocked<AuthService>;
+  let signupService: jest.Mocked<SignupService>;
+  let signinService: jest.Mocked<SigninService>;
+  let emailValidationService: jest.Mocked<EmailValidationService>;
+  let phoneValidationService: jest.Mocked<PhoneValidationService>;
+  let passwordRecoveryService: jest.Mocked<PasswordRecoveryService>;
+  let tokenService: jest.Mocked<TokenService>;
   let mockRequest: Partial<Request>;
 
   const mockUser = { id: '1', email: 'test@example.com', firstName: 'John', lastName: 'Doe', phone: '+5511999999999' };
 
   beforeEach(async () => {
-    service = {
-      signup: jest.fn(),
-      signin: jest.fn(),
+    signupService = { signup: jest.fn() } as unknown as jest.Mocked<SignupService>;
+    signinService = { signin: jest.fn() } as unknown as jest.Mocked<SigninService>;
+    emailValidationService = {
       sendEmailValidation: jest.fn(),
       verifyEmailCode: jest.fn(),
+    } as unknown as jest.Mocked<EmailValidationService>;
+    phoneValidationService = {
       sendPhoneValidation: jest.fn(),
       verifyPhoneCode: jest.fn(),
+    } as unknown as jest.Mocked<PhoneValidationService>;
+    passwordRecoveryService = {
       forgotPassword: jest.fn(),
       verifyPassword: jest.fn(),
       unlockAccount: jest.fn(),
-      getToken: jest.fn(),
-    } as unknown as jest.Mocked<AuthService>;
+    } as unknown as jest.Mocked<PasswordRecoveryService>;
+    tokenService = { getToken: jest.fn() } as unknown as jest.Mocked<TokenService>;
 
     mockRequest = {
       headers: { 'user-agent': 'test-agent' },
@@ -33,7 +47,14 @@ describe('AuthController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController, SecurityController],
-      providers: [{ provide: AuthService, useValue: service }],
+      providers: [
+        { provide: SignupService, useValue: signupService },
+        { provide: SigninService, useValue: signinService },
+        { provide: EmailValidationService, useValue: emailValidationService },
+        { provide: PhoneValidationService, useValue: phoneValidationService },
+        { provide: PasswordRecoveryService, useValue: passwordRecoveryService },
+        { provide: TokenService, useValue: tokenService },
+      ],
     }).compile();
 
     controller = module.get(AuthController);
@@ -48,20 +69,20 @@ describe('AuthController', () => {
         accessToken: 't',
         expiresIn: 3600,
       };
-      service.signup.mockResolvedValue(payload);
+      signupService.signup.mockResolvedValue(payload);
 
       const result = await controller.signup(dto);
 
       expect(result).toEqual(payload);
-      expect(service.signup).toHaveBeenCalledWith(dto);
+      expect(signupService.signup).toHaveBeenCalledWith(dto);
     });
 
     it('should propagate service errors', async () => {
       const dto = { email: 'e@mail.com' } as any;
-      service.signup.mockRejectedValue(new Error('signup failed'));
+      signupService.signup.mockRejectedValue(new Error('signup failed'));
 
       await expect(controller.signup(dto)).rejects.toThrow('signup failed');
-      expect(service.signup).toHaveBeenCalledWith(dto);
+      expect(signupService.signup).toHaveBeenCalledWith(dto);
     });
 
     it('should return user data with access token', async () => {
@@ -71,7 +92,7 @@ describe('AuthController', () => {
         accessToken: 'access_token_123',
         expiresIn: 3600,
       };
-      service.signup.mockResolvedValue(payload);
+      signupService.signup.mockResolvedValue(payload);
 
       const result = await controller.signup(dto);
 
@@ -92,12 +113,12 @@ describe('AuthController', () => {
         refreshToken: 'r',
         expiresIn: 3600,
       };
-      service.signin.mockResolvedValue(payload);
+      signinService.signin.mockResolvedValue(payload);
 
       const result = await controller.signin(dto, mockRequest as Request);
 
       expect(result).toEqual(payload);
-      expect(service.signin).toHaveBeenCalledWith(dto, { ipAddress: '127.0.0.1', userAgent: 'test-agent' });
+      expect(signinService.signin).toHaveBeenCalledWith(dto, { ipAddress: '127.0.0.1', userAgent: 'test-agent' });
     });
 
     it('should return user data with access and refresh tokens', async () => {
@@ -108,7 +129,7 @@ describe('AuthController', () => {
         refreshToken: 'def',
         expiresIn: 3600,
       };
-      service.signin.mockResolvedValue(payload);
+      signinService.signin.mockResolvedValue(payload);
 
       const result = await controller.signin(dto, mockRequest as Request);
 
@@ -121,7 +142,7 @@ describe('AuthController', () => {
 
     it('should propagate service errors', async () => {
       const dto = { identifier: 'user', password: 'wrong' } as any;
-      service.signin.mockRejectedValue(new Error('invalid credentials'));
+      signinService.signin.mockRejectedValue(new Error('invalid credentials'));
 
       await expect(controller.signin(dto, mockRequest as Request)).rejects.toThrow('invalid credentials');
     });
@@ -131,28 +152,28 @@ describe('AuthController', () => {
     it('sendEmailValidation should delegate to service', async () => {
       const dto = { email: 'test@example.com' } as any;
       const payload = { message: 'ok', debug: '123' };
-      service.sendEmailValidation.mockResolvedValue(payload);
+      emailValidationService.sendEmailValidation.mockResolvedValue(payload);
 
       const result = await controller.sendEmailValidation(dto);
 
       expect(result).toEqual(payload);
-      expect(service.sendEmailValidation).toHaveBeenCalledWith(dto);
+      expect(emailValidationService.sendEmailValidation).toHaveBeenCalledWith(dto);
     });
 
     it('verifyEmailCode should delegate to service', async () => {
       const dto = { email: 'test@example.com', code: '123456' } as any;
       const payload = { message: 'ok', email: 'test@example.com', nextStep: 'password' };
-      service.verifyEmailCode.mockResolvedValue(payload);
+      emailValidationService.verifyEmailCode.mockResolvedValue(payload);
 
       const result = await controller.verifyEmailCode(dto);
 
       expect(result).toEqual(payload);
-      expect(service.verifyEmailCode).toHaveBeenCalledWith(dto);
+      expect(emailValidationService.verifyEmailCode).toHaveBeenCalledWith(dto);
     });
 
     it('verifyEmailCode should propagate service errors', async () => {
       const dto = { email: 'test@example.com', code: 'invalid' } as any;
-      service.verifyEmailCode.mockRejectedValue(new Error('invalid code'));
+      emailValidationService.verifyEmailCode.mockRejectedValue(new Error('invalid code'));
 
       await expect(controller.verifyEmailCode(dto)).rejects.toThrow('invalid code');
     });
@@ -162,29 +183,29 @@ describe('AuthController', () => {
     it('sendPhoneValidation should delegate to service', async () => {
       const dto = { phone: '+5511999999999' } as any;
       const payload = { message: 'ok', debug: '456' };
-      service.sendPhoneValidation.mockResolvedValue(payload);
+      phoneValidationService.sendPhoneValidation.mockResolvedValue(payload);
 
       const result = await controller.sendPhoneValidation(dto);
 
       expect(result).toEqual(payload);
-      expect(service.sendPhoneValidation).toHaveBeenCalledWith(dto);
+      expect(phoneValidationService.sendPhoneValidation).toHaveBeenCalledWith(dto);
     });
 
     it('verifyPhoneCode should delegate to service', async () => {
       const dto = { phone: '+5511999999999', code: '123456' } as any;
       const payload = { message: 'ok', phone: '+5511999999999', nextStep: 'password' };
-      service.verifyPhoneCode.mockResolvedValue(payload);
+      phoneValidationService.verifyPhoneCode.mockResolvedValue(payload);
 
       const result = await controller.verifyPhoneCode(dto);
 
       expect(result).toEqual(payload);
-      expect(service.verifyPhoneCode).toHaveBeenCalledWith(dto);
+      expect(phoneValidationService.verifyPhoneCode).toHaveBeenCalledWith(dto);
     });
 
     it('verifyPhoneCode should return phone and next step', async () => {
       const dto = { phone: '+5511999999999', code: '123456' } as any;
       const payload = { message: 'ok', phone: '+5511999999999', nextStep: 'password' };
-      service.verifyPhoneCode.mockResolvedValue(payload);
+      phoneValidationService.verifyPhoneCode.mockResolvedValue(payload);
 
       const result = await controller.verifyPhoneCode(dto);
 
@@ -194,7 +215,7 @@ describe('AuthController', () => {
 
     it('verifyPhoneCode should propagate service errors', async () => {
       const dto = { phone: '+5511999999999', code: 'invalid' } as any;
-      service.verifyPhoneCode.mockRejectedValue(new Error('invalid code'));
+      phoneValidationService.verifyPhoneCode.mockRejectedValue(new Error('invalid code'));
 
       await expect(controller.verifyPhoneCode(dto)).rejects.toThrow('invalid code');
     });
@@ -204,28 +225,28 @@ describe('AuthController', () => {
     it('forgotPassword should delegate to service', async () => {
       const dto = { email: 'test@example.com' } as any;
       const payload = { message: 'ok', debug: '111' };
-      service.forgotPassword.mockResolvedValue(payload);
+      passwordRecoveryService.forgotPassword.mockResolvedValue(payload);
 
       const result = await controller.forgotPassword(dto);
 
       expect(result).toEqual(payload);
-      expect(service.forgotPassword).toHaveBeenCalledWith(dto);
+      expect(passwordRecoveryService.forgotPassword).toHaveBeenCalledWith(dto);
     });
 
     it('verify should delegate to service', async () => {
       const dto = { email: 'test@example.com', code: '123456', newPassword: 'newpass123' } as any;
       const payload = { message: 'ok' };
-      service.verifyPassword.mockResolvedValue(payload);
+      passwordRecoveryService.verifyPassword.mockResolvedValue(payload);
 
       const result = await controller.verify(dto);
 
       expect(result).toEqual(payload);
-      expect(service.verifyPassword).toHaveBeenCalledWith(dto);
+      expect(passwordRecoveryService.verifyPassword).toHaveBeenCalledWith(dto);
     });
 
     it('verify should propagate service errors', async () => {
       const dto = { email: 'test@example.com', code: 'invalid' } as any;
-      service.verifyPassword.mockRejectedValue(new Error('invalid code'));
+      passwordRecoveryService.verifyPassword.mockRejectedValue(new Error('invalid code'));
 
       await expect(controller.verify(dto)).rejects.toThrow('invalid code');
     });
@@ -235,23 +256,27 @@ describe('AuthController', () => {
     it('unlock should delegate to service', async () => {
       const dto = { id: 'user-123', password: 'Password123!' } as any;
       const payload = {
-        user: mockUser,
+        user: {
+          ...mockUser,
+          status: 'enable',
+          access: 'customer',
+        },
         accessToken: 'token',
         refreshToken: 'refresh',
         expiresIn: 3600,
         message: 'Account unlocked',
       };
-      service.unlockAccount.mockResolvedValue(payload);
+      passwordRecoveryService.unlockAccount.mockResolvedValue(payload);
 
       const result = await controller.unlock(dto, mockRequest as Request);
 
       expect(result).toEqual(payload);
-      expect(service.unlockAccount).toHaveBeenCalledWith(dto, { ipAddress: '127.0.0.1', userAgent: 'test-agent' });
+      expect(passwordRecoveryService.unlockAccount).toHaveBeenCalledWith(dto, { ipAddress: '127.0.0.1', userAgent: 'test-agent' });
     });
 
     it('unlock should propagate service errors', async () => {
       const dto = { id: 'user-123', password: 'Password123!' } as any;
-      service.unlockAccount.mockRejectedValue(new Error('unlock failed'));
+      passwordRecoveryService.unlockAccount.mockRejectedValue(new Error('unlock failed'));
 
       await expect(controller.unlock(dto, mockRequest as Request)).rejects.toThrow('unlock failed');
     });
@@ -260,17 +285,17 @@ describe('AuthController', () => {
   describe('SecurityController - getToken', () => {
     it('should delegate to service', async () => {
       const payload = { accessToken: 'token', tokenType: 'Bearer', expiresIn: 3600 };
-      service.getToken.mockResolvedValue(payload);
+      tokenService.getToken.mockResolvedValue(payload);
 
       const result = await security.getToken();
 
       expect(result).toEqual(payload);
-      expect(service.getToken).toHaveBeenCalled();
+      expect(tokenService.getToken).toHaveBeenCalled();
     });
 
     it('should return valid token response', async () => {
       const payload = { accessToken: 'token_abc123', tokenType: 'Bearer', expiresIn: 3600 };
-      service.getToken.mockResolvedValue(payload);
+      tokenService.getToken.mockResolvedValue(payload);
 
       const result = await security.getToken();
 
@@ -280,10 +305,10 @@ describe('AuthController', () => {
     });
 
     it('should propagate service errors', async () => {
-      service.getToken.mockRejectedValue(new Error('token failed'));
+      tokenService.getToken.mockRejectedValue(new Error('token failed'));
 
       await expect(security.getToken()).rejects.toThrow('token failed');
-      expect(service.getToken).toHaveBeenCalled();
+      expect(tokenService.getToken).toHaveBeenCalled();
     });
   });
 });

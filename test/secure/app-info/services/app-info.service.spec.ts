@@ -42,7 +42,7 @@ describe('AppInfoService', () => {
       ];
 
       const mockModules = [
-        { id: 'mod-1', key: 'darkMode', enabled: true, deletedAt: null },
+        { id: 'mod-1', name: 'darkMode', isActive: 1, deletedAt: null },
       ];
 
       prisma.system_config.findMany.mockResolvedValue(mockConfigs as any);
@@ -190,9 +190,9 @@ describe('AppInfoService', () => {
   describe('getFeatures', () => {
     it('should return feature flags from modules', async () => {
       const mockModules = [
-        { id: 'feat-1', key: 'darkMode', enabled: true, deletedAt: null },
-        { id: 'feat-2', key: 'notifications', enabled: true, deletedAt: null },
-        { id: 'feat-3', key: 'biometric', enabled: false, deletedAt: null },
+        { id: 'feat-1', name: 'darkMode', isActive: 1, deletedAt: null },
+        { id: 'feat-2', name: 'notifications', isActive: 1, deletedAt: null },
+        { id: 'feat-3', name: 'biometric', isActive: 0, deletedAt: null },
       ];
 
       prisma.modules.findMany.mockResolvedValue(mockModules as any);
@@ -200,7 +200,7 @@ describe('AppInfoService', () => {
       const result = await service.getFeatures();
 
       expect(typeof result).toBe('object');
-      expect(result['darkMode']).toBe(true);
+      expect(result['darkmode']).toBe(true);
       expect(result['notifications']).toBe(true);
       expect(result['biometric']).toBe(false);
     });
@@ -220,9 +220,9 @@ describe('AppInfoService', () => {
 
     it('should handle mixed enabled and disabled features', async () => {
       const mockModules = [
-        { id: 'feat-1', key: 'featureA', enabled: true, deletedAt: null },
-        { id: 'feat-2', key: 'featureB', enabled: false, deletedAt: null },
-        { id: 'feat-3', key: 'featureC', enabled: true, deletedAt: null },
+        { id: 'feat-1', name: 'featureA', isActive: 1, deletedAt: null },
+        { id: 'feat-2', name: 'featureB', isActive: 0, deletedAt: null },
+        { id: 'feat-3', name: 'featureC', isActive: 1, deletedAt: null },
       ];
 
       prisma.modules.findMany.mockResolvedValue(mockModules as any);

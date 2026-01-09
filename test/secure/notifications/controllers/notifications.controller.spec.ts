@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CanActivate } from '@nestjs/common';
 import { NotificationsController } from '../../../../src/secure/notifications/controllers/notifications.controller';
 import { NotificationsService } from '../../../../src/secure/notifications/services/notifications.service';
-import { AuthGuard } from '../../../../src/shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../../src/shared/guards/jwt-auth.guard';
 
 describe('NotificationsController', () => {
   let controller: NotificationsController;
@@ -30,10 +30,10 @@ describe('NotificationsController', () => {
       controllers: [NotificationsController],
       providers: [
         { provide: NotificationsService, useValue: service },
-        { provide: AuthGuard, useValue: mockAuthGuard },
+        { provide: JwtAuthGuard, useValue: mockAuthGuard },
       ],
     })
-      .overrideGuard(AuthGuard)
+      .overrideGuard(JwtAuthGuard)
       .useValue(mockAuthGuard)
       .compile();
 

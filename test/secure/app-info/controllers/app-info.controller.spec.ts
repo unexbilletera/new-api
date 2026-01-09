@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CanActivate } from '@nestjs/common';
 import { AppInfoController } from '../../../../src/secure/app-info/controllers/app-info.controller';
 import { AppInfoService } from '../../../../src/secure/app-info/services/app-info.service';
-import { AuthGuard } from '../../../../src/shared/guards/auth.guard';
+import { JwtAuthGuard } from '../../../../src/shared/guards/jwt-auth.guard';
 
 describe('AppInfoController', () => {
   let controller: AppInfoController;
@@ -25,10 +25,10 @@ describe('AppInfoController', () => {
       controllers: [AppInfoController],
       providers: [
         { provide: AppInfoService, useValue: service },
-        { provide: AuthGuard, useValue: mockAuthGuard },
+        { provide: JwtAuthGuard, useValue: mockAuthGuard },
       ],
     })
-      .overrideGuard(AuthGuard)
+      .overrideGuard(JwtAuthGuard)
       .useValue(mockAuthGuard)
       .compile();
 
