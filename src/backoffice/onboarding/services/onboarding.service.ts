@@ -1,5 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
+import { CronosService } from '../../../shared/cronos/cronos.service';
+import { BindService } from '../../../shared/bind/bind.service';
+import { MantecaService } from '../../../shared/manteca/manteca.service';
 import {
   ListOnboardingQueryDto,
   RejectUserDto,
@@ -7,10 +10,18 @@ import {
   RequestCorrectionDto,
   OnboardingUserDto,
 } from '../dto/onboarding.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class OnboardingService {
-  constructor(private prisma: PrismaService) {}  async listUsers(query: ListOnboardingQueryDto): Promise<{
+  private readonly logger = new Logger(OnboardingService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private cronosService: CronosService,
+    private bindService: BindService,
+    private mantecaService: MantecaService,
+  ) {}  async listUsers(query: ListOnboardingQueryDto): Promise<{
     data: OnboardingUserDto[];
     total: number;
     page: number;
