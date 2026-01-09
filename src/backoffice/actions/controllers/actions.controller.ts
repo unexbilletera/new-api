@@ -28,26 +28,26 @@ export class ActionsController {
   constructor(private readonly actionsService: ActionsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Listar ações/serviços disponíveis' })
-  @ApiQuery({ name: 'group', required: false, description: 'Grupo/módulo das ações' })
-  @ApiQuery({ name: 'search', required: false, description: 'Busca por nome ou descrição' })
-  @ApiQuery({ name: 'activeOnly', required: false, description: 'Apenas ações ativas' })
-  @ApiQuery({ name: 'page', required: false, description: 'Página' })
-  @ApiQuery({ name: 'limit', required: false, description: 'Limite por página' })
+  @ApiOperation({ summary: 'List available actions/services' })
+  @ApiQuery({ name: 'group', required: false, description: 'Action group/module' })
+  @ApiQuery({ name: 'search', required: false, description: 'Search by name or description' })
+  @ApiQuery({ name: 'activeOnly', required: false, description: 'Active actions only' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Limit per page' })
   @MinLevel(1)
   async listActions(@Query() query: ListActionsQueryDto) {
     return this.actionsService.listActions(query);
   }
 
   @Get('groups')
-  @ApiOperation({ summary: 'Listar grupos/módulos de ações' })
+  @ApiOperation({ summary: 'List action groups/modules' })
   @MinLevel(1)
   async listGroups() {
     return this.actionsService.listGroups();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obter ação por ID' })
+  @ApiOperation({ summary: 'Get action by ID' })
   @ApiParam({ name: 'id', description: 'ID da ação' })
   @MinLevel(1)
   async getAction(@Param('id') id: string) {
@@ -55,14 +55,14 @@ export class ActionsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Criar ação' })
+  @ApiOperation({ summary: 'Create action' })
   @MinLevel(3)
   async createAction(@Body() dto: CreateActionDto) {
     return this.actionsService.createAction(dto);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar ação' })
+  @ApiOperation({ summary: 'Update action' })
   @ApiParam({ name: 'id', description: 'ID da ação' })
   @MinLevel(3)
   async updateAction(@Param('id') id: string, @Body() dto: UpdateActionDto) {
@@ -78,7 +78,7 @@ export class ActionsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Deletar ação' })
+  @ApiOperation({ summary: 'Delete action' })
   @ApiParam({ name: 'id', description: 'ID da ação' })
   @MinLevel(3)
   async deleteAction(@Param('id') id: string) {
@@ -94,7 +94,7 @@ export class ActionsController {
 
   @Get('check/:userId/:actionName')
   @ApiOperation({ summary: 'Verificar se usuário pode executar ação' })
-  @ApiParam({ name: 'userId', description: 'ID do usuário' })
+  @ApiParam({ name: 'userId', description: 'User ID' })
   @ApiParam({ name: 'actionName', description: 'Nome da ação' })
   @MinLevel(1)
   async userCanPerformAction(

@@ -52,7 +52,7 @@ export class ActionsService {
     });
 
     if (!action) {
-      throw new NotFoundException('Ação não encontrada');
+      throw new NotFoundException('Action not found');
     }
 
     return action;
@@ -62,7 +62,7 @@ export class ActionsService {
     });
 
     if (existing) {
-      throw new ConflictException(`Ação '${dto.code}' já existe`);
+      throw new ConflictException(`Action '${dto.code}' already exists`);
     }
 
     return this.prisma.services_actions.create({
@@ -84,7 +84,7 @@ export class ActionsService {
     });
 
     if (!action) {
-      throw new NotFoundException('Ação não encontrada');
+      throw new NotFoundException('Action not found');
     }
 
     return this.prisma.services_actions.update({
@@ -102,14 +102,14 @@ export class ActionsService {
     });
 
     if (!action) {
-      throw new NotFoundException('Ação não encontrada');
+      throw new NotFoundException('Action not found');
     }
 
     await this.prisma.services_actions.delete({
       where: { id },
     });
 
-    return { success: true, message: 'Ação deletada com sucesso' };
+    return { success: true, message: 'Action deleted successfully' };
   }  async listGroups() {
     const actions = await this.prisma.services_actions.findMany({
       select: { moduleName: true },
@@ -123,7 +123,7 @@ export class ActionsService {
     });
 
     if (!action) {
-      throw new NotFoundException('Ação não encontrada');
+      throw new NotFoundException('Action not found');
     }
 
     return this.prisma.services_actions.update({
@@ -140,7 +140,7 @@ export class ActionsService {
 
     await Promise.all(updates);
 
-    return { success: true, message: 'Ações reordenadas com sucesso' };
+    return { success: true, message: 'Actions reordered successfully' };
   }  async userCanPerformAction(userId: string, actionName: string): Promise<boolean> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id: userId, deletedAt: null },
