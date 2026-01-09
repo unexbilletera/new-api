@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class OnboardingResponseDto {
   @ApiProperty({
     description: 'Message about the onboarding status',
-    example: 'Onboarding em andamento - Aguardando verificação de documento',
+    example: 'Onboarding in progress - Awaiting document verification',
   })
   message: string;
 

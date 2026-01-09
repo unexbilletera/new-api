@@ -9,13 +9,13 @@ export class EmailChangeRequestResponseDto {
 
   @ApiProperty({
     description: 'Informational message about the process',
-    example: 'Código de verificação enviado para o novo email',
+    example: 'Verification code sent to the new email',
   })
   message: string;
 
   @ApiProperty({
     description: 'New email sent for verification',
-    example: 'newemail@exemplo.com.br',
+    example: 'newemail@example.com.br',
   })
   email: string;
 
@@ -41,7 +41,7 @@ export class EmailChangeConfirmResponseDto {
 
   @ApiProperty({
     description: 'Confirmation message',
-    example: 'Email alterado com sucesso',
+    example: 'Email changed successfully',
   })
   message: string;
 

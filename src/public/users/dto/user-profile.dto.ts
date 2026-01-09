@@ -7,7 +7,7 @@ export class GetUserProfileDto {
 export class UpdateUserProfileDto {
   @ApiPropertyOptional({
     description: "User's first name",
-    example: 'João',
+    example: 'John',
   })
   @IsOptional()
   @IsString()
@@ -109,7 +109,7 @@ export class CloseAccountDto {
 
   @ApiPropertyOptional({
     description: 'Reason for account closure',
-    example: 'Não utilizo mais o serviço',
+    example: 'I no longer use the service',
   })
   @IsOptional()
   @IsString()
@@ -145,14 +145,14 @@ export class LivenessCheckDto {
 export class SendMessageDto {
   @ApiProperty({
     description: 'Message subject',
-    example: 'Dúvida sobre transferência',
+    example: 'Question about transfer',
   })
   @IsString()
   subject: string;
 
   @ApiProperty({
     description: 'Message content',
-    example: 'Gostaria de saber como fazer uma transferência internacional',
+    example: 'I would like to know how to make an international transfer',
   })
   @IsString()
   message: string;
@@ -197,7 +197,7 @@ export class SetUserAccountAliasDto {
 
   @ApiProperty({
     description: 'Alias for the account',
-    example: 'Conta Poupança',
+    example: 'Savings Account',
   })
   @IsString()
   alias: string;
@@ -276,7 +276,7 @@ export class UpdateAddressDto {
 
   @ApiProperty({
     description: 'Address city',
-    example: 'São Paulo',
+    example: 'Sao Paulo',
   })
   @IsString()
   city: string;

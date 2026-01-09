@@ -3,13 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class LivenessCheckDataDto {
   @ApiProperty({
     description: 'Text to be spoken during liveness verification',
-    example: 'Olá, meu nome é João Silva',
+    example: 'Hello, my name is John Silva',
   })
   text: string;
 
   @ApiProperty({
     description: 'URL to upload the verification video',
-    example: 'https://api.exemplo.com.br/upload/liveness/xyz123',
+    example: 'https://api.example.com.br/upload/liveness/xyz123',
   })
   url: string;
 }
@@ -17,7 +17,7 @@ export class LivenessCheckDataDto {
 export class LivenessCheckResponseDto {
   @ApiProperty({
     description: 'Data required for liveness verification',
-    type: LivenessCheckDataDto,
+    type: () => LivenessCheckDataDto,
   })
   data: LivenessCheckDataDto;
 

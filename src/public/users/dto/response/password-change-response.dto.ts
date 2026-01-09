@@ -9,7 +9,7 @@ export class PasswordChangeResponseDto {
 
   @ApiProperty({
     description: 'Message confirming the password change',
-    example: 'Senha alterada com sucesso',
+    example: 'Password changed successfully',
   })
   message: string;
 }

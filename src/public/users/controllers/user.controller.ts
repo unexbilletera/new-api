@@ -50,7 +50,7 @@ interface AuthenticatedUser {
   roleId?: string;
 }
 
-@ApiTags('Usuários')
+@ApiTags('Users')
 @ApiBearerAuth('JWT-auth')
 @Controller('api/users')
 export class UserController {
@@ -70,18 +70,18 @@ export class UserController {
   @Get('user/me')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Obter dados do usuário atual',
-    description: 'Retorna as informações completas do perfil do usuário autenticado',
+    summary: 'Get current user data',
+    description: 'Returns complete information about the authenticated user\'s profile',
   })
   @ApiResponse({
     status: 200,
-    description: 'Dados do usuário retornados com sucesso',
+    description: 'User data returned successfully',
     type: UserProfileResponseDto,
   })
   @ApiQuery({
     name: 'systemVersion',
     required: false,
-    description: 'Versão do sistema do cliente',
+    description: 'Client system version',
   })
   async getCurrentUser(
     @CurrentUser() user: AuthenticatedUser,
@@ -93,12 +93,12 @@ export class UserController {
   @Post('user/change-email/request')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Solicitar alteração de e-mail',
-    description: 'Inicia o processo de alteração do e-mail do usuário',
+    summary: 'Request email change',
+    description: 'Initiates the user email change process',
   })
   @ApiResponse({
     status: 200,
-    description: 'Solicitação de alteração enviada com sucesso',
+    description: 'Change request sent successfully',
     type: EmailChangeRequestResponseDto,
   })
   @ApiBody({ type: RequestEmailChangeDto })
@@ -112,12 +112,12 @@ export class UserController {
   @Post('user/change-email/confirm')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Confirmar alteração de e-mail',
-    description: 'Confirma a alteração do e-mail com o código enviado',
+    summary: 'Confirm email change',
+    description: 'Confirms the email change with the sent code',
   })
   @ApiResponse({
     status: 200,
-    description: 'E-mail alterado com sucesso',
+    description: 'Email changed successfully',
     type: EmailChangeConfirmResponseDto,
   })
   @ApiBody({ type: ConfirmEmailChangeDto })
@@ -131,12 +131,12 @@ export class UserController {
   @Post('user/address')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Atualizar endereço',
-    description: 'Atualiza o endereço cadastrado do usuário',
+    summary: 'Update address',
+    description: 'Updates the user\'s registered address',
   })
   @ApiResponse({
     status: 200,
-    description: 'Endereço atualizado com sucesso',
+    description: 'Address updated successfully',
     type: AddressUpdateResponseDto,
   })
   @ApiBody({ type: UpdateAddressDto })
@@ -150,12 +150,12 @@ export class UserController {
   @Post('user/profile')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Atualizar perfil',
-    description: 'Atualiza as informações do perfil do usuário',
+    summary: 'Update profile',
+    description: 'Updates the user\'s profile information',
   })
   @ApiResponse({
     status: 200,
-    description: 'Perfil atualizado com sucesso',
+    description: 'Profile updated successfully',
     type: ProfileUpdateResponseDto,
   })
   @ApiBody({ type: UpdateUserProfileDto })
@@ -169,12 +169,12 @@ export class UserController {
   @Post('user/change-password')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Alterar senha',
-    description: 'Altera a senha do usuário autenticado',
+    summary: 'Change password',
+    description: 'Changes the authenticated user\'s password',
   })
   @ApiResponse({
     status: 200,
-    description: 'Senha alterada com sucesso',
+    description: 'Password changed successfully',
     type: PasswordChangeResponseDto,
   })
   @ApiBody({ type: ChangePasswordDto })
@@ -196,12 +196,12 @@ export class UserController {
   @Post('user/signout')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Fazer logout',
-    description: 'Encerra a sessão do usuário autenticado',
+    summary: 'Logout',
+    description: 'Ends the authenticated user\'s session',
   })
   @ApiResponse({
     status: 200,
-    description: 'Logout realizado com sucesso',
+    description: 'Logout successful',
     type: SignoutResponseDto,
   })
   @ApiBody({ type: SignoutDto, required: false })
@@ -215,12 +215,12 @@ export class UserController {
   @Post('user/closeAccount')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Encerrar conta',
-    description: 'Inicia o processo de encerramento da conta do usuário',
+    summary: 'Close account',
+    description: 'Initiates the user account closure process',
   })
   @ApiResponse({
     status: 200,
-    description: 'Solicitação de encerramento processada com sucesso',
+    description: 'Closure request processed successfully',
     type: AccountClosureResponseDto,
   })
   @ApiBody({ type: CloseAccountDto })
@@ -234,12 +234,12 @@ export class UserController {
   @Post('user/liveness')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Verificação de vivacidade',
-    description: 'Realiza verificação de vivacidade do usuário',
+    summary: 'Liveness verification',
+    description: 'Performs user liveness verification',
   })
   @ApiResponse({
     status: 200,
-    description: 'Verificação concluída com sucesso',
+    description: 'Verification completed successfully',
     type: LivenessCheckResponseDto,
   })
   @ApiBody({ type: LivenessCheckDto })
@@ -253,17 +253,17 @@ export class UserController {
   @Post('user/onboarding/:step')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Avançar onboarding por etapa',
-    description: 'Avança o processo de onboarding para uma etapa específica',
+    summary: 'Advance onboarding by step',
+    description: 'Advances the onboarding process to a specific step',
   })
   @ApiResponse({
     status: 200,
-    description: 'Etapa de onboarding processada com sucesso',
+    description: 'Onboarding step processed successfully',
     type: OnboardingResponseDto,
   })
   @ApiParam({
     name: 'step',
-    description: 'Identificador da etapa do onboarding',
+    description: 'Onboarding step identifier',
   })
   async onboardingWithStep(
     @CurrentUser() user: AuthenticatedUser,
@@ -275,12 +275,12 @@ export class UserController {
   @Post('user/onboarding')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Atualizar status de onboarding',
-    description: 'Atualiza o status geral do onboarding do usuário',
+    summary: 'Update onboarding status',
+    description: 'Updates the user\'s overall onboarding status',
   })
   @ApiResponse({
     status: 200,
-    description: 'Status de onboarding atualizado com sucesso',
+    description: 'Onboarding status updated successfully',
     type: OnboardingResponseDto,
   })
   async onboarding(
@@ -292,12 +292,12 @@ export class UserController {
   @Post('sendMessage')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Enviar mensagem',
-    description: 'Envia uma mensagem do usuário através do sistema',
+    summary: 'Send message',
+    description: 'Sends a user message through the system',
   })
   @ApiResponse({
     status: 200,
-    description: 'Mensagem enviada com sucesso',
+    description: 'Message sent successfully',
     type: MessagingResponseDto,
   })
   @ApiBody({ type: SendMessageDto })
@@ -311,17 +311,17 @@ export class UserController {
   @Get('user/identities/:userId')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Listar identidades do usuário',
-    description: 'Retorna todas as identidades cadastradas do usuário',
+    summary: 'List user identities',
+    description: 'Returns all registered identities of the user',
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de identidades retornada com sucesso',
+    description: 'Identity list returned successfully',
     type: IdentityListResponseDto,
   })
   @ApiParam({
     name: 'userId',
-    description: 'ID do usuário',
+    description: 'User ID',
   })
   async getUserIdentities(
     @CurrentUser() user: AuthenticatedUser,
@@ -336,16 +336,16 @@ export class UserController {
   @Post('user/setDefaultUserIdentity/:id')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Definir identidade padrão',
-    description: 'Define uma identidade como padrão para o usuário',
+    summary: 'Set default identity',
+    description: 'Sets an identity as default for the user',
   })
   @ApiResponse({
     status: 200,
-    description: 'Identidade padrão definida com sucesso',
+    description: 'Default identity set successfully',
   })
   @ApiParam({
     name: 'id',
-    description: 'ID da identidade',
+    description: 'Identity ID',
   })
   async setDefaultIdentity(
     @CurrentUser() user: AuthenticatedUser,
@@ -357,16 +357,16 @@ export class UserController {
   @Post('user/setDefaultUserAccount/:id')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Definir conta padrão',
-    description: 'Define uma conta como padrão para o usuário',
+    summary: 'Set default account',
+    description: 'Sets an account as default for the user',
   })
   @ApiResponse({
     status: 200,
-    description: 'Conta padrão definida com sucesso',
+    description: 'Default account set successfully',
   })
   @ApiParam({
     name: 'id',
-    description: 'ID da conta',
+    description: 'Account ID',
   })
   async setDefaultAccount(
     @CurrentUser() user: AuthenticatedUser,
@@ -378,16 +378,16 @@ export class UserController {
   @Post('user/setUserAccountAlias/:id')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Definir apelido da conta',
-    description: 'Define um apelido personalizado para a conta do usuário',
+    summary: 'Set account alias',
+    description: 'Sets a custom alias for the user account',
   })
   @ApiResponse({
     status: 200,
-    description: 'Apelido definido com sucesso',
+    description: 'Alias set successfully',
   })
   @ApiParam({
     name: 'id',
-    description: 'ID da conta',
+    description: 'Account ID',
   })
   @ApiBody({ type: SetUserAccountAliasDto })
   async setUserAccountAlias(
@@ -401,12 +401,12 @@ export class UserController {
   @Get('user/balances')
   @UseGuards(AuthGuard)
   @ApiOperation({
-    summary: 'Obter saldos das contas',
-    description: 'Retorna os saldos de todas as contas do usuário',
+    summary: 'Get account balances',
+    description: 'Returns the balances of all user accounts',
   })
   @ApiResponse({
     status: 200,
-    description: 'Saldos retornados com sucesso',
+    description: 'Balances returned successfully',
     type: AccountBalanceResponseDto,
   })
   async getAccountBalances(
@@ -417,16 +417,16 @@ export class UserController {
 
   @Get('userAccountInfo/:id')
   @ApiOperation({
-    summary: 'Obter informações da conta',
-    description: 'Retorna informações detalhadas de uma conta específica',
+    summary: 'Get account information',
+    description: 'Returns detailed information about a specific account',
   })
   @ApiResponse({
     status: 200,
-    description: 'Informações da conta retornadas com sucesso',
+    description: 'Account information returned successfully',
   })
   @ApiParam({
     name: 'id',
-    description: 'ID da conta',
+    description: 'Account ID',
   })
   async getUserAccountInfo(@Param('id') accountId: string) {
     return this.accountService.getUserAccountInfo(accountId);
@@ -434,16 +434,16 @@ export class UserController {
 
   @Get('sailpointInfo/:id')
   @ApiOperation({
-    summary: 'Obter informações do Sailpoint',
-    description: 'Retorna informações do Sailpoint para um ID específico',
+    summary: 'Get Sailpoint information',
+    description: 'Returns Sailpoint information for a specific ID',
   })
   @ApiResponse({
     status: 200,
-    description: 'Informações do Sailpoint retornadas com sucesso',
+    description: 'Sailpoint information returned successfully',
   })
   @ApiParam({
     name: 'id',
-    description: 'ID do Sailpoint',
+    description: 'Sailpoint ID',
   })
   async getSailpointInfo(@Param('id') sailpointId: string) {
     return { message: 'Sailpoint info retrieved' };

@@ -62,7 +62,7 @@ export class IdentityListItemDto {
 export class IdentityListResponseDto {
   @ApiProperty({
     description: "User's identity document list",
-    type: [IdentityListItemDto],
+    type: () => [IdentityListItemDto],
   })
   identities: IdentityListItemDto[];
 }

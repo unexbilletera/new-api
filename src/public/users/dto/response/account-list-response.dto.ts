@@ -30,7 +30,7 @@ export class AccountListItemDto {
 
   @ApiProperty({
     description: 'Account alias',
-    example: 'Conta Principal',
+    example: 'Main Account',
     nullable: true,
   })
   alias: string | null;
@@ -46,7 +46,7 @@ export class AccountListItemDto {
 export class AccountListResponseDto {
   @ApiProperty({
     description: "User's account list",
-    type: [AccountListItemDto],
+    type: () => [AccountListItemDto],
   })
   accounts: AccountListItemDto[];
 }

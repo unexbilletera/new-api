@@ -28,7 +28,7 @@ export class AddressDataDto {
 
   @ApiProperty({
     description: 'City',
-    example: 'São Paulo',
+    example: 'Sao Paulo',
   })
   city: string;
 
@@ -55,7 +55,7 @@ export class AddressUpdateResponseDto {
 
   @ApiProperty({
     description: 'Updated address data',
-    type: AddressDataDto,
+    type: () => AddressDataDto,
   })
   address: AddressDataDto;
 }

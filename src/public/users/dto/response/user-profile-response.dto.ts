@@ -37,7 +37,7 @@ export class IdentityResponseDto {
 
   @ApiProperty({
     description: 'Full name in identity',
-    example: 'João Silva Santos',
+    example: 'John Silva Santos',
     nullable: true,
   })
   name: string | null;
@@ -120,7 +120,7 @@ export class AccountResponseDto {
 
   @ApiProperty({
     description: 'Account alias',
-    example: 'Conta Principal',
+    example: 'Main Account',
     nullable: true,
   })
   alias: string | null;
@@ -156,7 +156,7 @@ export class OnboardingStateDto {
 }
 
 export class ExchangeRatesDto {
-  [key: string]: number;
+  [key: string]: any;
 }
 
 export class UserDataDto {
@@ -182,7 +182,7 @@ export class UserDataDto {
 
   @ApiProperty({
     description: "User's first name",
-    example: 'João',
+    example: 'John',
     nullable: true,
   })
   firstName: string | null;
@@ -196,7 +196,7 @@ export class UserDataDto {
 
   @ApiProperty({
     description: "User's full name",
-    example: 'João Silva Santos',
+    example: 'John Silva Santos',
     nullable: true,
   })
   name: string | null;
@@ -298,19 +298,19 @@ export class UserDataDto {
 
   @ApiProperty({
     description: 'Onboarding process state',
-    type: OnboardingStateDto,
+    type: () => OnboardingStateDto,
   })
   onboardingState: OnboardingStateDto;
 
   @ApiProperty({
     description: "User's associated identities",
-    type: [IdentityResponseDto],
+    type: () => [IdentityResponseDto],
   })
   usersIdentities: IdentityResponseDto[];
 
   @ApiProperty({
     description: "User's associated accounts",
-    type: [AccountResponseDto],
+    type: () => [AccountResponseDto],
   })
   usersAccounts: AccountResponseDto[];
 
@@ -336,7 +336,7 @@ export class UserProfileResponseDto {
 
   @ApiProperty({
     description: "User profile's complete data",
-    type: UserDataDto,
+    type: () => UserDataDto,
   })
   user: UserDataDto;
 
@@ -348,7 +348,7 @@ export class UserProfileResponseDto {
 
   @ApiProperty({
     description: 'Current exchange rates',
-    type: ExchangeRatesDto,
+    type: () => ExchangeRatesDto,
     nullable: true,
   })
   exchangeRates: ExchangeRatesDto | null;

@@ -37,7 +37,7 @@ export class UserProfileUpdateDto {
 
   @ApiProperty({
     description: "User's full name",
-    example: 'João Silva',
+    example: 'John Silva',
     nullable: true,
   })
   name: string | null;
@@ -96,7 +96,7 @@ export class ProfileUpdateResponseDto {
 
   @ApiProperty({
     description: "Updated user's data",
-    type: UserProfileUpdateDto,
+    type: () => UserProfileUpdateDto,
   })
   user: UserProfileUpdateDto;
 }
