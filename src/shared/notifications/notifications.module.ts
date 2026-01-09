@@ -5,6 +5,7 @@ import { ConsoleEmailAdapter } from './adapters/console-email.adapter';
 import { ConsoleSmsAdapter } from './adapters/console-sms.adapter';
 import { ConsolePushAdapter } from './adapters/console-push.adapter';
 import { SesEmailAdapter } from './adapters/ses-email.adapter';
+import { TwilioSmsAdapter } from './adapters/twilio-sms.adapter';
 import { EMAIL_ADAPTER, PUSH_ADAPTER, SMS_ADAPTER } from './notifications.types';
 
 @Global()
@@ -32,7 +33,31 @@ import { EMAIL_ADAPTER, PUSH_ADAPTER, SMS_ADAPTER } from './notifications.types'
       },
       inject: [ConfigService],
     },
-    { provide: SMS_ADAPTER, useClass: ConsoleSmsAdapter },
+    {
+      provide: SMS_ADAPTER,
+      useFactory: (config: ConfigService) => {
+        const accountSid = config.get<string>('TWILIO_ACCOUNT_SID') || '';
+        const authToken = config.get<string>('TWILIO_AUTH_TOKEN') || '';
+        const from = config.get<string>('TWILIO_SMS_FROM') || '';
+        const sandboxSendSms = (config.get<string>('WALLET_SANDBOX_SEND_SMS') || '').toLowerCase() === 'true';
+        const nodeEnv = (config.get<string>('NODE_ENV') || '').toLowerCase();
+
+        const hasCreds = accountSid && authToken && from;
+        const allowSend = nodeEnv === 'production' || sandboxSendSms;
+
+        if (hasCreds && allowSend) {
+          try {
+            return new TwilioSmsAdapter({ accountSid, authToken, from });
+          } catch (error) {
+            console.warn('Failed to initialize Twilio SMS adapter, falling back to console', error);
+            return new ConsoleSmsAdapter();
+          }
+        }
+
+        return new ConsoleSmsAdapter();
+      },
+      inject: [ConfigService],
+    },
     { provide: PUSH_ADAPTER, useClass: ConsolePushAdapter },
   ],
   exports: [NotificationService],
