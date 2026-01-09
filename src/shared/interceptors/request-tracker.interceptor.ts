@@ -52,7 +52,7 @@ export class RequestTrackerInterceptor implements NestInterceptor {
             }
           }
 
-          this.logger.info('✅ Request completed', {
+          this.logger.info('Request completed', {
             method,
             url,
             statusCode,
@@ -84,7 +84,7 @@ export class RequestTrackerInterceptor implements NestInterceptor {
           }
 
           this.logger.error(
-            '❌ Request failed',
+            'Request failed',
             error instanceof Error ? error : new Error(error?.message || 'Unknown error'),
             {
               method,
