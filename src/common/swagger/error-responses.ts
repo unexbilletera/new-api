@@ -1,72 +1,72 @@
 export const ApiErrorResponses = {
   BadRequest: {
     status: 400,
-    description: 'Requisição inválida - parâmetros incorretos ou ausentes',
+    description: 'Invalid request - incorrect or missing parameters',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 400 },
-        message: { type: 'string', example: 'Falha na validação dos dados' },
+        message: { type: 'string', example: 'Data validation failed' },
         error: { type: 'string', example: 'Bad Request' },
       },
     },
   },
   Unauthorized: {
     status: 401,
-    description: 'Não autorizado - credenciais inválidas ou token expirado',
+    description: 'Unauthorized - invalid credentials or expired token',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 401 },
-        message: { type: 'string', example: 'Credenciais inválidas' },
+        message: { type: 'string', example: 'Invalid credentials' },
         error: { type: 'string', example: 'Unauthorized' },
       },
     },
   },
   Forbidden: {
     status: 403,
-    description: 'Proibido - usuário sem permissão para acessar este recurso',
+    description: 'Forbidden - user without permission to access this resource',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 403 },
-        message: { type: 'string', example: 'Acesso negado' },
+        message: { type: 'string', example: 'Access denied' },
         error: { type: 'string', example: 'Forbidden' },
       },
     },
   },
   NotFound: {
     status: 404,
-    description: 'Recurso não encontrado',
+    description: 'Resource not found',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 404 },
-        message: { type: 'string', example: 'Recurso não encontrado' },
+        message: { type: 'string', example: 'Resource not found' },
         error: { type: 'string', example: 'Not Found' },
       },
     },
   },
   Conflict: {
     status: 409,
-    description: 'Conflito - recurso já existe ou dados estão em estado inválido',
+    description: 'Conflict - resource already exists or data is in invalid state',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 409 },
-        message: { type: 'string', example: 'Recurso já existe' },
+        message: { type: 'string', example: 'Resource already exists' },
         error: { type: 'string', example: 'Conflict' },
       },
     },
   },
   InternalServerError: {
     status: 500,
-    description: 'Erro interno do servidor',
+    description: 'Internal server error',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 500 },
-        message: { type: 'string', example: 'Erro interno do servidor' },
+        message: { type: 'string', example: 'Internal server error' },
         error: { type: 'string', example: 'Internal Server Error' },
       },
     },
