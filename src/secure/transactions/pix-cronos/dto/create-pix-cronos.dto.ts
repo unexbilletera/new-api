@@ -1,21 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IsString, IsNumber, IsOptional, Min, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-/**
- * Tipos de chave PIX suportados pela Cronos
- */
 export enum PixKeyType {
   CPF = 'cpf',
   CNPJ = 'cnpj',
   EMAIL = 'email',
   PHONE = 'phone',
-  EVP = 'evp', // Chave aleatória
+  EVP = 'evp',
 }
 
-/**
- * DTO para criar transação PIX Cronos
- */
 export class CreatePixCronosDto {
   @ApiProperty({
     description: 'ID da conta de origem',

@@ -20,16 +20,12 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      // Validar e decodificar token
       const payload = await this.jwtService.verifyToken(token);
-      
-      // Adicionar payload ao request
       request.user = {
         userId: payload.userId,
         email: payload.email,
         roleId: payload.roleId,
       };
-
       return true;
     } catch (error) {
       if (error instanceof Error && error.message.includes('expired')) {

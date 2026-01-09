@@ -11,7 +11,6 @@ import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { LoggerService } from './shared/logger/logger.service';
 import { loadEnvironmentFile } from './shared/config/env-loader';
 
-// Carrega variáveis de ambiente ANTES de inicializar a aplicação
 loadEnvironmentFile();
 
 async function bootstrap() {
@@ -19,8 +18,6 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-
-  // Validação global de DTOs
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,13 +25,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  // Filtro global de exceções
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const logger = app.get(LoggerService);
-
-  // Interceptor global de logging
   app.useGlobalInterceptors(new LoggingInterceptor(logger));
 
   app.enableCors();

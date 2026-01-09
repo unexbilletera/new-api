@@ -6,12 +6,6 @@ import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ErrorCodes, ErrorHelper } from '../../../../shared/errors/app-error';
 import { ColoredLogger } from '../../../../shared/utils/logger-colors';
 
-/**
- * Service para lógica de negócio de transações PIX Cronos
- * Responsável por: validações, regras de negócio, integração com SQS
- *
- * Fluxo: Controller => Service => Model => Service => Controller
- */
 @Injectable()
 export class PixCronosService {
   constructor(
@@ -143,11 +137,6 @@ export class PixCronosService {
     }
   }
 
-  /**
-   * Confirma uma transação PIX Cronos e envia para processamento assíncrono
-   *
-   * Fluxo: Service => Model (buscar) => Model (atualizar) => Service (SQS) => Controller
-   */
   async confirmTransaction(
     userId: string,
     transactionId: string,

@@ -12,10 +12,6 @@ export class BackofficeUserModel {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
-
-  /**
-   * Busca usuário backoffice por email
-   */
   async findByEmail(email: string) {
     return this.prisma.backofficeUsers.findUnique({
       where: {
@@ -27,10 +23,6 @@ export class BackofficeUserModel {
       },
     });
   }
-
-  /**
-   * Valida credenciais e retorna usuário
-   */
   async validateCredentials(
     loginDto: LoginDto,
   ): Promise<LoginResponseDto> {
@@ -52,14 +44,10 @@ export class BackofficeUserModel {
     if (!isPasswordValid) {
       throw ErrorHelper.unauthorized(ErrorCodes.BACKOFFICE_INVALID_CREDENTIALS);
     }
-
-    // Atualiza último login
     await this.prisma.backofficeUsers.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
-
-    // Gera token JWT
     const accessToken = await this.jwtService.generateToken({
       userId: user.id,
       email: user.email,
@@ -82,10 +70,6 @@ export class BackofficeUserModel {
       code: SuccessCodes.BACKOFFICE_LOGIN_SUCCESS,
     };
   }
-
-  /**
-   * Busca usuário por ID
-   */
   async findById(id: string) {
     const user = await this.prisma.backofficeUsers.findUnique({
       where: {

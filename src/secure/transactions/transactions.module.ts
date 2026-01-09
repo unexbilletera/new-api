@@ -1,11 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../../shared/prisma/prisma.module';
 import { PixCronosModule } from './pix-cronos/pix-cronos.module';
-
-/**
- * Módulo de transações (área logada)
- * Responsável por: criar transações, consultar histórico, status
- */
+import { PrismaModule } from '../../shared/prisma/prisma.module';
 @Module({
   imports: [PrismaModule, PixCronosModule],
   controllers: [],

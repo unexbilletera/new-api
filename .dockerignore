@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+.git
+.gitignore
+*.md
+*.log
+.env.production
+.env.sandbox
+UNEX-PROD-PEM.pem
+UNEX-SANDBOX-PEM.pem
+*.pem
+.DS_Store

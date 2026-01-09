@@ -29,21 +29,11 @@ interface CurrentUserPayload {
 @Controller('backoffice/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  /**
-   * Login do backoffice
-   * POST /backoffice/auth/login
-   */
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     return this.authService.login(loginDto);
   }
-
-  /**
-   * Retorna dados do usuário logado
-   * GET /backoffice/auth/me
-   */
   @Get('me')
   @UseGuards(BackofficeAuthGuard)
   async getMe(

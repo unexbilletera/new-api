@@ -36,21 +36,36 @@
     "prisma:studio": "prisma studio",
     "prisma:migrate ": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
+    "loadtest:signin": "node scripts/loadtest-signin.js",
     "prisma:reset": "prisma migrate reset",
     "prisma:seed": "prisma db seed",
     "db:push": "prisma db push",
     "db:pull": "prisma db pull",
     "db:seed": "prisma db seed",
-    "ec2-prod": "ssh -i /Users/brunosiqueira/Downloads/UNEX-PROD-PEM.pem ubuntu@18.224.174.89",
-    "ec2-sandbox": "ssh -i /Users/brunosiqueira/Downloads/UNEX-SANDBOX-PEM.pem ubuntu@13.58.89.194",
+    "ec2-prod": "ssh -i ./pem/UNEX-PROD-PEM.pem ubuntu@18.224.174.89",
+    "ec2-sandbox": "ssh -i ./pem/UNEX-SANDBOX-PEM.pem ubuntu@13.58.89.194",
     "job-zip-generate": "./lambda/build.sh production",
-    "prod-tunnel": "ssh -i /Users/brunosiqueira/Downloads/UNEX-PROD-PEM.pem -L 3306:unex-prod-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@18.224.174.89",
-    "sandbox-tunnel": "ssh -i /Users/brunosiqueira/Downloads/UNEX-SANDBOX-PEM.pem -L 3306:unex-sandbox-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@13.58.89.194"
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build --no-cache",
+    "docker:logs": "docker-compose logs -f",
+    "docker:logs:api": "docker-compose logs -f api",
+    "docker:logs:mysql": "docker-compose logs -f mysql",
+    "docker:mysql:shell": "docker exec -it unex-mysql mysql -uadmin -phDWUGWllmOy9GRghSj9S unex",
+    "docker:api:shell": "docker exec -it unex-api sh",
+    "docker:restart": "docker-compose restart",
+    "docker:reset": "docker-compose down -v && docker-compose up -d",
+    "docker:prisma:migrate": "docker exec -it unex-api npx prisma migrate dev",
+    "docker:prisma:push": "docker exec -it unex-api npx prisma db push",
+    "docker:prisma:studio": "npx prisma studio",
+    "prod-tunnel": "ssh -i ./pem/UNEX-PROD-PEM.pem -L 3306:unex-prod-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@18.224.174.89",
+    "sandbox-tunnel": "ssh -i ./pem/UNEX-SANDBOX-PEM.pem -L 3306:unex-sandbox-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@13.58.89.194"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.960.0",
     "@fastify/static": "^9.0.0",
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
@@ -65,9 +80,11 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "socks-proxy-agent": "^8.0.2",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "autocannon": "^7.14.0",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
@@ -102,7 +119,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -110,7 +127,7 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
+    "coverageDirectory": "./coverage",
     "testEnvironment": "node"
   }
 }

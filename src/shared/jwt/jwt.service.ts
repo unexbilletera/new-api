@@ -10,17 +10,9 @@ export interface JwtPayload {
 @Injectable()
 export class JwtService {
   constructor(private jwtService: NestJwtService) {}
-
-  /**
-   * Gera token JWT
-   */
   async generateToken(payload: JwtPayload): Promise<string> {
     return this.jwtService.signAsync(payload);
   }
-
-  /**
-   * Valida e decodifica token JWT
-   */
   async verifyToken(token: string): Promise<JwtPayload> {
     try {
       return await this.jwtService.verifyAsync<JwtPayload>(token);

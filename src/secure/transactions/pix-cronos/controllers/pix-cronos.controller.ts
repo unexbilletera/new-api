@@ -37,10 +37,6 @@ interface CurrentUserPayload {
 export class PixCronosController {
   constructor(private pixCronosService: PixCronosService) {}
 
-  /**
-   * Cria uma transação PIX Cronos
-   * POST /transactions/pix/cronos/create
-   */
   @Post('create')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -109,10 +105,6 @@ export class PixCronosController {
     }
   }
 
-  /**
-   * Confirma uma transação PIX Cronos
-   * POST /transactions/pix/cronos/confirm
-   */
   @Post('confirm')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

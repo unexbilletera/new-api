@@ -7,9 +7,6 @@ import {
 import { ConfigService } from '../config/config.service';
 import { ColoredLogger } from '../utils/logger-colors';
 
-/**
- * Service para enviar mensagens para filas SQS
- */
 @Injectable()
 export class SqsService {
   private sqsClient: SQSClient | null = null;
@@ -67,9 +64,6 @@ export class SqsService {
     }
   }
 
-  /**
-   * Envia mensagem para fila de transações
-   */
   async sendTransactionMessage(
     jobType: string,
     payload: Record<string, any>,

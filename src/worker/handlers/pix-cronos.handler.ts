@@ -5,9 +5,6 @@ import { CronosService } from '../../shared/cronos/cronos.service';
 import { ColoredLogger } from '../../shared/utils/logger-colors';
 import type { transactions_status } from '../../../generated/prisma';
 
-/**
- * Handler para processar jobs PIX Cronos
- */
 @Injectable()
 export class PixCronosHandler {
   constructor(
@@ -16,11 +13,6 @@ export class PixCronosHandler {
     private cronosService: CronosService,
   ) {}
 
-  /**
-   * Processa job de criação de transação PIX Cronos
-   * Este job é executado após criar a transação inicial
-   * Responsabilidade: Validar dados, preparar para confirmação
-   */
   async handleCreate(payload: {
     transactionId: string;
     userId: string;
@@ -34,7 +26,6 @@ export class PixCronosHandler {
     this.logger.info(`Processing PIX Cronos create for transaction: ${payload.transactionId}`);
 
     try {
-      // Buscar transação
       const transaction = await this.prisma.transactions.findUnique({
         where: { id: payload.transactionId },
       });
@@ -44,25 +35,16 @@ export class PixCronosHandler {
         return;
       }
 
-      // Validar dados básicos
       if (transaction.status !== 'pending') {
         this.logger.warn(`Transaction ${payload.transactionId} is not pending. Status: ${transaction.status}`);
         return;
       }
 
-      // Aqui você pode adicionar validações adicionais:
-      // - Validar saldo da conta
-      // - Validar limites de transação
-      // - Validar chave PIX
-      // - Preparar dados para envio à API da Cronos
 
-      // Por enquanto, apenas logamos que o job foi processado
-      // O status permanece como 'pending' até o usuário confirmar
       this.logger.info(`PIX Cronos create job processed successfully for transaction: ${payload.transactionId}`);
     } catch (error) {
       this.logger.error(`Error processing PIX Cronos create job: ${error instanceof Error ? error.message : 'Unknown error'}`);
       
-      // Atualizar transação com erro
       try {
         await this.prisma.transactions.update({
           where: { id: payload.transactionId },
@@ -79,11 +61,6 @@ export class PixCronosHandler {
     }
   }
 
-  /**
-   * Processa job de confirmação de transação PIX Cronos
-   * Este job é executado após o usuário confirmar a transação
-   * Responsabilidade: Enviar para API da Cronos, atualizar status
-   */
   async handleConfirm(payload: {
     transactionId: string;
     userId: string;
@@ -91,7 +68,6 @@ export class PixCronosHandler {
     this.logger.info(`Processing PIX Cronos confirm for transaction: ${payload.transactionId}`);
 
     try {
-      // Buscar transação
       const transaction = await this.prisma.transactions.findFirst({
         where: {
           id: payload.transactionId,
@@ -115,7 +91,6 @@ export class PixCronosHandler {
         return;
       }
 
-      // Validar status
       if (transaction.status !== 'process') {
         this.logger.warn(`Transaction ${payload.transactionId} is not in process status. Status: ${transaction.status}`);
         return;
@@ -318,7 +293,6 @@ export class PixCronosHandler {
     } catch (error) {
       this.logger.error(`Error processing PIX Cronos confirm job: ${error instanceof Error ? error.message : 'Unknown error'}`);
       
-      // Atualizar transação com erro
       try {
         await this.prisma.transactions.update({
           where: { id: payload.transactionId },

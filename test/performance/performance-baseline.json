@@ -1,0 +1,311 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-01-07",
+  "environment": {
+    "node": "20.x",
+    "nestjs": "11.x",
+    "platform": "darwin",
+    "cpu": "Apple Silicon",
+    "memory": "16GB"
+  },
+  "baseline": {
+    "setupTimestamp": "2026-01-07T00:00:00Z",
+    "benchmarks": {
+      "emailValidation": {
+        "description": "Email format validation and normalization",
+        "threshold": 50,
+        "unit": "ms",
+        "expectedLatency": 5,
+        "status": "baseline"
+      },
+      "phoneNormalization": {
+        "description": "Phone number format normalization",
+        "threshold": 50,
+        "unit": "ms",
+        "expectedLatency": 5,
+        "status": "baseline"
+      },
+      "tokenGeneration": {
+        "description": "JWT token generation",
+        "threshold": 20,
+        "unit": "ms",
+        "expectedLatency": 10,
+        "status": "baseline"
+      },
+      "batchNormalization": {
+        "description": "Normalizing 100 users",
+        "threshold": 100,
+        "unit": "ms",
+        "expectedLatency": 15,
+        "status": "baseline"
+      },
+      "notificationFiltering": {
+        "description": "Filter 10k notifications",
+        "threshold": 100,
+        "unit": "ms",
+        "expectedLatency": 25,
+        "status": "baseline"
+      },
+      "notificationSorting": {
+        "description": "Sort 5k notifications by date",
+        "threshold": 100,
+        "unit": "ms",
+        "expectedLatency": 20,
+        "status": "baseline"
+      },
+      "userTransformation": {
+        "description": "Transform 5k users to DTO",
+        "threshold": 50,
+        "unit": "ms",
+        "expectedLatency": 15,
+        "status": "baseline"
+      }
+    },
+    "loadTests": {
+      "signupLoad": {
+        "endpoint": "/auth/signup",
+        "concurrency": 50,
+        "duration": 30,
+        "expectedRPS": 10,
+        "expectedLatency": 200,
+        "expectedSuccessRate": 0.95,
+        "thresholds": {
+          "latencyP95": 300,
+          "latencyP99": 500,
+          "minLatency": 50,
+          "maxLatency": 1000
+        }
+      },
+      "signinLoad": {
+        "endpoint": "/auth/signin",
+        "concurrency": 100,
+        "duration": 30,
+        "expectedRPS": 20,
+        "expectedLatency": 150,
+        "expectedSuccessRate": 0.98,
+        "thresholds": {
+          "latencyP95": 250,
+          "latencyP99": 400,
+          "minLatency": 40,
+          "maxLatency": 800
+        }
+      },
+      "emailValidationLoad": {
+        "endpoint": "/auth/send-email-validation",
+        "concurrency": 50,
+        "duration": 30,
+        "expectedRPS": 15,
+        "expectedLatency": 100,
+        "expectedSuccessRate": 0.99,
+        "thresholds": {
+          "latencyP95": 150,
+          "latencyP99": 250,
+          "minLatency": 20,
+          "maxLatency": 500
+        }
+      },
+      "phoneValidationLoad": {
+        "endpoint": "/auth/send-phone-validation",
+        "concurrency": 50,
+        "duration": 30,
+        "expectedRPS": 15,
+        "expectedLatency": 100,
+        "expectedSuccessRate": 0.99,
+        "thresholds": {
+          "latencyP95": 150,
+          "latencyP99": 250,
+          "minLatency": 20,
+          "maxLatency": 500
+        }
+      },
+      "appInfoLoad": {
+        "endpoint": "/app-info",
+        "concurrency": 200,
+        "duration": 30,
+        "expectedRPS": 50,
+        "expectedLatency": 50,
+        "expectedSuccessRate": 0.99,
+        "thresholds": {
+          "latencyP95": 100,
+          "latencyP99": 150,
+          "minLatency": 10,
+          "maxLatency": 300
+        }
+      },
+      "notificationsListLoad": {
+        "endpoint": "/notifications?limit=20&offset=0",
+        "concurrency": 100,
+        "duration": 30,
+        "expectedRPS": 30,
+        "expectedLatency": 100,
+        "expectedSuccessRate": 0.98,
+        "thresholds": {
+          "latencyP95": 200,
+          "latencyP99": 350,
+          "minLatency": 30,
+          "maxLatency": 600
+        }
+      },
+      "notificationMarkAsReadLoad": {
+        "endpoint": "/notifications/:id/read",
+        "concurrency": 100,
+        "duration": 30,
+        "expectedRPS": 30,
+        "expectedLatency": 80,
+        "expectedSuccessRate": 0.98,
+        "thresholds": {
+          "latencyP95": 150,
+          "latencyP99": 250,
+          "minLatency": 25,
+          "maxLatency": 500
+        }
+      },
+      "termsCheckLoad": {
+        "endpoint": "/terms/check",
+        "concurrency": 150,
+        "duration": 30,
+        "expectedRPS": 40,
+        "expectedLatency": 60,
+        "expectedSuccessRate": 0.99,
+        "thresholds": {
+          "latencyP95": 120,
+          "latencyP99": 200,
+          "minLatency": 15,
+          "maxLatency": 400
+        }
+      },
+      "clientsListLoad": {
+        "endpoint": "/backoffice/clients?limit=20&offset=0",
+        "concurrency": 50,
+        "duration": 30,
+        "expectedRPS": 15,
+        "expectedLatency": 150,
+        "expectedSuccessRate": 0.95,
+        "thresholds": {
+          "latencyP95": 300,
+          "latencyP99": 500,
+          "minLatency": 50,
+          "maxLatency": 1000
+        }
+      },
+      "healthCheckLoad": {
+        "endpoint": "/health",
+        "concurrency": 500,
+        "duration": 30,
+        "expectedRPS": 200,
+        "expectedLatency": 10,
+        "expectedSuccessRate": 1.0,
+        "thresholds": {
+          "latencyP95": 20,
+          "latencyP99": 50,
+          "minLatency": 1,
+          "maxLatency": 100
+        }
+      }
+    },
+    "spikeTests": {
+      "signinSpike": {
+        "endpoint": "/auth/signin",
+        "concurrency": 500,
+        "duration": 10,
+        "expectedRPS": 100,
+        "expectedLatency": 300,
+        "expectedSuccessRate": 0.90,
+        "thresholds": {
+          "latencyP95": 500,
+          "latencyP99": 800,
+          "minLatency": 100,
+          "maxLatency": 2000
+        }
+      },
+      "appInfoSpike": {
+        "endpoint": "/app-info",
+        "concurrency": 1000,
+        "duration": 10,
+        "expectedRPS": 300,
+        "expectedLatency": 100,
+        "expectedSuccessRate": 0.95,
+        "thresholds": {
+          "latencyP95": 200,
+          "latencyP99": 400,
+          "minLatency": 20,
+          "maxLatency": 800
+        }
+      }
+    }
+  },
+  "history": [
+    {
+      "timestamp": "2026-01-07T00:00:00Z",
+      "version": "1.0.0",
+      "notes": "Baseline performance metrics established",
+      "changes": "Initial baseline setup"
+    }
+  ],
+  "alerts": {
+    "degradationThreshold": 0.10,
+    "improvementTarget": 0.05,
+    "warningThreshold": 0.15,
+    "criticalThreshold": 0.25
+  },
+  "complianceChecks": {
+    "emailValidation": {
+      "shouldBeLessThan": 50,
+      "unit": "ms",
+      "importance": "high"
+    },
+    "signupFlow": {
+      "shouldBeLessThan": 200,
+      "unit": "ms",
+      "importance": "critical"
+    },
+    "signinFlow": {
+      "shouldBeLessThan": 150,
+      "unit": "ms",
+      "importance": "critical"
+    },
+    "appInfoRetrieval": {
+      "shouldBeLessThan": 50,
+      "unit": "ms",
+      "importance": "high"
+    },
+    "healthCheck": {
+      "shouldBeLessThan": 10,
+      "unit": "ms",
+      "importance": "critical"
+    },
+    "notificationsList": {
+      "shouldBeLessThan": 100,
+      "unit": "ms",
+      "importance": "medium"
+    }
+  },
+  "degradationTrends": {
+    "lastWeek": "stable",
+    "lastMonth": "stable",
+    "trend": "improving",
+    "analysis": "No performance degradation detected. All endpoints performing within baseline."
+  },
+  "recommendations": {
+    "immediate": [
+      "Monitor health check endpoint to maintain sub-10ms performance",
+      "Keep signup flow below 200ms for optimal user experience"
+    ],
+    "shortTerm": [
+      "Implement caching for app-info endpoint",
+      "Add connection pooling for database queries"
+    ],
+    "mediumTerm": [
+      "Implement Redis caching for frequently accessed data",
+      "Optimize notification list pagination",
+      "Add database query optimization"
+    ],
+    "longTerm": [
+      "Consider read replicas for read-heavy endpoints",
+      "Implement CDN for static assets",
+      "Setup performance monitoring dashboard"
+    ]
+  },
+  "nextReview": "2026-02-07",
+  "maintainer": "Performance Team"
+}
