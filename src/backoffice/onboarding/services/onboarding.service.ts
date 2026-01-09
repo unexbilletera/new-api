@@ -87,7 +87,7 @@ export class OnboardingService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     return {
@@ -110,11 +110,11 @@ export class OnboardingService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     if (user.status !== 'pending' && user.status !== 'process') {
-      throw new BadRequestException('Usuário não está em processo de onboarding');
+      throw new BadRequestException('User is not in onboarding process');
     }
 
     await this.prisma.users.update({
@@ -130,14 +130,14 @@ export class OnboardingService {
       data: { status: 'enable', updatedAt: new Date() },
     });
 
-    return { success: true, message: 'Usuário aprovado com sucesso' };
+    return { success: true, message: 'User approved successfully' };
   }  async rejectUser(userId: string, dto: RejectUserDto): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     const currentState = (user.onboardingState as any) || {};
@@ -157,14 +157,14 @@ export class OnboardingService {
       },
     });
 
-    return { success: true, message: 'Usuário rejeitado, aguardando correções' };
+    return { success: true, message: 'User rejected, awaiting corrections' };
   }  async requestCorrection(userId: string, dto: RequestCorrectionDto): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     const currentState = (user.onboardingState as any) || {};
@@ -183,14 +183,14 @@ export class OnboardingService {
       },
     });
 
-    return { success: true, message: 'Correção solicitada com sucesso' };
+    return { success: true, message: 'Correction requested successfully' };
   }  async updateUserInfo(userId: string, data: any): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     const updateData: any = { updatedAt: new Date() };
@@ -204,6 +204,6 @@ export class OnboardingService {
       data: updateData,
     });
 
-    return { success: true, message: 'Informações atualizadas com sucesso' };
+    return { success: true, message: 'Information updated successfully' };
   }
 }
