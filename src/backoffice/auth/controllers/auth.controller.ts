@@ -7,6 +7,12 @@ import {
   UseGuards,
   Get,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
 import { LoginDto } from '../dto/login.dto';
 import { LoginResponseDto } from '../dto/login-response.dto';
@@ -26,16 +32,50 @@ interface CurrentUserPayload {
   };
 }
 
+@ApiTags('backoffice-auth')
 @Controller('backoffice/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Backoffice login',
+    description: 'Authenticates a backoffice user and returns JWT token',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Login performed successfully',
+    type: LoginResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid credentials or user not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid username or password',
+  })
   async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     return this.authService.login(loginDto);
   }
+
   @Get('me')
   @UseGuards(BackofficeAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get authenticated user data',
+    description: 'Returns the data of the currently authenticated backoffice user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User data retrieved successfully',
+    type: UserResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired token',
+  })
   async getMe(
     @CurrentUser() user: CurrentUserPayload,
   ): Promise<UserResponseDto> {
