@@ -42,14 +42,30 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'JWT',
-        description: 'Enter JWT token',
+        description: 'Insira o token JWT no formato: Bearer <token>',
         in: 'header',
       },
       'JWT-auth',
     )
-    .addTag('transactions', 'Endpoints relacionados a transações')
-    .addTag('auth', 'Endpoints de autenticação')
-    .addTag('backoffice', 'Endpoints do backoffice')
+    .addTag('auth', 'Autenticação de usuários')
+    .addTag('users', 'Gestão de perfil e dados de usuários')
+    .addTag('onboarding', 'Processo de onboarding e verificação de identidade')
+    .addTag('biometric', 'Autenticação biométrica e dispositivos')
+    .addTag('transactions', 'Transações financeiras')
+    .addTag('notifications', 'Notificações push e do sistema')
+    .addTag('campaigns', 'Campanhas e códigos promocionais')
+    .addTag('terms', 'Termos e condições de serviço')
+    .addTag('actions', 'Ações e funcionalidades do aplicativo')
+    .addTag('app-info', 'Informações da aplicação')
+    .addTag('backoffice-auth', 'Autenticação de usuários backoffice')
+    .addTag('backoffice-users', 'Gestão de usuários backoffice')
+    .addTag('backoffice-clients', 'Gestão de clientes e contas')
+    .addTag('backoffice-roles', 'Papéis e permissões')
+    .addTag('backoffice-onboarding', 'Gerenciamento de onboarding')
+    .addTag('backoffice-actions', 'Gestão de ações e permissões')
+    .addTag('backoffice-system-config', 'Configurações do sistema')
+    .addTag('backoffice-logs', 'Logs e auditoria do sistema')
+    .addTag('health', 'Health check da API')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
