@@ -59,19 +59,19 @@ export class NotificationService {
   async sendUnlockAccount(email: string, code: string) {
     await this.sendEmail({
       to: email,
-      subject: 'Desbloqueio de conta',
-      text: `Use o código ${code} para desbloquear sua conta.`,
-      html: `<p>Use o código abaixo para desbloquear sua conta:</p><p><strong>${code}</strong></p>`,
+      subject: 'Account Unlock',
+      text: `Use code ${code} to unlock your account.`,
+      html: `<p>Use the code below to unlock your account:</p><p><strong>${code}</strong></p>`,
     });
   }
 
   async sendSigninAlert(email: string, ip?: string) {
-    const details = ip ? `IP: ${ip}` : 'Acesso realizado.';
+    const details = ip ? `IP: ${ip}` : 'Access performed.';
     await this.sendEmail({
       to: email,
-      subject: 'Novo acesso',
-      text: `Detectamos um novo acesso. ${details}`,
-      html: `<p>Detectamos um novo acesso na sua conta.</p><p>${details}</p>`,
+      subject: 'New Access',
+      text: `We detected a new access. ${details}`,
+      html: `<p>We detected a new access to your account.</p><p>${details}</p>`,
     });
   }
 }
