@@ -92,7 +92,10 @@ function loadDotEnvFile(filePath: string): void {
 
     mapWalletVariables();
   } catch (error) {
-    logger.error(`Error loading environment file ${filePath}:`, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      `Error loading environment file ${filePath}:`,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     throw error;
   }
 }

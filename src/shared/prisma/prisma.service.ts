@@ -1,6 +1,9 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 // Import types from generated/prisma for TypeScript type checking
-import type { PrismaClient as GeneratedPrismaClient } from '../../../generated/prisma';
+import type {
+  PrismaClient as GeneratedPrismaClient,
+  Prisma,
+} from '../../../generated/prisma';
 
 // Runtime import - load PrismaClient dynamically from generated/prisma
 // This works in both development (from src/) and production (from dist/)
