@@ -39,10 +39,10 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
-    ConfigModule, // Módulo de configuração global
-    LoggerModule, // Módulo Logger global
-    SqsModule, // Módulo SQS global
-    CronosModule, // Módulo Cronos global
+    ConfigModule,
+    LoggerModule,
+    SqsModule,
+    CronosModule,
     PrismaModule,
     JwtModule,
     HealthModule,
