@@ -1,31 +1,22 @@
 #!/bin/bash
 
-# Script para testar requisições Cronos diretamente na EC2
-# Testa se o problema é IP/proxy fazendo chamadas diretas
-
-# Configurações (ajuste conforme necessário)
 CRONOS_URL="https://apibr.unex.ar"
 CRONOS_USERNAME="pub_EwERFOBmKy78wm12FFERGydHzTTojIGdUNlazfOh"
 CRONOS_PASSWORD="priv_jstjv2TBDmsuWsIOUzhgG3yW4hTWOFjIi5PQbgcz"
 CRONOS_USER_PASSWORD="abc123\$!"
 USER_DOCUMENT="46087750819"
 
-# Para testar com id_pagamento existente, descomente e ajuste:
-# ID_PAGAMENTO="99b85d20-3b6e-4bcf-a133-fb62797592ea"
-
-# Para criar um novo id_pagamento, configure:
 PIX_KEY_TYPE="cpf"
 PIX_KEY_VALUE="12345678900"
 VALOR="0.11"
 DESCRIPTION="Transferência PIX teste"
 
 echo "═══════════════════════════════════════════════════════"
-echo "Teste Cronos API - Requisições curl diretas"
+echo "Cronos API Test - Direct curl requests"
 echo "═══════════════════════════════════════════════════════"
 echo ""
 
-# Passo 1: Obter token da aplicação (Basic Auth)
-echo "📤 Passo 1: Obtendo token da aplicação..."
+echo "Step 1: Getting application token..."
 echo "URL: GET ${CRONOS_URL}/api/v1/application/token"
 echo "Auth: Basic (${CRONOS_USERNAME}:${CRONOS_PASSWORD})"
 echo ""
@@ -45,23 +36,22 @@ echo "$APP_TOKEN_BODY" | jq '.' 2>/dev/null || echo "$APP_TOKEN_BODY"
 echo ""
 
 if [ "$HTTP_STATUS" != "200" ]; then
-  echo "❌ Erro ao obter token da aplicação. Status: ${HTTP_STATUS}"
+  echo "ERROR: Failed to get application token. Status: ${HTTP_STATUS}"
   exit 1
 fi
 
 APP_TOKEN=$(echo "$APP_TOKEN_BODY" | jq -r '.token' 2>/dev/null)
 
 if [ -z "$APP_TOKEN" ] || [ "$APP_TOKEN" = "null" ]; then
-  echo "❌ Token da aplicação não encontrado na resposta"
+  echo "ERROR: Application token not found in response"
   exit 1
 fi
 
-echo "✅ Token da aplicação obtido: ${APP_TOKEN:0:30}...${APP_TOKEN: -10}"
+echo "SUCCESS: Application token obtained: ${APP_TOKEN:0:30}...${APP_TOKEN: -10}"
 echo ""
 
-# Passo 2: Obter token do usuário (com app token no header)
 echo "═══════════════════════════════════════════════════════"
-echo "📤 Passo 2: Obtendo token do usuário..."
+echo "Step 2: Getting user token..."
 echo "URL: POST ${CRONOS_URL}/api/v1/user/auth"
 echo "Header: Authorization: Bearer ${APP_TOKEN:0:30}..."
 echo "Body: { \"document\": \"${USER_DOCUMENT}\", \"password\": \"***\" }"
@@ -86,23 +76,22 @@ echo "$USER_TOKEN_BODY" | jq '.' 2>/dev/null || echo "$USER_TOKEN_BODY"
 echo ""
 
 if [ "$HTTP_STATUS" != "200" ]; then
-  echo "❌ Erro ao obter token do usuário. Status: ${HTTP_STATUS}"
+  echo "ERROR: Failed to get user token. Status: ${HTTP_STATUS}"
   exit 1
 fi
 
 USER_TOKEN=$(echo "$USER_TOKEN_BODY" | jq -r '.token' 2>/dev/null)
 
 if [ -z "$USER_TOKEN" ] || [ "$USER_TOKEN" = "null" ]; then
-  echo "❌ Token do usuário não encontrado na resposta"
+  echo "ERROR: User token not found in response"
   exit 1
 fi
 
-echo "✅ Token do usuário obtido: ${USER_TOKEN:0:30}...${USER_TOKEN: -10}"
+echo "SUCCESS: User token obtained: ${USER_TOKEN:0:30}...${USER_TOKEN: -10}"
 echo ""
 
-# Passo 3: Criar transferência PIX (para obter id_pagamento FRESCO)
 echo "═══════════════════════════════════════════════════════"
-echo "📤 Passo 3: Criando transferência PIX para obter id_pagamento..."
+echo "Step 3: Creating PIX transfer to get fresh id_pagamento..."
 echo "URL: POST ${CRONOS_URL}/api/v1/pix/criartransferencia"
 echo "Header: Authorization: Bearer ${USER_TOKEN:0:30}..."
 echo "Body: {"
@@ -130,23 +119,22 @@ echo "$CREATE_BODY" | jq '.' 2>/dev/null || echo "$CREATE_BODY"
 echo ""
 
 if [ "$HTTP_STATUS" != "200" ]; then
-  echo "❌ Erro ao criar transferência PIX. Status: ${HTTP_STATUS}"
+  echo "ERROR: Failed to create PIX transfer. Status: ${HTTP_STATUS}"
   exit 1
 fi
 
 ID_PAGAMENTO=$(echo "$CREATE_BODY" | jq -r '.id_pagamento' 2>/dev/null)
 
 if [ -z "$ID_PAGAMENTO" ] || [ "$ID_PAGAMENTO" = "null" ]; then
-  echo "❌ id_pagamento não encontrado na resposta"
+  echo "ERROR: id_pagamento not found in response"
   exit 1
 fi
 
-echo "✅ Transferência PIX criada - id_pagamento: ${ID_PAGAMENTO}"
+echo "SUCCESS: PIX transfer created - id_pagamento: ${ID_PAGAMENTO}"
 echo ""
 
-# Passo 4: Confirmar transferência PIX (com user token no header)
 echo "═══════════════════════════════════════════════════════"
-echo "📤 Passo 4: Confirmando transferência PIX (COM ID_PAGAMENTO RECÉM-CRIADO)..."
+echo "Step 4: Confirming PIX transfer (WITH FRESHLY CREATED ID_PAGAMENTO)..."
 echo "URL: POST ${CRONOS_URL}/api/v1/pix/confirmartransferencia"
 echo "Header: Authorization: Bearer ${USER_TOKEN:0:30}..."
 echo "Body: {"
@@ -156,10 +144,10 @@ echo "  \"description\": \"${DESCRIPTION}\","
 echo "  \"save_as_favorite\": 0"
 echo "}"
 echo ""
-echo "⚠️  IMPORTANTE: Usando id_pagamento RECÉM-CRIADO (${ID_PAGAMENTO})"
-echo "   Se funcionar agora mas não funcionou antes, o problema pode ser:"
-echo "   - id_pagamento expirado"
-echo "   - Token diferente usado na criação vs confirmação"
+echo "IMPORTANT: Using FRESHLY CREATED id_pagamento (${ID_PAGAMENTO})"
+echo "   If it works now but didn't work before, the problem could be:"
+echo "   - Expired id_pagamento"
+echo "   - Different token used in creation vs confirmation"
 echo ""
 
 CONFIRM_RESPONSE=$(curl -s -X POST \
@@ -183,25 +171,24 @@ echo "$CONFIRM_BODY" | jq '.' 2>/dev/null || echo "$CONFIRM_BODY"
 echo ""
 
 if [ "$HTTP_STATUS" = "200" ]; then
-  echo "✅ Transferência PIX confirmada com sucesso!"
+  echo "SUCCESS: PIX transfer confirmed successfully!"
   echo ""
   SUCCESS=$(echo "$CONFIRM_BODY" | jq -r '.success' 2>/dev/null)
   if [ "$SUCCESS" = "true" ]; then
-    echo "✅ API retornou success: true"
+    echo "SUCCESS: API returned success: true"
   else
-    echo "⚠️  API retornou success: ${SUCCESS}"
+    echo "WARNING: API returned success: ${SUCCESS}"
   fi
 else
-  echo "❌ Erro ao confirmar transferência PIX. Status: ${HTTP_STATUS}"
+  echo "ERROR: Failed to confirm PIX transfer. Status: ${HTTP_STATUS}"
   echo ""
   MESSAGE=$(echo "$CONFIRM_BODY" | jq -r '.message' 2>/dev/null)
   if [ -n "$MESSAGE" ] && [ "$MESSAGE" != "null" ]; then
-    echo "Mensagem de erro: ${MESSAGE}"
+    echo "Error message: ${MESSAGE}"
   fi
 fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
-echo "Teste completo!"
+echo "Test complete!"
 echo "═══════════════════════════════════════════════════════"
-
