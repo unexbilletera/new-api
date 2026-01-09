@@ -4,6 +4,7 @@ export class LoginResponseDto {
   @ApiProperty({
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
   })
   accessToken: string;
 
@@ -11,8 +12,8 @@ export class LoginResponseDto {
     description: 'Authenticated user data',
     example: {
       id: '123e4567-e89b-12d3-a456-426614174000',
-      name: 'João Silva',
-      email: 'joao.silva@example.com',
+      name: 'John Silva',
+      email: 'john.silva@example.com',
       role: {
         id: '123e4567-e89b-12d3-a456-426614174001',
         name: 'Admin',
@@ -33,7 +34,7 @@ export class LoginResponseDto {
 
   @ApiProperty({
     description: 'Informational message',
-    example: 'Login realizado com sucesso',
+    example: 'Login successful',
   })
   message: string;
 
