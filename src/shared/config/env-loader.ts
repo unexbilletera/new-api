@@ -33,13 +33,18 @@ export function loadEnvironmentFile(): void {
 
   if (!envFileName) {
     envFileName = '.env';
+    console.warn(
+      `⚠️  NODE_ENV não está definido ou não é 'production'/'sandbox'. Tentando carregar: ${envFileName}`,
+    );
   }
 
   envFilePath = path.join(rootPath, envFileName);
 
   if (fs.existsSync(envFilePath)) {
     loadDotEnvFile(envFilePath);
-    logger.info(`Environment file loaded: ${envFileName}`);
+    console.log(
+      `✅ Environment file loaded: ${envFileName} (NODE_ENV=${process.env.NODE_ENV || 'not set'})`,
+    );
     return;
   }
 
@@ -76,7 +81,11 @@ function loadDotEnvFile(filePath: string): void {
 
       const cleanValue = value.replace(/^["']|["']$/g, '');
 
-      if (!process.env[key]) {
+      // Quando carregando env.prod ou env.sandbox, sempre sobrescreve (força valores do arquivo)
+      // Isso garante que o arquivo correto tenha prioridade
+      const isEnvFile =
+        filePath.includes('env.prod') || filePath.includes('env.sandbox');
+      if (isEnvFile || !process.env[key]) {
         process.env[key] = cleanValue;
       }
     }

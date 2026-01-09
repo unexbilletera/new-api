@@ -1,12 +1,13 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from '../prisma/prisma.module';
-import { LoggerModule } from '../logger/logger.module';
+import { Global, Module } from '@nestjs/common';
 import { CronosService } from './cronos.service';
+import { ConfigModule } from '../config/config.module';
+import { LoggerModule } from '../logger/logger.module';
 
+@Global()
 @Module({
-  imports: [ConfigModule, PrismaModule, LoggerModule],
+  imports: [ConfigModule, LoggerModule],
   providers: [CronosService],
   exports: [CronosService],
 })
 export class CronosModule {}
+

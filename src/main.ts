@@ -4,6 +4,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
@@ -31,9 +32,38 @@ async function bootstrap() {
 
   app.enableCors();
 
+  // Configurar Swagger/OpenAPI
+  const config = new DocumentBuilder()
+    .setTitle('Unex API')
+    .setDescription('API para gerenciamento de transações financeiras')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+    )
+    .addTag('transactions', 'Endpoints relacionados a transações')
+    .addTag('auth', 'Endpoints de autenticação')
+    .addTag('backoffice', 'Endpoints do backoffice')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
   const port = parseInt(process.env.PORT || process.env.WALLET_SERVER_PORT || '3000', 10);
   await app.listen(port, '0.0.0.0');
   logger.info(`API running on http://0.0.0.0:${port}`);
+  logger.info(`Swagger documentation available at http://0.0.0.0:${port}/api/docs`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 bootstrap();
