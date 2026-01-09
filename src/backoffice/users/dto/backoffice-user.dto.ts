@@ -2,20 +2,20 @@ import { IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, IsUUID } from 'cl
 
 export class CreateBackofficeUserDto {
   @IsString()
-  @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
-  @IsEmail({}, { message: 'Email inválido' })
-  @IsNotEmpty({ message: 'Email é obrigatório' })
+  @IsEmail({}, { message: 'Invalid email' })
+  @IsNotEmpty({ message: 'Email is required' })
   email: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'Senha é obrigatória' })
-  @MinLength(8, { message: 'Senha deve ter no mínimo 8 caracteres' })
+  @IsNotEmpty({ message: 'Password is required' })
+  @MinLength(8, { message: 'Password must be at least 8 characters' })
   password: string;
 
-  @IsUUID('4', { message: 'Role ID inválido' })
-  @IsNotEmpty({ message: 'Role é obrigatório' })
+  @IsUUID('4', { message: 'Invalid Role ID' })
+  @IsNotEmpty({ message: 'Role is required' })
   roleId: string;
 }
 
@@ -24,16 +24,16 @@ export class UpdateBackofficeUserDto {
   @IsOptional()
   name?: string;
 
-  @IsEmail({}, { message: 'Email inválido' })
+  @IsEmail({}, { message: 'Invalid email' })
   @IsOptional()
   email?: string;
 
   @IsString()
   @IsOptional()
-  @MinLength(8, { message: 'Senha deve ter no mínimo 8 caracteres' })
+  @MinLength(8, { message: 'Password must be at least 8 characters' })
   password?: string;
 
-  @IsUUID('4', { message: 'Role ID inválido' })
+  @IsUUID('4', { message: 'Invalid Role ID' })
   @IsOptional()
   roleId?: string;
 
