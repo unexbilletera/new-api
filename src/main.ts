@@ -34,7 +34,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Unex API')
-    .setDescription('API para gerenciamento de transações financeiras')
+    .setDescription('API for financial transaction management')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -42,30 +42,30 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'JWT',
-        description: 'Insira o token JWT no formato: Bearer <token>',
+        description: 'Enter JWT token in format: Bearer <token>',
         in: 'header',
       },
       'JWT-auth',
     )
-    .addTag('auth', 'Autenticação de usuários')
-    .addTag('users', 'Gestão de perfil e dados de usuários')
-    .addTag('onboarding', 'Processo de onboarding e verificação de identidade')
-    .addTag('biometric', 'Autenticação biométrica e dispositivos')
-    .addTag('transactions', 'Transações financeiras')
-    .addTag('notifications', 'Notificações push e do sistema')
-    .addTag('campaigns', 'Campanhas e códigos promocionais')
-    .addTag('terms', 'Termos e condições de serviço')
-    .addTag('actions', 'Ações e funcionalidades do aplicativo')
-    .addTag('app-info', 'Informações da aplicação')
-    .addTag('backoffice-auth', 'Autenticação de usuários backoffice')
-    .addTag('backoffice-users', 'Gestão de usuários backoffice')
-    .addTag('backoffice-clients', 'Gestão de clientes e contas')
-    .addTag('backoffice-roles', 'Papéis e permissões')
-    .addTag('backoffice-onboarding', 'Gerenciamento de onboarding')
-    .addTag('backoffice-actions', 'Gestão de ações e permissões')
-    .addTag('backoffice-system-config', 'Configurações do sistema')
-    .addTag('backoffice-logs', 'Logs e auditoria do sistema')
-    .addTag('health', 'Health check da API')
+    .addTag('auth', 'User authentication')
+    .addTag('users', 'User profile and data management')
+    .addTag('onboarding', 'Onboarding process and identity verification')
+    .addTag('biometric', 'Biometric authentication and devices')
+    .addTag('transactions', 'Financial transactions')
+    .addTag('notifications', 'Push and system notifications')
+    .addTag('campaigns', 'Campaigns and promotional codes')
+    .addTag('terms', 'Terms and conditions of service')
+    .addTag('actions', 'Application actions and features')
+    .addTag('app-info', 'Application information')
+    .addTag('backoffice-auth', 'Backoffice user authentication')
+    .addTag('backoffice-users', 'Backoffice user management')
+    .addTag('backoffice-clients', 'Client and account management')
+    .addTag('backoffice-roles', 'Roles and permissions')
+    .addTag('backoffice-onboarding', 'Onboarding management')
+    .addTag('backoffice-actions', 'Action and permission management')
+    .addTag('backoffice-system-config', 'System configuration')
+    .addTag('backoffice-logs', 'System logs and audit')
+    .addTag('health', 'API health check')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
