@@ -1,8 +1,3 @@
-/**
- * Schemas de resposta para erros padrão da API
- * Utilizados para documentação automática no Swagger
- */
-
 export const ApiErrorResponses = {
   BadRequest: {
     status: 400,
