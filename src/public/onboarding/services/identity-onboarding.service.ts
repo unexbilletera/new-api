@@ -137,7 +137,7 @@ export class IdentityOnboardingService {
       await this.notificationService.sendEmail({
         to: user.email,
         subject: 'Documento recebido',
-        text: 'Recebemos seu documento argentino para validação.',
+        text: 'We received your Argentine document for validation.',
       });
     }
 

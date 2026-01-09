@@ -97,7 +97,7 @@ export class OnboardingService {
 
     return {
       success: true,
-      message: 'Onboarding iniciado com sucesso',
+      message: 'Onboarding started successfully',
       userId: user.id,
       onboardingState,
       nextStep: 'emailForm',
@@ -236,7 +236,7 @@ export class OnboardingService {
 
     return {
       success: true,
-      message: 'Código verificado com sucesso',
+      message: 'Code verified successfully',
       userId: updated.id,
       onboardingState: updated.onboardingState,
       nextStep,
@@ -352,7 +352,7 @@ export class OnboardingService {
           await this.notificationService.sendEmail({
             to: user.email,
             subject: 'Selfie recebida',
-            text: 'Recebemos sua selfie para verificação de prova de vida.',
+            text: 'We received your selfie for proof-of-life verification.',
           });
         }
 
@@ -398,7 +398,7 @@ export class OnboardingService {
 
     return {
       success: true,
-      message: 'Dados atualizados com sucesso',
+      message: 'Data updated successfully',
       user: updated,
       onboardingState: updated.onboardingState,
     };
@@ -557,7 +557,7 @@ export class OnboardingService {
       await this.notificationService.sendEmail({
         to: user.email,
         subject: 'Documento recebido',
-        text: 'Recebemos seu documento argentino para validação.',
+        text: 'We received your Argentine document for validation.',
       });
     }
 
