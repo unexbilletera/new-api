@@ -77,23 +77,25 @@ export const COVERAGE_THRESHOLDS = {
 };
 
 export const CRITICAL_FILES = [
-  'src/public/auth/services/*.ts',
-  'src/shared/jwt/*.ts',
-  'src/shared/prisma/*.ts',
+  'src/1-public/1.1-authentication/services/*.ts',
+  'src/4-shared/jwt/*.ts',
+  'src/4-shared/prisma/*.ts',
+  'src/4-shared/security/*.ts',
 ];
 
 export const CORE_FILES = [
-  'src/public/auth/controllers/*.ts',
-  'src/secure/notifications/services/*.ts',
-  'src/secure/app-info/services/*.ts',
+  'src/1-public/1.1-authentication/controllers/*.ts',
+  'src/2-secure/2.2-services/notifications/services/*.ts',
+  'src/2-secure/2.3-information-management/app-info/services/*.ts',
+  'src/3-backoffice/3.1-authentication-access-control/auth/services/*.ts',
 ];
 
 export const COVERAGE_STATUS = {
-  excellent: { min: 95, color: '#10b981', emoji: '🟢' },
-  good: { min: 85, color: '#3b82f6', emoji: '🔵' },
-  acceptable: { min: 75, color: '#f59e0b', emoji: '🟡' },
-  poor: { min: 60, color: '#ef4444', emoji: '🔴' },
-  critical: { min: 0, color: '#7f1d1d', emoji: '🔴' },
+  excellent: { min: 95, color: '#10b981', label: 'Excellent' },
+  good: { min: 85, color: '#3b82f6', label: 'Good' },
+  acceptable: { min: 75, color: '#f59e0b', label: 'Acceptable' },
+  poor: { min: 60, color: '#ef4444', label: 'Poor' },
+  critical: { min: 0, color: '#7f1d1d', label: 'Critical' },
 };
 
 export function getCoverageStatus(percentage: number): keyof typeof COVERAGE_STATUS {
@@ -130,14 +132,14 @@ export const SAMPLE_COVERAGE_REPORT: CoverageReport = {
   },
   byFile: [
     {
-      file: 'src/public/auth/controllers/auth.controller.ts',
+      file: 'src/1-public/1.1-authentication/controllers/auth.controller.ts',
       lines: { total: 200, covered: 195, skipped: 0, pct: 97.5 },
       statements: { total: 220, covered: 215, skipped: 0, pct: 97.7 },
       functions: { total: 15, covered: 14, skipped: 0, pct: 93.3 },
       branches: { total: 40, covered: 38, skipped: 0, pct: 95 },
     },
     {
-      file: 'src/public/auth/services/auth.service.ts',
+      file: 'src/1-public/1.1-authentication/services/auth.service.ts',
       lines: { total: 300, covered: 285, skipped: 5, pct: 95 },
       statements: { total: 320, covered: 305, skipped: 5, pct: 95.3 },
       functions: { total: 25, covered: 24, skipped: 0, pct: 96 },
@@ -242,7 +244,13 @@ export const JEST_COVERAGE_CONFIG = {
       lines: 80,
       statements: 80,
     },
-    './src/public/auth/': {
+    './src/1-public/1.1-authentication/': {
+      branches: 85,
+      functions: 90,
+      lines: 95,
+      statements: 95,
+    },
+    './src/4-shared/jwt/': {
       branches: 85,
       functions: 90,
       lines: 95,
@@ -256,21 +264,21 @@ export function getRecommendations(coverage: CoverageMetrics): string[] {
   const recommendations: string[] = [];
 
   if (coverage.lines.pct < 80) {
-    recommendations.push('❌ Line coverage below 80% - Add more test cases');
+    recommendations.push('[CRITICAL] Line coverage below 80% - Add more test cases');
   } else if (coverage.lines.pct < 90) {
-    recommendations.push('⚠️ Line coverage 80-90% - Good, but can improve');
+    recommendations.push('[WARNING] Line coverage 80-90% - Good, but can improve');
   }
 
   if (coverage.statements.pct < 80) {
-    recommendations.push('❌ Statement coverage below 80% - Focus on statement coverage');
+    recommendations.push('[CRITICAL] Statement coverage below 80% - Focus on statement coverage');
   }
 
   if (coverage.functions.pct < 75) {
-    recommendations.push('❌ Function coverage below 75% - Test more functions');
+    recommendations.push('[CRITICAL] Function coverage below 75% - Test more functions');
   }
 
   if (coverage.branches.pct < 70) {
-    recommendations.push('❌ Branch coverage below 70% - Add edge case tests');
+    recommendations.push('[CRITICAL] Branch coverage below 70% - Add edge case tests');
   }
 
   if (
@@ -278,7 +286,7 @@ export function getRecommendations(coverage: CoverageMetrics): string[] {
     coverage.statements.pct >= 90 &&
     coverage.functions.pct >= 85
   ) {
-    recommendations.push('✅ Excellent coverage - Keep up the quality!');
+    recommendations.push('[SUCCESS] Excellent coverage - Keep up the quality!');
   }
 
   return recommendations;
