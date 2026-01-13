@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class EmailChangeRequestResponseDto {
   @ApiProperty({
@@ -24,12 +24,6 @@ export class EmailChangeRequestResponseDto {
     example: 600,
   })
   expiresIn: number;
-
-  @ApiPropertyOptional({
-    description: 'Debug information (development only)',
-    example: null,
-  })
-  debug?: any;
 }
 
 export class EmailChangeConfirmResponseDto {

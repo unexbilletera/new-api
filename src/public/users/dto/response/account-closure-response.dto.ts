@@ -2,10 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class AccountClosureResponseDto {
   @ApiProperty({
-    description: 'Access token (null after closure)',
-    example: null,
-    type: 'null',
-    nullable: true,
+    description: 'Indicates if the account closure was successful',
+    example: true,
   })
-  accessToken: null;
+  success: boolean;
+
+  @ApiProperty({
+    description: 'Informational message',
+    example: 'Account closure request processed successfully',
+  })
+  message: string;
 }

@@ -44,7 +44,7 @@ export class UserProfileUpdateDto {
 
   @ApiProperty({
     description: "User's preferred language",
-    example: 'pt-BR',
+    example: 'es',
     nullable: true,
   })
   language: string | null;
@@ -65,16 +65,14 @@ export class UserProfileUpdateDto {
 
   @ApiProperty({
     description: "User's gender",
-    example: 'M',
-    enum: ['M', 'F', 'O'],
+    example: 'masculino',
     nullable: true,
   })
   gender: string | null;
 
   @ApiProperty({
     description: "User's marital status",
-    example: 'SINGLE',
-    enum: ['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED'],
+    example: 'solteiro',
     nullable: true,
   })
   maritalStatus: string | null;

@@ -15,26 +15,12 @@ export class IdentityListItemDto {
   country: string | null;
 
   @ApiProperty({
-    description: 'Tax document number (CPF/CNPJ)',
-    example: '12345678901',
-    nullable: true,
-  })
-  taxDocumentNumber: string | null;
-
-  @ApiProperty({
     description: 'Tax document type',
     example: 'CPF',
     enum: ['CPF', 'CNPJ'],
     nullable: true,
   })
   taxDocumentType: string | null;
-
-  @ApiProperty({
-    description: 'Identity document number',
-    example: '1234567',
-    nullable: true,
-  })
-  identityDocumentNumber: string | null;
 
   @ApiProperty({
     description: 'Identity document type',
@@ -46,17 +32,24 @@ export class IdentityListItemDto {
 
   @ApiProperty({
     description: 'Document validation status',
-    example: 'APPROVED',
-    enum: ['PENDING', 'APPROVED', 'REJECTED'],
+    example: 'enable',
     nullable: true,
   })
   status: string | null;
 
   @ApiProperty({
-    description: 'Document creation date',
-    example: '2024-01-15T10:30:00Z',
+    description: "Identity's type",
+    example: 'personal',
+    nullable: true,
   })
-  createdAt: Date;
+  type: string | null;
+
+  @ApiProperty({
+    description: 'Full name in identity',
+    example: 'John Silva Santos',
+    nullable: true,
+  })
+  name: string | null;
 }
 
 export class IdentityListResponseDto {

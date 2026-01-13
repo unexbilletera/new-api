@@ -1,4 +1,47 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class IdentityLightDto {
+  @ApiProperty({
+    description: "Identity's unique ID",
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: "Identity's country",
+    example: 'BR',
+    nullable: true,
+  })
+  country: string | null;
+
+  @ApiProperty({
+    description: "Identity's status",
+    example: 'enable',
+    nullable: true,
+  })
+  status: string | null;
+
+  @ApiProperty({
+    description: "Identity's type",
+    example: 'personal',
+    nullable: true,
+  })
+  type: string | null;
+
+  @ApiProperty({
+    description: "Identity's subtype",
+    example: 'basic',
+    nullable: true,
+  })
+  subtype: string | null;
+
+  @ApiProperty({
+    description: 'Full name in identity',
+    example: 'John Silva Santos',
+    nullable: true,
+  })
+  name: string | null;
+}
 
 export class IdentityResponseDto {
   @ApiProperty({
@@ -83,6 +126,49 @@ export class IdentityResponseDto {
   updatedAt: Date;
 }
 
+export class AccountLightDto {
+  @ApiProperty({
+    description: "Account's unique ID",
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: 'Account type',
+    example: 'bind',
+    nullable: true,
+  })
+  type: string | null;
+
+  @ApiProperty({
+    description: 'Account status',
+    example: 'enable',
+    nullable: true,
+  })
+  status: string | null;
+
+  @ApiProperty({
+    description: "Account's CVU",
+    example: '0000003100010000000001',
+    nullable: true,
+  })
+  cvu: string | null;
+
+  @ApiProperty({
+    description: 'Account alias',
+    example: 'Main Account',
+    nullable: true,
+  })
+  alias: string | null;
+
+  @ApiProperty({
+    description: 'Account balance',
+    example: '1500.50',
+    nullable: true,
+  })
+  balance: string | null;
+}
+
 export class AccountResponseDto {
   @ApiProperty({
     description: "Account's unique ID",
@@ -157,6 +243,138 @@ export class OnboardingStateDto {
 
 export class ExchangeRatesDto {
   [key: string]: any;
+}
+
+export class UserDataLightDto {
+  @ApiProperty({
+    description: "User's unique ID",
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  id: string;
+
+  @ApiProperty({
+    description: "User's email address",
+    example: 'usuario@exemplo.com',
+    nullable: true,
+  })
+  email: string | null;
+
+  @ApiProperty({
+    description: "User's phone number",
+    example: '+5511987654321',
+    nullable: true,
+  })
+  phone: string | null;
+
+  @ApiProperty({
+    description: "User's first name",
+    example: 'John',
+    nullable: true,
+  })
+  firstName: string | null;
+
+  @ApiProperty({
+    description: "User's last name",
+    example: 'Silva',
+    nullable: true,
+  })
+  lastName: string | null;
+
+  @ApiProperty({
+    description: "User's full name",
+    example: 'John Silva Santos',
+    nullable: true,
+  })
+  name: string | null;
+
+  @ApiProperty({
+    description: "User account's status",
+    example: 'enable',
+  })
+  status: string;
+
+  @ApiProperty({
+    description: "User's access level",
+    example: 'user',
+  })
+  access: string;
+
+  @ApiProperty({
+    description: "User's preferred language",
+    example: 'es',
+    nullable: true,
+  })
+  language: string | null;
+
+  @ApiProperty({
+    description: "User's country",
+    example: 'BR',
+    nullable: true,
+  })
+  country: string | null;
+
+  @ApiProperty({
+    description: "User's birth date",
+    example: '1990-01-15T00:00:00Z',
+    nullable: true,
+  })
+  birthdate: Date | null;
+
+  @ApiProperty({
+    description: "User's gender",
+    example: 'masculino',
+    nullable: true,
+  })
+  gender: string | null;
+
+  @ApiProperty({
+    description: "User's marital status",
+    example: 'solteiro',
+    nullable: true,
+  })
+  maritalStatus: string | null;
+
+  @ApiProperty({
+    description: 'Indicates if email is verified',
+    example: true,
+  })
+  emailVerified: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if phone is verified',
+    example: true,
+  })
+  phoneVerified: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if liveness is verified',
+    example: false,
+  })
+  livenessVerified: boolean;
+
+  @ApiProperty({
+    description: 'Onboarding process state',
+    type: () => OnboardingStateDto,
+  })
+  onboardingState: OnboardingStateDto;
+
+  @ApiProperty({
+    description: "User's associated identities",
+    type: () => [IdentityLightDto],
+  })
+  usersIdentities: IdentityLightDto[];
+
+  @ApiProperty({
+    description: "User's associated accounts",
+    type: () => [AccountLightDto],
+  })
+  usersAccounts: AccountLightDto[];
+
+  @ApiProperty({
+    description: 'User creation date',
+    example: '2024-01-15T10:00:00Z',
+  })
+  createdAt: Date;
 }
 
 export class UserDataDto {
@@ -329,13 +547,28 @@ export class UserDataDto {
 
 export class UserProfileResponseDto {
   @ApiProperty({
-    description: 'Indicates if the request was successful',
-    example: true,
+    description: "User profile's essential data for navigation",
+    type: () => UserDataLightDto,
   })
-  success: boolean;
+  user: UserDataLightDto;
 
   @ApiProperty({
-    description: "User profile's complete data",
+    description: 'Indicates if it is necessary to force an application update',
+    example: false,
+  })
+  forceUpgrade: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Current exchange rates (only included when ?include=rates)',
+    type: () => ExchangeRatesDto,
+    nullable: true,
+  })
+  exchangeRates?: ExchangeRatesDto | null;
+}
+
+export class UserProfileFullResponseDto {
+  @ApiProperty({
+    description: "User profile's complete data with all fields",
     type: () => UserDataDto,
   })
   user: UserDataDto;

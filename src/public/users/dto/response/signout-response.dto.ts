@@ -2,10 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SignoutResponseDto {
   @ApiProperty({
-    description: 'Access token (null after logout)',
-    example: null,
-    type: 'null',
-    nullable: true,
+    description: 'Indicates if the logout was successful',
+    example: true,
   })
-  accessToken: null;
+  success: boolean;
+
+  @ApiProperty({
+    description: 'Informational message',
+    example: 'Logged out successfully',
+  })
+  message: string;
 }
