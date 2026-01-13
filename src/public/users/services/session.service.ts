@@ -16,6 +16,9 @@ export class SessionService {
       await this.userModel.clearTokens(user.id);
     }
 
-    return { accessToken: null };
+    return {
+      success: true,
+      message: 'Logged out successfully',
+    };
   }
 }

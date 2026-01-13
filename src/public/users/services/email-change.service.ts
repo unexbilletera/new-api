@@ -86,7 +86,6 @@ export class EmailChangeService {
     return this.userMapper.toEmailChangeRequestResponseDto(
       normalizedNewEmail,
       sendResult.expiresIn,
-      sendResult.debug,
     );
   }
 

@@ -29,8 +29,9 @@ export class UserProfileService {
   async getCurrentUser(
     userId: string,
     systemVersion?: string,
+    includeRates?: boolean,
   ): Promise<UserProfileResponseDto> {
-    this.logger.info('[PROFILE] Getting current user', { userId });
+    this.logger.info('[PROFILE] Getting current user', { userId, includeRates });
 
     const user = await this.userModel.findById(userId);
 
@@ -42,14 +43,16 @@ export class UserProfileService {
     }
 
     let exchangeRates: any = null;
-    try {
-      exchangeRates = await this.exchangeRatesService.getRates();
-      this.logger.debug('[PROFILE] Exchange rates obtained successfully');
-    } catch (mantecaError: any) {
-      this.logger.warn('[PROFILE] Manteca getRates failed (non-critical)', {
-        error: mantecaError.message,
-      });
-      exchangeRates = null;
+    if (includeRates) {
+      try {
+        exchangeRates = await this.exchangeRatesService.getRates();
+        this.logger.debug('[PROFILE] Exchange rates obtained successfully');
+      } catch (mantecaError: any) {
+        this.logger.warn('[PROFILE] Manteca getRates failed (non-critical)', {
+          error: mantecaError.message,
+        });
+        exchangeRates = null;
+      }
     }
 
     this.logger.info('[PROFILE] Current user retrieved successfully', {

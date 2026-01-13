@@ -32,6 +32,9 @@ export class AccountClosureService {
 
     await this.userModel.closeAccount(userId);
 
-    return { accessToken: null };
+    return {
+      success: true,
+      message: 'Account closure request processed successfully',
+    };
   }
 }

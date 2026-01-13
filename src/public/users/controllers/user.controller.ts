@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Patch,
   Body,
   Param,
   Query,
@@ -91,7 +90,7 @@ export class UserController {
   @ApiOperation({
     summary: 'Get current user data',
     description:
-      "Returns complete information about the authenticated user's profile",
+      "Returns essential information about the authenticated user's profile. Use ?include=rates to include exchange rates.",
   })
   @ApiResponse({
     status: 200,
@@ -103,11 +102,23 @@ export class UserController {
     required: false,
     description: 'Client system version',
   })
+  @ApiQuery({
+    name: 'include',
+    required: false,
+    description: 'Include additional data (e.g., "rates" for exchange rates)',
+    example: 'rates',
+  })
   async getCurrentUser(
     @CurrentUser() user: AuthenticatedUser,
     @Query('systemVersion') systemVersion?: string,
+    @Query('include') include?: string,
   ): Promise<UserProfileResponseDto> {
-    return this.userProfileService.getCurrentUser(user.id, systemVersion);
+    const includeRates = include === 'rates';
+    return this.userProfileService.getCurrentUser(
+      user.id,
+      systemVersion,
+      includeRates,
+    );
   }
 
   @Post('user/change-email/request')
