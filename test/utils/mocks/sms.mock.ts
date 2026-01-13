@@ -22,11 +22,21 @@ import { SmsService } from '../../../src/shared/sms/sms.service';
  */
 export function createSmsServiceMock(): jest.Mocked<SmsService> {
   return {
-    sendSms: jest.fn().mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
-    sendValidationCode: jest.fn().mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
-    sendOtp: jest.fn().mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
-    sendNotification: jest.fn().mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
-    sendBulk: jest.fn().mockResolvedValue([{ messageId: 'sms_mock_12345', status: 'sent' }]),
+    sendSms: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
+    sendValidationCode: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
+    sendOtp: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
+    sendNotification: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'sms_mock_12345', status: 'sent' }),
+    sendBulk: jest
+      .fn()
+      .mockResolvedValue([{ messageId: 'sms_mock_12345', status: 'sent' }]),
     verifyPhoneNumber: jest.fn().mockResolvedValue(true),
     formatPhoneNumber: jest.fn().mockReturnValue('+5511999999999'),
   } as any;

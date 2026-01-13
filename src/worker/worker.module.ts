@@ -14,4 +14,3 @@ import { PixCronosHandler } from './handlers/pix-cronos.handler';
   exports: [WorkerService],
 })
 export class WorkerModule {}
-

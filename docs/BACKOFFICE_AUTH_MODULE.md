@@ -45,17 +45,20 @@ Response JSON
 ### DTO (Data Transfer Object)
 
 **`dto/login.dto.ts`**
+
 - Defines input structure
 - Validates with `class-validator`
 - Custom error messages
 
 **`dto/login-response.dto.ts`**
+
 - Defines response structure
 - Ensures API consistency
 
 ### Controller
 
 **`controllers/auth.controller.ts`**
+
 - Receives HTTP requests
 - Validates DTO automatically (via `ValidationPipe`)
 - Calls Service
@@ -64,6 +67,7 @@ Response JSON
 ### Service
 
 **`services/auth.service.ts`**
+
 - Contains business logic
 - Orchestrates Model calls
 - Handles business errors
@@ -71,6 +75,7 @@ Response JSON
 ### Model
 
 **`models/backoffice-user.model.ts`**
+
 - Accesses database via Prisma
 - Model-specific methods
 - Data validations
@@ -78,6 +83,7 @@ Response JSON
 ### Module
 
 **`auth.module.ts`**
+
 - Registers Controller, Service and Model
 - Imports dependencies (PrismaModule)
 - Exports what is necessary
@@ -87,6 +93,7 @@ Response JSON
 ### POST /backoffice/auth/login
 
 **Request:**
+
 ```json
 {
   "email": "admin@example.com",
@@ -95,6 +102,7 @@ Response JSON
 ```
 
 **Response (200):**
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -112,6 +120,7 @@ Response JSON
 ```
 
 **Errors:**
+
 - `400`: Invalid data (validation)
 - `401`: Invalid email or password
 - `401`: User inactive
@@ -119,11 +128,13 @@ Response JSON
 ### GET /backoffice/auth/me
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 ```
 
 **Response (200):**
+
 ```json
 {
   "user": {

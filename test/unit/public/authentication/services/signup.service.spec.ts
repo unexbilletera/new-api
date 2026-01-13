@@ -100,7 +100,9 @@ describe('SignupService', () => {
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_123');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_123',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'jwt_token_123',
@@ -111,17 +113,24 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         'newuser@example.com',
-        '5511999999999'
+        '5511999999999',
       );
-      expect(validationCodeModel.getValidatedEmailCode).toHaveBeenCalledWith('newuser@example.com');
-      expect(validationCodeModel.getValidatedPhoneCode).toHaveBeenCalledWith('5511999999999');
+      expect(validationCodeModel.getValidatedEmailCode).toHaveBeenCalledWith(
+        'newuser@example.com',
+      );
+      expect(validationCodeModel.getValidatedPhoneCode).toHaveBeenCalledWith(
+        '5511999999999',
+      );
       expect(userModel.create).toHaveBeenCalled();
       expect(result).toHaveProperty('user');
       expect(result).toHaveProperty('accessToken');
     });
 
     it('should normalize email to lowercase', async () => {
-      const dtoWithUppercaseEmail = { ...mockSignupDto, email: 'NewUser@EXAMPLE.COM' };
+      const dtoWithUppercaseEmail = {
+        ...mockSignupDto,
+        email: 'NewUser@EXAMPLE.COM',
+      };
       userModel.exists.mockResolvedValue(false);
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
@@ -131,12 +140,15 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         'newuser@example.com',
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     it('should normalize phone by removing non-digits', async () => {
-      const dtoWithFormattedPhone = { ...mockSignupDto, phone: '+55 (11) 99999-9999' };
+      const dtoWithFormattedPhone = {
+        ...mockSignupDto,
+        phone: '+55 (11) 99999-9999',
+      };
       userModel.exists.mockResolvedValue(false);
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
@@ -146,14 +158,16 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         expect.any(String),
-        '5511999999999'
+        '5511999999999',
       );
     });
 
     it('should throw BadRequestException if user already exists', async () => {
       userModel.exists.mockResolvedValue(true);
 
-      await expect(service.signup(mockSignupDto)).rejects.toThrow(BadRequestException);
+      await expect(service.signup(mockSignupDto)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(userModel.exists).toHaveBeenCalled();
       expect(validationCodeModel.getValidatedEmailCode).not.toHaveBeenCalled();
     });
@@ -162,7 +176,9 @@ describe('SignupService', () => {
       userModel.exists.mockResolvedValue(false);
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(false);
 
-      await expect(service.signup(mockSignupDto)).rejects.toThrow(BadRequestException);
+      await expect(service.signup(mockSignupDto)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(validationCodeModel.getValidatedPhoneCode).not.toHaveBeenCalled();
     });
 
@@ -171,7 +187,9 @@ describe('SignupService', () => {
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(false);
 
-      await expect(service.signup(mockSignupDto)).rejects.toThrow(BadRequestException);
+      await expect(service.signup(mockSignupDto)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(userModel.create).not.toHaveBeenCalled();
     });
 
@@ -180,7 +198,9 @@ describe('SignupService', () => {
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_123');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_123',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'jwt_token_123',
@@ -198,7 +218,9 @@ describe('SignupService', () => {
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_abc');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_abc',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'jwt_token_abc',
@@ -212,7 +234,9 @@ describe('SignupService', () => {
     });
 
     it('should handle database errors', async () => {
-      userModel.exists.mockRejectedValue(new Error('Database connection failed'));
+      userModel.exists.mockRejectedValue(
+        new Error('Database connection failed'),
+      );
 
       await expect(service.signup(mockSignupDto)).rejects.toThrow();
     });
@@ -222,7 +246,9 @@ describe('SignupService', () => {
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_123');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_123',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'jwt_token_123',
@@ -231,19 +257,28 @@ describe('SignupService', () => {
 
       await service.signup(mockSignupDto);
 
-      expect(validationCodeModel.deleteEmailValidationCodes).toHaveBeenCalledWith('newuser@example.com');
-      expect(validationCodeModel.deletePhoneValidationCodes).toHaveBeenCalledWith('5511999999999');
+      expect(
+        validationCodeModel.deleteEmailValidationCodes,
+      ).toHaveBeenCalledWith('newuser@example.com');
+      expect(
+        validationCodeModel.deletePhoneValidationCodes,
+      ).toHaveBeenCalledWith('5511999999999');
     });
   });
 
   describe('email normalization', () => {
     it('should handle emails with spaces', async () => {
-      const dtoWithSpaces = { ...mockSignupDto, email: '  newuser@example.com  ' };
+      const dtoWithSpaces = {
+        ...mockSignupDto,
+        email: '  newuser@example.com  ',
+      };
       userModel.exists.mockResolvedValue(false);
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_123');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_123',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'jwt_token_123',
@@ -254,17 +289,22 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         'newuser@example.com',
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     it('should handle mixed case emails', async () => {
-      const dtoWithMixedCase = { ...mockSignupDto, email: 'NeWuSeR@ExAmPlE.cOm' };
+      const dtoWithMixedCase = {
+        ...mockSignupDto,
+        email: 'NeWuSeR@ExAmPlE.cOm',
+      };
       userModel.exists.mockResolvedValue(false);
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_123');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_123',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'newuser@example.com',
@@ -275,19 +315,24 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         'newuser@example.com',
-        expect.any(String)
+        expect.any(String),
       );
     });
   });
 
   describe('phone normalization', () => {
     it('should handle phone with special characters', async () => {
-      const dtoWithSpecialChars = { ...mockSignupDto, phone: '+55 (11) 9 9999-9999' };
+      const dtoWithSpecialChars = {
+        ...mockSignupDto,
+        phone: '+55 (11) 9 9999-9999',
+      };
       userModel.exists.mockResolvedValue(false);
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_123');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_123',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'jwt_token_123',
@@ -298,7 +343,7 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         expect.any(String),
-        '5511999999999'
+        '5511999999999',
       );
     });
 
@@ -308,7 +353,9 @@ describe('SignupService', () => {
       validationCodeModel.getValidatedEmailCode.mockResolvedValue(true);
       validationCodeModel.getValidatedPhoneCode.mockResolvedValue(true);
       userModel.create.mockResolvedValue(mockNewUser);
-      (jwtService.generateToken as jest.Mock).mockResolvedValue('jwt_token_123');
+      (jwtService.generateToken as jest.Mock).mockResolvedValue(
+        'jwt_token_123',
+      );
       authMapper.toSignupResponseDto.mockReturnValue({
         user: mockNewUser,
         accessToken: 'jwt_token_123',
@@ -319,7 +366,7 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         expect.any(String),
-        '11999999999'
+        '11999999999',
       );
     });
   });

@@ -10,9 +10,18 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
-import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
+import {
+  BackofficeRoleGuard,
+  MinLevel,
+} from '../../../shared/guards/backoffice-role.guard';
 import { ActionsService } from '../services/actions.service';
 import {
   CreateActionDto,
@@ -29,9 +38,21 @@ export class ActionsController {
 
   @Get()
   @ApiOperation({ summary: 'List available actions/services' })
-  @ApiQuery({ name: 'group', required: false, description: 'Action group/module' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by name or description' })
-  @ApiQuery({ name: 'activeOnly', required: false, description: 'Active actions only' })
+  @ApiQuery({
+    name: 'group',
+    required: false,
+    description: 'Action group/module',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search by name or description',
+  })
+  @ApiQuery({
+    name: 'activeOnly',
+    required: false,
+    description: 'Active actions only',
+  })
   @ApiQuery({ name: 'page', required: false, description: 'Page' })
   @ApiQuery({ name: 'limit', required: false, description: 'Limit per page' })
   @MinLevel(1)
@@ -73,7 +94,10 @@ export class ActionsController {
   @ApiOperation({ summary: 'Ativar/desativar ação' })
   @ApiParam({ name: 'id', description: 'ID da ação' })
   @MinLevel(2)
-  async toggleAction(@Param('id') id: string, @Body('enabled') enabled: boolean) {
+  async toggleAction(
+    @Param('id') id: string,
+    @Body('enabled') enabled: boolean,
+  ) {
     return this.actionsService.toggleAction(id, enabled);
   }
 
@@ -101,7 +125,10 @@ export class ActionsController {
     @Param('userId') userId: string,
     @Param('actionName') actionName: string,
   ) {
-    const canPerform = await this.actionsService.userCanPerformAction(userId, actionName);
+    const canPerform = await this.actionsService.userCanPerformAction(
+      userId,
+      actionName,
+    );
     return { userId, actionName, canPerform };
   }
 }

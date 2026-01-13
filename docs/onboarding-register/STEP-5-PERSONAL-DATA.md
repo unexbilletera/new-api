@@ -40,29 +40,29 @@ No authentication required (public endpoint).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| firstName | string | No | User's first name |
-| lastName | string | No | User's last name |
-| country | string | No | Country code (e.g., "br", "ar") |
-| birthdate | string | No | Birth date in ISO format (YYYY-MM-DD) |
-| gender | string | No | Gender ("male", "female", "other") |
-| maritalStatus | string | No | Marital status |
-| pep | string | No | PEP declaration ("0" = no, "1" = yes) |
-| pepSince | string | No | Date when user became PEP (if applicable) |
-| address | object | No | Address information (see below) |
+| Field         | Type   | Required | Description                               |
+| ------------- | ------ | -------- | ----------------------------------------- |
+| firstName     | string | No       | User's first name                         |
+| lastName      | string | No       | User's last name                          |
+| country       | string | No       | Country code (e.g., "br", "ar")           |
+| birthdate     | string | No       | Birth date in ISO format (YYYY-MM-DD)     |
+| gender        | string | No       | Gender ("male", "female", "other")        |
+| maritalStatus | string | No       | Marital status                            |
+| pep           | string | No       | PEP declaration ("0" = no, "1" = yes)     |
+| pepSince      | string | No       | Date when user became PEP (if applicable) |
+| address       | object | No       | Address information (see below)           |
 
 ### Address Object Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| street | string | No | Street name |
-| number | string | No | Street number |
-| complement | string | No | Address complement |
-| neighborhood | string | No | Neighborhood |
-| city | string | No | City |
-| state | string | No | State/Province |
-| zipCode | string | No | ZIP/Postal code |
+| Field        | Type   | Required | Description        |
+| ------------ | ------ | -------- | ------------------ |
+| street       | string | No       | Street name        |
+| number       | string | No       | Street number      |
+| complement   | string | No       | Address complement |
+| neighborhood | string | No       | Neighborhood       |
+| city         | string | No       | City               |
+| state        | string | No       | State/Province     |
+| zipCode      | string | No       | ZIP/Postal code    |
 
 ## Response
 
@@ -74,7 +74,18 @@ No authentication required (public endpoint).
   "message": "User data updated successfully",
   "userId": "550e8400-e29b-41d4-a716-446655440000",
   "onboardingState": {
-    "completedSteps": ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10"],
+    "completedSteps": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "1.5",
+      "1.6",
+      "1.7",
+      "1.8",
+      "1.9",
+      "1.10"
+    ],
     "needsCorrection": []
   },
   "nextStep": "livenessForm"
@@ -84,6 +95,7 @@ No authentication required (public endpoint).
 ### Error Responses
 
 #### 400 Bad Request - Invalid Data
+
 ```json
 {
   "statusCode": 400,
@@ -93,6 +105,7 @@ No authentication required (public endpoint).
 ```
 
 #### 404 Not Found - User Not Found
+
 ```json
 {
   "statusCode": 404,
@@ -104,11 +117,13 @@ No authentication required (public endpoint).
 ## Implementation Details
 
 ### Step Tracking
+
 - **Step 1.8**: Completed when `firstName` or `lastName` is provided
 - **Step 1.9**: Completed when `country`, `birthdate`, `gender`, or `maritalStatus` is provided
 - **Step 1.10**: Completed when `pep` or `pepSince` is provided
 
 ### Data Processing
+
 - `name` field is automatically generated from `firstName` and `lastName`
 - `username` is set to `firstName` if provided
 - `birthdate` is converted to Date object
@@ -118,6 +133,7 @@ No authentication required (public endpoint).
 ## State Management
 
 After successful update:
+
 - `onboardingState.completedSteps` includes `"1.8"`, `"1.9"`, and `"1.10"` (as applicable)
 - Personal data is stored in user record
 - Next step is liveness verification
@@ -125,6 +141,7 @@ After successful update:
 ## PEP Declaration
 
 PEP (Politically Exposed Person) declaration is required for compliance:
+
 - `pep: "0"` = User is not a PEP
 - `pep: "1"` = User is a PEP
 - `pepSince` = Date when user became PEP (required if PEP = "1")

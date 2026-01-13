@@ -6,7 +6,10 @@ import { SignoutResponseDto } from '../dto/response';
 export class SessionService {
   constructor(private userModel: UserModel) {}
 
-  async signout(userId: string, deviceId?: string): Promise<SignoutResponseDto> {
+  async signout(
+    userId: string,
+    deviceId?: string,
+  ): Promise<SignoutResponseDto> {
     const user = await this.userModel.findByIdWithValidStatus(userId);
 
     if (user) {

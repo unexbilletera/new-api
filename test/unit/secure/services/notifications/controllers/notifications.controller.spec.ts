@@ -45,7 +45,13 @@ describe('NotificationsController', () => {
       const query = { limit: 20, offset: 0 };
       const response = {
         data: [
-          { id: mockNotificationId, title: 'Test', message: 'Test notification', status: 'pending', createdAt: new Date() },
+          {
+            id: mockNotificationId,
+            title: 'Test',
+            message: 'Test notification',
+            status: 'pending',
+            createdAt: new Date(),
+          },
         ],
         total: 1,
         page: 1,
@@ -64,8 +70,21 @@ describe('NotificationsController', () => {
       const query = { limit: 10, offset: 0 };
       const response = {
         data: [
-          { id: 'notif-1', title: 'Notification 1', message: 'Message 1', status: 'pending', createdAt: new Date() },
-          { id: 'notif-2', title: 'Notification 2', message: 'Message 2', status: 'read', createdAt: new Date(), readedAt: new Date() },
+          {
+            id: 'notif-1',
+            title: 'Notification 1',
+            message: 'Message 1',
+            status: 'pending',
+            createdAt: new Date(),
+          },
+          {
+            id: 'notif-2',
+            title: 'Notification 2',
+            message: 'Message 2',
+            status: 'read',
+            createdAt: new Date(),
+            readedAt: new Date(),
+          },
         ],
         total: 2,
         page: 1,
@@ -82,7 +101,13 @@ describe('NotificationsController', () => {
 
     it('should handle empty notifications list', async () => {
       const query = { limit: 20, offset: 0 };
-      const response = { data: [], total: 0, page: 1, limit: 20, unreadCount: 0 };
+      const response = {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 20,
+        unreadCount: 0,
+      };
       service.list.mockResolvedValue(response);
 
       const result = await controller.list(mockUserId, query);
@@ -93,28 +118,47 @@ describe('NotificationsController', () => {
 
     it('should propagate service errors', async () => {
       const query = {};
-      service.list.mockRejectedValue(new Error('Failed to fetch notifications'));
+      service.list.mockRejectedValue(
+        new Error('Failed to fetch notifications'),
+      );
 
-      await expect(controller.list(mockUserId, query)).rejects.toThrow('Failed to fetch notifications');
+      await expect(controller.list(mockUserId, query)).rejects.toThrow(
+        'Failed to fetch notifications',
+      );
     });
   });
 
   describe('markAsRead', () => {
     it('should delegate to service', async () => {
-      const response = { success: true, message: 'Notification marked as read' };
+      const response = {
+        success: true,
+        message: 'Notification marked as read',
+      };
       service.markAsRead.mockResolvedValue(response);
 
-      const result = await controller.markAsRead(mockUserId, mockNotificationId);
+      const result = await controller.markAsRead(
+        mockUserId,
+        mockNotificationId,
+      );
 
       expect(result).toEqual(response);
-      expect(service.markAsRead).toHaveBeenCalledWith(mockUserId, mockNotificationId);
+      expect(service.markAsRead).toHaveBeenCalledWith(
+        mockUserId,
+        mockNotificationId,
+      );
     });
 
     it('should return success response', async () => {
-      const response = { success: true, message: 'Notification marked as read' };
+      const response = {
+        success: true,
+        message: 'Notification marked as read',
+      };
       service.markAsRead.mockResolvedValue(response);
 
-      const result = await controller.markAsRead(mockUserId, mockNotificationId);
+      const result = await controller.markAsRead(
+        mockUserId,
+        mockNotificationId,
+      );
 
       expect(result.message).toBeDefined();
       expect(result.success).toBe(true);
@@ -123,7 +167,9 @@ describe('NotificationsController', () => {
     it('should propagate service errors', async () => {
       service.markAsRead.mockRejectedValue(new Error('Notification not found'));
 
-      await expect(controller.markAsRead(mockUserId, mockNotificationId)).rejects.toThrow('Notification not found');
+      await expect(
+        controller.markAsRead(mockUserId, mockNotificationId),
+      ).rejects.toThrow('Notification not found');
     });
   });
 
@@ -166,7 +212,10 @@ describe('NotificationsController', () => {
       const result = await controller.delete(mockUserId, mockNotificationId);
 
       expect(result).toEqual(response);
-      expect(service.delete).toHaveBeenCalledWith(mockUserId, mockNotificationId);
+      expect(service.delete).toHaveBeenCalledWith(
+        mockUserId,
+        mockNotificationId,
+      );
     });
 
     it('should return success response', async () => {
@@ -182,7 +231,9 @@ describe('NotificationsController', () => {
     it('should propagate service errors', async () => {
       service.delete.mockRejectedValue(new Error('Notification not found'));
 
-      await expect(controller.delete(mockUserId, mockNotificationId)).rejects.toThrow('Notification not found');
+      await expect(
+        controller.delete(mockUserId, mockNotificationId),
+      ).rejects.toThrow('Notification not found');
     });
   });
 
@@ -251,7 +302,11 @@ describe('NotificationsController', () => {
 
     it('should return success status', async () => {
       const dto = { title: 'Test', message: 'Test notification' };
-      const response = { message: 'Test push sent', success: true, timestamp: new Date().toISOString() };
+      const response = {
+        message: 'Test push sent',
+        success: true,
+        timestamp: new Date().toISOString(),
+      };
       service.sendTestPush.mockResolvedValue(response);
 
       const result = await controller.sendTestPush(mockUserId, dto);
@@ -261,7 +316,11 @@ describe('NotificationsController', () => {
 
     it('should handle test push failure', async () => {
       const dto = { title: 'Test', message: 'Test notification' };
-      const response = { message: 'Failed to send test push', success: false, error: 'No push token found' };
+      const response = {
+        message: 'Failed to send test push',
+        success: false,
+        error: 'No push token found',
+      };
       service.sendTestPush.mockResolvedValue(response);
 
       const result = await controller.sendTestPush(mockUserId, dto);
@@ -271,9 +330,13 @@ describe('NotificationsController', () => {
 
     it('should propagate service errors', async () => {
       const dto = { title: 'Test', message: 'Test notification' };
-      service.sendTestPush.mockRejectedValue(new Error('Push service unavailable'));
+      service.sendTestPush.mockRejectedValue(
+        new Error('Push service unavailable'),
+      );
 
-      await expect(controller.sendTestPush(mockUserId, dto)).rejects.toThrow('Push service unavailable');
+      await expect(controller.sendTestPush(mockUserId, dto)).rejects.toThrow(
+        'Push service unavailable',
+      );
     });
   });
 });

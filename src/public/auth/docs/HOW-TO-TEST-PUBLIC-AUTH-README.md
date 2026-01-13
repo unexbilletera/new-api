@@ -13,6 +13,7 @@ They were created only to facilitate testing during development, allowing real l
 Temporary login for app users (customers).
 
 **Body (required):**
+
 ```json
 {
   "email": "usuario@exemplo.com",
@@ -21,6 +22,7 @@ Temporary login for app users (customers).
 ```
 
 **Success Response:**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -37,6 +39,7 @@ Temporary login for app users (customers).
 ```
 
 **Example with cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/test/auth/login \
   -H "Content-Type: application/json" \
@@ -53,6 +56,7 @@ curl -X POST http://localhost:3000/test/auth/login \
 Temporary login for backoffice users.
 
 **Body (required):**
+
 ```json
 {
   "email": "admin@exemplo.com",
@@ -61,6 +65,7 @@ Temporary login for backoffice users.
 ```
 
 **Success Response:**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -81,6 +86,7 @@ Temporary login for backoffice users.
 ```
 
 **Example with cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/test/auth/backoffice-login \
   -H "Content-Type: application/json" \

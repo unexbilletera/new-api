@@ -210,7 +210,7 @@
         "duration": 10,
         "expectedRPS": 100,
         "expectedLatency": 300,
-        "expectedSuccessRate": 0.90,
+        "expectedSuccessRate": 0.9,
         "thresholds": {
           "latencyP95": 500,
           "latencyP99": 800,
@@ -243,7 +243,7 @@
     }
   ],
   "alerts": {
-    "degradationThreshold": 0.10,
+    "degradationThreshold": 0.1,
     "improvementTarget": 0.05,
     "warningThreshold": 0.15,
     "criticalThreshold": 0.25

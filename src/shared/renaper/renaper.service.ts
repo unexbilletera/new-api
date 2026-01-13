@@ -64,9 +64,12 @@ export class RenaperService {
   }
 
   private loadConfig(): void {
-    const enable = this.configService.get<string>('WALLET_RENAPER', '') === 'enable';
-    const logging = this.configService.get<string>('WALLET_RENAPER_LOG', '') === 'enable';
-    const proxy = this.configService.get<string>('WALLET_RENAPER_PROXY', '') === 'enable';
+    const enable =
+      this.configService.get<string>('WALLET_RENAPER', '') === 'enable';
+    const logging =
+      this.configService.get<string>('WALLET_RENAPER_LOG', '') === 'enable';
+    const proxy =
+      this.configService.get<string>('WALLET_RENAPER_PROXY', '') === 'enable';
 
     this.config = {
       enable,
@@ -75,35 +78,66 @@ export class RenaperService {
       baseUrl: this.configService.get<string>('WALLET_RENAPER_URL', ''),
       credentials: {
         vigencia: {
-          username: this.configService.get<string>('WALLET_RENAPER_VIGENCIA_USER', ''),
-          password: this.configService.get<string>('WALLET_RENAPER_VIGENCIA_PASSWORD', ''),
+          username: this.configService.get<string>(
+            'WALLET_RENAPER_VIGENCIA_USER',
+            '',
+          ),
+          password: this.configService.get<string>(
+            'WALLET_RENAPER_VIGENCIA_PASSWORD',
+            '',
+          ),
         },
         facial: {
-          username: this.configService.get<string>('WALLET_RENAPER_FACIAL_USER', ''),
-          password: this.configService.get<string>('WALLET_RENAPER_FACIAL_PASSWORD', ''),
+          username: this.configService.get<string>(
+            'WALLET_RENAPER_FACIAL_USER',
+            '',
+          ),
+          password: this.configService.get<string>(
+            'WALLET_RENAPER_FACIAL_PASSWORD',
+            '',
+          ),
         },
         huella: {
-          username: this.configService.get<string>('WALLET_RENAPER_HUELLA_USER', ''),
-          password: this.configService.get<string>('WALLET_RENAPER_HUELLA_PASSWORD', ''),
+          username: this.configService.get<string>(
+            'WALLET_RENAPER_HUELLA_USER',
+            '',
+          ),
+          password: this.configService.get<string>(
+            'WALLET_RENAPER_HUELLA_PASSWORD',
+            '',
+          ),
         },
       },
-      minConfidence: parseFloat(this.configService.get<string>('WALLET_RENAPER_MIN_CONFIDENCE', '0.85')),
-      timeout: parseInt(this.configService.get<string>('WALLET_RENAPER_TIMEOUT', '30000'), 10),
-      validationMode: (this.configService.get<string>('RENAPER_VALIDATION_MODE', 'simple').toLowerCase() as 'simple' | 'complete') || 'simple',
+      minConfidence: parseFloat(
+        this.configService.get<string>('WALLET_RENAPER_MIN_CONFIDENCE', '0.85'),
+      ),
+      timeout: parseInt(
+        this.configService.get<string>('WALLET_RENAPER_TIMEOUT', '30000'),
+        10,
+      ),
+      validationMode:
+        (this.configService
+          .get<string>('RENAPER_VALIDATION_MODE', 'simple')
+          .toLowerCase() as 'simple' | 'complete') || 'simple',
     };
   }
 
   private createRenaperAgent(): https.Agent | SocksProxyAgent {
-    const shouldUseProxy = this.config.proxy || process.env.USE_SOCKS_PROXY === 'true';
+    const shouldUseProxy =
+      this.config.proxy || process.env.USE_SOCKS_PROXY === 'true';
 
     if (shouldUseProxy) {
       try {
         const proxyPort = process.env.SOCKS_PROXY_PORT || '8080';
-        this.logger.warn(`RENAPER: Using SOCKS Proxy with mTLS (localhost:${proxyPort})`);
+        this.logger.warn(
+          `RENAPER: Using SOCKS Proxy with mTLS (localhost:${proxyPort})`,
+        );
         return new SocksProxyAgent(`socks5h://localhost:${proxyPort}`);
       } catch (error) {
         this.logger.error('RENAPER: Error creating SOCKS Proxy Agent', error);
-        throw new Error(`SOCKS5 proxy not available at localhost:${process.env.SOCKS_PROXY_PORT || '8080'}`);
+        throw new Error(
+          `SOCKS5 proxy not available at localhost:${process.env.SOCKS_PROXY_PORT || '8080'}`,
+        );
       }
     } else {
       return new https.Agent();
@@ -146,16 +180,26 @@ export class RenaperService {
         this.logger.log(`RENAPER: Token generated successfully for ${service}`);
       }
 
-      if (response.data.codigo_http === 200 && response.data.data.codigo === 0) {
+      if (
+        response.data.codigo_http === 200 &&
+        response.data.data.codigo === 0
+      ) {
         return response.data.data.token;
       } else {
-        throw new Error(`Error generating token: ${response.data.data?.message || 'Unknown error'}`);
+        throw new Error(
+          `Error generating token: ${response.data.data?.message || 'Unknown error'}`,
+        );
       }
     } catch (error: any) {
       this.logger.error('Error generating RENAPER token', error);
 
-      if (error.response?.status === 403 || error.response?.data === 'FORBIDDEN - REMOTE ADDRESS NOT ALLOWED') {
-        const forbiddenError: any = new Error('RENAPER API: IP not authorized. The IP address is not on the RENAPER API whitelist.');
+      if (
+        error.response?.status === 403 ||
+        error.response?.data === 'FORBIDDEN - REMOTE ADDRESS NOT ALLOWED'
+      ) {
+        const forbiddenError: any = new Error(
+          'RENAPER API: IP not authorized. The IP address is not on the RENAPER API whitelist.',
+        );
         forbiddenError.code = 'RENAPER_FORBIDDEN';
         forbiddenError.statusCode = 403;
         forbiddenError.isForbidden = true;
@@ -166,7 +210,11 @@ export class RenaperService {
     }
   }
 
-  async verifyValidity(params: { documentNumber: string; gender: string; tramiteId: string }): Promise<ValidityResult> {
+  async verifyValidity(params: {
+    documentNumber: string;
+    gender: string;
+    tramiteId: string;
+  }): Promise<ValidityResult> {
     if (!this.config.enable) {
       throw new Error('RENAPER not enabled');
     }
@@ -181,17 +229,20 @@ export class RenaperService {
 
     try {
       const response = await firstValueFrom(
-        this.httpService.get(`${this.config.baseUrl}/apidatos/verificaVigencia.php`, {
-          params: {
-            dni: documentNumber,
-            sexo: gender,
-            id_tramite: tramiteId,
+        this.httpService.get(
+          `${this.config.baseUrl}/apidatos/verificaVigencia.php`,
+          {
+            params: {
+              dni: documentNumber,
+              sexo: gender,
+              id_tramite: tramiteId,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            httpsAgent: this.createRenaperAgent(),
           },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          httpsAgent: this.createRenaperAgent(),
-        }),
+        ),
       );
 
       const code = response.data.codigo;
@@ -237,7 +288,11 @@ export class RenaperService {
     }
   }
 
-  async validateFacial(params: { documentNumber: string; gender: string; image: string | Buffer }): Promise<FacialResult> {
+  async validateFacial(params: {
+    documentNumber: string;
+    gender: string;
+    image: string | Buffer;
+  }): Promise<FacialResult> {
     if (!this.config.enable) {
       throw new Error('RENAPER not enabled');
     }
@@ -272,12 +327,16 @@ export class RenaperService {
 
     try {
       const response = await firstValueFrom(
-        this.httpService.post(`${this.config.baseUrl}/API_ABIS/ValidacionFacialSincronico.php`, formData, {
-          headers,
-          httpsAgent: this.createRenaperAgent(),
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-        }),
+        this.httpService.post(
+          `${this.config.baseUrl}/API_ABIS/ValidacionFacialSincronico.php`,
+          formData,
+          {
+            headers,
+            httpsAgent: this.createRenaperAgent(),
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+          },
+        ),
       );
 
       if (response.data.codigo === 0) {
@@ -304,7 +363,11 @@ export class RenaperService {
     }
   }
 
-  async validateFingerprint(params: { documentNumber: string; gender: string; fingerprint: string }): Promise<FingerprintResult> {
+  async validateFingerprint(params: {
+    documentNumber: string;
+    gender: string;
+    fingerprint: string;
+  }): Promise<FingerprintResult> {
     if (!this.config.enable) {
       throw new Error('RENAPER not enabled');
     }
@@ -312,7 +375,9 @@ export class RenaperService {
     const { documentNumber, gender, fingerprint } = params;
 
     if (!documentNumber || !gender || !fingerprint) {
-      throw new Error('Required parameters: documentNumber, gender, fingerprint');
+      throw new Error(
+        'Required parameters: documentNumber, gender, fingerprint',
+      );
     }
 
     const token = await this.getToken('huella');
@@ -330,12 +395,16 @@ export class RenaperService {
 
     try {
       const response = await firstValueFrom(
-        this.httpService.post(`${this.config.baseUrl}/API_ABIS/ValidacionHuella.php`, formData, {
-          headers,
-          httpsAgent: this.createRenaperAgent(),
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-        }),
+        this.httpService.post(
+          `${this.config.baseUrl}/API_ABIS/ValidacionHuella.php`,
+          formData,
+          {
+            headers,
+            httpsAgent: this.createRenaperAgent(),
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+          },
+        ),
       );
 
       if (response.data.codigo === 0) {
@@ -435,7 +504,9 @@ export class RenaperService {
           );
           userImageBuffer = Buffer.from(resp.data);
           if (this.config.logging) {
-            this.logger.log('RENAPER.validateDocument: user image downloaded from URL');
+            this.logger.log(
+              'RENAPER.validateDocument: user image downloaded from URL',
+            );
           }
         } catch (e) {
           return {
@@ -449,7 +520,9 @@ export class RenaperService {
         const base64Data = params.userImage.split(',')[1];
         userImageBuffer = Buffer.from(base64Data, 'base64');
         if (this.config.logging) {
-          this.logger.log('RENAPER.validateDocument: user image parsed from base64');
+          this.logger.log(
+            'RENAPER.validateDocument: user image parsed from base64',
+          );
         }
       }
     }
@@ -496,7 +569,9 @@ export class RenaperService {
     };
   }
 
-  async extractPDF417Data(pdf417Data: string): Promise<{ success: boolean; data: any; validation: any }> {
+  async extractPDF417Data(
+    pdf417Data: string,
+  ): Promise<{ success: boolean; data: any; validation: any }> {
     try {
       const data = await this.pdf417Parser.parsePDF417(pdf417Data);
       const validation = this.pdf417Parser.validateData(data);

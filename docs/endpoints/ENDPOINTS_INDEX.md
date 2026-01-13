@@ -5,7 +5,9 @@ This documentation is organized by categories for easier navigation.
 ## Index
 
 ### [Public - No Auth Required](./PUBLIC_NO_AUTH.md)
+
 Public endpoints that do not require authentication:
+
 - Health checks
 - Authentication and registration
 - Email/phone validation
@@ -14,7 +16,9 @@ Public endpoints that do not require authentication:
 - Test endpoints
 
 ### [Public - Auth Required](./PUBLIC_AUTH.md)
+
 Public endpoints that require authentication:
+
 - User profile
 - Account management
 - Identity onboarding
@@ -22,7 +26,9 @@ Public endpoints that require authentication:
 - Identities and accounts
 
 ### [Secure - Auth Required](./SECURE_AUTH.md)
+
 Secure endpoints that require authentication:
+
 - Notifications
 - Actions and modules
 - App information
@@ -31,7 +37,9 @@ Secure endpoints that require authentication:
 - PIX transactions
 
 ### [Backoffice - Auth Required](./BACKOFFICE_AUTH.md)
+
 Backoffice endpoints that require authentication:
+
 - Authentication
 - Client management
 - User onboarding
@@ -42,6 +50,7 @@ Backoffice endpoints that require authentication:
 ## Documentation Structure
 
 Each file contains endpoints organized by functionality, including:
+
 - HTTP method and route
 - Description
 - Required and optional parameters

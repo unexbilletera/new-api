@@ -1,8 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { DeviceModel } from '../models/device.model';
 import { BiometricMapper } from '../mappers/biometric.mapper';
 import { SmsService } from '../../../shared/sms/sms.service';
-import { SendDeviceSmsValidationDto, RevokeDeviceDto } from '../dto/biometric.dto';
+import {
+  SendDeviceSmsValidationDto,
+  RevokeDeviceDto,
+} from '../dto/biometric.dto';
 
 @Injectable()
 export class DeviceManagementService {
@@ -12,7 +19,10 @@ export class DeviceManagementService {
     private smsService: SmsService,
   ) {}
 
-  async sendDeviceSmsValidation(userId: string, dto: SendDeviceSmsValidationDto) {
+  async sendDeviceSmsValidation(
+    userId: string,
+    dto: SendDeviceSmsValidationDto,
+  ) {
     const { deviceId } = dto;
 
     const user = await this.deviceModel.findUserById(userId);
@@ -48,7 +58,10 @@ export class DeviceManagementService {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const device = await this.deviceModel.findDeviceByIdAndUser(deviceId, userId);
+    const device = await this.deviceModel.findDeviceByIdAndUser(
+      deviceId,
+      userId,
+    );
     if (!device || !['pending', 'active'].includes(device.status)) {
       throw new NotFoundException('auth.errors.deviceNotFound');
     }
@@ -75,10 +88,16 @@ export class DeviceManagementService {
   }
 
   async checkDeviceHealth(userId: string, deviceIdentifier: string) {
-    const activeDevice = await this.deviceModel.findActiveDeviceByUserAndIdentifier(userId, deviceIdentifier);
+    const activeDevice =
+      await this.deviceModel.findActiveDeviceByUserAndIdentifier(
+        userId,
+        deviceIdentifier,
+      );
 
     if (activeDevice) {
-      await this.deviceModel.updateDevice(activeDevice.id, { lastUsedAt: new Date() });
+      await this.deviceModel.updateDevice(activeDevice.id, {
+        lastUsedAt: new Date(),
+      });
 
       return this.biometricMapper.toCheckDeviceHealthResponseDto(
         true,
@@ -87,7 +106,10 @@ export class DeviceManagementService {
       );
     }
 
-    const device = await this.deviceModel.findDeviceByUserAndIdentifier(userId, deviceIdentifier);
+    const device = await this.deviceModel.findDeviceByUserAndIdentifier(
+      userId,
+      deviceIdentifier,
+    );
 
     if (device && (device.status === 'revoked' || device.revokedAt)) {
       return this.biometricMapper.toCheckDeviceHealthResponseDto(

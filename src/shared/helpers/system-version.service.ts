@@ -10,20 +10,20 @@ export interface VersionValidationResult {
 
 @Injectable()
 export class SystemVersionService {
-
   private readonly DEFAULT_MINIMUM_VERSION = '1.0.0';
 
-  constructor(private configService: ConfigService) {}  getMinimumVersion(): string {
+  constructor(private configService: ConfigService) {}
+  getMinimumVersion(): string {
     return (
       this.configService.get<string>('MINIMUM_CLIENT_VERSION') ||
       this.DEFAULT_MINIMUM_VERSION
     );
-  }  private versionToNumber(version: string): number {
-
+  }
+  private versionToNumber(version: string): number {
     const cleaned = version.replace(/\./g, '');
     return parseInt(cleaned, 10) || 0;
-  }  validateVersion(systemVersion?: string): VersionValidationResult {
-
+  }
+  validateVersion(systemVersion?: string): VersionValidationResult {
     if (!systemVersion) {
       return { isValid: true };
     }
@@ -46,12 +46,13 @@ export class SystemVersionService {
       currentVersion: systemVersion,
       minimumVersion: minimumVersion,
     };
-  }  assertVersionValid(systemVersion?: string): void {
+  }
+  assertVersionValid(systemVersion?: string): void {
     const result = this.validateVersion(systemVersion);
-    
+
     if (!result.isValid) {
       throw new BadRequestException(
-        `Version obsoleta. Version mínima ${result.minimumVersion}`
+        `Version obsoleta. Version mínima ${result.minimumVersion}`,
       );
     }
   }

@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, IsUUID } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  MinLength,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateBackofficeUserDto {
   @IsString()

@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Body, Param, Query, UseGuards, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  ForbiddenException,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -118,7 +127,8 @@ export class BiometricController {
   @Post('register-device-soft')
   @ApiOperation({
     summary: 'Register device with soft authentication',
-    description: 'Registers a device with soft biometric authentication (less secure)',
+    description:
+      'Registers a device with soft biometric authentication (less secure)',
   })
   @ApiResponse({
     status: 201,
@@ -168,7 +178,8 @@ export class BiometricController {
   @Post('device/verify-sms-and-activate')
   @ApiOperation({
     summary: 'Verify SMS and activate device',
-    description: 'Verifies the SMS code and activates the device for authentication',
+    description:
+      'Verifies the SMS code and activates the device for authentication',
   })
   @ApiResponse({
     status: 200,
@@ -236,7 +247,7 @@ export class BiometricController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Access denied - cannot access another user\'s data',
+    description: "Access denied - cannot access another user's data",
   })
   async listDevices(
     @CurrentUser('id') authUserId: string,
@@ -286,6 +297,9 @@ export class BiometricController {
     if (userId && userId !== authUserId) {
       throw new ForbiddenException('users.errors.forbidden');
     }
-    return this.deviceManagementService.checkDeviceHealth(authUserId, deviceIdentifier);
+    return this.deviceManagementService.checkDeviceHealth(
+      authUserId,
+      deviceIdentifier,
+    );
   }
 }

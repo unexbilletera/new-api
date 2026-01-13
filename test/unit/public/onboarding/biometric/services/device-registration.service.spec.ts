@@ -33,7 +33,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../../../../../src/shared/prisma/prisma.service';
 import { LoggerService } from '../../../../../../src/shared/logger/logger.service';
-import { createPrismaMock, createLoggerServiceMock } from '../../../../../utils';
+import {
+  createPrismaMock,
+  createLoggerServiceMock,
+} from '../../../../../utils';
 
 describe('DeviceRegistrationService', () => {
   let service: any;
@@ -95,7 +98,10 @@ describe('DeviceRegistrationService', () => {
         registeredAt: new Date(),
       });
 
-      const result = await service.completeRegistration(registrationId, completionData);
+      const result = await service.completeRegistration(
+        registrationId,
+        completionData,
+      );
 
       expect(result.status).toBe('REGISTERED');
       expect(result.deviceId).toBeDefined();
@@ -105,10 +111,12 @@ describe('DeviceRegistrationService', () => {
       const registrationId = 'expired-reg';
 
       service.completeRegistration.mockRejectedValue(
-        new Error('Registration expired')
+        new Error('Registration expired'),
       );
 
-      await expect(service.completeRegistration(registrationId, {})).rejects.toThrow();
+      await expect(
+        service.completeRegistration(registrationId, {}),
+      ).rejects.toThrow();
     });
   });
 

@@ -11,8 +11,14 @@ export class S3Service {
 
   constructor(private configService: ConfigService) {
     const accessKeyId = this.configService.get<string>('WALLET_FILES_KEY', '');
-    const secretAccessKey = this.configService.get<string>('WALLET_FILES_PASSWORD', '');
-    const region = this.configService.get<string>('WALLET_FILES_REGION', 'us-east-2');
+    const secretAccessKey = this.configService.get<string>(
+      'WALLET_FILES_PASSWORD',
+      '',
+    );
+    const region = this.configService.get<string>(
+      'WALLET_FILES_REGION',
+      'us-east-2',
+    );
 
     this.s3Client = new S3Client({
       credentials: {
@@ -23,10 +29,16 @@ export class S3Service {
     });
 
     this.bucket = this.configService.get<string>('WALLET_FILES_BUCKET', '');
-    this.publicUrl = this.configService.get<string>('WALLET_FILES_PUBLIC_URL', '');
+    this.publicUrl = this.configService.get<string>(
+      'WALLET_FILES_PUBLIC_URL',
+      '',
+    );
   }
 
-  async uploadBase64(params: { base64: string; name: string }): Promise<string> {
+  async uploadBase64(params: {
+    base64: string;
+    name: string;
+  }): Promise<string> {
     if (!params.base64) {
       throw new Error('Missing base64 parameter');
     }

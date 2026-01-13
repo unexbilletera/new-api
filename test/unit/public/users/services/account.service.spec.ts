@@ -92,7 +92,7 @@ describe('AccountService', () => {
         userId: userId,
         accountNumber: '123456789',
         accountType: 'CHECKING',
-        balance: 1000.00,
+        balance: 1000.0,
         status: 'ACTIVE',
       };
 
@@ -116,7 +116,9 @@ describe('AccountService', () => {
      */
     it('should throw error when account not found', async () => {
       const userId = 'invalid-id';
-      service.getAccountDetails.mockRejectedValue(new Error('Account not found'));
+      service.getAccountDetails.mockRejectedValue(
+        new Error('Account not found'),
+      );
 
       await expect(service.getAccountDetails(userId)).rejects.toThrow();
     });
@@ -137,7 +139,7 @@ describe('AccountService', () => {
      */
     it('should get account balance', async () => {
       const userId = 'user-123';
-      const balance = 5000.50;
+      const balance = 5000.5;
 
       service.getBalance.mockResolvedValue(balance);
 
@@ -278,10 +280,12 @@ describe('AccountService', () => {
       const linkDto = { accountNumber: '987654321', bankCode: '001' };
 
       service.linkExternalAccount.mockRejectedValue(
-        new Error('Account already linked')
+        new Error('Account already linked'),
       );
 
-      await expect(service.linkExternalAccount(userId, linkDto)).rejects.toThrow();
+      await expect(
+        service.linkExternalAccount(userId, linkDto),
+      ).rejects.toThrow();
     });
   });
 
@@ -391,7 +395,7 @@ describe('AccountService', () => {
       const userId = 'user-123';
 
       service.closeAccount.mockRejectedValue(
-        new Error('Cannot close account with outstanding balance')
+        new Error('Cannot close account with outstanding balance'),
       );
 
       await expect(service.closeAccount(userId, 'reason')).rejects.toThrow();

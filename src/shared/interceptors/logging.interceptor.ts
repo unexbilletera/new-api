@@ -22,7 +22,7 @@ export class LoggingInterceptor implements NestInterceptor {
       tap((data) => {
         const response = context.switchToHttp().getResponse();
         const delay = Date.now() - now;
-        
+
         let code: string | undefined;
         if (data && typeof data === 'object') {
           if ('code' in data && typeof data.code === 'string') {
@@ -31,19 +31,24 @@ export class LoggingInterceptor implements NestInterceptor {
             code = data.error;
           }
         }
-        
+
         const codeInfo = code ? ` [${code}]` : '';
-        this.logger.info(`${method} ${url} ${response.statusCode} - ${delay}ms${codeInfo}`);
+        this.logger.info(
+          `${method} ${url} ${response.statusCode} - ${delay}ms${codeInfo}`,
+        );
       }),
       catchError((error) => {
         const response = context.switchToHttp().getResponse();
         const delay = Date.now() - now;
-        
+
         let errorCode: string | undefined;
         if (error?.response) {
           const errorResponse = error.response;
           if (typeof errorResponse === 'object' && errorResponse !== null) {
-            if ('error' in errorResponse && typeof errorResponse.error === 'string') {
+            if (
+              'error' in errorResponse &&
+              typeof errorResponse.error === 'string'
+            ) {
               errorCode = errorResponse.error;
             } else if ('code' in errorResponse) {
               errorCode = String(errorResponse.code);
@@ -54,14 +59,16 @@ export class LoggingInterceptor implements NestInterceptor {
         } else if (error?.message) {
           errorCode = error.message;
         }
-        
-        const statusCode = error?.status || error?.statusCode || response.statusCode || 500;
+
+        const statusCode =
+          error?.status || error?.statusCode || response.statusCode || 500;
         const codeInfo = errorCode ? ` [${errorCode}]` : '';
-        this.logger.info(`${method} ${url} ${statusCode} - ${delay}ms${codeInfo}`);
-        
+        this.logger.info(
+          `${method} ${url} ${statusCode} - ${delay}ms${codeInfo}`,
+        );
+
         return throwError(() => error);
       }),
     );
   }
 }
-

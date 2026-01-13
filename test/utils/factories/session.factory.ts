@@ -54,7 +54,10 @@ export class SessionFactory {
    * @param {ISessionFactoryOptions} overrides - Overrides for all
    * @returns {any[]} Array of sessions
    */
-  static createMultiple(count: number, overrides: ISessionFactoryOptions = {}): any[] {
+  static createMultiple(
+    count: number,
+    overrides: ISessionFactoryOptions = {},
+  ): any[] {
     return Array.from({ length: count }, () => this.create(overrides));
   }
 

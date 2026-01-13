@@ -1,17 +1,23 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { CreateRoleDto, UpdateRoleDto, RoleResponseDto } from '../dto/role.dto';
 import { randomUUID } from 'crypto';
 
 @Injectable()
 export class RolesService {
-  constructor(private prisma: PrismaService) {}  async list(): Promise<RoleResponseDto[]> {
+  constructor(private prisma: PrismaService) {}
+  async list(): Promise<RoleResponseDto[]> {
     const roles = await this.prisma.backofficeRoles.findMany({
       orderBy: { level: 'desc' },
     });
 
     return roles.map(this.mapToResponse);
-  }  async get(id: string): Promise<RoleResponseDto> {
+  }
+  async get(id: string): Promise<RoleResponseDto> {
     const role = await this.prisma.backofficeRoles.findUnique({
       where: { id },
     });
@@ -21,8 +27,8 @@ export class RolesService {
     }
 
     return this.mapToResponse(role);
-  }  async create(dto: CreateRoleDto): Promise<RoleResponseDto> {
-
+  }
+  async create(dto: CreateRoleDto): Promise<RoleResponseDto> {
     const existing = await this.prisma.backofficeRoles.findFirst({
       where: { name: dto.name },
     });
@@ -43,7 +49,8 @@ export class RolesService {
     });
 
     return this.mapToResponse(role);
-  }  async update(id: string, dto: UpdateRoleDto): Promise<RoleResponseDto> {
+  }
+  async update(id: string, dto: UpdateRoleDto): Promise<RoleResponseDto> {
     const role = await this.prisma.backofficeRoles.findUnique({
       where: { id },
     });
@@ -72,7 +79,8 @@ export class RolesService {
     });
 
     return this.mapToResponse(updated);
-  }  async delete(id: string): Promise<{ success: boolean; message: string }> {
+  }
+  async delete(id: string): Promise<{ success: boolean; message: string }> {
     const role = await this.prisma.backofficeRoles.findUnique({
       where: { id },
     });

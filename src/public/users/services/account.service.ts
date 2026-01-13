@@ -1,8 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserModel } from '../models/user.model';
 import { AccountModel } from '../models/account.model';
-import { SetDefaultAccountDto, SetUserAccountAliasDto } from '../dto/user-profile.dto';
-import { AccountListResponseDto, AccountBalanceResponseDto } from '../dto/response';
+import {
+  SetDefaultAccountDto,
+  SetUserAccountAliasDto,
+} from '../dto/user-profile.dto';
+import {
+  AccountListResponseDto,
+  AccountBalanceResponseDto,
+} from '../dto/response';
 
 @Injectable()
 export class AccountService {

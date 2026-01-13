@@ -24,7 +24,9 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(isValid).toBe(true);
       expect(duration).toBeLessThan(THRESHOLDS.emailValidation);
-      log(`Email validation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.emailValidation}ms)`);
+      log(
+        `Email validation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.emailValidation}ms)`,
+      );
     });
 
     it('should complete phone normalization within threshold', () => {
@@ -39,7 +41,9 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(normalized.length).toBeGreaterThanOrEqual(11);
       expect(duration).toBeLessThan(THRESHOLDS.phoneValidation);
-      log(`Phone normalization: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.phoneValidation}ms)`);
+      log(
+        `Phone normalization: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.phoneValidation}ms)`,
+      );
     });
   });
 
@@ -61,7 +65,9 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(token).toBeDefined();
       expect(duration).toBeLessThan(THRESHOLDS.tokenGeneration);
-      log(`Token generation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.tokenGeneration}ms)`);
+      log(
+        `Token generation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.tokenGeneration}ms)`,
+      );
     });
   });
 
@@ -76,7 +82,7 @@ describe('Performance - Benchmark Tests', () => {
 
       const startTime = performance.now();
 
-      const normalizedUsers = users.map(user => ({
+      const normalizedUsers = users.map((user) => ({
         email: user.email.toLowerCase().trim(),
         phone: user.phone.replace(/\D/g, ''),
         firstName: user.firstName.trim(),
@@ -89,18 +95,23 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(normalizedUsers.length).toBe(100);
       expect(avgPerUser).toBeLessThan(5);
-      log(`Batch normalization (100 users): ${duration.toFixed(3)}ms avg: ${avgPerUser.toFixed(3)}ms per user`);
+      log(
+        `Batch normalization (100 users): ${duration.toFixed(3)}ms avg: ${avgPerUser.toFixed(3)}ms per user`,
+      );
     });
   });
 
   describe('String Processing Performance', () => {
     it('should validate email format efficiently', () => {
-      const emails = Array.from({ length: 1000 }, (_, i) => `user${i}@example.com`);
+      const emails = Array.from(
+        { length: 1000 },
+        (_, i) => `user${i}@example.com`,
+      );
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       const startTime = performance.now();
 
-      const validEmails = emails.filter(email => emailRegex.test(email));
+      const validEmails = emails.filter((email) => emailRegex.test(email));
 
       const endTime = performance.now();
       const duration = endTime - startTime;
@@ -111,12 +122,15 @@ describe('Performance - Benchmark Tests', () => {
     });
 
     it('should validate phone format efficiently', () => {
-      const phones = Array.from({ length: 1000 }, (_, i) => `+55119999${String(9000 + i).slice(-4)}`);
+      const phones = Array.from(
+        { length: 1000 },
+        (_, i) => `+55119999${String(9000 + i).slice(-4)}`,
+      );
       const phoneRegex = /^\+?\d{10,15}$/;
 
       const startTime = performance.now();
 
-      const validPhones = phones.filter(phone => phoneRegex.test(phone));
+      const validPhones = phones.filter((phone) => phoneRegex.test(phone));
 
       const endTime = performance.now();
       const duration = endTime - startTime;
@@ -138,7 +152,7 @@ describe('Performance - Benchmark Tests', () => {
 
       const startTime = performance.now();
 
-      const unread = notifications.filter(n => !n.read);
+      const unread = notifications.filter((n) => !n.read);
 
       const endTime = performance.now();
       const duration = endTime - startTime;
@@ -157,14 +171,14 @@ describe('Performance - Benchmark Tests', () => {
       const startTime = performance.now();
 
       const sorted = [...notifications].sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       );
 
       const endTime = performance.now();
       const duration = endTime - startTime;
 
       expect(sorted[0].createdAt.getTime()).toBeGreaterThanOrEqual(
-        sorted[sorted.length - 1].createdAt.getTime()
+        sorted[sorted.length - 1].createdAt.getTime(),
       );
       expect(duration).toBeLessThan(100);
       log(`Sort 5k notifications: ${duration.toFixed(3)}ms`);
@@ -181,7 +195,7 @@ describe('Performance - Benchmark Tests', () => {
 
       const startTime = performance.now();
 
-      const dtos = users.map(user => ({
+      const dtos = users.map((user) => ({
         id: user.id,
         email: user.email,
         name: `${user.firstName} ${user.lastName}`,
@@ -211,7 +225,7 @@ describe('Performance - Benchmark Tests', () => {
           ...acc,
           [result.fieldName]: result.isValid,
         }),
-        {}
+        {},
       );
 
       const endTime = performance.now();
@@ -240,26 +254,31 @@ describe('Performance - Benchmark Tests', () => {
       const afterCreation = process.memoryUsage().heapUsed;
       const memoryIncrease = (afterCreation - initialMemory) / 1024 / 1024;
 
-      const filtered = largeDataset.filter(item => item.id % 10 === 0);
-      const mapped = filtered.map(item => item.id);
+      const filtered = largeDataset.filter((item) => item.id % 10 === 0);
+      const mapped = filtered.map((item) => item.id);
 
       const afterProcessing = process.memoryUsage().heapUsed;
 
       expect(memoryIncrease).toBeLessThan(50);
       expect(mapped.length).toBe(5000);
 
-      log(`Memory usage: Initial=${(initialMemory / 1024 / 1024).toFixed(2)}MB, After creation=${(afterCreation / 1024 / 1024).toFixed(2)}MB (+${memoryIncrease.toFixed(2)}MB)`);
+      log(
+        `Memory usage: Initial=${(initialMemory / 1024 / 1024).toFixed(2)}MB, After creation=${(afterCreation / 1024 / 1024).toFixed(2)}MB (+${memoryIncrease.toFixed(2)}MB)`,
+      );
     });
   });
 
   describe('Regex Performance', () => {
     it('should perform email regex efficiently', () => {
-      const emails = Array.from({ length: 10000 }, (_, i) => `user${i}@example.com`);
+      const emails = Array.from(
+        { length: 10000 },
+        (_, i) => `user${i}@example.com`,
+      );
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
       const startTime = performance.now();
 
-      const valid = emails.filter(email => emailRegex.test(email)).length;
+      const valid = emails.filter((email) => emailRegex.test(email)).length;
 
       const endTime = performance.now();
       const duration = endTime - startTime;
@@ -271,7 +290,7 @@ describe('Performance - Benchmark Tests', () => {
 
     it('should handle complex data validation regex', () => {
       const inputs = Array.from({ length: 5000 }, (_, i) => ({
-        cpf: `123.456.789-${String(10 + i % 90).slice(-2)}`,
+        cpf: `123.456.789-${String(10 + (i % 90)).slice(-2)}`,
         phone: `+55119999${String(9000 + i).slice(-4)}`,
       }));
 
@@ -280,8 +299,8 @@ describe('Performance - Benchmark Tests', () => {
 
       const startTime = performance.now();
 
-      const valid = inputs.filter(input =>
-        cpfRegex.test(input.cpf) && phoneRegex.test(input.phone)
+      const valid = inputs.filter(
+        (input) => cpfRegex.test(input.cpf) && phoneRegex.test(input.phone),
       ).length;
 
       const endTime = performance.now();
@@ -304,7 +323,7 @@ describe('Performance - Benchmark Tests', () => {
       const startTime = performance.now();
 
       const lastHour = new Date(now.getTime() - 3600000);
-      const recent = notifications.filter(n => n.createdAt > lastHour);
+      const recent = notifications.filter((n) => n.createdAt > lastHour);
 
       const endTime = performance.now();
       const duration = endTime - startTime;

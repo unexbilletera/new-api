@@ -98,7 +98,9 @@ export const COVERAGE_STATUS = {
   critical: { min: 0, color: '#7f1d1d', label: 'Critical' },
 };
 
-export function getCoverageStatus(percentage: number): keyof typeof COVERAGE_STATUS {
+export function getCoverageStatus(
+  percentage: number,
+): keyof typeof COVERAGE_STATUS {
   if (percentage >= COVERAGE_STATUS.excellent.min) return 'excellent';
   if (percentage >= COVERAGE_STATUS.good.min) return 'good';
   if (percentage >= COVERAGE_STATUS.acceptable.min) return 'acceptable';
@@ -108,7 +110,7 @@ export function getCoverageStatus(percentage: number): keyof typeof COVERAGE_STA
 
 export function analyzeCoverageTrend(
   previous: number,
-  current: number
+  current: number,
 ): { status: 'improved' | 'stable' | 'degraded'; change: number } {
   const change = current - previous;
   const changePercent = (change / previous) * 100;
@@ -264,21 +266,31 @@ export function getRecommendations(coverage: CoverageMetrics): string[] {
   const recommendations: string[] = [];
 
   if (coverage.lines.pct < 80) {
-    recommendations.push('[CRITICAL] Line coverage below 80% - Add more test cases');
+    recommendations.push(
+      '[CRITICAL] Line coverage below 80% - Add more test cases',
+    );
   } else if (coverage.lines.pct < 90) {
-    recommendations.push('[WARNING] Line coverage 80-90% - Good, but can improve');
+    recommendations.push(
+      '[WARNING] Line coverage 80-90% - Good, but can improve',
+    );
   }
 
   if (coverage.statements.pct < 80) {
-    recommendations.push('[CRITICAL] Statement coverage below 80% - Focus on statement coverage');
+    recommendations.push(
+      '[CRITICAL] Statement coverage below 80% - Focus on statement coverage',
+    );
   }
 
   if (coverage.functions.pct < 75) {
-    recommendations.push('[CRITICAL] Function coverage below 75% - Test more functions');
+    recommendations.push(
+      '[CRITICAL] Function coverage below 75% - Test more functions',
+    );
   }
 
   if (coverage.branches.pct < 70) {
-    recommendations.push('[CRITICAL] Branch coverage below 70% - Add edge case tests');
+    recommendations.push(
+      '[CRITICAL] Branch coverage below 70% - Add edge case tests',
+    );
   }
 
   if (

@@ -13,11 +13,13 @@ This guide shows how to test backoffice authentication endpoints using Postman.
 **POST** `/backoffice/auth/login`
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Body (JSON):**
+
 ```json
 {
   "email": "admin@exemplo.com",
@@ -26,10 +28,12 @@ Content-Type: application/json
 ```
 
 **Fields:**
+
 - `email` (string, required): Backoffice user email
 - `password` (string, required): Backoffice user password
 
 **Success Response (200):**
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -49,6 +53,7 @@ Content-Type: application/json
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "error": "401 backoffice.errors.invalidCredentials",
@@ -62,12 +67,14 @@ Content-Type: application/json
 **GET** `/backoffice/auth/me`
 
 **Headers:**
+
 ```
 Authorization: Bearer {token_from_login}
 Content-Type: application/json
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "id": "uuid-do-usuario",
@@ -82,6 +89,7 @@ Content-Type: application/json
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "error": "401 backoffice.errors.missingToken",
@@ -99,12 +107,14 @@ Content-Type: application/json
 3. In **Headers** tab, add:
    - `Content-Type`: `application/json`
 4. In **Body** tab, select **raw** and **JSON**, paste:
+
 ```json
 {
   "email": "seu-email@exemplo.com",
   "password": "sua-senha"
 }
 ```
+
 5. Click **Send**
 6. Copy the `accessToken` value from response
 
@@ -131,7 +141,9 @@ Then use `{{base_url}}` and `{{backoffice_token}}` in your requests.
 ## Common Error Codes
 
 ### 401 Unauthorized
+
 **Possible causes:**
+
 - `401 backoffice.errors.missingToken`: Token not provided
 - `401 backoffice.errors.invalidToken`: Invalid token
 - `401 backoffice.errors.expiredToken`: Token expired
@@ -142,7 +154,9 @@ Then use `{{base_url}}` and `{{backoffice_token}}` in your requests.
 **Solution**: Verify token is correct and user is active.
 
 ### 400 Bad Request
+
 **Possible causes:**
+
 - `400 backoffice.errors.invalidEmail`: Invalid email
 - `400 backoffice.errors.invalidPassword`: Invalid password
 

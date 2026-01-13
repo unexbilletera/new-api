@@ -39,7 +39,8 @@ export class TermsController {
   @Get(':serviceType')
   @ApiOperation({
     summary: 'Check service terms',
-    description: 'Checks if the user has accepted the terms of use for a specific service',
+    description:
+      'Checks if the user has accepted the terms of use for a specific service',
   })
   @ApiParam({
     name: 'serviceType',
@@ -80,14 +81,17 @@ export class TermsController {
     status: 401,
     description: 'Unauthorized - invalid or missing token',
   })
-  async listAcceptances(@CurrentUser('id') userId: string): Promise<TermAcceptanceResponseDto[]> {
+  async listAcceptances(
+    @CurrentUser('id') userId: string,
+  ): Promise<TermAcceptanceResponseDto[]> {
     return this.termsService.listAcceptances(userId);
   }
 
   @Get('required/check')
   @ApiOperation({
     summary: 'Check required terms',
-    description: 'Checks if the user has accepted all required terms of the system',
+    description:
+      'Checks if the user has accepted all required terms of the system',
   })
   @ApiResponse({
     status: 200,
@@ -98,7 +102,9 @@ export class TermsController {
     status: 401,
     description: 'Unauthorized - invalid or missing token',
   })
-  async checkRequired(@CurrentUser('id') userId: string): Promise<CheckAllRequiredResponseDto> {
+  async checkRequired(
+    @CurrentUser('id') userId: string,
+  ): Promise<CheckAllRequiredResponseDto> {
     return this.termsService.checkAllRequired(userId);
   }
 

@@ -50,8 +50,12 @@ export class UserMapper {
         phoneVerifiedAt: user.phoneVerifiedAt,
         livenessVerifiedAt: user.livenessVerifiedAt,
         onboardingState,
-        usersIdentities: user.usersIdentities.map((i: any) => this.toIdentityResponseDto(i)),
-        usersAccounts: user.usersAccounts.map((a: any) => this.toAccountResponseDto(a)),
+        usersIdentities: user.usersIdentities.map((i: any) =>
+          this.toIdentityResponseDto(i),
+        ),
+        usersAccounts: user.usersAccounts.map((a: any) =>
+          this.toAccountResponseDto(a),
+        ),
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
@@ -90,7 +94,11 @@ export class UserMapper {
     };
   }
 
-  toEmailChangeRequestResponseDto(email: string, expiresIn: number, debug?: any): EmailChangeRequestResponseDto {
+  toEmailChangeRequestResponseDto(
+    email: string,
+    expiresIn: number,
+    debug?: any,
+  ): EmailChangeRequestResponseDto {
     return {
       success: true,
       message: 'users.messages.emailChangeCodeSent',
@@ -100,7 +108,9 @@ export class UserMapper {
     };
   }
 
-  toEmailChangeConfirmResponseDto(email: string): EmailChangeConfirmResponseDto {
+  toEmailChangeConfirmResponseDto(
+    email: string,
+  ): EmailChangeConfirmResponseDto {
     return {
       success: true,
       message: 'users.messages.emailChangedSuccessfully',

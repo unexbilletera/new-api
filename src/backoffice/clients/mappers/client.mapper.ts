@@ -22,7 +22,9 @@ export class ClientMapper {
       isBlocked: user.isBlocked,
       isDisabled: user.isDisabled,
       lastLoginAt: user.lastLoginAt,
-      identities: (user.usersIdentities_usersIdentities_userIdTousers || []).map((i: any) => ({
+      identities: (
+        user.usersIdentities_usersIdentities_userIdTousers || []
+      ).map((i: any) => ({
         id: i.id,
         type: i.type,
         country: i.country,

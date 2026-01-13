@@ -161,10 +161,12 @@ describe('SmsService', () => {
      * @complexity O(1) - Single SMS send
      */
     it('should send validation code', async () => {
-      const sendSpy = jest.spyOn(service, 'sendValidationCode').mockResolvedValue({
-        messageId: 'sm_validation_123',
-        status: 'sent',
-      });
+      const sendSpy = jest
+        .spyOn(service, 'sendValidationCode')
+        .mockResolvedValue({
+          messageId: 'sm_validation_123',
+          status: 'sent',
+        });
 
       const result = await service.sendValidationCode(codePayload);
 
@@ -181,17 +183,21 @@ describe('SmsService', () => {
      * @complexity O(1) - Message construction
      */
     it('should include code in message', async () => {
-      const sendSpy = jest.spyOn(service, 'sendValidationCode').mockResolvedValue({
-        messageId: 'sm_validation_123',
-        status: 'sent',
-      });
+      const sendSpy = jest
+        .spyOn(service, 'sendValidationCode')
+        .mockResolvedValue({
+          messageId: 'sm_validation_123',
+          status: 'sent',
+        });
 
       await service.sendValidationCode(codePayload);
 
-      expect(sendSpy).toHaveBeenCalledWith(expect.objectContaining({
-        code: '123456',
-        expiryMinutes: 15,
-      }));
+      expect(sendSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          code: '123456',
+          expiryMinutes: 15,
+        }),
+      );
     });
   });
 
@@ -257,7 +263,7 @@ describe('SmsService', () => {
 
       expect(Array.isArray(results)).toBe(true);
       expect(results.length).toBe(3);
-      expect(results.every(r => r.status === 'sent')).toBe(true);
+      expect(results.every((r) => r.status === 'sent')).toBe(true);
     });
 
     /**
@@ -279,7 +285,7 @@ describe('SmsService', () => {
       const results = await service.sendBulk(bulkPayload);
 
       expect(results.length).toBe(3);
-      expect(results.some(r => r.status === 'failed')).toBe(true);
+      expect(results.some((r) => r.status === 'failed')).toBe(true);
     });
   });
 
@@ -297,7 +303,9 @@ describe('SmsService', () => {
      * @complexity O(1) - Regex validation
      */
     it('should validate correct phone numbers', () => {
-      const verifySpy = jest.spyOn(service, 'verifyPhoneNumber').mockReturnValue(true);
+      const verifySpy = jest
+        .spyOn(service, 'verifyPhoneNumber')
+        .mockReturnValue(true);
 
       const result = service.verifyPhoneNumber('+5511988888888');
 
@@ -314,7 +322,9 @@ describe('SmsService', () => {
      * @edge-case Tests various invalid formats
      */
     it('should reject invalid phone numbers', () => {
-      const verifySpy = jest.spyOn(service, 'verifyPhoneNumber').mockReturnValue(false);
+      const verifySpy = jest
+        .spyOn(service, 'verifyPhoneNumber')
+        .mockReturnValue(false);
 
       const invalidNumbers = [
         '1234567890',
@@ -324,7 +334,7 @@ describe('SmsService', () => {
         '',
       ];
 
-      invalidNumbers.forEach(phone => {
+      invalidNumbers.forEach((phone) => {
         const result = service.verifyPhoneNumber(phone);
         expect(result).toBe(false);
       });
@@ -345,7 +355,9 @@ describe('SmsService', () => {
      * @complexity O(1) - String formatting
      */
     it('should format phone to +55 format', () => {
-      const formatSpy = jest.spyOn(service, 'formatPhoneNumber').mockReturnValue('+5511988888888');
+      const formatSpy = jest
+        .spyOn(service, 'formatPhoneNumber')
+        .mockReturnValue('+5511988888888');
 
       const result = service.formatPhoneNumber('11988888888');
 
@@ -362,7 +374,9 @@ describe('SmsService', () => {
      * @complexity O(1) - Normalization
      */
     it('should normalize various phone formats', () => {
-      const formatSpy = jest.spyOn(service, 'formatPhoneNumber').mockReturnValue('+5511988888888');
+      const formatSpy = jest
+        .spyOn(service, 'formatPhoneNumber')
+        .mockReturnValue('+5511988888888');
 
       service.formatPhoneNumber('(11) 98888-8888');
       service.formatPhoneNumber('11 98888-8888');
@@ -387,12 +401,12 @@ describe('SmsService', () => {
      * @edge-case Tests invalid input
      */
     it('should handle invalid phone number', async () => {
-      const sendSpy = jest.spyOn(service, 'sendSms').mockRejectedValue(
-        new Error('Invalid phone number format')
-      );
+      const sendSpy = jest
+        .spyOn(service, 'sendSms')
+        .mockRejectedValue(new Error('Invalid phone number format'));
 
       await expect(
-        service.sendSms({ to: 'invalid', message: 'test' })
+        service.sendSms({ to: 'invalid', message: 'test' }),
       ).rejects.toThrow();
     });
 
@@ -406,12 +420,12 @@ describe('SmsService', () => {
      * @edge-case Tests service failure
      */
     it('should handle service unavailable error', async () => {
-      const sendSpy = jest.spyOn(service, 'sendSms').mockRejectedValue(
-        new Error('SMS service unavailable')
-      );
+      const sendSpy = jest
+        .spyOn(service, 'sendSms')
+        .mockRejectedValue(new Error('SMS service unavailable'));
 
       await expect(
-        service.sendSms({ to: '+5511988888888', message: 'test' })
+        service.sendSms({ to: '+5511988888888', message: 'test' }),
       ).rejects.toThrow('SMS service unavailable');
     });
   });

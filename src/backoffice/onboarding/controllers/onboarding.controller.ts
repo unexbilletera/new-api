@@ -8,9 +8,18 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
-import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
+import {
+  BackofficeRoleGuard,
+  MinLevel,
+} from '../../../shared/guards/backoffice-role.guard';
 import { OnboardingService } from '../services/onboarding.service';
 import {
   ListOnboardingQueryDto,
@@ -28,9 +37,17 @@ export class OnboardingController {
 
   @Get('users')
   @ApiOperation({ summary: 'List users in onboarding' })
-  @ApiQuery({ name: 'status', required: false, description: 'Status do onboarding' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Status do onboarding',
+  })
   @ApiQuery({ name: 'country', required: false, description: 'Country' })
-  @ApiQuery({ name: 'search', required: false, description: 'Busca por nome ou email' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Busca por nome ou email',
+  })
   @ApiQuery({ name: 'page', required: false, description: 'Page' })
   @ApiQuery({ name: 'limit', required: false, description: 'Limit per page' })
   @MinLevel(1)
@@ -81,7 +98,10 @@ export class OnboardingController {
   @ApiOperation({ summary: 'Request information correction' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @MinLevel(2)
-  async requestCorrection(@Param('id') id: string, @Body() dto: RequestCorrectionDto) {
+  async requestCorrection(
+    @Param('id') id: string,
+    @Body() dto: RequestCorrectionDto,
+  ) {
     return this.onboardingService.requestCorrection(id, dto);
   }
 }

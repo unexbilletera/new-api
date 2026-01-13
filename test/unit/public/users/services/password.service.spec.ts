@@ -116,7 +116,7 @@ describe('PasswordService', () => {
       };
 
       service.changePassword.mockRejectedValue(
-        new Error('Current password is incorrect')
+        new Error('Current password is incorrect'),
       );
 
       await expect(service.changePassword(userId, changeDto)).rejects.toThrow();
@@ -139,7 +139,7 @@ describe('PasswordService', () => {
       };
 
       service.changePassword.mockRejectedValue(
-        new Error('New password does not meet strength requirements')
+        new Error('New password does not meet strength requirements'),
       );
 
       await expect(service.changePassword(userId, changeDto)).rejects.toThrow();
@@ -335,7 +335,7 @@ describe('PasswordService', () => {
       const newPassword = 'NewPassword456!';
 
       service.resetPassword.mockRejectedValue(
-        new Error('Invalid or expired token')
+        new Error('Invalid or expired token'),
       );
 
       await expect(service.resetPassword(token, newPassword)).rejects.toThrow();

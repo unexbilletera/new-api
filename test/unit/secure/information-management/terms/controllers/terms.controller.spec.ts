@@ -10,7 +10,10 @@ describe('TermsController', () => {
   let service: jest.Mocked<TermsService>;
 
   const mockUserId = 'user-123';
-  const mockRequest = { ip: '192.168.1.1', headers: { 'x-forwarded-for': '10.0.0.1' } } as any;
+  const mockRequest = {
+    ip: '192.168.1.1',
+    headers: { 'x-forwarded-for': '10.0.0.1' },
+  } as any;
 
   beforeEach(async () => {
     service = {
@@ -70,7 +73,10 @@ describe('TermsController', () => {
     });
 
     it('should handle multiple service types', async () => {
-      const serviceTypes = [ServiceType.MANTECA_PIX, ServiceType.MANTECA_EXCHANGE];
+      const serviceTypes = [
+        ServiceType.MANTECA_PIX,
+        ServiceType.MANTECA_EXCHANGE,
+      ];
 
       for (const serviceType of serviceTypes) {
         const response = { accepted: false, serviceType };
@@ -86,7 +92,9 @@ describe('TermsController', () => {
       const serviceType = ServiceType.MANTECA_PIX;
       service.check.mockRejectedValue(new Error('Service type not found'));
 
-      await expect(controller.check(mockUserId, serviceType)).rejects.toThrow('Service type not found');
+      await expect(controller.check(mockUserId, serviceType)).rejects.toThrow(
+        'Service type not found',
+      );
     });
   });
 
@@ -148,9 +156,13 @@ describe('TermsController', () => {
     });
 
     it('should propagate service errors', async () => {
-      service.listAcceptances.mockRejectedValue(new Error('Failed to fetch acceptances'));
+      service.listAcceptances.mockRejectedValue(
+        new Error('Failed to fetch acceptances'),
+      );
 
-      await expect(controller.listAcceptances(mockUserId)).rejects.toThrow('Failed to fetch acceptances');
+      await expect(controller.listAcceptances(mockUserId)).rejects.toThrow(
+        'Failed to fetch acceptances',
+      );
     });
   });
 
@@ -170,7 +182,11 @@ describe('TermsController', () => {
     });
 
     it('should indicate if all required terms are accepted', async () => {
-      const response = { allAccepted: true, missing: [], accepted: ['manteca_pix', 'manteca_exchange'] };
+      const response = {
+        allAccepted: true,
+        missing: [],
+        accepted: ['manteca_pix', 'manteca_exchange'],
+      };
       service.checkAllRequired.mockResolvedValue(response);
 
       const result = await controller.checkRequired(mockUserId);
@@ -215,11 +231,18 @@ describe('TermsController', () => {
       const result = await controller.accept(mockUserId, dto, mockRequest);
 
       expect(result).toEqual(response);
-      expect(service.accept).toHaveBeenCalledWith(mockUserId, dto, mockRequest.ip);
+      expect(service.accept).toHaveBeenCalledWith(
+        mockUserId,
+        dto,
+        mockRequest.ip,
+      );
     });
 
     it('should extract IP from request', async () => {
-      const dto = { serviceType: ServiceType.MANTECA_EXCHANGE, version: '1.5.0' };
+      const dto = {
+        serviceType: ServiceType.MANTECA_EXCHANGE,
+        version: '1.5.0',
+      };
       const response = {
         success: true,
         message: 'Term accepted successfully',
@@ -235,12 +258,18 @@ describe('TermsController', () => {
 
       const result = await controller.accept(mockUserId, dto, mockRequest);
 
-      expect(service.accept).toHaveBeenCalledWith(mockUserId, dto, mockRequest.ip);
+      expect(service.accept).toHaveBeenCalledWith(
+        mockUserId,
+        dto,
+        mockRequest.ip,
+      );
     });
 
     it('should use x-forwarded-for header if request ip not available', async () => {
       const dto = { serviceType: ServiceType.MANTECA_PIX, version: '1.0.0' };
-      const requestWithoutIp = { headers: { 'x-forwarded-for': '10.0.0.5' } } as any;
+      const requestWithoutIp = {
+        headers: { 'x-forwarded-for': '10.0.0.5' },
+      } as any;
       const response = {
         success: true,
         message: 'Term accepted successfully',
@@ -285,7 +314,9 @@ describe('TermsController', () => {
       const dto = { serviceType: ServiceType.MANTECA_PIX, version: '1.0.0' };
       service.accept.mockRejectedValue(new Error('Terms acceptance failed'));
 
-      await expect(controller.accept(mockUserId, dto, mockRequest)).rejects.toThrow('Terms acceptance failed');
+      await expect(
+        controller.accept(mockUserId, dto, mockRequest),
+      ).rejects.toThrow('Terms acceptance failed');
     });
 
     it('should handle accept with null IP', async () => {
@@ -304,7 +335,11 @@ describe('TermsController', () => {
       };
       service.accept.mockResolvedValue(response);
 
-      const result = await controller.accept(mockUserId, dto, requestWithNullIp);
+      const result = await controller.accept(
+        mockUserId,
+        dto,
+        requestWithNullIp,
+      );
 
       expect(service.accept).toHaveBeenCalledWith(mockUserId, dto, undefined);
     });

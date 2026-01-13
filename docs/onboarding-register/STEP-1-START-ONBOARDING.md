@@ -24,9 +24,9 @@ No authentication required (public endpoint).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | string | Yes | User's email address (must be valid email format) |
+| Field | Type   | Required | Description                                       |
+| ----- | ------ | -------- | ------------------------------------------------- |
+| email | string | Yes      | User's email address (must be valid email format) |
 
 ### Validation Rules
 
@@ -54,6 +54,7 @@ No authentication required (public endpoint).
 ### Error Responses
 
 #### 400 Bad Request - Invalid Email Format
+
 ```json
 {
   "statusCode": 400,
@@ -63,6 +64,7 @@ No authentication required (public endpoint).
 ```
 
 #### 409 Conflict - Email Already Registered
+
 ```json
 {
   "statusCode": 409,
@@ -82,6 +84,7 @@ No authentication required (public endpoint).
 ## State Management
 
 After this step:
+
 - `onboardingState.completedSteps` includes `"1.1"`
 - User status is set to `pending`
 - Next step is to send email validation code

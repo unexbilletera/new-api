@@ -53,7 +53,10 @@ export class BiometricFactory {
    * @param {IBiometricFactoryOptions} overrides - Overrides for all
    * @returns {any[]} Array of biometric records
    */
-  static createMultiple(count: number, overrides: IBiometricFactoryOptions = {}): any[] {
+  static createMultiple(
+    count: number,
+    overrides: IBiometricFactoryOptions = {},
+  ): any[] {
     return Array.from({ length: count }, () => this.create(overrides));
   }
 

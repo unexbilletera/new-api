@@ -1,5 +1,24 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request, ForbiddenException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+  ForbiddenException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import {
@@ -71,7 +90,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get current user data',
-    description: 'Returns complete information about the authenticated user\'s profile',
+    description:
+      "Returns complete information about the authenticated user's profile",
   })
   @ApiResponse({
     status: 200,
@@ -132,7 +152,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Update address',
-    description: 'Updates the user\'s registered address',
+    description: "Updates the user's registered address",
   })
   @ApiResponse({
     status: 200,
@@ -151,7 +171,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Update profile',
-    description: 'Updates the user\'s profile information',
+    description: "Updates the user's profile information",
   })
   @ApiResponse({
     status: 200,
@@ -170,7 +190,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Change password',
-    description: 'Changes the authenticated user\'s password',
+    description: "Changes the authenticated user's password",
   })
   @ApiResponse({
     status: 200,
@@ -190,14 +210,17 @@ export class UserController {
       'unknown';
     const userAgent = (req.headers['user-agent'] as string) || undefined;
 
-    return this.passwordService.changePassword(user.id, dto, { ipAddress, userAgent });
+    return this.passwordService.changePassword(user.id, dto, {
+      ipAddress,
+      userAgent,
+    });
   }
 
   @Post('user/signout')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Logout',
-    description: 'Ends the authenticated user\'s session',
+    description: "Ends the authenticated user's session",
   })
   @ApiResponse({
     status: 200,
@@ -276,7 +299,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Update onboarding status',
-    description: 'Updates the user\'s overall onboarding status',
+    description: "Updates the user's overall onboarding status",
   })
   @ApiResponse({
     status: 200,
@@ -395,7 +418,11 @@ export class UserController {
     @Param('id') accountId: string,
     @Body() dto: SetUserAccountAliasDto,
   ) {
-    return this.accountService.setUserAccountAlias(user.id, accountId, dto.alias);
+    return this.accountService.setUserAccountAlias(
+      user.id,
+      accountId,
+      dto.alias,
+    );
   }
 
   @Get('user/balances')

@@ -4,7 +4,8 @@ import { ListLogsQueryDto, LogResponseDto, LogStatsDto } from '../dto/logs.dto';
 
 @Injectable()
 export class LogsService {
-  constructor(private prisma: PrismaService) {}  async list(query: ListLogsQueryDto): Promise<{
+  constructor(private prisma: PrismaService) {}
+  async list(query: ListLogsQueryDto): Promise<{
     data: LogResponseDto[];
     total: number;
     page: number;
@@ -25,7 +26,8 @@ export class LogsService {
     }
 
     if (query.success !== undefined) {
-      where.success = query.success === true || String(query.success) === 'true';
+      where.success =
+        query.success === true || String(query.success) === 'true';
     }
 
     if (query.startDate || query.endDate) {
@@ -59,7 +61,8 @@ export class LogsService {
       page,
       limit,
     };
-  }  async get(id: string): Promise<LogResponseDto> {
+  }
+  async get(id: string): Promise<LogResponseDto> {
     const log = await this.prisma.backofficeLogs.findUnique({
       where: { id },
       include: {
@@ -74,7 +77,8 @@ export class LogsService {
     }
 
     return this.mapToResponse(log);
-  }  async stats(startDate?: string, endDate?: string): Promise<LogStatsDto> {
+  }
+  async stats(startDate?: string, endDate?: string): Promise<LogStatsDto> {
     const where: any = {};
 
     if (startDate || endDate) {
@@ -87,22 +91,27 @@ export class LogsService {
       }
     }
 
-    const [totalLogs, successCount, failureCount, uniqueUsersResult, actionBreakdown] =
-      await Promise.all([
-        this.prisma.backofficeLogs.count({ where }),
-        this.prisma.backofficeLogs.count({ where: { ...where, success: true } }),
-        this.prisma.backofficeLogs.count({ where: { ...where, success: false } }),
-        this.prisma.backofficeLogs.groupBy({
-          by: ['userId'],
-          where,
-        }),
-        this.prisma.backofficeLogs.groupBy({
-          by: ['action'],
-          where,
-          _count: { action: true },
-          orderBy: { _count: { action: 'desc' } },
-        }),
-      ]);
+    const [
+      totalLogs,
+      successCount,
+      failureCount,
+      uniqueUsersResult,
+      actionBreakdown,
+    ] = await Promise.all([
+      this.prisma.backofficeLogs.count({ where }),
+      this.prisma.backofficeLogs.count({ where: { ...where, success: true } }),
+      this.prisma.backofficeLogs.count({ where: { ...where, success: false } }),
+      this.prisma.backofficeLogs.groupBy({
+        by: ['userId'],
+        where,
+      }),
+      this.prisma.backofficeLogs.groupBy({
+        by: ['action'],
+        where,
+        _count: { action: true },
+        orderBy: { _count: { action: 'desc' } },
+      }),
+    ]);
 
     return {
       totalLogs,
@@ -114,14 +123,19 @@ export class LogsService {
         count: a._count.action,
       })),
     };
-  }  async getActions(): Promise<string[]> {
+  }
+  async getActions(): Promise<string[]> {
     const actions = await this.prisma.backofficeLogs.groupBy({
       by: ['action'],
       orderBy: { action: 'asc' },
     });
 
     return actions.map((a) => a.action);
-  }  async getUserLogs(userId: string, query: ListLogsQueryDto): Promise<{
+  }
+  async getUserLogs(
+    userId: string,
+    query: ListLogsQueryDto,
+  ): Promise<{
     data: LogResponseDto[];
     total: number;
     page: number;

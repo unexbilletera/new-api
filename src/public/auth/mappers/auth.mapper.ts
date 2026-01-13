@@ -19,7 +19,11 @@ import {
 
 @Injectable()
 export class AuthMapper {
-  toSignupResponseDto(user: any, token: string, expiresIn: number = 3600): SignupResponseDto {
+  toSignupResponseDto(
+    user: any,
+    token: string,
+    expiresIn: number = 3600,
+  ): SignupResponseDto {
     return {
       user: {
         id: user.id,
@@ -33,7 +37,11 @@ export class AuthMapper {
     };
   }
 
-  toSignupDeviceRequiredResponseDto(user: any, token: string, deviceType: string): SignupDeviceRequiredResponseDto {
+  toSignupDeviceRequiredResponseDto(
+    user: any,
+    token: string,
+    deviceType: string,
+  ): SignupDeviceRequiredResponseDto {
     return {
       deviceRequired: true,
       deviceType,
@@ -50,7 +58,11 @@ export class AuthMapper {
     };
   }
 
-  toSigninResponseDto(user: any, token: string, expiresIn: number = 3600): SigninResponseDto {
+  toSigninResponseDto(
+    user: any,
+    token: string,
+    expiresIn: number = 3600,
+  ): SigninResponseDto {
     return {
       user: {
         id: user.id,
@@ -65,7 +77,11 @@ export class AuthMapper {
     };
   }
 
-  toSigninDeviceRequiredResponseDto(user: any, token: string, deviceType: string): SigninDeviceRequiredResponseDto {
+  toSigninDeviceRequiredResponseDto(
+    user: any,
+    token: string,
+    deviceType: string,
+  ): SigninDeviceRequiredResponseDto {
     return {
       deviceRequired: true,
       deviceType,
@@ -82,14 +98,20 @@ export class AuthMapper {
     };
   }
 
-  toEmailValidationResponseDto(message: string, debug?: string): EmailValidationResponseDto {
+  toEmailValidationResponseDto(
+    message: string,
+    debug?: string,
+  ): EmailValidationResponseDto {
     return {
       message,
       debug,
     };
   }
 
-  toEmailCodeVerificationResponseDto(message: string, email: string): EmailCodeVerificationResponseDto {
+  toEmailCodeVerificationResponseDto(
+    message: string,
+    email: string,
+  ): EmailCodeVerificationResponseDto {
     return {
       message,
       email,
@@ -97,14 +119,20 @@ export class AuthMapper {
     };
   }
 
-  toPhoneValidationResponseDto(message: string, debug?: string): PhoneValidationResponseDto {
+  toPhoneValidationResponseDto(
+    message: string,
+    debug?: string,
+  ): PhoneValidationResponseDto {
     return {
       message,
       debug,
     };
   }
 
-  toPhoneCodeVerificationResponseDto(message: string, phone: string): PhoneCodeVerificationResponseDto {
+  toPhoneCodeVerificationResponseDto(
+    message: string,
+    phone: string,
+  ): PhoneCodeVerificationResponseDto {
     return {
       message,
       phone,
@@ -112,7 +140,10 @@ export class AuthMapper {
     };
   }
 
-  toForgotPasswordResponseDto(message: string, debug?: string): ForgotPasswordResponseDto {
+  toForgotPasswordResponseDto(
+    message: string,
+    debug?: string,
+  ): ForgotPasswordResponseDto {
     return {
       message,
       debug,
@@ -123,7 +154,11 @@ export class AuthMapper {
     return { message };
   }
 
-  toUnlockAccountResponseDto(user: any, token: string, expiresIn: number = 3600): UnlockAccountResponseDto {
+  toUnlockAccountResponseDto(
+    user: any,
+    token: string,
+    expiresIn: number = 3600,
+  ): UnlockAccountResponseDto {
     return {
       user: {
         id: user.id,
@@ -141,7 +176,10 @@ export class AuthMapper {
     };
   }
 
-  toTokenResponseDto(token: string, expiresIn: number = 3600): TokenResponseDto {
+  toTokenResponseDto(
+    token: string,
+    expiresIn: number = 3600,
+  ): TokenResponseDto {
     return {
       accessToken: token,
       tokenType: 'Bearer',

@@ -35,24 +35,24 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| userId | string | Yes | User identifier |
-| identityId | string | Yes | Identity document identifier |
-| frontImage | string | Yes | Base64-encoded front image of DNI |
-| backImage | string | Yes | Base64-encoded back image of DNI |
-| pdf417Data | object | Yes | PDF417 barcode extracted data (see below) |
+| Field      | Type   | Required | Description                               |
+| ---------- | ------ | -------- | ----------------------------------------- |
+| userId     | string | Yes      | User identifier                           |
+| identityId | string | Yes      | Identity document identifier              |
+| frontImage | string | Yes      | Base64-encoded front image of DNI         |
+| backImage  | string | Yes      | Base64-encoded back image of DNI          |
+| pdf417Data | object | Yes      | PDF417 barcode extracted data (see below) |
 
 ### PDF417 Data Object
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| documentNumber | string | Yes | DNI document number |
-| firstName | string | Yes | First name from document |
-| lastName | string | Yes | Last name from document |
-| dateOfBirth | string | Yes | Date of birth (YYYY-MM-DD) |
-| gender | string | Yes | Gender ("M" or "F") |
-| documentExpiration | string | No | Document expiration date |
+| Field              | Type   | Required | Description                |
+| ------------------ | ------ | -------- | -------------------------- |
+| documentNumber     | string | Yes      | DNI document number        |
+| firstName          | string | Yes      | First name from document   |
+| lastName           | string | Yes      | Last name from document    |
+| dateOfBirth        | string | Yes      | Date of birth (YYYY-MM-DD) |
+| gender             | string | Yes      | Gender ("M" or "F")        |
+| documentExpiration | string | No       | Document expiration date   |
 
 ## Response
 
@@ -70,7 +70,24 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
     "facial": true
   },
   "onboardingState": {
-    "completedSteps": ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.11", "1.12", "2.1", "2.2", "2.3", "2.4"],
+    "completedSteps": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "1.5",
+      "1.6",
+      "1.7",
+      "1.8",
+      "1.9",
+      "1.10",
+      "1.11",
+      "1.12",
+      "2.1",
+      "2.2",
+      "2.3",
+      "2.4"
+    ],
     "needsCorrection": []
   },
   "s3Urls": {
@@ -83,6 +100,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 ### Error Responses
 
 #### 400 Bad Request - Missing Images
+
 ```json
 {
   "statusCode": 400,
@@ -92,6 +110,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 ```
 
 #### 400 Bad Request - Missing PDF417 Data
+
 ```json
 {
   "statusCode": 400,
@@ -101,6 +120,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 ```
 
 #### 400 Bad Request - Incomplete PDF417 Data
+
 ```json
 {
   "statusCode": 400,
@@ -110,6 +130,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 ```
 
 #### 400 Bad Request - Invalid Country
+
 ```json
 {
   "statusCode": 400,
@@ -119,6 +140,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 ```
 
 #### 403 Forbidden - RENAPER IP Not Authorized
+
 ```json
 {
   "statusCode": 403,
@@ -172,6 +194,7 @@ The RENAPER service performs three types of validation:
 ## State Management
 
 After successful upload:
+
 - `onboardingState.completedSteps` includes `"2.3"` and `"2.4"`
 - Identity status is set to `process` (awaiting backoffice approval)
 - Document images are stored in S3
@@ -206,6 +229,7 @@ WALLET_FILES_PUBLIC_URL=...
 ## Backoffice Approval
 
 After document upload:
+
 - Identity status is set to `process`
 - Document is ready for backoffice review
 - Upon approval, automatic account creation is triggered:
@@ -216,12 +240,14 @@ After document upload:
 ## Error Handling
 
 ### RENAPER Errors
+
 - **IP Not Authorized**: Server IP must be whitelisted on RENAPER
 - **Invalid Document**: Document number not found in RENAPER
 - **Expired Document**: Document has expired
 - **Facial Mismatch**: Document photo doesn't match liveness image
 
 ### S3 Upload Errors
+
 - **Upload Failed**: Network or permission issues
 - **Invalid Image Format**: Image must be valid JPEG/PNG
 

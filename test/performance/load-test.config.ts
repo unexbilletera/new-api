@@ -1,4 +1,3 @@
-
 export interface LoadTestScenario {
   name: string;
   endpoint: string;
@@ -99,7 +98,7 @@ export const LOAD_TEST_SCENARIOS: LoadTestScenario[] = [
     expectedLatency: 50,
     expectedSuccessRate: 0.99,
     headers: {
-      'Authorization': 'Bearer mock-token',
+      Authorization: 'Bearer mock-token',
     },
   },
 
@@ -113,7 +112,7 @@ export const LOAD_TEST_SCENARIOS: LoadTestScenario[] = [
     expectedLatency: 100,
     expectedSuccessRate: 0.98,
     headers: {
-      'Authorization': 'Bearer mock-token',
+      Authorization: 'Bearer mock-token',
     },
   },
 
@@ -127,7 +126,7 @@ export const LOAD_TEST_SCENARIOS: LoadTestScenario[] = [
     expectedLatency: 80,
     expectedSuccessRate: 0.98,
     headers: {
-      'Authorization': 'Bearer mock-token',
+      Authorization: 'Bearer mock-token',
     },
   },
 
@@ -141,7 +140,7 @@ export const LOAD_TEST_SCENARIOS: LoadTestScenario[] = [
     expectedLatency: 60,
     expectedSuccessRate: 0.99,
     headers: {
-      'Authorization': 'Bearer mock-token',
+      Authorization: 'Bearer mock-token',
     },
   },
 
@@ -155,7 +154,7 @@ export const LOAD_TEST_SCENARIOS: LoadTestScenario[] = [
     expectedLatency: 150,
     expectedSuccessRate: 0.95,
     headers: {
-      'Authorization': 'Bearer admin-token',
+      Authorization: 'Bearer admin-token',
     },
   },
 
@@ -180,7 +179,7 @@ export const SPIKE_TEST_SCENARIOS: LoadTestScenario[] = [
     duration: 10,
     expectedRPS: 100,
     expectedLatency: 300,
-    expectedSuccessRate: 0.90,
+    expectedSuccessRate: 0.9,
     payload: {
       email: 'user@example.com',
       password: 'SecurePass123!',
@@ -197,7 +196,7 @@ export const SPIKE_TEST_SCENARIOS: LoadTestScenario[] = [
     expectedLatency: 100,
     expectedSuccessRate: 0.95,
     headers: {
-      'Authorization': 'Bearer mock-token',
+      Authorization: 'Bearer mock-token',
     },
   },
 ];
@@ -231,7 +230,7 @@ export const PERFORMANCE_THRESHOLDS = {
   mediumPriority: {
     latencyP95: 300,
     latencyP99: 500,
-    successRate: 0.90,
+    successRate: 0.9,
   },
 
   lowPriority: {
@@ -317,7 +316,7 @@ export function calculateMetrics(
   latencies: number[],
   totalRequests: number,
   successfulRequests: number,
-  duration: number
+  duration: number,
 ): Partial<LoadTestResults> {
   const sorted = [...latencies].sort((a, b) => a - b);
   const p95Index = Math.floor(sorted.length * 0.95);
@@ -339,25 +338,25 @@ export function calculateMetrics(
 
 export function validateResults(
   results: LoadTestResults,
-  scenario: LoadTestScenario
+  scenario: LoadTestScenario,
 ): { valid: boolean; violations: string[] } {
   const violations: string[] = [];
 
   if (results.averageLatency > scenario.expectedLatency) {
     violations.push(
-      `Average latency ${results.averageLatency}ms exceeds expected ${scenario.expectedLatency}ms`
+      `Average latency ${results.averageLatency}ms exceeds expected ${scenario.expectedLatency}ms`,
     );
   }
 
   if (results.successRate < scenario.expectedSuccessRate) {
     violations.push(
-      `Success rate ${(results.successRate * 100).toFixed(2)}% below expected ${(scenario.expectedSuccessRate * 100).toFixed(2)}%`
+      `Success rate ${(results.successRate * 100).toFixed(2)}% below expected ${(scenario.expectedSuccessRate * 100).toFixed(2)}%`,
     );
   }
 
   if (results.throughput < scenario.expectedRPS * 0.8) {
     violations.push(
-      `Throughput ${results.throughput.toFixed(2)} RPS below expected ${scenario.expectedRPS} RPS`
+      `Throughput ${results.throughput.toFixed(2)} RPS below expected ${scenario.expectedRPS} RPS`,
     );
   }
 

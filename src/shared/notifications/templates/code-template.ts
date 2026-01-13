@@ -21,7 +21,9 @@ export function renderCodeEmailTemplate(params: CodeTemplateParams) {
 
   const safeLogo =
     logoUrl ||
-    `${process.env.WALLET_SERVER_URL || ''}/logo.svg`.replace(/\/{2,}/g, '/').replace(':/', '://');
+    `${process.env.WALLET_SERVER_URL || ''}/logo.svg`
+      .replace(/\/{2,}/g, '/')
+      .replace(':/', '://');
 
   const hasAction = Boolean(actionText && actionUrl);
 

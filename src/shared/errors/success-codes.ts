@@ -1,4 +1,3 @@
-
 export enum SuccessCodes {
   USERS_LOGIN_SUCCESS = '200 users.success.login',
   USERS_LOGOUT_SUCCESS = '200 users.success.logout',

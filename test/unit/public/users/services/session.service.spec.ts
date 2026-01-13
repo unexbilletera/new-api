@@ -230,7 +230,7 @@ describe('SessionService', () => {
       const sessionId = 'invalid-session';
 
       service.getSessionDetails.mockRejectedValue(
-        new Error('Session not found')
+        new Error('Session not found'),
       );
 
       await expect(service.getSessionDetails(sessionId)).rejects.toThrow();
@@ -261,7 +261,9 @@ describe('SessionService', () => {
 
       const result = await service.updateActivity(sessionId);
 
-      expect(result.lastActivityAt.getTime()).toBeGreaterThanOrEqual(beforeTime.getTime());
+      expect(result.lastActivityAt.getTime()).toBeGreaterThanOrEqual(
+        beforeTime.getTime(),
+      );
     });
   });
 

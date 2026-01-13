@@ -33,7 +33,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../../../../../src/shared/prisma/prisma.service';
 import { LoggerService } from '../../../../../../src/shared/logger/logger.service';
-import { createPrismaMock, createLoggerServiceMock } from '../../../../../utils';
+import {
+  createPrismaMock,
+  createLoggerServiceMock,
+} from '../../../../../utils';
 
 describe('DeviceManagementService', () => {
   let service: any;

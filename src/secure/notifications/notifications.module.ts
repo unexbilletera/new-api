@@ -13,4 +13,3 @@ import { JwtModule } from '../../shared/jwt/jwt.module';
   exports: [NotificationsService, NotificationModel, NotificationsMapper],
 })
 export class SecureNotificationsModule {}
-

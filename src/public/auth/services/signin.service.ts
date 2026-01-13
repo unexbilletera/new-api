@@ -37,12 +37,17 @@ export class SigninService {
     return email.toLowerCase().trim();
   }
 
-  async signin(dto: SigninDto, requestContext?: { ipAddress?: string; userAgent?: string }) {
+  async signin(
+    dto: SigninDto,
+    requestContext?: { ipAddress?: string; userAgent?: string },
+  ) {
     try {
       this.systemVersionService.assertVersionValid(dto.systemVersion);
     } catch (versionError) {
       throw new BadRequestException(
-        versionError instanceof Error ? versionError.message : 'users.errors.invalidSystemVersion',
+        versionError instanceof Error
+          ? versionError.message
+          : 'users.errors.invalidSystemVersion',
       );
     }
 
@@ -53,7 +58,8 @@ export class SigninService {
     }
 
     const usernameRegex = /^[A-Za-z0-9]{1,}[\-\_\.]?[A-Za-z0-9]{4,}$/;
-    const emailRegex = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const emailRegex =
+      /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
     if (identifier.length > 255) {
       throw new BadRequestException('users.errors.invalidUsername');
@@ -71,30 +77,47 @@ export class SigninService {
       where: {
         ...where,
         status: { in: ['pending', 'enable', 'error'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
     const ipAddress = requestContext?.ipAddress;
     const userAgent = requestContext?.userAgent;
 
-    const bruteForceCheck = await this.bruteForceService.checkAttempt(identifier, ipAddress, {
-      maxAttempts: 5,
-      windowMs: 15 * 60 * 1000,
-      lockoutDurationMs: 30 * 60 * 1000,
-    });
+    const bruteForceCheck = await this.bruteForceService.checkAttempt(
+      identifier,
+      ipAddress,
+      {
+        maxAttempts: 5,
+        windowMs: 15 * 60 * 1000,
+        lockoutDurationMs: 30 * 60 * 1000,
+      },
+    );
 
     if (!bruteForceCheck.allowed) {
-      throw new HttpException('users.errors.tooManyAttempts', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        'users.errors.tooManyAttempts',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
 
     if (!user) {
-      await this.bruteForceService.recordFailure(identifier, undefined, ipAddress);
+      await this.bruteForceService.recordFailure(
+        identifier,
+        undefined,
+        ipAddress,
+      );
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
     if (user.status === 'disable') {
-      await this.bruteForceService.recordFailure(identifier, user.id, ipAddress);
+      await this.bruteForceService.recordFailure(
+        identifier,
+        user.id,
+        ipAddress,
+      );
       await this.accessLogService.logFailure({
         userId: user.id,
         ipAddress: requestContext?.ipAddress,
@@ -104,7 +127,11 @@ export class SigninService {
     }
 
     if (!user.password) {
-      await this.bruteForceService.recordFailure(identifier, user.id, ipAddress);
+      await this.bruteForceService.recordFailure(
+        identifier,
+        user.id,
+        ipAddress,
+      );
       await this.accessLogService.logFailure({
         userId: user.id,
         ipAddress: requestContext?.ipAddress,
@@ -113,10 +140,17 @@ export class SigninService {
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
-    const isPasswordValid = await PasswordHelper.compare(dto.password, user.password);
+    const isPasswordValid = await PasswordHelper.compare(
+      dto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
-      await this.bruteForceService.recordFailure(identifier, user.id, ipAddress);
+      await this.bruteForceService.recordFailure(
+        identifier,
+        user.id,
+        ipAddress,
+      );
       await this.accessLogService.logFailure({
         userId: user.id,
         ipAddress: requestContext?.ipAddress,
@@ -128,7 +162,11 @@ export class SigninService {
     let deviceRequired = false;
     if (dto.deviceIdentifier) {
       const activeDevice = await this.prisma.devices.findFirst({
-        where: { userId: user.id, deviceIdentifier: dto.deviceIdentifier, status: 'active' },
+        where: {
+          userId: user.id,
+          deviceIdentifier: dto.deviceIdentifier,
+          status: 'active',
+        },
       });
       deviceRequired = !activeDevice;
     } else {
@@ -145,7 +183,11 @@ export class SigninService {
         roleId: user.id,
       };
       const tempToken = await this.jwtService.generateToken(tempPayload);
-      return this.authMapper.toSigninDeviceRequiredResponseDto(user, tempToken, 'hard');
+      return this.authMapper.toSigninDeviceRequiredResponseDto(
+        user,
+        tempToken,
+        'hard',
+      );
     }
 
     await this.bruteForceService.clearAttempts(identifier, ipAddress);
@@ -169,7 +211,9 @@ export class SigninService {
         })),
       });
     } catch (syncError: any) {
-      this.logger.warn('Cronos sync error (non-blocking)', { error: syncError?.message });
+      this.logger.warn('Cronos sync error (non-blocking)', {
+        error: syncError?.message,
+      });
     }
 
     await this.accessLogService.logSuccess({
@@ -188,7 +232,9 @@ export class SigninService {
         ),
       )
       .catch((error) => {
-        this.logger.warn('Suspicious activity check failed', { error: error?.message });
+        this.logger.warn('Suspicious activity check failed', {
+          error: error?.message,
+        });
       });
 
     await this.userModel.updateLastLogin(user.id);

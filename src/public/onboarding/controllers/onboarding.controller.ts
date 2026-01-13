@@ -1,4 +1,14 @@
-import { Controller, Post, Patch, Get, Body, Param, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Patch,
+  Get,
+  Body,
+  Param,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -62,7 +72,9 @@ export class OnboardingController {
     status: 400,
     description: 'Invalid data or email already registered',
   })
-  async startUserOnboarding(@Body() dto: StartUserOnboardingDto): Promise<StartUserOnboardingResponseDto> {
+  async startUserOnboarding(
+    @Body() dto: StartUserOnboardingDto,
+  ): Promise<StartUserOnboardingResponseDto> {
     return this.userOnboardingService.startUserOnboarding(dto);
   }
 
@@ -80,7 +92,9 @@ export class OnboardingController {
     status: 400,
     description: 'Invalid or expired code',
   })
-  async verifyCode(@Body() dto: VerifyOnboardingCodeDto): Promise<VerifyOnboardingCodeResponseDto> {
+  async verifyCode(
+    @Body() dto: VerifyOnboardingCodeDto,
+  ): Promise<VerifyOnboardingCodeResponseDto> {
     return this.verificationService.verifyOnboardingCode(dto);
   }
 
@@ -205,7 +219,10 @@ export class OnboardingController {
     @Param('identityId') identityId: string,
     @Body() dto: UpdateIdentityOnboardingDto,
   ): Promise<UpdateIdentityOnboardingResponseDto> {
-    return this.identityOnboardingService.updateIdentityOnboarding(identityId, dto);
+    return this.identityOnboardingService.updateIdentityOnboarding(
+      identityId,
+      dto,
+    );
   }
 
   @Post('identity/ar/upload-document')
@@ -223,9 +240,14 @@ export class OnboardingController {
     description: 'Invalid file or incomplete data',
   })
   async uploadArgentinaDocument(
-    @Body() dto: UploadArgentinaDocumentDto & { userId: string; identityId: string },
+    @Body()
+    dto: UploadArgentinaDocumentDto & { userId: string; identityId: string },
   ): Promise<UploadArgentinaDocumentResponseDto> {
-    return this.identityOnboardingService.uploadArgentinaDocument(dto.userId, dto.identityId, dto);
+    return this.identityOnboardingService.uploadArgentinaDocument(
+      dto.userId,
+      dto.identityId,
+      dto,
+    );
   }
 }
 
@@ -239,7 +261,8 @@ export class UserOnboardingController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get pending onboarding data',
-    description: 'Returns the data that still needs to be provided to complete onboarding',
+    description:
+      'Returns the data that still needs to be provided to complete onboarding',
   })
   @ApiParam({
     name: 'userIdentityId',
@@ -263,7 +286,9 @@ export class UserOnboardingController {
     @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
   ): Promise<OnboardingPendingDataResponseDto> {
-    return this.identityOnboardingService.getOnboardingPendingData(userIdentityId);
+    return this.identityOnboardingService.getOnboardingPendingData(
+      userIdentityId,
+    );
   }
 
   @Post('user/onboarding/update-specific-data/:userIdentityId')
@@ -294,14 +319,17 @@ export class UserOnboardingController {
     @Param('userIdentityId') userIdentityId: string,
     @Body() dto: any,
   ) {
-    return this.identityOnboardingService.updateOnboardingSpecificData(userIdentityId, dto);
+    return this.identityOnboardingService.updateOnboardingSpecificData(
+      userIdentityId,
+      dto,
+    );
   }
 
   @Get('user/onboarding/status/:userIdentityId')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get onboarding status',
-    description: 'Returns the current status of the user\'s onboarding process',
+    description: "Returns the current status of the user's onboarding process",
   })
   @ApiParam({
     name: 'userIdentityId',
@@ -356,7 +384,9 @@ export class UserOnboardingController {
     @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
   ): Promise<ValidateOnboardingDataResponseDto> {
-    return this.identityOnboardingService.validateOnboardingData(userIdentityId);
+    return this.identityOnboardingService.validateOnboardingData(
+      userIdentityId,
+    );
   }
 
   @Post('user/onboarding/retry/:userIdentityId')
@@ -364,7 +394,8 @@ export class UserOnboardingController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Retry onboarding',
-    description: 'Allows the user to retry the onboarding process after failure',
+    description:
+      'Allows the user to retry the onboarding process after failure',
   })
   @ApiParam({
     name: 'userIdentityId',

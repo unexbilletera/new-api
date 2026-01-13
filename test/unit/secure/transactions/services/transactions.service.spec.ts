@@ -85,10 +85,12 @@ describe('TransactionsService', () => {
       const txnData = { amount: 99999, type: 'TRANSFER' };
 
       service.createTransaction.mockRejectedValue(
-        new Error('Insufficient balance')
+        new Error('Insufficient balance'),
       );
 
-      await expect(service.createTransaction(userId, txnData)).rejects.toThrow();
+      await expect(
+        service.createTransaction(userId, txnData),
+      ).rejects.toThrow();
     });
   });
 

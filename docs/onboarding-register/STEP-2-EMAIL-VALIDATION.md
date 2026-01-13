@@ -3,6 +3,7 @@
 ## Overview
 
 This step involves sending a validation code to the user's email and verifying it to confirm email ownership. This step consists of two sub-steps:
+
 - **Step 1.2**: Send email validation code
 - **Step 1.3**: Verify email validation code
 
@@ -36,13 +37,14 @@ No authentication required (public endpoints).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | string | Yes | User's email address |
+| Field | Type   | Required | Description          |
+| ----- | ------ | -------- | -------------------- |
+| email | string | Yes      | User's email address |
 
 ### Response
 
 #### Success Response (200 OK)
+
 ```json
 {
   "success": true,
@@ -53,6 +55,7 @@ No authentication required (public endpoints).
 #### Error Responses
 
 **400 Bad Request - Invalid Email**
+
 ```json
 {
   "statusCode": 400,
@@ -62,6 +65,7 @@ No authentication required (public endpoints).
 ```
 
 **400 Bad Request - Email Already Registered**
+
 ```json
 {
   "statusCode": 400,
@@ -84,11 +88,11 @@ No authentication required (public endpoints).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | string | Yes | User's email address |
-| code | string | Yes | Validation code received via email |
-| type | string | Yes | Must be `"email"` |
+| Field | Type   | Required | Description                        |
+| ----- | ------ | -------- | ---------------------------------- |
+| email | string | Yes      | User's email address               |
+| code  | string | Yes      | Validation code received via email |
+| type  | string | Yes      | Must be `"email"`                  |
 
 ### Response
 
@@ -110,6 +114,7 @@ No authentication required (public endpoints).
 #### Error Responses
 
 **400 Bad Request - Code Not Found or Expired**
+
 ```json
 {
   "statusCode": 400,
@@ -119,6 +124,7 @@ No authentication required (public endpoints).
 ```
 
 **400 Bad Request - Invalid Code**
+
 ```json
 {
   "statusCode": 400,
@@ -130,12 +136,14 @@ No authentication required (public endpoints).
 ## Implementation Details
 
 ### Send Email Validation Code
+
 - Generates a 6-digit validation code
 - Sends email with validation code (unless `WALLET_SANDBOX_SEND_MAIL=false`)
 - Stores code hash in database with expiration time
 - In sandbox mode with `ENABLE_MOCK_CODES=true`, accepts mock codes
 
 ### Verify Email Validation Code
+
 - Validates the code against stored hash
 - Checks code expiration
 - Marks email as verified (`emailVerifiedAt` timestamp)
@@ -144,6 +152,7 @@ No authentication required (public endpoints).
 ## State Management
 
 After successful verification:
+
 - `onboardingState.completedSteps` includes `"1.2"` and `"1.3"`
 - `emailVerifiedAt` is set to current timestamp
 - Next step is phone validation
@@ -151,6 +160,7 @@ After successful verification:
 ## Mock Codes
 
 When `ENABLE_MOCK_CODES=true`:
+
 - Email validation can be bypassed with mock codes
 - See [Mock Codes Documentation](../PROVIDER_FEATURES.md) for details
 
@@ -171,6 +181,7 @@ WALLET_SANDBOX_SEND_MAIL=true
 ## Example cURL
 
 ### Send Email Validation Code
+
 ```bash
 curl -X POST https://api.example.com/api/onboarding/user/send-email-validation \
   -H "Content-Type: application/json" \
@@ -180,6 +191,7 @@ curl -X POST https://api.example.com/api/onboarding/user/send-email-validation \
 ```
 
 ### Verify Email Validation Code
+
 ```bash
 curl -X POST https://api.example.com/api/onboarding/user/verify-code \
   -H "Content-Type: application/json" \

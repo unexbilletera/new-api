@@ -41,7 +41,10 @@ export class OnboardingMapper {
     };
   }
 
-  toUpdateUserOnboardingResponseDto(user: any, onboardingState: any): UpdateUserOnboardingResponseDto {
+  toUpdateUserOnboardingResponseDto(
+    user: any,
+    onboardingState: any,
+  ): UpdateUserOnboardingResponseDto {
     return {
       success: true,
       message: 'Data updated successfully',
@@ -55,21 +58,27 @@ export class OnboardingMapper {
     };
   }
 
-  toStartIdentityOnboardingResponseDto(identityId: string): StartIdentityOnboardingResponseDto {
+  toStartIdentityOnboardingResponseDto(
+    identityId: string,
+  ): StartIdentityOnboardingResponseDto {
     return {
       message: 'Identity onboarding started',
       identityId,
     };
   }
 
-  toUpdateIdentityOnboardingResponseDto(identityId: string): UpdateIdentityOnboardingResponseDto {
+  toUpdateIdentityOnboardingResponseDto(
+    identityId: string,
+  ): UpdateIdentityOnboardingResponseDto {
     return {
       message: 'Identity updated successfully',
       identityId,
     };
   }
 
-  toUploadArgentinaDocumentResponseDto(onboardingState: any): UploadArgentinaDocumentResponseDto {
+  toUploadArgentinaDocumentResponseDto(
+    onboardingState: any,
+  ): UploadArgentinaDocumentResponseDto {
     return {
       message: 'Document uploaded successfully',
       onboardingState,
@@ -90,9 +99,12 @@ export class OnboardingMapper {
     requiredSteps: string[],
     completedSteps: string[],
   ): OnboardingStatusResponseDto {
-    const pendingSteps = requiredSteps.filter((step) => !completedSteps.includes(step));
+    const pendingSteps = requiredSteps.filter(
+      (step) => !completedSteps.includes(step),
+    );
     const completionPercentage = Math.round(
-      ((requiredSteps.length - pendingSteps.length) / requiredSteps.length) * 100,
+      ((requiredSteps.length - pendingSteps.length) / requiredSteps.length) *
+        100,
     );
 
     return {
@@ -102,7 +114,9 @@ export class OnboardingMapper {
     };
   }
 
-  toValidateOnboardingDataResponseDto(errors: string[]): ValidateOnboardingDataResponseDto {
+  toValidateOnboardingDataResponseDto(
+    errors: string[],
+  ): ValidateOnboardingDataResponseDto {
     return {
       isValid: errors.length === 0,
       errors,

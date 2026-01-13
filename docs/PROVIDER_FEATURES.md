@@ -232,34 +232,38 @@ This document lists all features/capabilities of each payment provider, without 
 
 ## Comparative Summary
 
-| Feature | Cronos | Bind | Gire | Manteca | Coelsa |
-|---------|--------|------|------|---------|--------|
-| **Cash-in** | Yes | Yes | Yes | Yes (Exchange) | Yes |
-| **Cash-out** | Yes | Yes | Yes | Yes (QR + Exchange) | Yes |
-| **Transfers** | Yes | Yes | No | No | No |
-| **Payments (Bill)** | Yes | No | Yes | No | No |
-| **Payments (QR)** | Yes | No | No | Yes | No |
-| **Recharges** | Yes | No | Yes | No | No |
-| **Exchange (Conversion)** | No | No | No | Yes | No |
-| **PIX** | Yes | No | No | No | No |
-| **CVU/CBU** | No | Yes | No | No | No |
-| **Webhook** | Yes | Yes | Yes | Yes | No |
-| **Main Region** | BR | AR | AR | AR + BR | BR |
+| Feature                   | Cronos | Bind | Gire | Manteca             | Coelsa |
+| ------------------------- | ------ | ---- | ---- | ------------------- | ------ |
+| **Cash-in**               | Yes    | Yes  | Yes  | Yes (Exchange)      | Yes    |
+| **Cash-out**              | Yes    | Yes  | Yes  | Yes (QR + Exchange) | Yes    |
+| **Transfers**             | Yes    | Yes  | No   | No                  | No     |
+| **Payments (Bill)**       | Yes    | No   | Yes  | No                  | No     |
+| **Payments (QR)**         | Yes    | No   | No   | Yes                 | No     |
+| **Recharges**             | Yes    | No   | Yes  | No                  | No     |
+| **Exchange (Conversion)** | No     | No   | No   | Yes                 | No     |
+| **PIX**                   | Yes    | No   | No   | No                  | No     |
+| **CVU/CBU**               | No     | Yes  | No   | No                  | No     |
+| **Webhook**               | Yes    | Yes  | Yes  | Yes                 | No     |
+| **Main Region**           | BR     | AR   | AR   | AR + BR             | BR     |
 
 ## Common Features (Centralize)
 
 ### 1. Transaction Creation
+
 - All providers use the same flow: `createTransaction` → `confirmTransaction`
 - Difference is only in transaction `type`
 
 ### 2. Transaction Confirmation
+
 - All use `confirmTransaction` after creating
 - Processing is asynchronous via webhook
 
 ### 3. Webhooks
+
 - All providers send webhooks to update status
 - Asynchronous processing (SQS queue)
 
 ### 4. Transaction Query
+
 - All allow querying status of created transaction
 - Search by transaction ID

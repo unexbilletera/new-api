@@ -15,34 +15,35 @@ The onboarding process consists of two main phases:
 
 ### Phase 1: User Onboarding
 
-| Step | Description | Endpoint | Status |
-|------|-------------|----------|--------|
-| 1.1 | Start onboarding (email registration) | `POST /api/onboarding/user/start` | ✅ Required |
-| 1.2 | Email validation code sent | `POST /api/onboarding/user/send-email-validation` | ✅ Required |
-| 1.3 | Email code verified | `POST /api/onboarding/user/verify-code` | ✅ Required |
-| 1.4 | Phone number provided | `PATCH /api/onboarding/user/:userId` | ✅ Required |
-| 1.5 | Phone validation code sent | `POST /api/onboarding/user/send-phone-validation` | ✅ Required |
-| 1.6 | Phone code verified | `POST /api/onboarding/user/verify-code` | ✅ Required |
-| 1.7 | Password created | `PATCH /api/onboarding/user/:userId` | ✅ Required |
-| 1.8 | Personal information (name) | `PATCH /api/onboarding/user/:userId` | ✅ Required |
-| 1.9 | Additional personal data | `PATCH /api/onboarding/user/:userId` | ✅ Required |
-| 1.10 | PEP declaration | `PATCH /api/onboarding/user/:userId` | ✅ Required |
-| 1.11 | Liveness verification initiated | `PATCH /api/onboarding/user/:userId` or `POST /api/users/user/liveness` | ✅ Required |
-| 1.12 | Liveness verification completed | Automatic | ✅ Required |
-| 1.13 | All user steps completed | Automatic | ✅ Required |
+| Step | Description                           | Endpoint                                                                | Status      |
+| ---- | ------------------------------------- | ----------------------------------------------------------------------- | ----------- |
+| 1.1  | Start onboarding (email registration) | `POST /api/onboarding/user/start`                                       | ✅ Required |
+| 1.2  | Email validation code sent            | `POST /api/onboarding/user/send-email-validation`                       | ✅ Required |
+| 1.3  | Email code verified                   | `POST /api/onboarding/user/verify-code`                                 | ✅ Required |
+| 1.4  | Phone number provided                 | `PATCH /api/onboarding/user/:userId`                                    | ✅ Required |
+| 1.5  | Phone validation code sent            | `POST /api/onboarding/user/send-phone-validation`                       | ✅ Required |
+| 1.6  | Phone code verified                   | `POST /api/onboarding/user/verify-code`                                 | ✅ Required |
+| 1.7  | Password created                      | `PATCH /api/onboarding/user/:userId`                                    | ✅ Required |
+| 1.8  | Personal information (name)           | `PATCH /api/onboarding/user/:userId`                                    | ✅ Required |
+| 1.9  | Additional personal data              | `PATCH /api/onboarding/user/:userId`                                    | ✅ Required |
+| 1.10 | PEP declaration                       | `PATCH /api/onboarding/user/:userId`                                    | ✅ Required |
+| 1.11 | Liveness verification initiated       | `PATCH /api/onboarding/user/:userId` or `POST /api/users/user/liveness` | ✅ Required |
+| 1.12 | Liveness verification completed       | Automatic                                                               | ✅ Required |
+| 1.13 | All user steps completed              | Automatic                                                               | ✅ Required |
 
 ### Phase 2: Identity Onboarding
 
 #### Argentina (Steps 2.1 - 2.4)
 
-| Step | Description | Endpoint | Status |
-|------|-------------|----------|--------|
-| 2.1 | Start identity onboarding | `POST /api/onboarding/identity/:userId` | ✅ Required |
-| 2.2 | Document information provided | `PATCH /api/onboarding/identity/:identityId` | ✅ Required |
-| 2.3 | Document uploaded with RENAPER validation | `POST /api/onboarding/identity/ar/upload-document` | ✅ Implemented |
-| 2.4 | Document verification success | Automatic | ✅ Implemented |
+| Step | Description                               | Endpoint                                           | Status         |
+| ---- | ----------------------------------------- | -------------------------------------------------- | -------------- |
+| 2.1  | Start identity onboarding                 | `POST /api/onboarding/identity/:userId`            | ✅ Required    |
+| 2.2  | Document information provided             | `PATCH /api/onboarding/identity/:identityId`       | ✅ Required    |
+| 2.3  | Document uploaded with RENAPER validation | `POST /api/onboarding/identity/ar/upload-document` | ✅ Implemented |
+| 2.4  | Document verification success             | Automatic                                          | ✅ Implemented |
 
 **Argentina Implementation Details:**
+
 - ✅ PDF417 barcode parsing from DNI documents
 - ✅ RENAPER API integration for document validity verification
 - ✅ RENAPER facial validation (when liveness image available)
@@ -51,15 +52,16 @@ The onboarding process consists of two main phases:
 
 #### Brazil (Steps 3.1 - 3.5)
 
-| Step | Description | Endpoint | Status |
-|------|-------------|----------|--------|
-| 3.1 | Start identity onboarding | `POST /api/onboarding/identity/:userId` | ✅ Required |
-| 3.2 | Document information provided | `PATCH /api/onboarding/identity/:identityId` | ✅ Required |
-| 3.3 | Cronos onboarding started | Automatic (via backoffice approval) | ✅ Implemented |
-| 3.4 | Cronos onboarding completed | Automatic (via backoffice approval) | ✅ Implemented |
-| 3.5 | Document verification success | Automatic | ✅ Implemented |
+| Step | Description                   | Endpoint                                     | Status         |
+| ---- | ----------------------------- | -------------------------------------------- | -------------- |
+| 3.1  | Start identity onboarding     | `POST /api/onboarding/identity/:userId`      | ✅ Required    |
+| 3.2  | Document information provided | `PATCH /api/onboarding/identity/:identityId` | ✅ Required    |
+| 3.3  | Cronos onboarding started     | Automatic (via backoffice approval)          | ✅ Implemented |
+| 3.4  | Cronos onboarding completed   | Automatic (via backoffice approval)          | ✅ Implemented |
+| 3.5  | Document verification success | Automatic                                    | ✅ Implemented |
 
 **Brazil Implementation Details:**
+
 - ✅ Cronos onboarding integration (`onboardingStart`, `onboarding`, `getOnboardingStatus`)
 - ✅ Automatic PIX key generation (EVP)
 - ✅ Automatic account creation via Cronos (PIX) and Manteca (crypto) after backoffice approval
@@ -80,11 +82,13 @@ POST /backoffice/onboarding/users/:id/approve
 Upon approval, the system automatically creates accounts based on the user's country:
 
 #### Argentina
+
 1. **Bind CVU**: Creates CVU (Cuenta Virtual Única) for ARS transactions
 2. **Manteca**: Creates crypto account for Argentina exchange
 3. **Status Update**: Sets identity and user status to `enable`
 
 #### Brazil
+
 1. **Cronos**: Creates PIX account and generates EVP key if missing
 2. **Manteca**: Creates crypto account for Brazil exchange
 3. **Status Update**: Sets identity and user status to `enable`
@@ -119,6 +123,7 @@ VALIDA_ENABLED=true
 ### External Services Configuration
 
 #### RENAPER (Argentina)
+
 ```env
 WALLET_RENAPER=enable
 WALLET_RENAPER_LOG=enable
@@ -135,6 +140,7 @@ WALLET_RENAPER_TIMEOUT=30000
 ```
 
 #### Bind (Argentina)
+
 ```env
 WALLET_BIND=enable
 WALLET_BIND_LOG=enable
@@ -149,6 +155,7 @@ WALLET_BIND_PASSPHRASE=...
 ```
 
 #### Cronos (Brazil)
+
 ```env
 WALLET_CRONOS=enable
 WALLET_CRONOS_LOG=enable
@@ -160,6 +167,7 @@ WALLET_CRONOS_USER_PASSWORD=...
 ```
 
 #### Manteca (Crypto)
+
 ```env
 WALLET_MANTECA=enable
 WALLET_MANTECA_LOG=enable
@@ -168,6 +176,7 @@ WALLET_MANTECA_KEY=...
 ```
 
 #### S3 Storage
+
 ```env
 WALLET_FILES_KEY=...
 WALLET_FILES_PASSWORD=...
@@ -179,6 +188,7 @@ WALLET_FILES_PUBLIC_URL=...
 ### Mock Code Behavior
 
 When `ENABLE_MOCK_CODES=true`:
+
 - Email validation codes can be bypassed with mock codes
 - SMS validation codes can be bypassed with mock codes
 - See [Mock Codes Documentation](../PROVIDER_FEATURES.md) for details
@@ -213,32 +223,38 @@ The onboarding state is stored in the `onboardingState` field of the user record
 ## Validation Rules
 
 ### Email
+
 - Must be valid email format
 - Must be unique (not already registered)
 - Normalized to lowercase
 
 ### Phone
+
 - Must be valid phone number format
 - Normalized (non-digit characters removed)
 - Country-specific validation
 
 ### Password
+
 - Must be 6 digits (numeric only)
 - Format: `^\d{6}$`
 
 ### Liveness
+
 - **Valida Enabled**: Full Valida flow via `/api/users/user/liveness`
 - **Valida Disabled**: Simple photo upload via `PATCH /api/onboarding/user/:userId`
 
 ### Document Validation
 
 #### Argentina
+
 - PDF417 barcode data extraction and validation
 - RENAPER validity verification (vigencia)
 - RENAPER facial validation (when liveness image available)
 - Document images uploaded to S3
 
 #### Brazil
+
 - CPF format validation
 - Cronos onboarding status verification
 - Automatic PIX key generation
@@ -256,6 +272,7 @@ All endpoints return standardized error responses:
 ```
 
 Common error codes:
+
 - `users.errors.emailAlreadyInUse` - Email already registered
 - `users.errors.invalidEmail` - Invalid email format
 - `users.errors.codeNotFoundOrExpired` - Validation code expired

@@ -151,10 +151,8 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   private async getAppToken(): Promise<string> {
     try {
-
       if (
         this.appAuth &&
         this.appAuth.token &&
@@ -249,7 +247,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   private async getUserToken(document: string): Promise<string> {
     try {
       if (!document) {
@@ -395,7 +392,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   private async request(params: {
     method: string;
     action: string;
@@ -718,7 +714,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   async transferPix(params: {
     document: string;
     keyType: string;
@@ -795,7 +790,6 @@ export class CronosService implements OnModuleInit {
           );
         }
       } catch (userAuthError) {
-
         if (this.config.logging) {
           this.logger.warn(
             '[CronosService] WARNING',
@@ -858,7 +852,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   async confirmTransferPix(params: {
     document: string;
     id: string;
@@ -914,7 +907,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   async createTransactionalToken(params: {
     document: string;
     amount: number;
@@ -966,7 +958,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   async confirmTransactionPassword(params: { document: string }): Promise<any> {
     try {
       if (!params.document) {
@@ -1012,7 +1003,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   async getAccountBalance(params: {
     document: string;
   }): Promise<{ amount?: number; balance?: number; saldo?: number }> {
@@ -1053,7 +1043,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   async getTransactions(params: {
     document: string;
     startDate?: string;
@@ -1110,7 +1099,6 @@ export class CronosService implements OnModuleInit {
     }
   }
 
-  
   async syncCronosBalance(params: {
     userId: string;
     userIdentities: Array<{
@@ -1304,11 +1292,15 @@ export class CronosService implements OnModuleInit {
           }
         }
       } else {
-        this.logger.success('[CronosService] SUCCESS', 'Balances synchronized:', {
-          unexBalance,
-          cronosBalance,
-          difference,
-        });
+        this.logger.success(
+          '[CronosService] SUCCESS',
+          'Balances synchronized:',
+          {
+            unexBalance,
+            cronosBalance,
+            difference,
+          },
+        );
       }
 
       if (Math.abs(difference) > 0.01) {
@@ -1344,11 +1336,9 @@ export class CronosService implements OnModuleInit {
         '[CronosService] ERROR',
         `General synchronization error: ${error?.message || String(error)}`,
       );
-
     }
   }
 
-  
   private mapKeyTypeToCronos(keyType: string): string {
     const mapping: Record<string, string> = {
       cpf: 'cpf',
@@ -1361,7 +1351,9 @@ export class CronosService implements OnModuleInit {
     return mapping[keyType.toLowerCase()] || keyType.toLowerCase();
   }
 
-  async onboardingStart(params: { document: string }): Promise<{ individual_id: string }> {
+  async onboardingStart(params: {
+    document: string;
+  }): Promise<{ individual_id: string }> {
     try {
       if (!params || !params.document) {
         throw new Error('Missing document. Invalid parameters');
@@ -1377,7 +1369,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStart error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStart error',
+        error,
+      );
       throw error;
     }
   }
@@ -1410,7 +1406,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep1 error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStep1 error',
+        error,
+      );
       throw error;
     }
   }
@@ -1445,7 +1445,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep2 error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStep2 error',
+        error,
+      );
       throw error;
     }
   }
@@ -1490,7 +1494,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep3 error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStep3 error',
+        error,
+      );
       throw error;
     }
   }
@@ -1537,22 +1545,30 @@ export class CronosService implements OnModuleInit {
       };
 
       if (params.documentType) {
-        body.document_name = params.documentType.toString().trim().toUpperCase();
+        body.document_name = params.documentType
+          .toString()
+          .trim()
+          .toUpperCase();
       }
       if (params.documentNumber) body.document_number = params.documentNumber;
       if (params.documentState) body.document_state = params.documentState;
-      if (params.documentIssuance) body.document_issuance = params.documentIssuance;
-      if (params.documentIssuanceDate) body.issuance_date = params.documentIssuanceDate;
+      if (params.documentIssuance)
+        body.document_issuance = params.documentIssuance;
+      if (params.documentIssuanceDate)
+        body.issuance_date = params.documentIssuanceDate;
       if (params.gender) {
-        body.gender = cronosGender[params.gender.toLowerCase()] || params.gender;
+        body.gender =
+          cronosGender[params.gender.toLowerCase()] || params.gender;
       }
       if (params.birthDate) body.birth_date = params.birthDate;
       if (params.maritalStatus) {
         body.marital_status =
-          cronosMaritalStatus[params.maritalStatus.toLowerCase()] ?? params.maritalStatus;
+          cronosMaritalStatus[params.maritalStatus.toLowerCase()] ??
+          params.maritalStatus;
       }
       if (params.nationality) body.nationality = params.nationality;
-      if (params.nationalityState) body.nationality_state = params.nationalityState;
+      if (params.nationalityState)
+        body.nationality_state = params.nationalityState;
       if (params.motherName) body.mother_name = params.motherName;
       if (params.fatherName) body.father_name = params.fatherName;
       if (params.pep !== undefined) body.pep = params.pep;
@@ -1567,12 +1583,19 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep4 error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStep4 error',
+        error,
+      );
       throw error;
     }
   }
 
-  async onboardingStep5(params: { cronosId: string; fileUrl: string }): Promise<any> {
+  async onboardingStep5(params: {
+    cronosId: string;
+    fileUrl: string;
+  }): Promise<any> {
     try {
       if (!params || !params.cronosId) {
         throw new Error('Missing cronosId. Invalid parameters');
@@ -1600,7 +1623,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep5 error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStep5 error',
+        error,
+      );
       throw error;
     }
   }
@@ -1657,7 +1684,8 @@ export class CronosService implements OnModuleInit {
         body: {
           individual_id: params.cronosId,
           postal_code: params.zipCode,
-          address_type_id: cronosAddressType[params.addressTypeId || 'own'] || 1,
+          address_type_id:
+            cronosAddressType[params.addressTypeId || 'own'] || 1,
           street: params.street,
           number: params.number,
           neighborhood: params.neighborhood,
@@ -1670,7 +1698,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep6 error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStep6 error',
+        error,
+      );
       throw error;
     }
   }
@@ -1693,7 +1725,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboardingStep7 error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboardingStep7 error',
+        error,
+      );
       throw error;
     }
   }
@@ -1711,7 +1747,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'getOnboardingStatus error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'getOnboardingStatus error',
+        error,
+      );
       throw error;
     }
   }
@@ -1731,7 +1771,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'getAccount error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'getAccount error',
+        error,
+      );
       throw error;
     }
   }
@@ -1751,7 +1795,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'getPixKeys error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'getPixKeys error',
+        error,
+      );
       throw error;
     }
   }
@@ -1781,12 +1829,20 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'getAlias error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'getAlias error',
+        error,
+      );
       return {};
     }
   }
 
-  async addPixKey(params: { document: string; type: string; key: string }): Promise<any> {
+  async addPixKey(params: {
+    document: string;
+    type: string;
+    key: string;
+  }): Promise<any> {
     try {
       if (!params || !params.document) {
         throw new Error('Missing document. Invalid parameters');
@@ -1811,7 +1867,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'addPixKey error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'addPixKey error',
+        error,
+      );
       throw error;
     }
   }
@@ -1886,12 +1946,17 @@ export class CronosService implements OnModuleInit {
       };
 
       const toUpper = (value: any): string | undefined => {
-        return value ? value.toString().trim().toUpperCase() || undefined : undefined;
+        return value
+          ? value.toString().trim().toUpperCase() || undefined
+          : undefined;
       };
 
       const cleanPostalCode = (value: any): string | undefined => {
         if (!value) return undefined;
-        return value.toString().trim().replace(/[^0-9A-Z]/gi, '');
+        return value
+          .toString()
+          .trim()
+          .replace(/[^0-9A-Z]/gi, '');
       };
 
       const mapEnum = (value: any, mapping: Record<string, any>): any => {
@@ -1910,8 +1975,10 @@ export class CronosService implements OnModuleInit {
         const genderValue = params.gender.toString().trim();
         const mapped = mapEnum(genderValue, cronosGender);
         if (mapped === 'M' || mapped === 'F') return mapped;
-        if (/^m$/i.test(genderValue) || /^masculino$/i.test(genderValue)) return 'M';
-        if (/^f$/i.test(genderValue) || /^feminino$/i.test(genderValue)) return 'F';
+        if (/^m$/i.test(genderValue) || /^masculino$/i.test(genderValue))
+          return 'M';
+        if (/^f$/i.test(genderValue) || /^feminino$/i.test(genderValue))
+          return 'F';
         return undefined;
       })();
 
@@ -1931,7 +1998,9 @@ export class CronosService implements OnModuleInit {
         birth_date: toCronosDate(params.birthdate),
         nationality: toUpper(params.nationality || params.country),
         nationality_state: toUpper(params.nationalityState),
-        document_name: params.documentType ? params.documentType.toString().trim() : undefined,
+        document_name: params.documentType
+          ? params.documentType.toString().trim()
+          : undefined,
         document_number: params.documentNumber,
         document_state: toUpper(params.documentState),
         document_issuance: params.documentIssuance
@@ -1939,7 +2008,12 @@ export class CronosService implements OnModuleInit {
           : undefined,
         issuance_date: toCronosDate(params.documentIssuanceDate),
         marital_status: mapEnum(params.maritalStatus, cronosMaritalStatus),
-        pep: params.pep === 'no' || params.pep === '0' || (typeof params.pep === 'number' && params.pep === 0) ? 0 : 1,
+        pep:
+          params.pep === 'no' ||
+          params.pep === '0' ||
+          (typeof params.pep === 'number' && params.pep === 0)
+            ? 0
+            : 1,
         selfie: params.selfie,
         postal_code: cleanPostalCode(params.zipCode),
         address_type_id: mapEnum(params.addressTypeId, cronosAddressType),
@@ -1954,7 +2028,11 @@ export class CronosService implements OnModuleInit {
       };
 
       Object.keys(payload).forEach((key) => {
-        if (payload[key] === undefined || payload[key] === null || payload[key] === '') {
+        if (
+          payload[key] === undefined ||
+          payload[key] === null ||
+          payload[key] === ''
+        ) {
           delete payload[key];
         }
       });
@@ -1967,7 +2045,11 @@ export class CronosService implements OnModuleInit {
 
       return result;
     } catch (error) {
-      this.logger.errorWithStack('[CronosService] ERROR', 'onboarding error', error);
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'onboarding error',
+        error,
+      );
       throw error;
     }
   }

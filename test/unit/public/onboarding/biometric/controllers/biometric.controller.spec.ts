@@ -52,8 +52,14 @@ describe('BiometricController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BiometricController],
       providers: [
-        { provide: DeviceRegistrationService, useValue: deviceRegistrationService },
-        { provide: ChallengeVerificationService, useValue: challengeVerificationService },
+        {
+          provide: DeviceRegistrationService,
+          useValue: deviceRegistrationService,
+        },
+        {
+          provide: ChallengeVerificationService,
+          useValue: challengeVerificationService,
+        },
         { provide: DeviceManagementService, useValue: deviceManagementService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: JwtAuthGuard, useValue: mockAuthGuard },
@@ -69,18 +75,28 @@ describe('BiometricController', () => {
   describe('challenge generation and verification', () => {
     it('generateChallenge should delegate to service', async () => {
       const dto = { userId: mockUserId, deviceId: mockDeviceId };
-      const payload = { challengeId: mockChallengeId, challenge: 'challenge_data', expiresIn: 180 };
+      const payload = {
+        challengeId: mockChallengeId,
+        challenge: 'challenge_data',
+        expiresIn: 180,
+      };
       challengeVerificationService.generateChallenge.mockResolvedValue(payload);
 
       const result = await controller.generateChallenge(mockUserId, dto);
 
       expect(result).toEqual(payload);
-      expect(challengeVerificationService.generateChallenge).toHaveBeenCalledWith(dto);
+      expect(
+        challengeVerificationService.generateChallenge,
+      ).toHaveBeenCalledWith(dto);
     });
 
     it('generateChallenge should include challenge expiration time', async () => {
       const dto = { userId: mockUserId, deviceId: mockDeviceId };
-      const payload = { challengeId: mockChallengeId, challenge: 'challenge_data', expiresIn: 180 };
+      const payload = {
+        challengeId: mockChallengeId,
+        challenge: 'challenge_data',
+        expiresIn: 180,
+      };
       challengeVerificationService.generateChallenge.mockResolvedValue(payload);
 
       const result = await controller.generateChallenge(mockUserId, dto);
@@ -91,32 +107,58 @@ describe('BiometricController', () => {
 
     it('generateChallenge should propagate service errors', async () => {
       const dto = { userId: mockUserId, deviceId: mockDeviceId };
-      challengeVerificationService.generateChallenge.mockRejectedValue(new Error('Challenge generation failed'));
+      challengeVerificationService.generateChallenge.mockRejectedValue(
+        new Error('Challenge generation failed'),
+      );
 
-      await expect(controller.generateChallenge(mockUserId, dto)).rejects.toThrow('Challenge generation failed');
+      await expect(
+        controller.generateChallenge(mockUserId, dto),
+      ).rejects.toThrow('Challenge generation failed');
     });
 
     it('verifySignature should delegate to service', async () => {
-      const dto = { userId: mockUserId, deviceId: mockDeviceId, challengeId: mockChallengeId, signature: 'signature_data' };
+      const dto = {
+        userId: mockUserId,
+        deviceId: mockDeviceId,
+        challengeId: mockChallengeId,
+        signature: 'signature_data',
+      };
       const payload = {
         accessToken: 'jwt_token',
         expiresIn: 3600,
-        user: { id: mockUserId, email: 'test@example.com', firstName: 'John', lastName: 'Doe' },
+        user: {
+          id: mockUserId,
+          email: 'test@example.com',
+          firstName: 'John',
+          lastName: 'Doe',
+        },
       };
       challengeVerificationService.verifySignature.mockResolvedValue(payload);
 
       const result = await controller.verifySignature(mockUserId, dto);
 
       expect(result).toEqual(payload);
-      expect(challengeVerificationService.verifySignature).toHaveBeenCalledWith(dto);
+      expect(challengeVerificationService.verifySignature).toHaveBeenCalledWith(
+        dto,
+      );
     });
 
     it('verifySignature should return user data and access token', async () => {
-      const dto = { userId: mockUserId, deviceId: mockDeviceId, challengeId: mockChallengeId, signature: 'signature_data' };
+      const dto = {
+        userId: mockUserId,
+        deviceId: mockDeviceId,
+        challengeId: mockChallengeId,
+        signature: 'signature_data',
+      };
       const payload = {
         accessToken: 'jwt_token_123',
         expiresIn: 3600,
-        user: { id: mockUserId, email: 'test@example.com', firstName: 'John', lastName: 'Doe' },
+        user: {
+          id: mockUserId,
+          email: 'test@example.com',
+          firstName: 'John',
+          lastName: 'Doe',
+        },
       };
       challengeVerificationService.verifySignature.mockResolvedValue(payload);
 
@@ -128,28 +170,60 @@ describe('BiometricController', () => {
     });
 
     it('verifySignature should propagate service errors', async () => {
-      const dto = { userId: mockUserId, deviceId: mockDeviceId, challengeId: mockChallengeId, signature: 'invalid' };
-      challengeVerificationService.verifySignature.mockRejectedValue(new Error('Invalid signature'));
+      const dto = {
+        userId: mockUserId,
+        deviceId: mockDeviceId,
+        challengeId: mockChallengeId,
+        signature: 'invalid',
+      };
+      challengeVerificationService.verifySignature.mockRejectedValue(
+        new Error('Invalid signature'),
+      );
 
-      await expect(controller.verifySignature(mockUserId, dto)).rejects.toThrow('Invalid signature');
+      await expect(controller.verifySignature(mockUserId, dto)).rejects.toThrow(
+        'Invalid signature',
+      );
     });
   });
 
   describe('device registration', () => {
     it('registerDevice should delegate to service with user context', async () => {
-      const dto = { publicKeyPem: 'pem_key', keyType: 'ES256', platform: 'ios', deviceIdentifier: 'device-id' };
-      const payload = { deviceId: mockDeviceId, status: 'pending' as const, registrationType: 'hard' as const, requiresSmsValidation: true };
+      const dto = {
+        publicKeyPem: 'pem_key',
+        keyType: 'ES256',
+        platform: 'ios',
+        deviceIdentifier: 'device-id',
+      };
+      const payload = {
+        deviceId: mockDeviceId,
+        status: 'pending' as const,
+        registrationType: 'hard' as const,
+        requiresSmsValidation: true,
+      };
       deviceRegistrationService.registerDevice.mockResolvedValue(payload);
 
       const result = await controller.registerDevice(mockUserId, dto);
 
       expect(result).toEqual(payload);
-      expect(deviceRegistrationService.registerDevice).toHaveBeenCalledWith(mockUserId, dto);
+      expect(deviceRegistrationService.registerDevice).toHaveBeenCalledWith(
+        mockUserId,
+        dto,
+      );
     });
 
     it('registerDevice should return device with pending status', async () => {
-      const dto = { publicKeyPem: 'pem_key', keyType: 'ES256', platform: 'ios', deviceIdentifier: 'device-id' };
-      const payload = { deviceId: mockDeviceId, status: 'pending' as const, registrationType: 'hard' as const, requiresSmsValidation: true };
+      const dto = {
+        publicKeyPem: 'pem_key',
+        keyType: 'ES256',
+        platform: 'ios',
+        deviceIdentifier: 'device-id',
+      };
+      const payload = {
+        deviceId: mockDeviceId,
+        status: 'pending' as const,
+        registrationType: 'hard' as const,
+        requiresSmsValidation: true,
+      };
       deviceRegistrationService.registerDevice.mockResolvedValue(payload);
 
       const result = await controller.registerDevice(mockUserId, dto);
@@ -160,7 +234,12 @@ describe('BiometricController', () => {
     });
 
     it('registerDeviceSoft should delegate to service', async () => {
-      const dto = { publicKeyPem: 'pem_key', keyType: 'ES256', platform: 'ios', deviceIdentifier: 'device-id' };
+      const dto = {
+        publicKeyPem: 'pem_key',
+        keyType: 'ES256',
+        platform: 'ios',
+        deviceIdentifier: 'device-id',
+      };
       const payload = {
         deviceId: mockDeviceId,
         status: 'active' as const,
@@ -172,11 +251,19 @@ describe('BiometricController', () => {
       const result = await controller.registerDeviceSoft(mockUserId, dto);
 
       expect(result).toEqual(payload);
-      expect(deviceRegistrationService.registerDeviceSoft).toHaveBeenCalledWith(mockUserId, dto);
+      expect(deviceRegistrationService.registerDeviceSoft).toHaveBeenCalledWith(
+        mockUserId,
+        dto,
+      );
     });
 
     it('registerDeviceSoft should return device with active status', async () => {
-      const dto = { publicKeyPem: 'pem_key', keyType: 'ES256', platform: 'ios', deviceIdentifier: 'device-id' };
+      const dto = {
+        publicKeyPem: 'pem_key',
+        keyType: 'ES256',
+        platform: 'ios',
+        deviceIdentifier: 'device-id',
+      };
       const payload = {
         deviceId: mockDeviceId,
         status: 'active' as const,
@@ -195,19 +282,35 @@ describe('BiometricController', () => {
   describe('SMS validation', () => {
     it('sendDeviceSmsValidation should delegate to service', async () => {
       const dto = { deviceId: mockDeviceId };
-      const payload = { success: true, message: 'SMS validation code sent', phone: '+5511999999999', expiresIn: 300 };
-      deviceManagementService.sendDeviceSmsValidation.mockResolvedValue(payload);
+      const payload = {
+        success: true,
+        message: 'SMS validation code sent',
+        phone: '+5511999999999',
+        expiresIn: 300,
+      };
+      deviceManagementService.sendDeviceSmsValidation.mockResolvedValue(
+        payload,
+      );
 
       const result = await controller.sendDeviceSmsValidation(mockUserId, dto);
 
       expect(result).toEqual(payload);
-      expect(deviceManagementService.sendDeviceSmsValidation).toHaveBeenCalledWith(mockUserId, dto);
+      expect(
+        deviceManagementService.sendDeviceSmsValidation,
+      ).toHaveBeenCalledWith(mockUserId, dto);
     });
 
     it('sendDeviceSmsValidation should return expiration time', async () => {
       const dto = { deviceId: mockDeviceId };
-      const payload = { success: true, message: 'SMS validation code sent', phone: '+5511999999999', expiresIn: 300 };
-      deviceManagementService.sendDeviceSmsValidation.mockResolvedValue(payload);
+      const payload = {
+        success: true,
+        message: 'SMS validation code sent',
+        phone: '+5511999999999',
+        expiresIn: 300,
+      };
+      deviceManagementService.sendDeviceSmsValidation.mockResolvedValue(
+        payload,
+      );
 
       const result = await controller.sendDeviceSmsValidation(mockUserId, dto);
 
@@ -217,19 +320,35 @@ describe('BiometricController', () => {
 
     it('verifySmsAndActivate should delegate to service', async () => {
       const dto = { deviceId: mockDeviceId, code: '123456' };
-      const payload = { success: true, message: 'Device activated successfully', deviceId: mockDeviceId, status: 'active' as const };
-      challengeVerificationService.verifySmsAndActivate.mockResolvedValue(payload);
+      const payload = {
+        success: true,
+        message: 'Device activated successfully',
+        deviceId: mockDeviceId,
+        status: 'active' as const,
+      };
+      challengeVerificationService.verifySmsAndActivate.mockResolvedValue(
+        payload,
+      );
 
       const result = await controller.verifySmsAndActivate(mockUserId, dto);
 
       expect(result).toEqual(payload);
-      expect(challengeVerificationService.verifySmsAndActivate).toHaveBeenCalledWith(mockUserId, dto);
+      expect(
+        challengeVerificationService.verifySmsAndActivate,
+      ).toHaveBeenCalledWith(mockUserId, dto);
     });
 
     it('verifySmsAndActivate should return active device', async () => {
       const dto = { deviceId: mockDeviceId, code: '123456' };
-      const payload = { success: true, message: 'Device activated successfully', deviceId: mockDeviceId, status: 'active' as const };
-      challengeVerificationService.verifySmsAndActivate.mockResolvedValue(payload);
+      const payload = {
+        success: true,
+        message: 'Device activated successfully',
+        deviceId: mockDeviceId,
+        status: 'active' as const,
+      };
+      challengeVerificationService.verifySmsAndActivate.mockResolvedValue(
+        payload,
+      );
 
       const result = await controller.verifySmsAndActivate(mockUserId, dto);
 
@@ -239,27 +358,40 @@ describe('BiometricController', () => {
 
     it('verifySmsAndActivate should propagate service errors', async () => {
       const dto = { deviceId: mockDeviceId, code: 'invalid' };
-      challengeVerificationService.verifySmsAndActivate.mockRejectedValue(new Error('Invalid code'));
+      challengeVerificationService.verifySmsAndActivate.mockRejectedValue(
+        new Error('Invalid code'),
+      );
 
-      await expect(controller.verifySmsAndActivate(mockUserId, dto)).rejects.toThrow('Invalid code');
+      await expect(
+        controller.verifySmsAndActivate(mockUserId, dto),
+      ).rejects.toThrow('Invalid code');
     });
   });
 
   describe('device management', () => {
     it('revokeDevice should delegate to service', async () => {
       const dto = { deviceId: mockDeviceId };
-      const payload = { status: 'revoked' as const, message: 'Device revoked successfully' };
+      const payload = {
+        status: 'revoked' as const,
+        message: 'Device revoked successfully',
+      };
       deviceManagementService.revokeDevice.mockResolvedValue(payload);
 
       const result = await controller.revokeDevice(mockUserId, dto);
 
       expect(result).toEqual(payload);
-      expect(deviceManagementService.revokeDevice).toHaveBeenCalledWith(mockUserId, dto);
+      expect(deviceManagementService.revokeDevice).toHaveBeenCalledWith(
+        mockUserId,
+        dto,
+      );
     });
 
     it('revokeDevice should return revoked status', async () => {
       const dto = { deviceId: mockDeviceId };
-      const payload = { status: 'revoked' as const, message: 'Device revoked successfully' };
+      const payload = {
+        status: 'revoked' as const,
+        message: 'Device revoked successfully',
+      };
       deviceManagementService.revokeDevice.mockResolvedValue(payload);
 
       const result = await controller.revokeDevice(mockUserId, dto);
@@ -285,7 +417,9 @@ describe('BiometricController', () => {
       const result = await controller.listDevices(mockUserId, mockUserId);
 
       expect(result).toEqual(payload);
-      expect(deviceManagementService.listUserDevices).toHaveBeenCalledWith(mockUserId);
+      expect(deviceManagementService.listUserDevices).toHaveBeenCalledWith(
+        mockUserId,
+      );
     });
 
     it('listDevices should return array of devices', async () => {
@@ -320,30 +454,53 @@ describe('BiometricController', () => {
     });
 
     it('listDevices should propagate service errors', async () => {
-      deviceManagementService.listUserDevices.mockRejectedValue(new Error('Failed to list devices'));
+      deviceManagementService.listUserDevices.mockRejectedValue(
+        new Error('Failed to list devices'),
+      );
 
-      await expect(controller.listDevices(mockUserId, mockUserId)).rejects.toThrow('Failed to list devices');
+      await expect(
+        controller.listDevices(mockUserId, mockUserId),
+      ).rejects.toThrow('Failed to list devices');
     });
   });
 
   describe('device health check', () => {
     it('healthCheck should delegate to service', async () => {
       const deviceIdentifier = 'device-identifier';
-      const payload = { isValid: true, status: 'active' as const, deviceId: mockDeviceId };
+      const payload = {
+        isValid: true,
+        status: 'active' as const,
+        deviceId: mockDeviceId,
+      };
       deviceManagementService.checkDeviceHealth.mockResolvedValue(payload);
 
-      const result = await controller.healthCheck(mockUserId, mockUserId, deviceIdentifier);
+      const result = await controller.healthCheck(
+        mockUserId,
+        mockUserId,
+        deviceIdentifier,
+      );
 
       expect(result).toEqual(payload);
-      expect(deviceManagementService.checkDeviceHealth).toHaveBeenCalledWith(mockUserId, deviceIdentifier);
+      expect(deviceManagementService.checkDeviceHealth).toHaveBeenCalledWith(
+        mockUserId,
+        deviceIdentifier,
+      );
     });
 
     it('healthCheck should return device validity status', async () => {
       const deviceIdentifier = 'device-identifier';
-      const payload = { isValid: true, status: 'active' as const, deviceId: mockDeviceId };
+      const payload = {
+        isValid: true,
+        status: 'active' as const,
+        deviceId: mockDeviceId,
+      };
       deviceManagementService.checkDeviceHealth.mockResolvedValue(payload);
 
-      const result = await controller.healthCheck(mockUserId, mockUserId, deviceIdentifier);
+      const result = await controller.healthCheck(
+        mockUserId,
+        mockUserId,
+        deviceIdentifier,
+      );
 
       expect(result.isValid).toBe(true);
       expect(result.status).toEqual('active');
@@ -351,19 +508,31 @@ describe('BiometricController', () => {
 
     it('healthCheck should handle invalid devices', async () => {
       const deviceIdentifier = 'invalid-device';
-      const payload = { isValid: false, status: 'revoked' as const, deviceId: undefined };
+      const payload = {
+        isValid: false,
+        status: 'revoked' as const,
+        deviceId: undefined,
+      };
       deviceManagementService.checkDeviceHealth.mockResolvedValue(payload);
 
-      const result = await controller.healthCheck(mockUserId, mockUserId, deviceIdentifier);
+      const result = await controller.healthCheck(
+        mockUserId,
+        mockUserId,
+        deviceIdentifier,
+      );
 
       expect(result.isValid).toBe(false);
     });
 
     it('healthCheck should propagate service errors', async () => {
       const deviceIdentifier = 'device-identifier';
-      deviceManagementService.checkDeviceHealth.mockRejectedValue(new Error('Health check failed'));
+      deviceManagementService.checkDeviceHealth.mockRejectedValue(
+        new Error('Health check failed'),
+      );
 
-      await expect(controller.healthCheck(mockUserId, mockUserId, deviceIdentifier)).rejects.toThrow('Health check failed');
+      await expect(
+        controller.healthCheck(mockUserId, mockUserId, deviceIdentifier),
+      ).rejects.toThrow('Health check failed');
     });
   });
 });

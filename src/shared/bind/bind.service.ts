@@ -46,16 +46,24 @@ export class BindService implements OnModuleInit {
   private loadConfig(): void {
     this.config = {
       enable: this.configService.get<string>('WALLET_BIND', '') === 'enable',
-      logging: this.configService.get<string>('WALLET_BIND_LOG', '') === 'enable',
-      proxy: this.configService.get<string>('WALLET_BIND_PROXY', '') === 'enable',
+      logging:
+        this.configService.get<string>('WALLET_BIND_LOG', '') === 'enable',
+      proxy:
+        this.configService.get<string>('WALLET_BIND_PROXY', '') === 'enable',
       apiUrl: this.configService.get<string>('WALLET_BIND_URL', ''),
       username: this.configService.get<string>('WALLET_BIND_USERNAME', ''),
       password: this.configService.get<string>('WALLET_BIND_PASSWORD', ''),
-      bankId: this.configService.get<string>('WALLET_BIND_ACCOUNT', '')?.split('-')[0] || '',
+      bankId:
+        this.configService
+          .get<string>('WALLET_BIND_ACCOUNT', '')
+          ?.split('-')[0] || '',
       account: this.configService.get<string>('WALLET_BIND_ACCOUNT', ''),
       sslKey: this.configService.get<string>('WALLET_BIND_KEY', ''),
       sslCrt: this.configService.get<string>('WALLET_BIND_CRT', ''),
-      sslPassphrase: this.configService.get<string>('WALLET_BIND_PASSPHRASE', ''),
+      sslPassphrase: this.configService.get<string>(
+        'WALLET_BIND_PASSPHRASE',
+        '',
+      ),
     };
   }
 
@@ -69,7 +77,8 @@ export class BindService implements OnModuleInit {
       passphrase: this.config.sslPassphrase,
     };
 
-    const useProxy = this.config.proxy || process.env.USE_SOCKS_PROXY === 'true';
+    const useProxy =
+      this.config.proxy || process.env.USE_SOCKS_PROXY === 'true';
 
     if (useProxy) {
       if (this.config.logging) {
@@ -77,7 +86,10 @@ export class BindService implements OnModuleInit {
       }
       try {
         const proxyPort = process.env.SOCKS_PROXY_PORT || '8080';
-        return new SocksProxyAgent(`socks5h://localhost:${proxyPort}`, mstrOptions as any);
+        return new SocksProxyAgent(
+          `socks5h://localhost:${proxyPort}`,
+          mstrOptions as any,
+        );
       } catch (error: any) {
         const proxyPort = process.env.SOCKS_PROXY_PORT || '8080';
         this.logger.error('BIND: Error creating SOCKS Proxy Agent', error);
@@ -93,7 +105,11 @@ export class BindService implements OnModuleInit {
       throw new Error('Bind not available');
     }
 
-    if (this.auth && this.auth.token && new Date().getTime() - this.auth.time < 1000 * 60 * 60) {
+    if (
+      this.auth &&
+      this.auth.token &&
+      new Date().getTime() - this.auth.time < 1000 * 60 * 60
+    ) {
       return this.auth.token;
     }
 
@@ -160,7 +176,10 @@ export class BindService implements OnModuleInit {
     }
 
     if (this.config.logging) {
-      this.logger.log(`BIND request: ${params.method} ${params.action}`, params.body);
+      this.logger.log(
+        `BIND request: ${params.method} ${params.action}`,
+        params.body,
+      );
     }
 
     try {

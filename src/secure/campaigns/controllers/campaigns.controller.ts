@@ -36,7 +36,8 @@ export class CampaignsController {
   @Get('validate/:code')
   @ApiOperation({
     summary: 'Validate campaign code via parameter',
-    description: 'Validates a campaign code through the route parameter and checks if it is available for the user',
+    description:
+      'Validates a campaign code through the route parameter and checks if it is available for the user',
   })
   @ApiParam({
     name: 'code',
@@ -67,7 +68,8 @@ export class CampaignsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Validate campaign code via body',
-    description: 'Validates a campaign code through the request body and checks if it is available for the user',
+    description:
+      'Validates a campaign code through the request body and checks if it is available for the user',
   })
   @ApiBody({
     type: ValidateCampaignCodeDto,
@@ -97,7 +99,8 @@ export class CampaignsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Use campaign code',
-    description: 'Applies a valid campaign code for the user, activating its benefits',
+    description:
+      'Applies a valid campaign code for the user, activating its benefits',
   })
   @ApiBody({
     type: ValidateCampaignCodeDto,
@@ -137,7 +140,9 @@ export class CampaignsController {
     status: 401,
     description: 'Unauthorized - invalid or missing token',
   })
-  async myUsedCampaigns(@CurrentUser('id') userId: string): Promise<ListUserCampaignsResponseDto> {
+  async myUsedCampaigns(
+    @CurrentUser('id') userId: string,
+  ): Promise<ListUserCampaignsResponseDto> {
     return this.campaignsService.listUserCampaigns(userId);
   }
 }

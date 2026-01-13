@@ -6,7 +6,10 @@ import { NotificationsModule } from '../../shared/notifications/notifications.mo
 import { LoggerModule } from '../../shared/logger/logger.module';
 import { AppConfigModule } from '../../shared/config/config.module';
 import { ValidaModule } from '../../shared/valida/valida.module';
-import { OnboardingController, UserOnboardingController } from './controllers/onboarding.controller';
+import {
+  OnboardingController,
+  UserOnboardingController,
+} from './controllers/onboarding.controller';
 import { OnboardingService } from './services/onboarding.service';
 import { AuthService } from '../auth/services/auth.service';
 import { PublicAuthModule } from '../auth/auth.module';
@@ -44,4 +47,3 @@ import { IdentityOnboardingService } from './services/identity-onboarding.servic
   ],
 })
 export class PublicOnboardingModule {}
-

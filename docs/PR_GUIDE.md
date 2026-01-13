@@ -1,4 +1,5 @@
 # Pull Request Template
+
 - Summary: short context and intent (1–3 lines)
 - Changes Made: concise bullets of what changed
 - Example:

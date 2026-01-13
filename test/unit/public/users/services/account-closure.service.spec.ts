@@ -129,7 +129,7 @@ describe('AccountClosureService', () => {
       const userId = 'user-123';
 
       service.cancelClosure.mockRejectedValue(
-        new Error('Account closure already completed')
+        new Error('Account closure already completed'),
       );
 
       await expect(service.cancelClosure(userId)).rejects.toThrow();
@@ -154,7 +154,7 @@ describe('AccountClosureService', () => {
       const userId = 'user-123';
 
       service.reopenAccount.mockRejectedValue(
-        new Error('Account closure reopen limit exceeded')
+        new Error('Account closure reopen limit exceeded'),
       );
 
       await expect(service.reopenAccount(userId)).rejects.toThrow();

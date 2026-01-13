@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { CronosService } from '../../../shared/cronos/cronos.service';
 import { BindService } from '../../../shared/bind/bind.service';
@@ -21,7 +26,8 @@ export class OnboardingService {
     private cronosService: CronosService,
     private bindService: BindService,
     private mantecaService: MantecaService,
-  ) {}  async listUsers(query: ListOnboardingQueryDto): Promise<{
+  ) {}
+  async listUsers(query: ListOnboardingQueryDto): Promise<{
     data: OnboardingUserDto[];
     total: number;
     page: number;
@@ -84,7 +90,8 @@ export class OnboardingService {
       page,
       limit,
     };
-  }  async getUserDetails(userId: string) {
+  }
+  async getUserDetails(userId: string) {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
       include: {
@@ -113,9 +120,14 @@ export class OnboardingService {
       identities: user.usersIdentities_usersIdentities_userIdTousers,
       accounts: user.usersAccounts,
     };
-  }  async getPendingUsers(query: ListOnboardingQueryDto) {
+  }
+  async getPendingUsers(query: ListOnboardingQueryDto) {
     return this.listUsers({ ...query, status: 'pending' });
-  }  async approveUser(userId: string, dto: ApproveUserDto): Promise<{ success: boolean; message: string }> {
+  }
+  async approveUser(
+    userId: string,
+    dto: ApproveUserDto,
+  ): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
@@ -142,7 +154,11 @@ export class OnboardingService {
     });
 
     return { success: true, message: 'User approved successfully' };
-  }  async rejectUser(userId: string, dto: RejectUserDto): Promise<{ success: boolean; message: string }> {
+  }
+  async rejectUser(
+    userId: string,
+    dto: RejectUserDto,
+  ): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
@@ -169,7 +185,11 @@ export class OnboardingService {
     });
 
     return { success: true, message: 'User rejected, awaiting corrections' };
-  }  async requestCorrection(userId: string, dto: RequestCorrectionDto): Promise<{ success: boolean; message: string }> {
+  }
+  async requestCorrection(
+    userId: string,
+    dto: RequestCorrectionDto,
+  ): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
@@ -195,7 +215,11 @@ export class OnboardingService {
     });
 
     return { success: true, message: 'Correction requested successfully' };
-  }  async updateUserInfo(userId: string, data: any): Promise<{ success: boolean; message: string }> {
+  }
+  async updateUserInfo(
+    userId: string,
+    data: any,
+  ): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id: userId, deletedAt: null },
     });
@@ -205,7 +229,7 @@ export class OnboardingService {
     }
 
     const updateData: any = { updatedAt: new Date() };
-    
+
     if (data.name) updateData.name = data.name;
     if (data.email) updateData.email = data.email;
     if (data.phone) updateData.phone = data.phone;

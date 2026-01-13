@@ -18,7 +18,10 @@ import {
 import { RolesService } from '../services/roles.service';
 import { CreateRoleDto, UpdateRoleDto } from '../dto/role.dto';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
-import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
+import {
+  BackofficeRoleGuard,
+  MinLevel,
+} from '../../../shared/guards/backoffice-role.guard';
 
 @ApiTags('3.1 Backoffice - Roles')
 @ApiBearerAuth('JWT-auth')
@@ -34,8 +37,14 @@ export class RolesController {
     description: 'Returns a list of all available roles',
   })
   @ApiResponse({ status: 200, description: 'Roles listed successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   async list() {
     return this.rolesService.list();
   }
@@ -48,8 +57,14 @@ export class RolesController {
   })
   @ApiParam({ name: 'id', type: String, description: 'Role identifier' })
   @ApiResponse({ status: 200, description: 'Role returned successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   @ApiResponse({ status: 404, description: 'Role not found' })
   async get(@Param('id') id: string) {
     return this.rolesService.get(id);
@@ -63,9 +78,18 @@ export class RolesController {
   })
   @ApiResponse({ status: 201, description: 'Role created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
-  @ApiResponse({ status: 409, description: 'Role with this name already exists' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Role with this name already exists',
+  })
   async create(@Body() dto: CreateRoleDto) {
     return this.rolesService.create(dto);
   }
@@ -79,8 +103,14 @@ export class RolesController {
   @ApiParam({ name: 'id', type: String, description: 'Role identifier' })
   @ApiResponse({ status: 200, description: 'Role updated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   @ApiResponse({ status: 404, description: 'Role not found' })
   async update(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
     return this.rolesService.update(id, dto);
@@ -94,9 +124,18 @@ export class RolesController {
   })
   @ApiParam({ name: 'id', type: String, description: 'Role identifier' })
   @ApiResponse({ status: 200, description: 'Role deleted successfully' })
-  @ApiResponse({ status: 400, description: 'Role cannot be deleted - there are linked users' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 400,
+    description: 'Role cannot be deleted - there are linked users',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   @ApiResponse({ status: 404, description: 'Role not found' })
   async delete(@Param('id') id: string) {
     return this.rolesService.delete(id);

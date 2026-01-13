@@ -11,7 +11,11 @@ export class NotificationModel {
     });
   }
 
-  async listNotifications(where: any = {}, skip: number = 0, take: number = 20) {
+  async listNotifications(
+    where: any = {},
+    skip: number = 0,
+    take: number = 20,
+  ) {
     return this.prisma.notifications.findMany({
       where,
       skip,

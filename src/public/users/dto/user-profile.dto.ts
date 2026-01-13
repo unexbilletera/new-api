@@ -1,8 +1,7 @@
 import { IsString, IsOptional, IsObject } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class GetUserProfileDto {
-}
+export class GetUserProfileDto {}
 
 export class UpdateUserProfileDto {
   @ApiPropertyOptional({
@@ -31,7 +30,10 @@ export class UpdateUserProfileDto {
 
   @ApiPropertyOptional({
     description: "User's profile picture",
-    example: { url: 'https://exemplo.com/foto.jpg', key: 'profile/user123.jpg' },
+    example: {
+      url: 'https://exemplo.com/foto.jpg',
+      key: 'profile/user123.jpg',
+    },
   })
   @IsOptional()
   @IsObject()
@@ -166,8 +168,7 @@ export class SendMessageDto {
   attachmentUrl?: string;
 }
 
-export class GetUserIdentitiesDto {
-}
+export class GetUserIdentitiesDto {}
 
 export class SetDefaultIdentityDto {
   @ApiProperty({

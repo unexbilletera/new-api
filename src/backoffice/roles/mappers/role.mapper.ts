@@ -26,7 +26,12 @@ export class RoleMapper {
     };
   }
 
-  toListRolesResponseDto(roles: any[], total: number, page: number, limit: number): ListRolesResponseDto {
+  toListRolesResponseDto(
+    roles: any[],
+    total: number,
+    page: number,
+    limit: number,
+  ): ListRolesResponseDto {
     return {
       data: roles.map((r) => this.toRoleResponseDto(r)),
       total,

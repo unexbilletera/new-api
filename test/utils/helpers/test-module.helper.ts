@@ -50,9 +50,13 @@ export interface TestModuleOptions {
  * });
  * const controller = module.get<AuthController>(AuthController);
  */
-export async function createTestModule(options: TestModuleOptions): Promise<TestingModule> {
+export async function createTestModule(
+  options: TestModuleOptions,
+): Promise<TestingModule> {
   const moduleBuilder = Test.createTestingModule({
-    controllers: options.controller ? [options.controller] : options.controllers,
+    controllers: options.controller
+      ? [options.controller]
+      : options.controllers,
     providers: options.provider ? [options.provider] : options.providers,
     imports: options.imports,
   });
@@ -73,7 +77,10 @@ export async function createTestModule(options: TestModuleOptions): Promise<Test
  *   createPrismaMock()
  * );
  */
-export function createMockProvider(serviceClass: Type<any>, mockValue: any): any {
+export function createMockProvider(
+  serviceClass: Type<any>,
+  mockValue: any,
+): any {
   return {
     provide: serviceClass,
     useValue: mockValue,

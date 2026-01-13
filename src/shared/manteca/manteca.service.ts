@@ -29,7 +29,8 @@ export class MantecaService implements OnModuleInit {
   private loadConfig(): void {
     this.config = {
       enable: this.configService.get<string>('WALLET_MANTECA', '') === 'enable',
-      logging: this.configService.get<string>('WALLET_MANTECA_LOG', '') === 'enable',
+      logging:
+        this.configService.get<string>('WALLET_MANTECA_LOG', '') === 'enable',
       apiUrl: this.configService.get<string>('WALLET_MANTECA_URL', ''),
       apiKey: this.configService.get<string>('WALLET_MANTECA_KEY', ''),
     };
@@ -61,7 +62,10 @@ export class MantecaService implements OnModuleInit {
     }
 
     if (this.config.logging) {
-      this.logger.log(`MANTECA request: ${params.method} ${params.action}`, params.body);
+      this.logger.log(
+        `MANTECA request: ${params.method} ${params.action}`,
+        params.body,
+      );
     }
 
     try {
@@ -216,7 +220,11 @@ export class MantecaService implements OnModuleInit {
       };
     }
 
-    if (params.documentFrontImage || params.documentBackImage || params.selfie) {
+    if (
+      params.documentFrontImage ||
+      params.documentBackImage ||
+      params.selfie
+    ) {
       body.documents = {};
       if (params.documentFrontImage) {
         body.documents.documentFrontImage = params.documentFrontImage;
@@ -236,7 +244,10 @@ export class MantecaService implements OnModuleInit {
     });
   }
 
-  async getUserByLegalId(params: { legalId?: string; email?: string }): Promise<any> {
+  async getUserByLegalId(params: {
+    legalId?: string;
+    email?: string;
+  }): Promise<any> {
     if (!params.legalId && !params.email) {
       throw new Error('Missing legalId or email. At least one is required');
     }
@@ -271,7 +282,8 @@ export class MantecaService implements OnModuleInit {
             return foundUser;
           }
 
-          const totalPages = pagination?.totalPages || pagination?.lastPage || 1;
+          const totalPages =
+            pagination?.totalPages || pagination?.lastPage || 1;
           if (page >= totalPages || usersList.length === 0) {
             return null;
           }

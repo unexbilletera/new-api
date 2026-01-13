@@ -49,7 +49,8 @@ export const ApiErrorResponses = {
   },
   Conflict: {
     status: 409,
-    description: 'Conflict - resource already exists or data is in invalid state',
+    description:
+      'Conflict - resource already exists or data is in invalid state',
     schema: {
       type: 'object',
       properties: {

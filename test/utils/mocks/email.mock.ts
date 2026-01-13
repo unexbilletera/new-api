@@ -22,12 +22,24 @@ import { EmailService } from '../../../src/shared/email/email.service';
  */
 export function createEmailServiceMock(): jest.Mocked<EmailService> {
   return {
-    sendEmail: jest.fn().mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
-    sendValidationCode: jest.fn().mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
-    sendPasswordRecovery: jest.fn().mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
-    sendWelcome: jest.fn().mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
-    sendNotification: jest.fn().mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
-    sendBulk: jest.fn().mockResolvedValue([{ messageId: 'msg_mock_12345', status: 'sent' }]),
+    sendEmail: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
+    sendValidationCode: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
+    sendPasswordRecovery: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
+    sendWelcome: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
+    sendNotification: jest
+      .fn()
+      .mockResolvedValue({ messageId: 'msg_mock_12345', status: 'sent' }),
+    sendBulk: jest
+      .fn()
+      .mockResolvedValue([{ messageId: 'msg_mock_12345', status: 'sent' }]),
     verifyEmail: jest.fn().mockResolvedValue(true),
   } as any;
 }

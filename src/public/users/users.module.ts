@@ -72,4 +72,3 @@ import { MessagingService } from './services/messaging.service';
   ],
 })
 export class PublicUsersModule {}
-

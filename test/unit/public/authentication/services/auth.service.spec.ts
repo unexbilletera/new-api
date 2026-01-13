@@ -98,13 +98,13 @@ describe('AuthService', () => {
     smsService = {
       sendValidationCode: jest.fn(),
       verifyCode: jest.fn(),
-      normalizePhone: jest.fn(phone => phone.replace(/\D/g, '')),
+      normalizePhone: jest.fn((phone) => phone.replace(/\D/g, '')),
     } as unknown as jest.Mocked<SmsService>;
 
     emailService = {
       sendValidationCode: jest.fn(),
       verifyCode: jest.fn(),
-      normalizeEmail: jest.fn(email => email.toLowerCase().trim()),
+      normalizeEmail: jest.fn((email) => email.toLowerCase().trim()),
     } as unknown as jest.Mocked<EmailService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -129,7 +129,12 @@ describe('AuthService', () => {
   describe('sendEmailValidation', () => {
     it('should send email validation code successfully', async () => {
       const dto = { email: 'test@example.com' };
-      emailService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', email: 'test@example.com', expiresIn: 300 });
+      emailService.sendValidationCode.mockResolvedValue({
+        success: true,
+        message: 'Sent',
+        email: 'test@example.com',
+        expiresIn: 300,
+      });
 
       const result = await service.sendEmailValidation(dto);
 
@@ -137,14 +142,19 @@ describe('AuthService', () => {
         'test@example.com',
         expect.any(Number),
         expect.any(Number),
-        expect.any(Boolean)
+        expect.any(Boolean),
       );
       expect(result).toHaveProperty('message');
     });
 
     it('should normalize email to lowercase', async () => {
       const dto = { email: 'TEST@EXAMPLE.COM' };
-      emailService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', email: 'test@example.com', expiresIn: 300 });
+      emailService.sendValidationCode.mockResolvedValue({
+        success: true,
+        message: 'Sent',
+        email: 'test@example.com',
+        expiresIn: 300,
+      });
 
       await service.sendEmailValidation(dto);
 
@@ -152,7 +162,7 @@ describe('AuthService', () => {
         'TEST@EXAMPLE.COM',
         expect.any(Number),
         expect.any(Number),
-        expect.any(Boolean)
+        expect.any(Boolean),
       );
     });
 
@@ -166,8 +176,12 @@ describe('AuthService', () => {
         expiresAt: new Date(),
       };
 
-      (prisma.email_validation_codes.create as jest.Mock).mockResolvedValue(mockValidationCode);
-      emailService.sendValidationCode.mockRejectedValue(new Error('Email service down'));
+      (prisma.email_validation_codes.create as jest.Mock).mockResolvedValue(
+        mockValidationCode,
+      );
+      emailService.sendValidationCode.mockRejectedValue(
+        new Error('Email service down'),
+      );
 
       await expect(service.sendEmailValidation(dto)).rejects.toThrow();
     });
@@ -176,7 +190,12 @@ describe('AuthService', () => {
   describe('sendPhoneValidation', () => {
     it('should send phone validation code successfully', async () => {
       const dto = { phone: '+5511999999999' };
-      smsService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', phone: '+5511999999999', expiresIn: 300 });
+      smsService.sendValidationCode.mockResolvedValue({
+        success: true,
+        message: 'Sent',
+        phone: '+5511999999999',
+        expiresIn: 300,
+      });
 
       const result = await service.sendPhoneValidation(dto);
 
@@ -184,14 +203,19 @@ describe('AuthService', () => {
         '+5511999999999',
         expect.any(Number),
         expect.any(Number),
-        expect.any(String)
+        expect.any(String),
       );
       expect(result).toHaveProperty('message');
     });
 
     it('should normalize phone by removing non-digits', async () => {
       const dto = { phone: '+55 (11) 9 9999-9999' };
-      smsService.sendValidationCode.mockResolvedValue({ success: true, message: 'Sent', phone: '5511999999999', expiresIn: 300 });
+      smsService.sendValidationCode.mockResolvedValue({
+        success: true,
+        message: 'Sent',
+        phone: '5511999999999',
+        expiresIn: 300,
+      });
 
       await service.sendPhoneValidation(dto);
 
@@ -199,7 +223,7 @@ describe('AuthService', () => {
         '+55 (11) 9 9999-9999',
         expect.any(Number),
         expect.any(Number),
-        expect.any(String)
+        expect.any(String),
       );
     });
   });
@@ -207,9 +231,16 @@ describe('AuthService', () => {
   describe('verifyEmailCode', () => {
     it('should verify valid email code', async () => {
       const dto = { email: 'test@example.com', code: '12345678' };
-      emailService.verifyCode.mockResolvedValue({ success: true, message: 'ok', email: 'test@example.com' });
+      emailService.verifyCode.mockResolvedValue({
+        success: true,
+        message: 'ok',
+        email: 'test@example.com',
+      });
       (prisma.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
-      (prisma.users.update as jest.Mock).mockResolvedValue({ ...mockUser, emailVerifiedAt: new Date() });
+      (prisma.users.update as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        emailVerifiedAt: new Date(),
+      });
 
       const result = await service.verifyEmailCode(dto);
 
@@ -222,7 +253,9 @@ describe('AuthService', () => {
 
       emailService.verifyCode.mockRejectedValue(new Error('expired'));
 
-      await expect(service.verifyEmailCode(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.verifyEmailCode(dto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw error if code invalid', async () => {
@@ -230,16 +263,25 @@ describe('AuthService', () => {
 
       emailService.verifyCode.mockRejectedValue(new Error('invalid'));
 
-      await expect(service.verifyEmailCode(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.verifyEmailCode(dto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('verifyPhoneCode', () => {
     it('should verify valid phone code', async () => {
       const dto = { phone: '+5511999999999', code: '12345678' };
-      smsService.verifyCode.mockResolvedValue({ success: true, message: 'ok', phone: '+5511999999999' });
+      smsService.verifyCode.mockResolvedValue({
+        success: true,
+        message: 'ok',
+        phone: '+5511999999999',
+      });
       (prisma.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
-      (prisma.users.update as jest.Mock).mockResolvedValue({ ...mockUser, phoneVerifiedAt: new Date() });
+      (prisma.users.update as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        phoneVerifiedAt: new Date(),
+      });
 
       const result = await service.verifyPhoneCode(dto);
 
@@ -252,7 +294,9 @@ describe('AuthService', () => {
 
       smsService.verifyCode.mockRejectedValue(new Error('expired'));
 
-      await expect(service.verifyPhoneCode(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.verifyPhoneCode(dto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -261,7 +305,10 @@ describe('AuthService', () => {
       const dto = { email: 'test@example.com' };
 
       (prisma.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
-      (prisma.users.update as jest.Mock).mockResolvedValue({ ...mockUser, recovery: 'hash' });
+      (prisma.users.update as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        recovery: 'hash',
+      });
       notificationService.sendPasswordRecovery.mockResolvedValue(undefined);
 
       const result = await service.forgotPassword(dto);
@@ -292,8 +339,13 @@ describe('AuthService', () => {
       (prisma.users.findFirst as jest.Mock).mockResolvedValue(userWithRecovery);
       const bcrypt = require('bcrypt');
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
-      jest.spyOn(PasswordHelper, 'hash').mockResolvedValue('new_hashed_password');
-      (prisma.users.update as jest.Mock).mockResolvedValue({ ...mockUser, password: 'new_hashed_password' });
+      jest
+        .spyOn(PasswordHelper, 'hash')
+        .mockResolvedValue('new_hashed_password');
+      (prisma.users.update as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        password: 'new_hashed_password',
+      });
 
       const result = await service.verifyPassword(dto);
 
@@ -308,23 +360,42 @@ describe('AuthService', () => {
         newPassword: 'NewPassword123!',
       };
 
-      (prisma.users.findFirst as jest.Mock).mockResolvedValue({ ...mockUser, recovery: 'hashed' });
+      (prisma.users.findFirst as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        recovery: 'hashed',
+      });
       const bcrypt = require('bcrypt');
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false);
 
-      await expect(service.verifyPassword(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.verifyPassword(dto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('unlockAccount', () => {
     it('should unlock account with valid credentials', async () => {
-      const dto = { id: '550e8400-e29b-41d4-a716-446655440000', password: 'ValidPassword123!' };
+      const dto = {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        password: 'ValidPassword123!',
+      };
 
-      (prisma.users.findFirst as jest.Mock).mockResolvedValue({ ...mockUser, id: dto.id, password: 'hashedpwd', status: 'disable' });
+      (prisma.users.findFirst as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        id: dto.id,
+        password: 'hashedpwd',
+        status: 'disable',
+      });
       jest.spyOn(PasswordHelper, 'compare').mockResolvedValue(true);
-      (prisma.users.update as jest.Mock).mockResolvedValue({ ...mockUser, status: 'enable' });
+      (prisma.users.update as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        status: 'enable',
+      });
 
-      const result = await service.unlockAccount(dto, { ipAddress: '127.0.0.1', userAgent: 'test' });
+      const result = await service.unlockAccount(dto, {
+        ipAddress: '127.0.0.1',
+        userAgent: 'test',
+      });
 
       expect(prisma.users.update).toHaveBeenCalled();
       expect(result).toHaveProperty('message');

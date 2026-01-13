@@ -31,7 +31,11 @@ export class BruteForceService {
     identifier: string,
     ipAddress?: string,
     config?: Partial<BruteForceConfig>,
-  ): Promise<{ allowed: boolean; remainingAttempts: number; lockoutUntil?: Date }> {
+  ): Promise<{
+    allowed: boolean;
+    remainingAttempts: number;
+    lockoutUntil?: Date;
+  }> {
     const finalConfig = { ...this.defaultConfig, ...config };
 
     const identifierKey = `bf:identifier:${identifier}`;
@@ -50,21 +54,30 @@ export class BruteForceService {
       });
 
       if (!ipAllowed) {
-        this.logger.warn(`Brute force blocked by IP: ${ipAddress} for identifier: ${identifier}`);
+        this.logger.warn(
+          `Brute force blocked by IP: ${ipAddress} for identifier: ${identifier}`,
+        );
         return {
           allowed: false,
           remainingAttempts: 0,
-          lockoutUntil: new Date(Date.now() + finalConfig.lockoutDurationMs / 2),
+          lockoutUntil: new Date(
+            Date.now() + finalConfig.lockoutDurationMs / 2,
+          ),
         };
       }
     }
 
     if (!identifierAllowed) {
-      const recentFailures = await this.getRecentFailures(identifier, finalConfig.windowMs);
-      
+      const recentFailures = await this.getRecentFailures(
+        identifier,
+        finalConfig.windowMs,
+      );
+
       if (recentFailures >= finalConfig.maxAttempts) {
-        const lockoutUntil = new Date(Date.now() + finalConfig.lockoutDurationMs);
-        
+        const lockoutUntil = new Date(
+          Date.now() + finalConfig.lockoutDurationMs,
+        );
+
         this.logger.error(
           `Account locked due to brute force: ${identifier}`,
           undefined,
@@ -76,8 +89,15 @@ export class BruteForceService {
           },
         );
 
-        if (finalConfig.notifyAfterAttempts && recentFailures >= finalConfig.notifyAfterAttempts) {
-          await this.notifySuspiciousActivity(identifier, ipAddress, recentFailures);
+        if (
+          finalConfig.notifyAfterAttempts &&
+          recentFailures >= finalConfig.notifyAfterAttempts
+        ) {
+          await this.notifySuspiciousActivity(
+            identifier,
+            ipAddress,
+            recentFailures,
+          );
         }
 
         return {
@@ -125,11 +145,14 @@ export class BruteForceService {
     if (ipAddress) {
       await this.rateLimiter.reset(`bf:ip:${ipAddress}`);
     }
-    
+
     this.logger.debug(`Brute force attempts cleared: ${identifier}`);
   }
 
-  private async getRecentFailures(identifier: string, windowMs: number): Promise<number> {
+  private async getRecentFailures(
+    identifier: string,
+    windowMs: number,
+  ): Promise<number> {
     try {
       const windowStart = new Date(Date.now() - windowMs);
 
@@ -159,7 +182,10 @@ export class BruteForceService {
 
       return count;
     } catch (error) {
-      this.logger.error('Error getting recent failures', error instanceof Error ? error : undefined);
+      this.logger.error(
+        'Error getting recent failures',
+        error instanceof Error ? error : undefined,
+      );
       return 0;
     }
   }
@@ -169,16 +195,11 @@ export class BruteForceService {
     ipAddress?: string,
     attemptCount?: number,
   ): Promise<void> {
-    this.logger.error(
-      'Suspicious login activity detected',
-      undefined,
-      {
-        identifier,
-        ipAddress,
-        attemptCount,
-        timestamp: new Date(),
-      },
-    );
-
+    this.logger.error('Suspicious login activity detected', undefined, {
+      identifier,
+      ipAddress,
+      attemptCount,
+      timestamp: new Date(),
+    });
   }
 }

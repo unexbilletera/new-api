@@ -33,7 +33,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../../../../../src/shared/prisma/prisma.service';
 import { LoggerService } from '../../../../../../src/shared/logger/logger.service';
-import { createPrismaMock, createLoggerServiceMock } from '../../../../../utils';
+import {
+  createPrismaMock,
+  createLoggerServiceMock,
+} from '../../../../../utils';
 
 /**
  * @testSuite BiometricService
@@ -123,10 +126,12 @@ describe('BiometricService', () => {
       };
 
       service.enrollBiometric.mockRejectedValue(
-        new Error('Biometric quality too low')
+        new Error('Biometric quality too low'),
       );
 
-      await expect(service.enrollBiometric(userId, poorBiometric)).rejects.toThrow();
+      await expect(
+        service.enrollBiometric(userId, poorBiometric),
+      ).rejects.toThrow();
     });
   });
 

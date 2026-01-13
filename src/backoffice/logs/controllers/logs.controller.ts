@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -16,7 +10,10 @@ import {
 import { LogsService } from '../services/logs.service';
 import { ListLogsQueryDto } from '../dto/logs.dto';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
-import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
+import {
+  BackofficeRoleGuard,
+  MinLevel,
+} from '../../../shared/guards/backoffice-role.guard';
 
 @ApiTags('3.3 Backoffice - Logs')
 @ApiBearerAuth('JWT-auth')
@@ -29,7 +26,8 @@ export class LogsController {
   @Get()
   @ApiOperation({
     summary: 'List system logs',
-    description: 'Returns a paginated list of system logs (Requires minimum level 2)',
+    description:
+      'Returns a paginated list of system logs (Requires minimum level 2)',
   })
   @ApiQuery({
     name: 'page',
@@ -64,7 +62,8 @@ export class LogsController {
   @Get('stats')
   @ApiOperation({
     summary: 'Get log statistics',
-    description: 'Returns aggregated log statistics within a period (Requires minimum level 2)',
+    description:
+      'Returns aggregated log statistics within a period (Requires minimum level 2)',
   })
   @ApiQuery({
     name: 'startDate',
@@ -102,7 +101,8 @@ export class LogsController {
   @Get('actions')
   @ApiOperation({
     summary: 'List recorded actions',
-    description: 'Returns the list of all actions that were recorded in the logs (Requires minimum level 2)',
+    description:
+      'Returns the list of all actions that were recorded in the logs (Requires minimum level 2)',
   })
   @ApiResponse({
     status: 200,
@@ -123,7 +123,8 @@ export class LogsController {
   @Get('user/:userId')
   @ApiOperation({
     summary: 'Get user logs',
-    description: 'Returns all logs associated with a specific user (Requires minimum level 2)',
+    description:
+      'Returns all logs associated with a specific user (Requires minimum level 2)',
   })
   @ApiParam({
     name: 'userId',
@@ -170,7 +171,8 @@ export class LogsController {
   @Get(':id')
   @ApiOperation({
     summary: 'Get log by ID',
-    description: 'Returns the details of a specific log (Requires minimum level 2)',
+    description:
+      'Returns the details of a specific log (Requires minimum level 2)',
   })
   @ApiParam({
     name: 'id',

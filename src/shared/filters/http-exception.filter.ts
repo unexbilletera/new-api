@@ -27,8 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       };
       errorCode = responseData.error;
       message = responseData.message;
-    }
-    else if (exception instanceof HttpException) {
+    } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const responseData = exception.getResponse();
 
@@ -45,13 +44,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
         if (isErrorCode(errorData.error)) {
           status = getStatusCodeFromErrorCode(errorData.error);
         }
-      }
-      else if (typeof responseData === 'string' && isErrorCode(responseData)) {
+      } else if (
+        typeof responseData === 'string' &&
+        isErrorCode(responseData)
+      ) {
         errorCode = responseData;
         message = responseData;
         status = getStatusCodeFromErrorCode(responseData);
-      }
-      else {
+      } else {
         message =
           typeof responseData === 'string'
             ? responseData
@@ -60,8 +60,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const isInternalError = Number(status) === 500;
         errorCode = `500 server.errors.${isInternalError ? 'internalError' : 'unknownError'}`;
       }
-    }
-    else if (exception instanceof Error) {
+    } else if (exception instanceof Error) {
       if (isErrorCode(exception.message)) {
         errorCode = exception.message;
         message = exception.message;
@@ -70,8 +69,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errorCode = '500 server.errors.internalError';
         message = exception.message || 'Erro interno do servidor';
       }
-    }
-    else {
+    } else {
       errorCode = '500 server.errors.internalError';
       message = 'Erro interno do servidor';
     }

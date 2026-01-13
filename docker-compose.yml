@@ -11,11 +11,11 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: UnexDev@2026
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,9 +25,9 @@ services:
     container_name: unex-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - '6379:6379'
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,7 +43,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       # ============================================
       # SERVER CONFIG
@@ -71,17 +71,17 @@ services:
       # AUTHENTICATION (JWT)
       # ============================================
       WALLET_TOKEN_SECRET: local-dev-jwt-secret-do-not-use-in-production
-      WALLET_TOKEN_EXPIRE: 86400  # 24 hours
+      WALLET_TOKEN_EXPIRE: 86400 # 24 hours
 
       # ============================================
       # DEVELOPMENT MODE FLAGS
       # ============================================
       WALLET_SANDBOX: enable
       WALLET_SANDBOX_SEND_PUSH: disable
-      WALLET_SANDBOX_SEND_MAIL: "false"
-      WALLET_SANDBOX_SEND_SMS: "false"
+      WALLET_SANDBOX_SEND_MAIL: 'false'
+      WALLET_SANDBOX_SEND_SMS: 'false'
       WALLET_DEVICE_VALIDATION_DISABLE: enable
-      ENABLE_MOCK_CODES: "true"
+      ENABLE_MOCK_CODES: 'true'
 
       # ============================================
       # FEATURES
@@ -90,7 +90,7 @@ services:
       WALLET_TASKS_LOG: enable
       WALLET_SPENDING_LIMITS: enable
       WALLET_SPENDING_LIMITS_LOG: enable
-      BIOMETRIC_CHALLENGE_TTL: 300  # 5 minutes
+      BIOMETRIC_CHALLENGE_TTL: 300 # 5 minutes
 
       # ============================================
       # EMAIL (SES) - Disabled for local dev
@@ -104,8 +104,8 @@ services:
       # ============================================
       TWILIO_ACCOUNT_SID: AC_local_dev_mock_sid
       TWILIO_AUTH_TOKEN: local_dev_mock_token
-      TWILIO_SMS_FROM: "+15551234567"
-      TWILIO_WHATSAPP_FROM: "+15551234567"
+      TWILIO_SMS_FROM: '+15551234567'
+      TWILIO_WHATSAPP_FROM: '+15551234567'
       TWILIO_WHATSAPP_CONTENT_SID: local_dev_content_sid
 
       # ============================================

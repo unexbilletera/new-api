@@ -72,7 +72,8 @@ export class AppConfigService implements OnModuleInit {
     const sandboxEnabled = sandbox.enable;
     const nodeEnv = environment.nodeEnv;
 
-    const enabled = mockCodesEnabled || sandboxEnabled || nodeEnv !== 'production';
+    const enabled =
+      mockCodesEnabled || sandboxEnabled || nodeEnv !== 'production';
 
     return {
       enabled,
@@ -97,17 +98,23 @@ export class AppConfigService implements OnModuleInit {
 
   private loadValidaConfig(): ValidaConfig {
     const validaEnabled =
-      (this.configService.get<string>('VALIDA_ENABLED', '') || '').toLowerCase() === 'true' ||
+      (
+        this.configService.get<string>('VALIDA_ENABLED', '') || ''
+      ).toLowerCase() === 'true' ||
       this.configService.get<string>('WALLET_VALIDA', '') === 'enable';
 
     return {
       enable: validaEnabled,
-      logging: this.configService.get<string>('WALLET_VALIDA_LOG', '') === 'enable',
+      logging:
+        this.configService.get<string>('WALLET_VALIDA_LOG', '') === 'enable',
       apiUrl: this.configService.get<string>('WALLET_VALIDA_URL', ''),
       username: this.configService.get<string>('WALLET_VALIDA_USERNAME', ''),
       password: this.configService.get<string>('WALLET_VALIDA_PASSWORD', ''),
       theme: this.configService.get<string>('WALLET_VALIDA_THEME', ''),
-      webhookSecret: this.configService.get<string>('WALLET_VALIDA_WEBHOOK_SECRET', ''),
+      webhookSecret: this.configService.get<string>(
+        'WALLET_VALIDA_WEBHOOK_SECRET',
+        '',
+      ),
       tokenTimeoutMin: 45,
       enrollmentFlow: 'ldr',
       hideQr: true,
@@ -122,9 +129,15 @@ export class AppConfigService implements OnModuleInit {
         this.configService.get<string>('WALLET_SANDBOX', '') === 'enable' ||
         environment.nodeEnv !== 'production',
       userId: '00000000-0000-0000-0000-000000000000',
-      skipSecurity: this.configService.get<string>('WALLET_SANDBOX_SKIP_SECURITY', '') === 'enable',
-      sendPush: this.configService.get<string>('WALLET_SANDBOX_SEND_PUSH', '') === 'enable',
-      sendMail: this.configService.get<string>('WALLET_SANDBOX_SEND_MAIL', '') === 'enable',
+      skipSecurity:
+        this.configService.get<string>('WALLET_SANDBOX_SKIP_SECURITY', '') ===
+        'enable',
+      sendPush:
+        this.configService.get<string>('WALLET_SANDBOX_SEND_PUSH', '') ===
+        'enable',
+      sendMail:
+        this.configService.get<string>('WALLET_SANDBOX_SEND_MAIL', '') ===
+        'enable',
     };
   }
 
@@ -172,7 +185,10 @@ export class AppConfigService implements OnModuleInit {
 
   isMockCode(code: string | null | undefined): boolean {
     if (!code || typeof code !== 'string') return false;
-    return code === this.config.mock.code6Digits || code === this.config.mock.code8Digits;
+    return (
+      code === this.config.mock.code6Digits ||
+      code === this.config.mock.code8Digits
+    );
   }
 
   isSmsMockEnabled(): boolean {
@@ -215,7 +231,9 @@ export class ConfigService {
   }
 
   get jwtExpiresIn(): string {
-    return process.env.JWT_EXPIRES_IN || process.env.WALLET_TOKEN_EXPIRE || '24h';
+    return (
+      process.env.JWT_EXPIRES_IN || process.env.WALLET_TOKEN_EXPIRE || '24h'
+    );
   }
 
   get serverPort(): number {

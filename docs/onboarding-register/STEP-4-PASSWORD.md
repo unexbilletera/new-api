@@ -25,10 +25,10 @@ No authentication required (public endpoint).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| password | string | Yes | User password (must be exactly 6 digits) |
-| campaignCode | string | No | Optional campaign/referral code |
+| Field        | Type   | Required | Description                              |
+| ------------ | ------ | -------- | ---------------------------------------- |
+| password     | string | Yes      | User password (must be exactly 6 digits) |
+| campaignCode | string | No       | Optional campaign/referral code          |
 
 ### Validation Rules
 
@@ -56,6 +56,7 @@ No authentication required (public endpoint).
 ### Error Responses
 
 #### 400 Bad Request - Invalid Password Format
+
 ```json
 {
   "statusCode": 400,
@@ -65,6 +66,7 @@ No authentication required (public endpoint).
 ```
 
 #### 404 Not Found - User Not Found
+
 ```json
 {
   "statusCode": 404,
@@ -84,6 +86,7 @@ No authentication required (public endpoint).
 ## State Management
 
 After successful password creation:
+
 - `onboardingState.completedSteps` includes `"1.7"`
 - `passwordUpdatedAt` is set to current timestamp
 - Password hash is stored in database

@@ -1,5 +1,11 @@
 import { Controller, Post, Body, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, getSchemaPath } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { SignupService } from '../services/signup.service';
 import { SigninService } from '../services/signin.service';
@@ -9,9 +15,19 @@ import { PasswordRecoveryService } from '../services/password-recovery.service';
 import { TokenService } from '../services/token.service';
 import { SignupDto } from '../dto/signup.dto';
 import { SigninDto } from '../dto/signin.dto';
-import { SendEmailValidationDto, VerifyEmailCodeDto } from '../dto/email-validation.dto';
-import { SendPhoneValidationDto, VerifyPhoneCodeDto } from '../dto/phone-validation.dto';
-import { ForgotPasswordDto, VerifyPasswordDto, UnlockAccountDto } from '../dto/password-recovery.dto';
+import {
+  SendEmailValidationDto,
+  VerifyEmailCodeDto,
+} from '../dto/email-validation.dto';
+import {
+  SendPhoneValidationDto,
+  VerifyPhoneCodeDto,
+} from '../dto/phone-validation.dto';
+import {
+  ForgotPasswordDto,
+  VerifyPasswordDto,
+  UnlockAccountDto,
+} from '../dto/password-recovery.dto';
 import {
   SignupResponseDto,
   SignupDeviceRequiredResponseDto,
@@ -41,7 +57,8 @@ export class AuthController {
   @Post('user/signup')
   @ApiOperation({
     summary: 'Register new user',
-    description: 'Creates a new user account in the system with the provided data',
+    description:
+      'Creates a new user account in the system with the provided data',
   })
   @ApiResponse({
     status: 201,
@@ -58,7 +75,9 @@ export class AuthController {
     description: 'Invalid data or user already exists',
   })
   @ApiBody({ type: SignupDto })
-  async signup(@Body() dto: SignupDto): Promise<SignupResponseDto | SignupDeviceRequiredResponseDto> {
+  async signup(
+    @Body() dto: SignupDto,
+  ): Promise<SignupResponseDto | SignupDeviceRequiredResponseDto> {
     return this.signupService.signup(dto);
   }
 
@@ -82,8 +101,14 @@ export class AuthController {
     description: 'Invalid credentials',
   })
   @ApiBody({ type: SigninDto })
-  async signin(@Body() dto: SigninDto, @Req() req: Request): Promise<SigninResponseDto | SigninDeviceRequiredResponseDto> {
-    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+  async signin(
+    @Body() dto: SigninDto,
+    @Req() req: Request,
+  ): Promise<SigninResponseDto | SigninDeviceRequiredResponseDto> {
+    const ipAddress =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'];
     return this.signinService.signin(dto, { ipAddress, userAgent });
   }
@@ -91,7 +116,7 @@ export class AuthController {
   @Post('user/sendEmailValidation')
   @ApiOperation({
     summary: 'Send validation code via email',
-    description: 'Sends a validation code to the user\'s email',
+    description: "Sends a validation code to the user's email",
   })
   @ApiResponse({
     status: 200,
@@ -99,7 +124,9 @@ export class AuthController {
     type: EmailValidationResponseDto,
   })
   @ApiBody({ type: SendEmailValidationDto })
-  async sendEmailValidation(@Body() dto: SendEmailValidationDto): Promise<EmailValidationResponseDto> {
+  async sendEmailValidation(
+    @Body() dto: SendEmailValidationDto,
+  ): Promise<EmailValidationResponseDto> {
     return this.emailValidationService.sendEmailValidation(dto);
   }
 
@@ -118,14 +145,16 @@ export class AuthController {
     description: 'Invalid or expired code',
   })
   @ApiBody({ type: VerifyEmailCodeDto })
-  async verifyEmailCode(@Body() dto: VerifyEmailCodeDto): Promise<EmailCodeVerificationResponseDto> {
+  async verifyEmailCode(
+    @Body() dto: VerifyEmailCodeDto,
+  ): Promise<EmailCodeVerificationResponseDto> {
     return this.emailValidationService.verifyEmailCode(dto);
   }
 
   @Post('user/sendPhoneValidation')
   @ApiOperation({
     summary: 'Send validation code via SMS',
-    description: 'Sends a validation code to the user\'s phone via SMS',
+    description: "Sends a validation code to the user's phone via SMS",
   })
   @ApiResponse({
     status: 200,
@@ -133,7 +162,9 @@ export class AuthController {
     type: PhoneValidationResponseDto,
   })
   @ApiBody({ type: SendPhoneValidationDto })
-  async sendPhoneValidation(@Body() dto: SendPhoneValidationDto): Promise<PhoneValidationResponseDto> {
+  async sendPhoneValidation(
+    @Body() dto: SendPhoneValidationDto,
+  ): Promise<PhoneValidationResponseDto> {
     return this.phoneValidationService.sendPhoneValidation(dto);
   }
 
@@ -152,7 +183,9 @@ export class AuthController {
     description: 'Invalid or expired code',
   })
   @ApiBody({ type: VerifyPhoneCodeDto })
-  async verifyPhoneCode(@Body() dto: VerifyPhoneCodeDto): Promise<PhoneCodeVerificationResponseDto> {
+  async verifyPhoneCode(
+    @Body() dto: VerifyPhoneCodeDto,
+  ): Promise<PhoneCodeVerificationResponseDto> {
     return this.phoneValidationService.verifyPhoneCode(dto);
   }
 
@@ -167,7 +200,9 @@ export class AuthController {
     type: ForgotPasswordResponseDto,
   })
   @ApiBody({ type: ForgotPasswordDto })
-  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<ForgotPasswordResponseDto> {
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<ForgotPasswordResponseDto> {
     return this.passwordRecoveryService.forgotPassword(dto);
   }
 
@@ -186,7 +221,9 @@ export class AuthController {
     description: 'Invalid or expired code',
   })
   @ApiBody({ type: VerifyPasswordDto })
-  async verify(@Body() dto: VerifyPasswordDto): Promise<VerifyPasswordResponseDto> {
+  async verify(
+    @Body() dto: VerifyPasswordDto,
+  ): Promise<VerifyPasswordResponseDto> {
     return this.passwordRecoveryService.verifyPassword(dto);
   }
 
@@ -201,10 +238,19 @@ export class AuthController {
     type: UnlockAccountResponseDto,
   })
   @ApiBody({ type: UnlockAccountDto })
-  async unlock(@Body() dto: UnlockAccountDto, @Req() req: Request): Promise<UnlockAccountResponseDto> {
-    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+  async unlock(
+    @Body() dto: UnlockAccountDto,
+    @Req() req: Request,
+  ): Promise<UnlockAccountResponseDto> {
+    const ipAddress =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'];
-    return this.passwordRecoveryService.unlockAccount(dto, { ipAddress, userAgent });
+    return this.passwordRecoveryService.unlockAccount(dto, {
+      ipAddress,
+      userAgent,
+    });
   }
 }
 

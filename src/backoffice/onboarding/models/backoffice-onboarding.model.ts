@@ -43,7 +43,11 @@ export class BackofficeOnboardingModel {
   async reject(id: string, reason: string) {
     return this.prisma.usersIdentities.update({
       where: { id },
-      data: { status: 'rejected', notes: reason || 'Rejeitado', updatedAt: new Date() },
+      data: {
+        status: 'rejected',
+        notes: reason || 'Rejeitado',
+        updatedAt: new Date(),
+      },
     });
   }
 }

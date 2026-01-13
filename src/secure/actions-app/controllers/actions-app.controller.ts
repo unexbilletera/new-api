@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -34,7 +28,8 @@ export class ActionsAppController {
   @Get('layout')
   @ApiOperation({
     summary: 'Get actions layout',
-    description: 'Returns the complete layout with all available actions organized in sections',
+    description:
+      'Returns the complete layout with all available actions organized in sections',
   })
   @ApiResponse({
     status: 200,
@@ -122,7 +117,9 @@ export class ActionsAppController {
     status: 401,
     description: 'Invalid or expired token',
   })
-  async checkModuleEnabled(@Param('key') moduleKey: string): Promise<ModuleStatusResponseDto> {
+  async checkModuleEnabled(
+    @Param('key') moduleKey: string,
+  ): Promise<ModuleStatusResponseDto> {
     const enabled = await this.actionsAppService.isModuleEnabled(moduleKey);
     return { moduleKey, enabled };
   }
@@ -130,7 +127,8 @@ export class ActionsAppController {
   @Get('filtered')
   @ApiOperation({
     summary: 'Get filtered actions',
-    description: 'Returns actions filtered according to available permissions and modules',
+    description:
+      'Returns actions filtered according to available permissions and modules',
   })
   @ApiResponse({
     status: 200,
@@ -164,7 +162,9 @@ export class ActionsAppController {
     status: 401,
     description: 'Invalid or expired token',
   })
-  async getActionsBySection(@Param('section') section: ActionSection): Promise<ActionResponseDto[]> {
+  async getActionsBySection(
+    @Param('section') section: ActionSection,
+  ): Promise<ActionResponseDto[]> {
     return this.actionsAppService.getActionsBySection(section, true);
   }
 
@@ -194,7 +194,9 @@ export class ActionsAppController {
     status: 401,
     description: 'Invalid or expired token',
   })
-  async getAllActions(@Query() query: ListActionsQueryDto): Promise<LayoutResponseDto | ActionResponseDto[]> {
+  async getAllActions(
+    @Query() query: ListActionsQueryDto,
+  ): Promise<LayoutResponseDto | ActionResponseDto[]> {
     if (query.section) {
       return this.actionsAppService.getActionsBySection(
         query.section,

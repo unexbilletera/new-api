@@ -75,7 +75,9 @@ describe('JwtService', () => {
       signAsync: jest.fn().mockImplementation((payload: any) => {
         // Generate different tokens based on payload
         const payloadStr = JSON.stringify(payload);
-        const tokenId = Buffer.from(payloadStr).toString('base64').substring(0, 10);
+        const tokenId = Buffer.from(payloadStr)
+          .toString('base64')
+          .substring(0, 10);
         return Promise.resolve(`header.${tokenId}.signature`);
       }),
       verifyAsync: jest.fn().mockResolvedValue(mockPayload),
@@ -145,7 +147,7 @@ describe('JwtService', () => {
       (nestJwtService.signAsync as jest.Mock)
         .mockResolvedValueOnce('header.token1.signature')
         .mockResolvedValueOnce('header.token2.signature');
-      
+
       const token1 = await service.generateToken(mockPayload);
       const token2 = await service.generateToken({
         ...mockPayload,
@@ -187,7 +189,9 @@ describe('JwtService', () => {
      * @edge-case Tests tampering detection
      */
     it('should reject invalid token signature', async () => {
-      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(new Error('Invalid token'));
+      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(
+        new Error('Invalid token'),
+      );
       const tamperedToken = 'invalid.token.here';
 
       await expect(service.verifyToken(tamperedToken)).rejects.toThrow();
@@ -203,7 +207,9 @@ describe('JwtService', () => {
      * @edge-case Tests malformed token handling
      */
     it('should reject malformed token', async () => {
-      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(new Error('Invalid token'));
+      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(
+        new Error('Invalid token'),
+      );
       const malformedToken = 'not.a.valid.token.format';
 
       await expect(service.verifyToken(malformedToken)).rejects.toThrow();
@@ -245,7 +251,9 @@ describe('JwtService', () => {
         ...mockPayload,
         permissions: ['read', 'write'],
       };
-      (nestJwtService.verifyAsync as jest.Mock).mockResolvedValueOnce(extendedPayload);
+      (nestJwtService.verifyAsync as jest.Mock).mockResolvedValueOnce(
+        extendedPayload,
+      );
       const token = await service.generateToken(extendedPayload);
       const decoded = await service.verifyToken(token);
 
@@ -283,7 +291,9 @@ describe('JwtService', () => {
      * @edge-case Tests expiration boundary
      */
     it('should return true for expired token', async () => {
-      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(new Error('Token expired'));
+      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(
+        new Error('Token expired'),
+      );
       const token = 'expired.token.here';
 
       await expect(service.verifyToken(token)).rejects.toThrow();
@@ -309,7 +319,7 @@ describe('JwtService', () => {
       (nestJwtService.signAsync as jest.Mock)
         .mockResolvedValueOnce('header.original.signature')
         .mockResolvedValueOnce('header.refreshed.signature');
-      
+
       const originalToken = await service.generateToken(mockPayload);
       const decodedOriginal = await service.verifyToken(originalToken);
       const refreshedToken = await service.generateToken(decodedOriginal);
@@ -332,7 +342,9 @@ describe('JwtService', () => {
      * @complexity O(1) - Validation before refresh
      */
     it('should reject refresh of invalid token', async () => {
-      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(new Error('Invalid token'));
+      (nestJwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(
+        new Error('Invalid token'),
+      );
       const invalidToken = 'invalid.token.here';
 
       await expect(service.verifyToken(invalidToken)).rejects.toThrow();

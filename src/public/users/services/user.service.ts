@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
-import { ExchangeRatesService, ExchangeRates } from '../../../shared/exchange/exchange-rates.service';
+import {
+  ExchangeRatesService,
+  ExchangeRates,
+} from '../../../shared/exchange/exchange-rates.service';
 import { SystemVersionService } from '../../../shared/helpers/system-version.service';
 import { LoggerService } from '../../../shared/logger/logger.service';
 import { AppConfigService } from '../../../shared/config/config.service';
@@ -86,7 +94,8 @@ export class UserService {
 
     let forceUpgrade = false;
     if (systemVersion) {
-      const versionResult = this.systemVersionService.validateVersion(systemVersion);
+      const versionResult =
+        this.systemVersionService.validateVersion(systemVersion);
       forceUpgrade = !versionResult.isValid;
     }
 
@@ -95,7 +104,9 @@ export class UserService {
       exchangeRates = await this.exchangeRatesService.getRates();
       this.logger.debug('[PROFILE] Exchange rates obtained successfully');
     } catch (mantecaError: any) {
-      this.logger.warn('[PROFILE] Manteca getRates failed (non-critical)', { error: mantecaError.message });
+      this.logger.warn('[PROFILE] Manteca getRates failed (non-critical)', {
+        error: mantecaError.message,
+      });
       exchangeRates = null;
     }
 
@@ -132,12 +143,17 @@ export class UserService {
       exchangeRates,
     };
 
-    this.logger.info('[PROFILE] Current user retrieved successfully', { userId });
+    this.logger.info('[PROFILE] Current user retrieved successfully', {
+      userId,
+    });
     return response;
   }
 
   async requestEmailChange(userId: string, dto: RequestEmailChangeDto) {
-    this.logger.info('[EMAIL CHANGE] Requesting email change', { userId, newEmail: dto.newEmail });
+    this.logger.info('[EMAIL CHANGE] Requesting email change', {
+      userId,
+      newEmail: dto.newEmail,
+    });
 
     const emailRegex =
       /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -169,7 +185,12 @@ export class UserService {
       throw new BadRequestException('users.errors.duplicatedEmail');
     }
 
-    const sendResult = await this.emailService.sendValidationCode(normalizedNewEmail, 8, 10, false);
+    const sendResult = await this.emailService.sendValidationCode(
+      normalizedNewEmail,
+      8,
+      10,
+      false,
+    );
 
     const tokenPayload = {
       type: 'email_change',
@@ -201,7 +222,10 @@ export class UserService {
   }
 
   async confirmEmailChange(userId: string, dto: ConfirmEmailChangeDto) {
-    this.logger.info('[EMAIL CHANGE] Confirming email change', { userId, newEmail: dto.newEmail });
+    this.logger.info('[EMAIL CHANGE] Confirming email change', {
+      userId,
+      newEmail: dto.newEmail,
+    });
 
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
@@ -288,8 +312,12 @@ export class UserService {
 
     let targetIdentityId = user.defaultUserIdentityId || null;
     if (!targetIdentityId) {
-      const identities = user.usersIdentities_usersIdentities_userIdTousers || [];
-      identities.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const identities =
+        user.usersIdentities_usersIdentities_userIdTousers || [];
+      identities.sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
       targetIdentityId = identities[0]?.id || null;
     }
     if (!targetIdentityId) {
@@ -320,18 +348,25 @@ export class UserService {
     };
   }
   async updateProfile(userId: string, dto: UpdateUserProfileDto) {
-    this.logger.info('[PROFILE] Updating user profile', { userId, fields: Object.keys(dto) });
+    this.logger.info('[PROFILE] Updating user profile', {
+      userId,
+      fields: Object.keys(dto),
+    });
 
     const user = await this.prisma.users.findFirst({
       where: {
         id: userId,
         status: { in: ['pending', 'enable', 'error'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
     if (!user) {
-      this.logger.warn('[PROFILE] User not found or invalid status', { userId });
+      this.logger.warn('[PROFILE] User not found or invalid status', {
+        userId,
+      });
       throw new NotFoundException('users.errors.userNotFound');
     }
 
@@ -398,7 +433,14 @@ export class UserService {
     }
 
     if (dto.maritalStatus) {
-      const validStatuses = ['single', 'married', 'divorced', 'widowed', 'cohabiting', 'separated'];
+      const validStatuses = [
+        'single',
+        'married',
+        'divorced',
+        'widowed',
+        'cohabiting',
+        'separated',
+      ];
       if (!validStatuses.includes(dto.maritalStatus)) {
         throw new BadRequestException('users.errors.invalidMaritalStatus');
       }
@@ -454,7 +496,9 @@ export class UserService {
     this.logger.info('[PASSWORD] Password change requested', { userId });
 
     if (!dto.currentPassword || !dto.newPassword) {
-      throw new BadRequestException('users.errors.currentPasswordAndNewPasswordRequired');
+      throw new BadRequestException(
+        'users.errors.currentPasswordAndNewPasswordRequired',
+      );
     }
 
     if (!dto.newPassword.match(/^\d{6}$/)) {
@@ -465,12 +509,16 @@ export class UserService {
       where: {
         id: userId,
         status: { in: ['pending', 'enable', 'error'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
     if (!user) {
-      this.logger.warn('[PASSWORD] User not found or invalid status', { userId });
+      this.logger.warn('[PASSWORD] User not found or invalid status', {
+        userId,
+      });
       throw new NotFoundException('users.errors.userNotFound');
     }
 
@@ -531,7 +579,9 @@ export class UserService {
       where: {
         id: userId,
         status: { in: ['pending', 'enable', 'error'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
@@ -553,7 +603,9 @@ export class UserService {
       where: {
         id: userId,
         status: { in: ['pending', 'enable', 'error'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
@@ -561,7 +613,10 @@ export class UserService {
       throw new NotFoundException('users.errors.invalidContextUser');
     }
 
-    const isPasswordValid = await PasswordHelper.compare(dto.password, user.password || '');
+    const isPasswordValid = await PasswordHelper.compare(
+      dto.password,
+      user.password || '',
+    );
     if (!isPasswordValid) {
       throw new BadRequestException('users.errors.invalidPassword');
     }
@@ -592,18 +647,18 @@ export class UserService {
     if (!validaEnabled) {
       if (!dto.image) {
         throw new BadRequestException('users.errors.imageRequired');
-    }
+      }
 
-    await this.prisma.users.update({
-      where: { id: userId },
-      data: {
-        livenessImage: dto.image,
-        livenessVerifiedAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
+      await this.prisma.users.update({
+        where: { id: userId },
+        data: {
+          livenessImage: dto.image,
+          livenessVerifiedAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
 
-    return {
+      return {
         data: {
           text: '',
           url: '',
@@ -638,9 +693,12 @@ export class UserService {
               apiPath: '/api',
             });
           } catch (error) {
-            this.logger.warn('[VALIDA] Failed to create enrollment, trying to get status', {
-              error: (error as Error).message,
-            });
+            this.logger.warn(
+              '[VALIDA] Failed to create enrollment, trying to get status',
+              {
+                error: (error as Error).message,
+              },
+            );
             validaEnrollment = await this.validaService.getEnrollmentStatus({
               refId: String(user.number),
             });
@@ -650,7 +708,8 @@ export class UserService {
             const parts = validaEnrollment.url.split('/').filter(Boolean);
             const validaId = parts[parts.length - 1];
 
-            const notes = (user.notes || '') + 
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT CREATED validaId: ${validaId}\n`;
 
             await this.prisma.users.update({
@@ -687,7 +746,8 @@ export class UserService {
               livenessImage = validaEnrollment.images.selfie;
             }
 
-            const notes = (user.notes || '') + 
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT VERIFIED validaId: ${user.validaId}\n`;
 
             const currentOnboardingState = (user.onboardingState as any) || {
@@ -720,9 +780,12 @@ export class UserService {
             result.next = 'verifySuccess';
           } else if (
             validaEnrollment.enrollment &&
-            ['failed', 'system-error'].includes(validaEnrollment.enrollment.status || '')
+            ['failed', 'system-error'].includes(
+              validaEnrollment.enrollment.status || '',
+            )
           ) {
-            const notes = (user.notes || '') + 
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT ERROR validaId: ${user.validaId}\n`;
 
             await this.prisma.users.update({
@@ -734,14 +797,16 @@ export class UserService {
             });
 
             result.next = 'verifyWarning';
-            result.data.text = 'Hubo un problema para iniciar el proceso para tu identidad.';
+            result.data.text =
+              'Hubo un problema para iniciar el proceso para tu identidad.';
           } else if (
             validaEnrollment.enrollment &&
             ['new', 'incomplete', 'funnel-end', 'funnel_end'].includes(
-              validaEnrollment.enrollment.status || ''
+              validaEnrollment.enrollment.status || '',
             )
           ) {
-            const notes = (user.notes || '') + 
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT PROCESS validaId: ${user.validaId}\n`;
 
             await this.prisma.users.update({
@@ -756,7 +821,8 @@ export class UserService {
             validaEnrollment.enrollment &&
             validaEnrollment.enrollment.status === 'void'
           ) {
-            const notes = (user.notes || '') + 
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT CANCELED validaId: ${user.validaId}\n`;
 
             const newEnrollment = await this.validaService.createEnrollment({
@@ -774,7 +840,9 @@ export class UserService {
                 where: { id: user.id },
                 data: {
                   validaId: newValidaId,
-                  notes: notes + `${new Date().toISOString()} - VALIDA ENROLLMENT CREATED validaId: ${newValidaId}\n`,
+                  notes:
+                    notes +
+                    `${new Date().toISOString()} - VALIDA ENROLLMENT CREATED validaId: ${newValidaId}\n`,
                 },
               });
 

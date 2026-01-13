@@ -50,9 +50,13 @@ export class RateLimiterService {
     if (entry.count > config.maxRequests) {
       if (config.blockDurationMs) {
         entry.blockedUntil = now + config.blockDurationMs;
-        this.logger.warn(`Rate limit exceeded and blocked: ${key} for ${config.blockDurationMs}ms`);
+        this.logger.warn(
+          `Rate limit exceeded and blocked: ${key} for ${config.blockDurationMs}ms`,
+        );
       } else {
-        this.logger.warn(`Rate limit exceeded: ${key} (${entry.count}/${config.maxRequests})`);
+        this.logger.warn(
+          `Rate limit exceeded: ${key} (${entry.count}/${config.maxRequests})`,
+        );
       }
       return false;
     }
@@ -88,14 +92,19 @@ export class RateLimiterService {
     let cleaned = 0;
 
     for (const [key, entry] of this.store.entries()) {
-      if (entry.resetTime <= now && (!entry.blockedUntil || entry.blockedUntil <= now)) {
+      if (
+        entry.resetTime <= now &&
+        (!entry.blockedUntil || entry.blockedUntil <= now)
+      ) {
         this.store.delete(key);
         cleaned++;
       }
     }
 
     if (cleaned > 0) {
-      this.logger.debug(`Rate limiter cleanup: removed ${cleaned} expired entries`);
+      this.logger.debug(
+        `Rate limiter cleanup: removed ${cleaned} expired entries`,
+      );
     }
   }
 

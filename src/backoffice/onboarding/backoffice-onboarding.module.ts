@@ -9,7 +9,14 @@ import { MantecaModule } from '../../shared/manteca/manteca.module';
 import { LoggerModule } from '../../shared/logger/logger.module';
 
 @Module({
-  imports: [PrismaModule, JwtModule, CronosModule, BindModule, MantecaModule, LoggerModule],
+  imports: [
+    PrismaModule,
+    JwtModule,
+    CronosModule,
+    BindModule,
+    MantecaModule,
+    LoggerModule,
+  ],
   controllers: [OnboardingController],
   providers: [OnboardingService],
   exports: [OnboardingService],

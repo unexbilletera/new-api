@@ -191,9 +191,7 @@ describe('ProfileService', () => {
       const userId = 'user-123';
       const updateDto = { birthDate: 'invalid-date' };
 
-      service.updateProfile.mockRejectedValue(
-        new Error('Invalid date format')
-      );
+      service.updateProfile.mockRejectedValue(new Error('Invalid date format'));
 
       await expect(service.updateProfile(userId, updateDto)).rejects.toThrow();
     });
@@ -252,10 +250,12 @@ describe('ProfileService', () => {
       };
 
       service.uploadProfilePicture.mockRejectedValue(
-        new Error('File too large')
+        new Error('File too large'),
       );
 
-      await expect(service.uploadProfilePicture(userId, mockFile)).rejects.toThrow();
+      await expect(
+        service.uploadProfilePicture(userId, mockFile),
+      ).rejects.toThrow();
     });
 
     /**
@@ -275,10 +275,12 @@ describe('ProfileService', () => {
       };
 
       service.uploadProfilePicture.mockRejectedValue(
-        new Error('Invalid file format')
+        new Error('Invalid file format'),
       );
 
-      await expect(service.uploadProfilePicture(userId, mockFile)).rejects.toThrow();
+      await expect(
+        service.uploadProfilePicture(userId, mockFile),
+      ).rejects.toThrow();
     });
   });
 
@@ -335,7 +337,7 @@ describe('ProfileService', () => {
       };
 
       service.updateAddress.mockRejectedValue(
-        new Error('Invalid ZIP code format')
+        new Error('Invalid ZIP code format'),
       );
 
       await expect(service.updateAddress(userId, addressDto)).rejects.toThrow();

@@ -47,4 +47,7 @@ export { SessionFactory } from './factories/session.factory';
 export { BiometricFactory } from './factories/biometric.factory';
 
 // Helpers
-export { createTestModule, createMockProvider } from './helpers/test-module.helper';
+export {
+  createTestModule,
+  createMockProvider,
+} from './helpers/test-module.helper';

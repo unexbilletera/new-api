@@ -143,7 +143,7 @@ export class PixCronosService {
       try {
         await this.sqsService.sendTransactionMessage('pix_cronos_confirm', {
           transactionId: transactionId,
-          userId:           userId,
+          userId: userId,
         });
       } catch (error) {
         this.logger.errorWithStack(

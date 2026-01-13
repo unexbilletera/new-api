@@ -153,7 +153,9 @@ export class UserModel {
       where: {
         id: userId,
         status: { in: ['pending', 'enable', 'error'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
@@ -188,7 +190,11 @@ export class UserModel {
     });
   }
 
-  async updateEmailChangeRequest(userId: string, verifyToken: string, notes: string) {
+  async updateEmailChangeRequest(
+    userId: string,
+    verifyToken: string,
+    notes: string,
+  ) {
     return this.prisma.users.update({
       where: { id: userId },
       data: {
@@ -268,7 +274,11 @@ export class UserModel {
     });
   }
 
-  async updateWithValidaEnrollment(userId: string, validaId: string, notes: string) {
+  async updateWithValidaEnrollment(
+    userId: string,
+    validaId: string,
+    notes: string,
+  ) {
     return this.prisma.users.update({
       where: { id: userId },
       data: {
@@ -296,7 +306,11 @@ export class UserModel {
     });
   }
 
-  async updateValidaStatus(userId: string, status: 'pending' | 'process' | 'enable' | 'disable' | 'error' | 'rejected', notes: string) {
+  async updateValidaStatus(
+    userId: string,
+    status: 'pending' | 'process' | 'enable' | 'disable' | 'error' | 'rejected',
+    notes: string,
+  ) {
     return this.prisma.users.update({
       where: { id: userId },
       data: {

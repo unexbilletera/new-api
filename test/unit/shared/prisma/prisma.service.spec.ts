@@ -49,10 +49,7 @@ describe('PrismaService', () => {
     logger = createLoggerServiceMock();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PrismaService,
-        { provide: LoggerService, useValue: logger },
-      ],
+      providers: [PrismaService, { provide: LoggerService, useValue: logger }],
     }).compile();
 
     service = module.get<PrismaService>(PrismaService);
@@ -72,7 +69,9 @@ describe('PrismaService', () => {
      * @complexity O(n) where n = connection setup time
      */
     it('should connect to database', async () => {
-      const connectSpy = jest.spyOn(service, '$connect').mockResolvedValue(undefined);
+      const connectSpy = jest
+        .spyOn(service, '$connect')
+        .mockResolvedValue(undefined);
 
       await service.$connect();
 
@@ -88,7 +87,9 @@ describe('PrismaService', () => {
      * @complexity O(n) where n = connection teardown time
      */
     it('should disconnect from database', async () => {
-      const disconnectSpy = jest.spyOn(service, '$disconnect').mockResolvedValue(undefined);
+      const disconnectSpy = jest
+        .spyOn(service, '$disconnect')
+        .mockResolvedValue(undefined);
 
       await service.$disconnect();
 
@@ -119,7 +120,9 @@ describe('PrismaService', () => {
      * @complexity O(1) - Single insert operation
      */
     it('should create user', async () => {
-      const createSpy = jest.spyOn(service.users, 'create').mockResolvedValue(mockUser as any);
+      const createSpy = jest
+        .spyOn(service.users, 'create')
+        .mockResolvedValue(mockUser as any);
 
       const result = await service.users.create({
         data: {
@@ -143,14 +146,18 @@ describe('PrismaService', () => {
      * @complexity O(log n) - Index lookup
      */
     it('should find user by email', async () => {
-      const findSpy = jest.spyOn(service.users, 'findUnique').mockResolvedValue(mockUser as any);
+      const findSpy = jest
+        .spyOn(service.users, 'findUnique')
+        .mockResolvedValue(mockUser as any);
 
       const result = await service.users.findUnique({
         where: { email: mockUser.email },
       });
 
       expect(result).toEqual(mockUser);
-      expect(findSpy).toHaveBeenCalledWith({ where: { email: mockUser.email } });
+      expect(findSpy).toHaveBeenCalledWith({
+        where: { email: mockUser.email },
+      });
     });
 
     /**
@@ -163,7 +170,9 @@ describe('PrismaService', () => {
      */
     it('should update user', async () => {
       const updatedUser = { ...mockUser, firstName: 'Jonathan' };
-      const updateSpy = jest.spyOn(service.users, 'update').mockResolvedValue(updatedUser as any);
+      const updateSpy = jest
+        .spyOn(service.users, 'update')
+        .mockResolvedValue(updatedUser as any);
 
       const result = await service.users.update({
         where: { id: mockUser.id },
@@ -183,7 +192,9 @@ describe('PrismaService', () => {
      * @complexity O(log n) - Index lookup + delete
      */
     it('should delete user', async () => {
-      const deleteSpy = jest.spyOn(service.users, 'delete').mockResolvedValue(mockUser as any);
+      const deleteSpy = jest
+        .spyOn(service.users, 'delete')
+        .mockResolvedValue(mockUser as any);
 
       const result = await service.users.delete({
         where: { id: mockUser.id },
@@ -202,8 +213,13 @@ describe('PrismaService', () => {
      * @complexity O(n) - Full table scan
      */
     it('should find multiple users', async () => {
-      const users = [mockUser, { ...mockUser, id: 'user-456', email: 'test2@example.com' }];
-      const findManySpy = jest.spyOn(service.users, 'findMany').mockResolvedValue(users as any);
+      const users = [
+        mockUser,
+        { ...mockUser, id: 'user-456', email: 'test2@example.com' },
+      ];
+      const findManySpy = jest
+        .spyOn(service.users, 'findMany')
+        .mockResolvedValue(users as any);
 
       const result = await service.users.findMany();
 
@@ -222,7 +238,9 @@ describe('PrismaService', () => {
      * @edge-case Tests missing record handling
      */
     it('should return null when user not found', async () => {
-      const findSpy = jest.spyOn(service.users, 'findUnique').mockResolvedValue(null);
+      const findSpy = jest
+        .spyOn(service.users, 'findUnique')
+        .mockResolvedValue(null);
 
       const result = await service.users.findUnique({
         where: { email: 'nonexistent@example.com' },
@@ -246,7 +264,9 @@ describe('PrismaService', () => {
      * @complexity O(n) where n = number of operations
      */
     it('should execute transaction', async () => {
-      const transactionSpy = jest.spyOn(service, '$transaction').mockResolvedValue([{}, {}]);
+      const transactionSpy = jest
+        .spyOn(service, '$transaction')
+        .mockResolvedValue([{}, {}]);
 
       const result = await service.$transaction([
         service.users.create({ data: {} as any }),
@@ -268,12 +288,12 @@ describe('PrismaService', () => {
      * @edge-case Tests error handling in transaction
      */
     it('should rollback transaction on error', async () => {
-      const transactionSpy = jest.spyOn(service, '$transaction').mockRejectedValue(new Error('Transaction failed'));
+      const transactionSpy = jest
+        .spyOn(service, '$transaction')
+        .mockRejectedValue(new Error('Transaction failed'));
 
       await expect(
-        service.$transaction([
-          service.users.create({ data: {} as any }),
-        ])
+        service.$transaction([service.users.create({ data: {} as any })]),
       ).rejects.toThrow('Transaction failed');
     });
   });
@@ -293,12 +313,14 @@ describe('PrismaService', () => {
      * @edge-case Tests unique constraint
      */
     it('should handle unique constraint errors', async () => {
-      const error = new Error('Unique constraint failed on the fields: (`email`)');
-      const createSpy = jest.spyOn(service.users, 'create').mockRejectedValue(error);
+      const error = new Error(
+        'Unique constraint failed on the fields: (`email`)',
+      );
+      const createSpy = jest
+        .spyOn(service.users, 'create')
+        .mockRejectedValue(error);
 
-      await expect(
-        service.users.create({ data: {} as any })
-      ).rejects.toThrow();
+      await expect(service.users.create({ data: {} as any })).rejects.toThrow();
     });
 
     /**
@@ -312,10 +334,12 @@ describe('PrismaService', () => {
      */
     it('should handle foreign key constraint errors', async () => {
       const error = new Error('Foreign key constraint failed');
-      const createSpy = jest.spyOn(service.transactions, 'create').mockRejectedValue(error);
+      const createSpy = jest
+        .spyOn(service.transactions, 'create')
+        .mockRejectedValue(error);
 
       await expect(
-        service.transactions.create({ data: {} as any })
+        service.transactions.create({ data: {} as any }),
       ).rejects.toThrow();
     });
   });

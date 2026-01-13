@@ -20,10 +20,7 @@ describe('AppInfoService', () => {
     } as any;
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AppInfoService,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [AppInfoService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     service = module.get<AppInfoService>(AppInfoService);
@@ -38,14 +35,23 @@ describe('AppInfoService', () => {
       ];
 
       const mockNews = [
-        { id: 'news-1', title: 'Update', message: 'New version available', active: true, createdAt: new Date(), priority: 1 },
+        {
+          id: 'news-1',
+          title: 'Update',
+          message: 'New version available',
+          active: true,
+          createdAt: new Date(),
+          priority: 1,
+        },
       ];
 
       const mockModules = [
         { id: 'mod-1', name: 'darkMode', isActive: 1, deletedAt: null },
       ];
 
-      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(mockConfigs);
+      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(
+        mockConfigs,
+      );
       (prisma.news.findMany as jest.Mock).mockResolvedValue(mockNews);
       (prisma.modules.findMany as jest.Mock).mockResolvedValue(mockModules);
 
@@ -63,7 +69,9 @@ describe('AppInfoService', () => {
         { id: 'config-3', key: 'maintenance_mode', value: 'false' },
       ];
 
-      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(mockConfigs);
+      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(
+        mockConfigs,
+      );
       (prisma.news.findMany as jest.Mock).mockResolvedValue([]);
       (prisma.modules.findMany as jest.Mock).mockResolvedValue([]);
 
@@ -82,7 +90,9 @@ describe('AppInfoService', () => {
         { id: 'config-3', key: 'maintenance_mode', value: 'false' },
       ];
 
-      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(mockConfigs);
+      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(
+        mockConfigs,
+      );
       (prisma.modules.findMany as jest.Mock).mockResolvedValue([]);
 
       const result = await service.getAppInfo('1.5.0');
@@ -102,7 +112,9 @@ describe('AppInfoService', () => {
         { id: 'config-4', key: 'min_app_version_ios', value: '1.0.0' },
       ];
 
-      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(mockConfigs);
+      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(
+        mockConfigs,
+      );
 
       const result = await service.checkVersion('1.5.0', 'ios');
 
@@ -119,7 +131,9 @@ describe('AppInfoService', () => {
         { id: 'config-4', key: 'min_app_version_android', value: '1.0.0' },
       ];
 
-      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(mockConfigs);
+      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(
+        mockConfigs,
+      );
 
       const result = await service.checkVersion('2.0.0', 'android');
 
@@ -137,20 +151,38 @@ describe('AppInfoService', () => {
         { id: 'config-6', key: 'min_app_version_android', value: '1.0.0' },
       ];
 
-      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(mockConfigs);
+      (prisma.system_config.findMany as jest.Mock).mockResolvedValue(
+        mockConfigs,
+      );
 
       const resultIos = await service.checkVersion('2.0.0', 'ios');
       const resultAndroid = await service.checkVersion('2.0.0', 'android');
 
-      expect(resultIos.currentVersion).not.toEqual(resultAndroid.currentVersion);
+      expect(resultIos.currentVersion).not.toEqual(
+        resultAndroid.currentVersion,
+      );
     });
   });
 
   describe('getNews', () => {
     it('should return list of news', async () => {
       const mockNews = [
-        { id: 'news-1', title: 'Update 1', message: 'Content 1', active: true, createdAt: new Date(), priority: 1 },
-        { id: 'news-2', title: 'Update 2', message: 'Content 2', active: true, createdAt: new Date(), priority: 2 },
+        {
+          id: 'news-1',
+          title: 'Update 1',
+          message: 'Content 1',
+          active: true,
+          createdAt: new Date(),
+          priority: 1,
+        },
+        {
+          id: 'news-2',
+          title: 'Update 2',
+          message: 'Content 2',
+          active: true,
+          createdAt: new Date(),
+          priority: 2,
+        },
       ];
 
       (prisma.news.findMany as jest.Mock).mockResolvedValue(mockNews);
@@ -174,8 +206,28 @@ describe('AppInfoService', () => {
 
     it('should filter active news and apply date constraints', async () => {
       const mockNews = [
-        { id: 'news-1', title: 'Old news', message: 'Content', active: true, createdAt: new Date('2026-01-01'), priority: 1, startDate: null, endDate: null, deletedAt: null },
-        { id: 'news-2', title: 'New news', message: 'Content', active: true, createdAt: new Date('2026-01-05'), priority: 2, startDate: null, endDate: null, deletedAt: null },
+        {
+          id: 'news-1',
+          title: 'Old news',
+          message: 'Content',
+          active: true,
+          createdAt: new Date('2026-01-01'),
+          priority: 1,
+          startDate: null,
+          endDate: null,
+          deletedAt: null,
+        },
+        {
+          id: 'news-2',
+          title: 'New news',
+          message: 'Content',
+          active: true,
+          createdAt: new Date('2026-01-05'),
+          priority: 2,
+          startDate: null,
+          endDate: null,
+          deletedAt: null,
+        },
       ];
 
       (prisma.news.findMany as jest.Mock).mockResolvedValue(mockNews);
@@ -229,7 +281,9 @@ describe('AppInfoService', () => {
 
       const result = await service.getFeatures();
 
-      const enabledCount = Object.values(result).filter(v => v === true).length;
+      const enabledCount = Object.values(result).filter(
+        (v) => v === true,
+      ).length;
       expect(enabledCount).toBeGreaterThanOrEqual(2);
     });
   });

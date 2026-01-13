@@ -35,12 +35,14 @@ export class SignupService {
       throw new BadRequestException('users.errors.userAlreadyExists');
     }
 
-    const emailValidated = await this.validationCodeModel.getValidatedEmailCode(email);
+    const emailValidated =
+      await this.validationCodeModel.getValidatedEmailCode(email);
     if (!emailValidated) {
       throw new BadRequestException('users.errors.emailValidationRequired');
     }
 
-    const phoneValidated = await this.validationCodeModel.getValidatedPhoneCode(phone);
+    const phoneValidated =
+      await this.validationCodeModel.getValidatedPhoneCode(phone);
     if (!phoneValidated) {
       throw new BadRequestException('users.errors.phoneValidationRequired');
     }
@@ -80,7 +82,11 @@ export class SignupService {
     let deviceRequired = false;
     if (dto.deviceIdentifier) {
       const existingDevice = await this.prisma.devices.findFirst({
-        where: { userId: user.id, deviceIdentifier: dto.deviceIdentifier, status: 'active' },
+        where: {
+          userId: user.id,
+          deviceIdentifier: dto.deviceIdentifier,
+          status: 'active',
+        },
       });
       deviceRequired = !existingDevice;
     } else {
@@ -98,7 +104,11 @@ export class SignupService {
     const token = await this.jwtService.generateToken(payload);
 
     if (deviceRequired) {
-      return this.authMapper.toSignupDeviceRequiredResponseDto(user, token, 'soft');
+      return this.authMapper.toSignupDeviceRequiredResponseDto(
+        user,
+        token,
+        'soft',
+      );
     }
 
     return this.authMapper.toSignupResponseDto(user, token);

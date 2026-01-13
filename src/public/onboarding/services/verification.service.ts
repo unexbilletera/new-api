@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { OnboardingModel } from '../models/onboarding.model';
 import { OnboardingMapper } from '../mappers/onboarding.mapper';
 import { LoggerService } from '../../../shared/logger/logger.service';
@@ -62,18 +66,39 @@ export class VerificationService {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const onboardingState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
 
     if (dto.type === 'email') {
-      return await this.verifyEmailCode(user, email!, dto.code, onboardingState);
+      return await this.verifyEmailCode(
+        user,
+        email!,
+        dto.code,
+        onboardingState,
+      );
     } else {
-      return await this.verifyPhoneCode(user, phone!, dto.code, onboardingState);
+      return await this.verifyPhoneCode(
+        user,
+        phone!,
+        dto.code,
+        onboardingState,
+      );
     }
   }
 
-  private async verifyEmailCode(user: any, email: string, code: string, onboardingState: any) {
+  private async verifyEmailCode(
+    user: any,
+    email: string,
+    code: string,
+    onboardingState: any,
+  ) {
     try {
-      this.logger.info('[ONBOARDING] Verifying email code', { userId: user.id, email });
+      this.logger.info('[ONBOARDING] Verifying email code', {
+        userId: user.id,
+        email,
+      });
       await this.emailService.verifyCode(email, code, true);
 
       if (!onboardingState.completedSteps.includes('1.2')) {
@@ -83,10 +108,13 @@ export class VerificationService {
         onboardingState.completedSteps.push('1.3');
       }
 
-      const updated = await this.onboardingModel.updateUserOnboardingComplete(user.id, {
-        onboardingState,
-        emailVerifiedAt: new Date(),
-      });
+      const updated = await this.onboardingModel.updateUserOnboardingComplete(
+        user.id,
+        {
+          onboardingState,
+          emailVerifiedAt: new Date(),
+        },
+      );
 
       this.logger.info('[ONBOARDING] Email code verified successfully', {
         userId: user.id,
@@ -101,14 +129,19 @@ export class VerificationService {
     } catch (error) {
       this.logger.error(
         '[ONBOARDING] Email code verification failed',
-        error instanceof Error ? error : new Error('Email code verification failed'),
+        error instanceof Error
+          ? error
+          : new Error('Email code verification failed'),
         {
           userId: user.id,
           error: error instanceof Error ? error.message : 'Unknown error',
         },
       );
       if (error instanceof Error) {
-        if (error.message.includes('not found') || error.message.includes('expired')) {
+        if (
+          error.message.includes('not found') ||
+          error.message.includes('expired')
+        ) {
           throw new BadRequestException('users.errors.codeNotFoundOrExpired');
         }
         if (error.message.includes('Invalid')) {
@@ -119,9 +152,17 @@ export class VerificationService {
     }
   }
 
-  private async verifyPhoneCode(user: any, phone: string, code: string, onboardingState: any) {
+  private async verifyPhoneCode(
+    user: any,
+    phone: string,
+    code: string,
+    onboardingState: any,
+  ) {
     try {
-      this.logger.info('[ONBOARDING] Verifying phone code', { userId: user.id, phone });
+      this.logger.info('[ONBOARDING] Verifying phone code', {
+        userId: user.id,
+        phone,
+      });
       await this.smsService.verifyCode(phone, code);
 
       if (!onboardingState.completedSteps.includes('1.5')) {
@@ -131,10 +172,13 @@ export class VerificationService {
         onboardingState.completedSteps.push('1.6');
       }
 
-      const updated = await this.onboardingModel.updateUserOnboardingComplete(user.id, {
-        onboardingState,
-        phoneVerifiedAt: new Date(),
-      });
+      const updated = await this.onboardingModel.updateUserOnboardingComplete(
+        user.id,
+        {
+          onboardingState,
+          phoneVerifiedAt: new Date(),
+        },
+      );
 
       this.logger.info('[ONBOARDING] Phone code verified successfully', {
         userId: user.id,
@@ -149,14 +193,19 @@ export class VerificationService {
     } catch (error) {
       this.logger.error(
         '[ONBOARDING] Phone code verification failed',
-        error instanceof Error ? error : new Error('Phone code verification failed'),
+        error instanceof Error
+          ? error
+          : new Error('Phone code verification failed'),
         {
           userId: user.id,
           error: error instanceof Error ? error.message : 'Unknown error',
         },
       );
       if (error instanceof Error) {
-        if (error.message.includes('not found') || error.message.includes('expired')) {
+        if (
+          error.message.includes('not found') ||
+          error.message.includes('expired')
+        ) {
           throw new BadRequestException('users.errors.codeNotFoundOrExpired');
         }
         if (error.message.includes('Invalid')) {

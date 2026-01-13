@@ -22,7 +22,9 @@ export class AuthUserModel {
       where: {
         id: userId,
         status: { in: ['pending', 'enable', 'error', 'disable'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 

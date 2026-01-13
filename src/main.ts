@@ -47,12 +47,21 @@ async function bootstrap() {
       },
       'JWT-auth',
     )
-    .addTag('1.1 Public - Authentication', 'User authentication and registration')
+    .addTag(
+      '1.1 Public - Authentication',
+      'User authentication and registration',
+    )
     .addTag('1.1 Public - Security', 'Security tokens for public operations')
     .addTag('1.2 Public - Users', 'User profile and data management')
-    .addTag('1.3 Public - Onboarding', 'Onboarding process and identity verification')
+    .addTag(
+      '1.3 Public - Onboarding',
+      'Onboarding process and identity verification',
+    )
     .addTag('1.3 Public - Biometric', 'Biometric authentication and devices')
-    .addTag('2.1 Secure - Transactions', 'Financial transactions (PIX, transfers)')
+    .addTag(
+      '2.1 Secure - Transactions',
+      'Financial transactions (PIX, transfers)',
+    )
     .addTag('2.2 Secure - Notifications', 'Push and system notifications')
     .addTag('2.2 Secure - Campaigns', 'Campaigns and promotional codes')
     .addTag('2.3 Secure - Terms', 'Terms and conditions of service')
@@ -77,10 +86,15 @@ async function bootstrap() {
     },
   });
 
-  const port = parseInt(process.env.PORT || process.env.WALLET_SERVER_PORT || '3000', 10);
+  const port = parseInt(
+    process.env.PORT || process.env.WALLET_SERVER_PORT || '3000',
+    10,
+  );
   await app.listen(port, '0.0.0.0');
   logger.info(`API running on http://0.0.0.0:${port}`);
-  logger.info(`Swagger documentation available at http://0.0.0.0:${port}/api/docs`);
+  logger.info(
+    `Swagger documentation available at http://0.0.0.0:${port}/api/docs`,
+  );
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 bootstrap();

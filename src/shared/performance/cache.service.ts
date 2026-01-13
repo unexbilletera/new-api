@@ -29,7 +29,11 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     return entry.value as T;
   }
 
-  async set<T>(key: string, value: T, ttlMs: number = this.defaultTTL): Promise<void> {
+  async set<T>(
+    key: string,
+    value: T,
+    ttlMs: number = this.defaultTTL,
+  ): Promise<void> {
     this.cache.set(key, {
       value,
       expiresAt: Date.now() + ttlMs,
@@ -49,7 +53,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       }
     }
     if (cleared > 0) {
-      this.logger.debug(`Cleared ${cleared} cache entries matching pattern: ${pattern}`);
+      this.logger.debug(
+        `Cleared ${cleared} cache entries matching pattern: ${pattern}`,
+      );
     }
   }
 
@@ -64,14 +70,14 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     ttlMs: number = this.defaultTTL,
   ): Promise<T> {
     const cached = await this.get<T>(key);
-    
+
     if (cached !== null) {
       return cached;
     }
 
     const value = await fetchFn();
     await this.set(key, value, ttlMs);
-    
+
     return value;
   }
 

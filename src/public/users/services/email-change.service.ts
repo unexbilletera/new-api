@@ -1,10 +1,20 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserModel } from '../models/user.model';
 import { EmailService } from '../../../shared/email/email.service';
 import { LoggerService } from '../../../shared/logger/logger.service';
 import { UserMapper } from '../mappers/user.mapper';
-import { RequestEmailChangeDto, ConfirmEmailChangeDto } from '../dto/user-profile.dto';
-import { EmailChangeRequestResponseDto, EmailChangeConfirmResponseDto } from '../dto/response';
+import {
+  RequestEmailChangeDto,
+  ConfirmEmailChangeDto,
+} from '../dto/user-profile.dto';
+import {
+  EmailChangeRequestResponseDto,
+  EmailChangeConfirmResponseDto,
+} from '../dto/response';
 
 @Injectable()
 export class EmailChangeService {
@@ -15,8 +25,14 @@ export class EmailChangeService {
     private userMapper: UserMapper,
   ) {}
 
-  async requestEmailChange(userId: string, dto: RequestEmailChangeDto): Promise<EmailChangeRequestResponseDto> {
-    this.logger.info('[EMAIL CHANGE] Requesting email change', { userId, newEmail: dto.newEmail });
+  async requestEmailChange(
+    userId: string,
+    dto: RequestEmailChangeDto,
+  ): Promise<EmailChangeRequestResponseDto> {
+    this.logger.info('[EMAIL CHANGE] Requesting email change', {
+      userId,
+      newEmail: dto.newEmail,
+    });
 
     const emailRegex =
       /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -35,12 +51,20 @@ export class EmailChangeService {
       throw new BadRequestException('users.errors.emailAlreadyInUse');
     }
 
-    const exists = await this.userModel.findByEmailExcluding(normalizedNewEmail, userId);
+    const exists = await this.userModel.findByEmailExcluding(
+      normalizedNewEmail,
+      userId,
+    );
     if (exists) {
       throw new BadRequestException('users.errors.duplicatedEmail');
     }
 
-    const sendResult = await this.emailService.sendValidationCode(normalizedNewEmail, 8, 10, false);
+    const sendResult = await this.emailService.sendValidationCode(
+      normalizedNewEmail,
+      8,
+      10,
+      false,
+    );
 
     const tokenPayload = {
       type: 'email_change',
@@ -53,13 +77,27 @@ export class EmailChangeService {
       (user.notes || '') +
       `${new Date().toISOString()} - EMAIL CHANGE REQUESTED to: ${normalizedNewEmail}\n`;
 
-    await this.userModel.updateEmailChangeRequest(userId, JSON.stringify(tokenPayload), notes);
+    await this.userModel.updateEmailChangeRequest(
+      userId,
+      JSON.stringify(tokenPayload),
+      notes,
+    );
 
-    return this.userMapper.toEmailChangeRequestResponseDto(normalizedNewEmail, sendResult.expiresIn, sendResult.debug);
+    return this.userMapper.toEmailChangeRequestResponseDto(
+      normalizedNewEmail,
+      sendResult.expiresIn,
+      sendResult.debug,
+    );
   }
 
-  async confirmEmailChange(userId: string, dto: ConfirmEmailChangeDto): Promise<EmailChangeConfirmResponseDto> {
-    this.logger.info('[EMAIL CHANGE] Confirming email change', { userId, newEmail: dto.newEmail });
+  async confirmEmailChange(
+    userId: string,
+    dto: ConfirmEmailChangeDto,
+  ): Promise<EmailChangeConfirmResponseDto> {
+    this.logger.info('[EMAIL CHANGE] Confirming email change', {
+      userId,
+      newEmail: dto.newEmail,
+    });
 
     const user = await this.userModel.findByIdSimple(userId);
     if (!user) {
@@ -89,7 +127,10 @@ export class EmailChangeService {
 
     await this.emailService.verifyCode(normalizedNewEmail, dto.code, false);
 
-    const exists = await this.userModel.findByEmailExcluding(normalizedNewEmail, userId);
+    const exists = await this.userModel.findByEmailExcluding(
+      normalizedNewEmail,
+      userId,
+    );
     if (exists) {
       throw new BadRequestException('users.errors.duplicatedEmail');
     }

@@ -1,4 +1,11 @@
-import { IsString, IsEmail, IsOptional, IsObject, Matches, IsPhoneNumber } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsObject,
+  Matches,
+  IsPhoneNumber,
+} from 'class-validator';
 
 export class StartUserOnboardingDto {
   @IsEmail()

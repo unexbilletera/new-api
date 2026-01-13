@@ -1,8 +1,10 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';export class ValidateCampaignCodeDto {
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+export class ValidateCampaignCodeDto {
   @IsString()
   @IsNotEmpty()
   code: string;
-}export class CampaignCodeResponseDto {
+}
+export class CampaignCodeResponseDto {
   id: string;
   code: string;
   name: string;
@@ -15,12 +17,14 @@ import { IsString, IsNotEmpty, IsOptional } from 'class-validator';export class 
   startDate?: Date;
   endDate?: Date;
   active: boolean;
-}export class CampaignValidationResponseDto {
+}
+export class CampaignValidationResponseDto {
   valid: boolean;
   message: string;
   campaign?: CampaignCodeResponseDto;
   alreadyUsed?: boolean;
-}export class UseCampaignResponseDto {
+}
+export class UseCampaignResponseDto {
   success: boolean;
   message: string;
   usageId?: string;

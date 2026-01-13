@@ -53,7 +53,10 @@ export class NotificationFactory {
    * @param {INotificationFactoryOptions} overrides - Overrides for all
    * @returns {any[]} Array of notifications
    */
-  static createMultiple(count: number, overrides: INotificationFactoryOptions = {}): any[] {
+  static createMultiple(
+    count: number,
+    overrides: INotificationFactoryOptions = {},
+  ): any[] {
     return Array.from({ length: count }, () => this.create(overrides));
   }
 

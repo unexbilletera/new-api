@@ -117,10 +117,12 @@ describe('EmailChangeService', () => {
       const existingEmail = 'existing@example.com';
 
       service.requestEmailChange.mockRejectedValue(
-        new Error('Email already in use')
+        new Error('Email already in use'),
       );
 
-      await expect(service.requestEmailChange(userId, existingEmail)).rejects.toThrow();
+      await expect(
+        service.requestEmailChange(userId, existingEmail),
+      ).rejects.toThrow();
     });
   });
 
@@ -192,10 +194,12 @@ describe('EmailChangeService', () => {
       const wrongCode = '000000';
 
       service.verifyNewEmail.mockRejectedValue(
-        new Error('Invalid verification code')
+        new Error('Invalid verification code'),
       );
 
-      await expect(service.verifyNewEmail(changeId, wrongCode)).rejects.toThrow();
+      await expect(
+        service.verifyNewEmail(changeId, wrongCode),
+      ).rejects.toThrow();
     });
 
     /**
@@ -212,10 +216,12 @@ describe('EmailChangeService', () => {
       const expiredCode = '123456';
 
       service.verifyNewEmail.mockRejectedValue(
-        new Error('Verification code expired')
+        new Error('Verification code expired'),
       );
 
-      await expect(service.verifyNewEmail(changeId, expiredCode)).rejects.toThrow();
+      await expect(
+        service.verifyNewEmail(changeId, expiredCode),
+      ).rejects.toThrow();
     });
   });
 
@@ -289,8 +295,16 @@ describe('EmailChangeService', () => {
       const userId = 'user-123';
 
       service.getChangeHistory.mockResolvedValue([
-        { from: 'old1@example.com', to: 'old2@example.com', completedAt: new Date() },
-        { from: 'old2@example.com', to: 'current@example.com', completedAt: new Date() },
+        {
+          from: 'old1@example.com',
+          to: 'old2@example.com',
+          completedAt: new Date(),
+        },
+        {
+          from: 'old2@example.com',
+          to: 'current@example.com',
+          completedAt: new Date(),
+        },
       ]);
 
       const result = await service.getChangeHistory(userId);

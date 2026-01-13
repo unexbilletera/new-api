@@ -34,7 +34,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../../../../../src/shared/prisma/prisma.service';
 import { LoggerService } from '../../../../../../src/shared/logger/logger.service';
-import { createPrismaMock, createLoggerServiceMock } from '../../../../../utils';
+import {
+  createPrismaMock,
+  createLoggerServiceMock,
+} from '../../../../../utils';
 
 interface MockAuthService {
   adminLogin: jest.Mock;
@@ -129,9 +132,7 @@ describe('Backoffice AuthService', () => {
         password: 'WrongPass',
       };
 
-      service.adminLogin.mockRejectedValue(
-        new Error('Invalid credentials')
-      );
+      service.adminLogin.mockRejectedValue(new Error('Invalid credentials'));
 
       await expect(service.adminLogin(credentials)).rejects.toThrow();
     });

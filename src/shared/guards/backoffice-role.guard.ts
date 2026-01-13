@@ -8,7 +8,8 @@ import {
 import { Reflector } from '@nestjs/core';
 
 export const MIN_LEVEL_KEY = 'minLevel';
-export const MinLevel = (level: number) => SetMetadata(MIN_LEVEL_KEY, level);@Injectable()
+export const MinLevel = (level: number) => SetMetadata(MIN_LEVEL_KEY, level);
+@Injectable()
 export class BackofficeRoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 

@@ -65,13 +65,24 @@ describe('UserController', () => {
       getCurrentUser: jest.fn(),
       updateProfile: jest.fn(),
     };
-    const emailChangeService = { requestEmailChange: jest.fn(), confirmEmailChange: jest.fn() };
+    const emailChangeService = {
+      requestEmailChange: jest.fn(),
+      confirmEmailChange: jest.fn(),
+    };
     const passwordService = { changePassword: jest.fn() };
     const sessionService = { signout: jest.fn() };
     const accountClosureService = { closeAccount: jest.fn() };
     const livenessService = { checkLiveness: jest.fn() };
-    const identityService = { listIdentities: jest.fn(), setDefaultIdentity: jest.fn() };
-    const accountService = { listAccounts: jest.fn(), setDefaultAccount: jest.fn(), setAccountAlias: jest.fn(), getBalance: jest.fn() };
+    const identityService = {
+      listIdentities: jest.fn(),
+      setDefaultIdentity: jest.fn(),
+    };
+    const accountService = {
+      listAccounts: jest.fn(),
+      setDefaultAccount: jest.fn(),
+      setAccountAlias: jest.fn(),
+      getBalance: jest.fn(),
+    };
     const onboardingStatusService = { getStatus: jest.fn() };
     const messagingService = { sendMessage: jest.fn() };
 
@@ -182,7 +193,10 @@ describe('UserController', () => {
       const updatedUser = { ...mockActiveUser, ...updateDto };
       service.updateProfile.mockResolvedValue(updatedUser);
 
-      const result = await controller.updateProfile({ id: userId } as any, updateDto);
+      const result = await controller.updateProfile(
+        { id: userId } as any,
+        updateDto,
+      );
 
       expect(result.firstName).toBe(updateDto.firstName);
       expect(service.updateProfile).toHaveBeenCalledWith(userId, updateDto);
@@ -203,7 +217,10 @@ describe('UserController', () => {
       const updatedUser = { ...mockActiveUser, firstName: 'Jane' };
       service.updateProfile.mockResolvedValue(updatedUser);
 
-      const result = await controller.updateProfile({ id: userId } as any, updateDto);
+      const result = await controller.updateProfile(
+        { id: userId } as any,
+        updateDto,
+      );
 
       expect(result.firstName).toBe('Jane');
       expect(service.updateProfile).toHaveBeenCalledWith(userId, updateDto);
@@ -271,7 +288,7 @@ describe('UserController', () => {
       service.updateEmail.mockRejectedValue(new Error('Email already in use'));
 
       await expect(
-        controller.updateEmail(userId, { email: existingEmail })
+        controller.updateEmail(userId, { email: existingEmail }),
       ).rejects.toThrow();
     });
   });

@@ -11,9 +11,18 @@ import {
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
-import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
+import {
+  BackofficeRoleGuard,
+  MinLevel,
+} from '../../../shared/guards/backoffice-role.guard';
 import { SystemConfigService } from '../services/system-config.service';
 import {
   CreateSystemConfigDto,
@@ -32,7 +41,11 @@ export class SystemConfigController {
 
   @Get()
   @ApiOperation({ summary: 'List system configurations' })
-  @ApiQuery({ name: 'group', required: false, description: 'Configuration group' })
+  @ApiQuery({
+    name: 'group',
+    required: false,
+    description: 'Configuration group',
+  })
   @ApiQuery({ name: 'search', required: false, description: 'Busca por chave' })
   @ApiQuery({ name: 'page', required: false, description: 'Page' })
   @ApiQuery({ name: 'limit', required: false, description: 'Limit per page' })
@@ -67,7 +80,10 @@ export class SystemConfigController {
   @ApiOperation({ summary: 'Update configuration' })
   @ApiParam({ name: 'id', description: 'Configuration ID' })
   @MinLevel(3)
-  async updateConfig(@Param('id') id: string, @Body() dto: UpdateSystemConfigDto) {
+  async updateConfig(
+    @Param('id') id: string,
+    @Body() dto: UpdateSystemConfigDto,
+  ) {
     return this.systemConfigService.updateConfig(id, dto);
   }
 
@@ -105,7 +121,10 @@ export class SystemConfigController {
   @ApiOperation({ summary: 'Update module' })
   @ApiParam({ name: 'id', description: 'Module ID' })
   @MinLevel(3)
-  async updateModule(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateModuleDto) {
+  async updateModule(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateModuleDto,
+  ) {
     return this.systemConfigService.updateModule(id, dto);
   }
 
@@ -113,7 +132,10 @@ export class SystemConfigController {
   @ApiOperation({ summary: 'Activate/deactivate module' })
   @ApiParam({ name: 'id', description: 'Module ID' })
   @MinLevel(2)
-  async toggleModule(@Param('id', ParseIntPipe) id: number, @Body('isActive') isActive: boolean) {
+  async toggleModule(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('isActive') isActive: boolean,
+  ) {
     return this.systemConfigService.toggleModule(id, isActive);
   }
 

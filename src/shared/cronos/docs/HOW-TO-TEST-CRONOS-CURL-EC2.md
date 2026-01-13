@@ -58,6 +58,7 @@ curl -v -X POST "https://apibr.unex.ar/api/v1/pix/confirmartransferencia" \
 ## What to observe:
 
 **If it works on EC2:**
+
 - The problem is NOT IP
 - Could be:
   - Different token in new API (create vs confirm)
@@ -65,6 +66,7 @@ curl -v -X POST "https://apibr.unex.ar/api/v1/pix/confirmartransferencia" \
   - Timing between creation and confirmation
 
 **If it doesn't work on EC2:**
+
 - Could be:
   - Invalid or expired id_pagamento
   - Invalid token

@@ -30,7 +30,9 @@ describe('AppController', () => {
     });
 
     it('should return the service response', () => {
-      const response: AppGreetingResponseDto = { message: 'Application is running' };
+      const response: AppGreetingResponseDto = {
+        message: 'Application is running',
+      };
       service.getHello.mockReturnValue(response);
 
       const result = controller.getHello();

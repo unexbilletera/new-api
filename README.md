@@ -11,21 +11,25 @@ This project implements a modular API architecture using the NestJS framework, o
 Detailed documentation is available in the [docs](docs) directory:
 
 ### Core Documentation
+
 - [Architecture](docs/ARCHITECTURE.md) - System architecture and design patterns
 - [Project Structure](docs/STRUCTURE.md) - Directory organization and module layout
 - [Installation Guide](docs/INSTALL.md) - Setup and installation instructions
 - [Environment Configuration](docs/ENVIRONMENT.md) - Environment variables and configuration
 
 ### API Documentation
+
 - [Endpoints Map](docs/ENDPOINTS_MAP.md) - Complete API endpoints reference
 - [Error Codes](docs/ERROR_CODES.md) - Error handling and status codes
 - [Provider Features](docs/PROVIDER_FEATURES.md) - Provider-specific features and capabilities
 
 ### Module Documentation
+
 - [Backoffice Authentication](docs/BACKOFFICE_AUTH_MODULE.md) - Backoffice authentication system
 - [Worker Service](docs/WORKER.md) - SQS worker and background processing
 
 ### Testing Documentation
+
 - [Public Authentication Testing](docs/PUBLIC_AUTH_TESTING.md) - Public API authentication test guide
 - [Backoffice Authentication Testing](docs/BACKOFFICE_AUTH_TESTING.md) - Backoffice authentication test guide
 - [PIX Cronos Testing](docs/PIX_CRONOS_TESTING.md) - PIX integration testing guide

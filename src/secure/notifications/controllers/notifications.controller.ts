@@ -47,7 +47,8 @@ export class NotificationsController {
   @Get()
   @ApiOperation({
     summary: 'List notifications',
-    description: 'Returns the list of notifications for the authenticated user with pagination',
+    description:
+      'Returns the list of notifications for the authenticated user with pagination',
   })
   @ApiQuery({
     name: 'page',
@@ -111,7 +112,9 @@ export class NotificationsController {
     type: MarkAllAsReadResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Invalid or expired token' })
-  async markAllAsRead(@CurrentUser('id') userId: string): Promise<MarkAllAsReadResponseDto> {
+  async markAllAsRead(
+    @CurrentUser('id') userId: string,
+  ): Promise<MarkAllAsReadResponseDto> {
     return this.notificationsService.markAllAsRead(userId);
   }
 
@@ -170,7 +173,9 @@ export class NotificationsController {
     type: GetPushTokenResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Invalid or expired token' })
-  async getPushToken(@CurrentUser('id') userId: string): Promise<GetPushTokenResponseDto> {
+  async getPushToken(
+    @CurrentUser('id') userId: string,
+  ): Promise<GetPushTokenResponseDto> {
     return this.notificationsService.getPushToken(userId);
   }
 

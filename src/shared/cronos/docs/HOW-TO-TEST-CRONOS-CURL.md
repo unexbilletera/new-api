@@ -5,6 +5,7 @@ This file contains curl commands to test Cronos API requests directly on EC2.
 ## IMPORTANT: Testing on EC2
 
 **Why test on EC2?**
+
 - If it works on EC2 directly with curl: the problem is NOT IP, it could be:
   - Different token used in creation vs confirmation
   - id_pagamento expired or invalidated
@@ -37,6 +38,7 @@ curl -v -X GET \
 ```
 
 **Expected response:**
+
 ```json
 {
   "token": "eyJ0eXAiOiJKV1QiLCJh..."
@@ -44,6 +46,7 @@ curl -v -X GET \
 ```
 
 **Save the token:**
+
 ```bash
 APP_TOKEN=$(curl -s -X GET \
   "${CRONOS_URL}/api/v1/application/token" \
@@ -70,6 +73,7 @@ curl -v -X POST \
 ```
 
 **Expected response:**
+
 ```json
 {
   "token": "eyJ0eXAiOiJKV1QiLCJh...",
@@ -80,6 +84,7 @@ curl -v -X POST \
 ```
 
 **Save the user token:**
+
 ```bash
 USER_TOKEN=$(curl -s -X POST \
   "${CRONOS_URL}/api/v1/user/auth" \
@@ -112,6 +117,7 @@ curl -v -X POST \
 ```
 
 **Expected response (success):**
+
 ```json
 {
   "success": true,
@@ -121,6 +127,7 @@ curl -v -X POST \
 ```
 
 **Expected response (authorization error):**
+
 ```json
 {
   "success": false,
@@ -197,10 +204,11 @@ bash /path/to/test-cronos-curl.sh
    - If it doesn't work: could be another problem (token, data, etc.)
 
 2. **Test on EC2 with SOCKS proxy:**
+
    ```bash
    # Check if SOCKS tunnel is active
    netstat -an | grep 8080
-   
+
    # Use curl with SOCKS proxy
    curl --socks5-hostname localhost:8080 -v -X POST ...
    ```
@@ -214,6 +222,7 @@ bash /path/to/test-cronos-curl.sh
 ### Check Cronos API Logs
 
 If you have access to Cronos logs, check:
+
 - Which IP is making the request
 - If the IP is in the whitelist
 - If the token is being validated correctly
@@ -249,9 +258,11 @@ If you have access to Cronos logs, check:
 ### How to Test:
 
 1. **Test with freshly created id_pagamento:**
+
    ```bash
    ./test-cronos-curl.sh
    ```
+
    - This creates a new `id_pagamento` and confirms immediately
    - If it works: the problem was expired `id_pagamento`
    - If it doesn't work: problem elsewhere
@@ -260,6 +271,7 @@ If you have access to Cronos logs, check:
    ```bash
    ./test-cronos-curl-simple.sh 99b85d20-3b6e-4bcf-a133-fb62797592ea 0.11
    ```
+
    - Tests with an existing `id_pagamento`
    - If it works: the problem may be timing/token in the new API
    - If it doesn't work: the `id_pagamento` may have expired or been invalidated

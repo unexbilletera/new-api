@@ -74,7 +74,11 @@ export class CircuitBreakerService {
     return stats;
   }
 
-  private recordFailure(circuit: CircuitStats, cfg: CircuitConfig, key: string): void {
+  private recordFailure(
+    circuit: CircuitStats,
+    cfg: CircuitConfig,
+    key: string,
+  ): void {
     const now = Date.now();
     circuit.failures.push(now);
     this.pruneStats(circuit, cfg);
@@ -87,10 +91,15 @@ export class CircuitBreakerService {
       return;
     }
 
-    if (circuit.failures.length >= cfg.failureThreshold && circuit.state === 'CLOSED') {
+    if (
+      circuit.failures.length >= cfg.failureThreshold &&
+      circuit.state === 'CLOSED'
+    ) {
       circuit.state = 'OPEN';
       circuit.nextAttemptAt = now + cfg.openTimeoutMs;
-      this.logger.error(`Circuit ${key} opened after ${circuit.failures.length} failures`);
+      this.logger.error(
+        `Circuit ${key} opened after ${circuit.failures.length} failures`,
+      );
     }
   }
 

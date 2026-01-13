@@ -10,7 +10,8 @@ import {
 
 @Injectable()
 export class ClientsService {
-  constructor(private prisma: PrismaService) {}  async list(query: ListClientsQueryDto): Promise<{
+  constructor(private prisma: PrismaService) {}
+  async list(query: ListClientsQueryDto): Promise<{
     data: ClientResponseDto[];
     total: number;
     page: number;
@@ -121,7 +122,8 @@ export class ClientsService {
       page,
       limit,
     };
-  }  async getDetails(id: string): Promise<ClientDetailsDto> {
+  }
+  async getDetails(id: string): Promise<ClientDetailsDto> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
       include: {
@@ -144,14 +146,16 @@ export class ClientsService {
     const baseResponse = this.mapToResponse(user);
     return {
       ...baseResponse,
-      identities: user.usersIdentities_usersIdentities_userIdTousers.map((i) => ({
-        id: i.id,
-        type: i.type,
-        country: i.country,
-        taxDocumentNumber: i.taxDocumentNumber,
-        status: i.status,
-        createdAt: i.createdAt,
-      })),
+      identities: user.usersIdentities_usersIdentities_userIdTousers.map(
+        (i) => ({
+          id: i.id,
+          type: i.type,
+          country: i.country,
+          taxDocumentNumber: i.taxDocumentNumber,
+          status: i.status,
+          createdAt: i.createdAt,
+        }),
+      ),
       accounts: user.usersAccounts
         .filter((a) => a.status === 'enable')
         .map((a) => ({
@@ -161,7 +165,8 @@ export class ClientsService {
           status: a.status || null,
         })),
     };
-  }  async update(id: string, dto: UpdateClientDto): Promise<ClientResponseDto> {
+  }
+  async update(id: string, dto: UpdateClientDto): Promise<ClientResponseDto> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
@@ -187,7 +192,11 @@ export class ClientsService {
     });
 
     return this.mapToResponse(updated);
-  }  async block(id: string, dto: BlockClientDto): Promise<{ success: boolean; message: string }> {
+  }
+  async block(
+    id: string,
+    dto: BlockClientDto,
+  ): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
@@ -206,7 +215,8 @@ export class ClientsService {
     });
 
     return { success: true, message: 'Client blocked successfully' };
-  }  async unblock(id: string): Promise<{ success: boolean; message: string }> {
+  }
+  async unblock(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
@@ -225,7 +235,11 @@ export class ClientsService {
     });
 
     return { success: true, message: 'Client unblocked successfully' };
-  }  async disable(id: string, dto: BlockClientDto): Promise<{ success: boolean; message: string }> {
+  }
+  async disable(
+    id: string,
+    dto: BlockClientDto,
+  ): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
@@ -244,7 +258,8 @@ export class ClientsService {
     });
 
     return { success: true, message: 'Client disabled successfully' };
-  }  async enable(id: string): Promise<{ success: boolean; message: string }> {
+  }
+  async enable(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
@@ -263,7 +278,8 @@ export class ClientsService {
     });
 
     return { success: true, message: 'Client enabled successfully' };
-  }  async getAccounts(id: string) {
+  }
+  async getAccounts(id: string) {
     const user = await this.prisma.users.findFirst({
       where: { id, deletedAt: null },
     });
@@ -287,7 +303,8 @@ export class ClientsService {
       status: a.status || null,
       createdAt: a.createdAt,
     }));
-  }  async getLogs(id: string, query: { page?: number; limit?: number }) {
+  }
+  async getLogs(id: string, query: { page?: number; limit?: number }) {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 20;
     const skip = (page - 1) * limit;
@@ -303,7 +320,8 @@ export class ClientsService {
     ]);
 
     return { data, total, page, limit };
-  }  async getTransactions(id: string, query: { page?: number; limit?: number }) {
+  }
+  async getTransactions(id: string, query: { page?: number; limit?: number }) {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 20;
     const skip = (page - 1) * limit;
@@ -323,14 +341,18 @@ export class ClientsService {
 
   private mapToResponse(user: any): ClientResponseDto {
     const identities = user.usersIdentities_usersIdentities_userIdTousers || [];
-    const enabledIdentities = identities.filter((i: any) => i.status === 'enable');
-    
-    const activeAccounts = (user.usersAccounts || []).filter((a: any) => a.status === 'enable');
-    
+    const enabledIdentities = identities.filter(
+      (i: any) => i.status === 'enable',
+    );
+
+    const activeAccounts = (user.usersAccounts || []).filter(
+      (a: any) => a.status === 'enable',
+    );
+
     const accountOriginsFromAccounts = activeAccounts
       .map((a: any) => a.usersIdentities?.country)
       .filter(Boolean);
-    
+
     const accountTypesFromAccounts = activeAccounts
       .map((a: any) => a.type)
       .filter(Boolean);

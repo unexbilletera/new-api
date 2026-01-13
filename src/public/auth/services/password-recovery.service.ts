@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { randomBytes } from 'crypto';
 const bcrypt = require('bcrypt');
 import { AuthUserModel } from '../models/user.model';
@@ -8,7 +12,11 @@ import { NotificationService } from '../../../shared/notifications/notifications
 import { AccessLogService } from '../../../shared/access-log/access-log.service';
 import { SystemVersionService } from '../../../shared/helpers/system-version.service';
 import { AuthMapper } from '../mappers/auth.mapper';
-import { ForgotPasswordDto, VerifyPasswordDto, UnlockAccountDto } from '../dto/password-recovery.dto';
+import {
+  ForgotPasswordDto,
+  VerifyPasswordDto,
+  UnlockAccountDto,
+} from '../dto/password-recovery.dto';
 
 @Injectable()
 export class PasswordRecoveryService {
@@ -53,7 +61,11 @@ export class PasswordRecoveryService {
 
     await this.userModel.storeRecoveryCode(email, hashed);
 
-    await this.notificationService.sendPasswordRecovery(email, code, user.language);
+    await this.notificationService.sendPasswordRecovery(
+      email,
+      code,
+      user.language,
+    );
 
     return this.authMapper.toForgotPasswordResponseDto(
       'Password reset code sent to email',
@@ -78,15 +90,21 @@ export class PasswordRecoveryService {
 
     await this.userModel.updatePassword(user.id, hashedPassword);
 
-    return this.authMapper.toVerifyPasswordResponseDto('Password updated successfully');
+    return this.authMapper.toVerifyPasswordResponseDto(
+      'Password updated successfully',
+    );
   }
 
-  async unlockAccount(dto: UnlockAccountDto, requestContext?: { ipAddress?: string; userAgent?: string }) {
+  async unlockAccount(
+    dto: UnlockAccountDto,
+    requestContext?: { ipAddress?: string; userAgent?: string },
+  ) {
     if (!dto.id || dto.id.length > 255) {
       throw new BadRequestException('users.errors.invalidId');
     }
 
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
     if (!uuidRegex.test(dto.id)) {
       throw new BadRequestException('users.errors.invalidId');
     }
@@ -101,7 +119,10 @@ export class PasswordRecoveryService {
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
-    const isPasswordValid = await PasswordHelper.compare(dto.password.trim(), user.password);
+    const isPasswordValid = await PasswordHelper.compare(
+      dto.password.trim(),
+      user.password,
+    );
 
     if (!isPasswordValid) {
       await this.accessLogService.logFailure({
@@ -116,7 +137,9 @@ export class PasswordRecoveryService {
       this.systemVersionService.assertVersionValid(dto.systemVersion);
     } catch (versionError) {
       throw new BadRequestException(
-        versionError instanceof Error ? versionError.message : 'users.errors.invalidSystemVersion',
+        versionError instanceof Error
+          ? versionError.message
+          : 'users.errors.invalidSystemVersion',
       );
     }
 

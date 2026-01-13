@@ -20,7 +20,9 @@ export class CreateActionDto {
   @IsOptional()
   isActive?: boolean;
 
-  @ApiPropertyOptional({ description: 'Additional metadata (icon, order, etc)' })
+  @ApiPropertyOptional({
+    description: 'Additional metadata (icon, order, etc)',
+  })
   @IsOptional()
   metadata?: { icon?: string; order?: number };
 }

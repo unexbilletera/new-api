@@ -90,7 +90,10 @@ export class UserFactory {
    * const users = UserFactory.createMultiple(5);
    * const adminUsers = UserFactory.createMultiple(3, { role: 'ADMIN' });
    */
-  static createMultiple(count: number, overrides: IUserFactoryOptions = {}): any[] {
+  static createMultiple(
+    count: number,
+    overrides: IUserFactoryOptions = {},
+  ): any[] {
     return Array.from({ length: count }, () => this.create(overrides));
   }
 
@@ -126,7 +129,11 @@ export class UserFactory {
    * const lockedUser = UserFactory.createInactive();
    */
   static createInactive(overrides: IUserFactoryOptions = {}): any {
-    return this.create({ ...overrides, status: 'LOCKED', emailVerified: false });
+    return this.create({
+      ...overrides,
+      status: 'LOCKED',
+      emailVerified: false,
+    });
   }
 
   /**

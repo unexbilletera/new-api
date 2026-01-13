@@ -1,4 +1,5 @@
 # Commit Convention
+
 - Format: `type: short summary` (English, imperative, max ~72 chars)
 - Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `perf`, `test`, `ci`, `build`, `style`, `revert`
 - Scope: optional (`type(scope): summary`) when helpful

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import {
   CreateSystemConfigDto,
@@ -172,7 +176,8 @@ export class SystemConfigService {
       where: { id },
       data: {
         name: dto.name,
-        isActive: dto.isActive !== undefined ? (dto.isActive ? 1 : 0) : undefined,
+        isActive:
+          dto.isActive !== undefined ? (dto.isActive ? 1 : 0) : undefined,
         updatedAt: new Date(),
       },
     });

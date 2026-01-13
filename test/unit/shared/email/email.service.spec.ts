@@ -163,10 +163,12 @@ describe('EmailService', () => {
 
       await service.sendEmail(emailWithCc);
 
-      expect(sendSpy).toHaveBeenCalledWith(expect.objectContaining({
-        cc: 'cc@example.com',
-        bcc: 'bcc@example.com',
-      }));
+      expect(sendSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          cc: 'cc@example.com',
+          bcc: 'bcc@example.com',
+        }),
+      );
     });
   });
 
@@ -191,10 +193,12 @@ describe('EmailService', () => {
      * @complexity O(1) - Single email send
      */
     it('should send validation code email', async () => {
-      const sendSpy = jest.spyOn(service, 'sendValidationCode').mockResolvedValue({
-        messageId: 'msg_validation_123',
-        status: 'sent',
-      });
+      const sendSpy = jest
+        .spyOn(service, 'sendValidationCode')
+        .mockResolvedValue({
+          messageId: 'msg_validation_123',
+          status: 'sent',
+        });
 
       const result = await service.sendValidationCode(validationPayload);
 
@@ -211,16 +215,20 @@ describe('EmailService', () => {
      * @complexity O(1) - Content generation
      */
     it('should include code expiry in email content', async () => {
-      const sendSpy = jest.spyOn(service, 'sendValidationCode').mockResolvedValue({
-        messageId: 'msg_validation_123',
-        status: 'sent',
-      });
+      const sendSpy = jest
+        .spyOn(service, 'sendValidationCode')
+        .mockResolvedValue({
+          messageId: 'msg_validation_123',
+          status: 'sent',
+        });
 
       await service.sendValidationCode(validationPayload);
 
-      expect(sendSpy).toHaveBeenCalledWith(expect.objectContaining({
-        expiryMinutes: 30,
-      }));
+      expect(sendSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          expiryMinutes: 30,
+        }),
+      );
     });
   });
 
@@ -243,10 +251,12 @@ describe('EmailService', () => {
      * @complexity O(1) - Single email send
      */
     it('should send password recovery email', async () => {
-      const sendSpy = jest.spyOn(service, 'sendPasswordRecovery').mockResolvedValue({
-        messageId: 'msg_recovery_123',
-        status: 'sent',
-      });
+      const sendSpy = jest
+        .spyOn(service, 'sendPasswordRecovery')
+        .mockResolvedValue({
+          messageId: 'msg_recovery_123',
+          status: 'sent',
+        });
 
       const result = await service.sendPasswordRecovery(recoveryPayload);
 
@@ -263,16 +273,20 @@ describe('EmailService', () => {
      * @complexity O(1) - Link validation
      */
     it('should include recovery link in email', async () => {
-      const sendSpy = jest.spyOn(service, 'sendPasswordRecovery').mockResolvedValue({
-        messageId: 'msg_recovery_123',
-        status: 'sent',
-      });
+      const sendSpy = jest
+        .spyOn(service, 'sendPasswordRecovery')
+        .mockResolvedValue({
+          messageId: 'msg_recovery_123',
+          status: 'sent',
+        });
 
       await service.sendPasswordRecovery(recoveryPayload);
 
-      expect(sendSpy).toHaveBeenCalledWith(expect.objectContaining({
-        recoveryLink: expect.stringContaining('https://'),
-      }));
+      expect(sendSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          recoveryLink: expect.stringContaining('https://'),
+        }),
+      );
     });
   });
 
@@ -307,7 +321,7 @@ describe('EmailService', () => {
 
       expect(Array.isArray(results)).toBe(true);
       expect(results.length).toBe(3);
-      expect(results.every(r => r.status === 'sent')).toBe(true);
+      expect(results.every((r) => r.status === 'sent')).toBe(true);
     });
 
     /**
@@ -330,8 +344,8 @@ describe('EmailService', () => {
       const results = await service.sendBulk(bulkPayload);
 
       expect(results.length).toBe(3);
-      expect(results.some(r => r.status === 'failed')).toBe(true);
-      expect(results.some(r => r.status === 'sent')).toBe(true);
+      expect(results.some((r) => r.status === 'failed')).toBe(true);
+      expect(results.some((r) => r.status === 'sent')).toBe(true);
     });
   });
 
@@ -349,7 +363,9 @@ describe('EmailService', () => {
      * @complexity O(1) - Regex validation
      */
     it('should validate correct email format', () => {
-      const verifySpy = jest.spyOn(service, 'verifyEmail').mockReturnValue(true);
+      const verifySpy = jest
+        .spyOn(service, 'verifyEmail')
+        .mockReturnValue(true);
 
       const result = service.verifyEmail('user@example.com');
 
@@ -366,7 +382,9 @@ describe('EmailService', () => {
      * @edge-case Tests various invalid formats
      */
     it('should reject invalid email formats', () => {
-      const verifySpy = jest.spyOn(service, 'verifyEmail').mockReturnValue(false);
+      const verifySpy = jest
+        .spyOn(service, 'verifyEmail')
+        .mockReturnValue(false);
 
       const invalidEmails = [
         'invalid@',
@@ -376,7 +394,7 @@ describe('EmailService', () => {
         'user@example',
       ];
 
-      invalidEmails.forEach(email => {
+      invalidEmails.forEach((email) => {
         const result = service.verifyEmail(email);
         expect(result).toBe(false);
       });
@@ -391,7 +409,9 @@ describe('EmailService', () => {
      * @complexity O(1) - String normalization
      */
     it('should handle email normalization', () => {
-      const verifySpy = jest.spyOn(service, 'verifyEmail').mockReturnValue(true);
+      const verifySpy = jest
+        .spyOn(service, 'verifyEmail')
+        .mockReturnValue(true);
 
       service.verifyEmail('  USER@EXAMPLE.COM  ');
 
@@ -414,12 +434,16 @@ describe('EmailService', () => {
      * @edge-case Tests invalid input
      */
     it('should handle invalid recipient email', async () => {
-      const sendSpy = jest.spyOn(service, 'sendEmail').mockRejectedValue(
-        new Error('Invalid email address')
-      );
+      const sendSpy = jest
+        .spyOn(service, 'sendEmail')
+        .mockRejectedValue(new Error('Invalid email address'));
 
       await expect(
-        service.sendEmail({ to: 'invalid@', subject: 'Test', html: '<p>test</p>' })
+        service.sendEmail({
+          to: 'invalid@',
+          subject: 'Test',
+          html: '<p>test</p>',
+        }),
       ).rejects.toThrow();
     });
 
@@ -433,12 +457,16 @@ describe('EmailService', () => {
      * @edge-case Tests service failure
      */
     it('should handle service unavailable error', async () => {
-      const sendSpy = jest.spyOn(service, 'sendEmail').mockRejectedValue(
-        new Error('Email service unavailable')
-      );
+      const sendSpy = jest
+        .spyOn(service, 'sendEmail')
+        .mockRejectedValue(new Error('Email service unavailable'));
 
       await expect(
-        service.sendEmail({ to: 'user@example.com', subject: 'Test', html: '<p>test</p>' })
+        service.sendEmail({
+          to: 'user@example.com',
+          subject: 'Test',
+          html: '<p>test</p>',
+        }),
       ).rejects.toThrow('Email service unavailable');
     });
   });

@@ -30,15 +30,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/signup",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "signup"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "signup"]
                 },
                 "description": "Registra um novo usuario no sistema. Valida email unico e envia email de verificacao.\n\nCampos obrigatorios:\n- email (string, formato email valido)\n- password (string, minimo 8 caracteres)\n- firstName (string)\n- lastName (string)\n\nResposta esperada (201):\n{\"id\": \"user-123\", \"email\": \"usuario@example.com\", \"status\": \"pending_email_verification\"}"
               }
@@ -59,15 +52,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/signin",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "signin"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "signin"]
                 },
                 "description": "Autentica um usuario existente e retorna JWT token.\n\nCampos obrigatorios:\n- email (string)\n- password (string)\n\nResposta esperada (200 OK):\n{\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"user\": {\"id\": \"user-123\", \"email\": \"usuario@example.com\"}}"
               }
@@ -88,15 +74,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/sendEmailValidation",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "sendEmailValidation"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "sendEmailValidation"]
                 },
                 "description": "Envia um codigo de validacao para o email do usuario.\n\nCampos obrigatorios:\n- email (string)\n\nResposta esperada (200 OK):\n{\"sent\": true, \"message\": \"Codigo enviado\"}"
               }
@@ -117,15 +96,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/verifyEmailCode",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "verifyEmailCode"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "verifyEmailCode"]
                 },
                 "description": "Verifica o codigo de validacao enviado por email.\n\nCampos obrigatorios:\n- email (string)\n- code (string, codigo de 6 digitos)\n\nResposta esperada (200 OK):\n{\"verified\": true, \"message\": \"Email verificado com sucesso\"}"
               }
@@ -146,15 +118,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/sendPhoneValidation",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "sendPhoneValidation"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "sendPhoneValidation"]
                 },
                 "description": "Envia um codigo de validacao via SMS.\n\nCampos obrigatorios:\n- phone (string, formato +55 DD 9XXXX-XXXX)\n\nResposta esperada (200 OK):\n{\"sent\": true}"
               }
@@ -175,15 +140,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/verifyPhoneCode",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "verifyPhoneCode"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "verifyPhoneCode"]
                 },
                 "description": "Verifica o codigo SMS.\n\nCampos obrigatorios:\n- phone (string)\n- code (string, codigo de 6 digitos)\n\nResposta esperada (200 OK):\n{\"verified\": true}"
               }
@@ -204,15 +162,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/forgot",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "forgot"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "forgot"]
                 },
                 "description": "Inicia processo de recuperacao de senha.\n\nCampos obrigatorios:\n- email (string)\n\nResposta esperada (200 OK):\n{\"sent\": true}"
               }
@@ -233,15 +184,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/verify",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "verify"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "verify"]
                 },
                 "description": "Verifica codigo de recuperacao e define nova senha.\n\nCampos obrigatorios:\n- email (string)\n- code (string)\n- newPassword (string)\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -262,15 +206,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/unlock",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "unlock"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "unlock"]
                 },
                 "description": "Desbloqueia uma conta que foi bloqueada.\n\nCampos obrigatorios:\n- email (string)\n\nResposta esperada (200 OK):\n{\"unlocked\": true}"
               }
@@ -291,14 +228,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/security/token",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "security",
-                    "token"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security", "token"]
                 },
                 "description": "Gera um token de seguranca.\n\nResposta esperada (200 OK):\n{\"token\": \"sec_abc123def456...\"}"
               }
@@ -319,14 +250,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/test/auth/login",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "test",
-                    "auth",
-                    "login"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["test", "auth", "login"]
                 },
                 "description": "Endpoint de teste para login (apenas desenvolvimento)\n\nResposta esperada (200 OK):\n{\"token\": \"...\", \"user\": {...}}"
               }
@@ -347,14 +272,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/test/auth/backoffice-login",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "test",
-                    "auth",
-                    "backoffice-login"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["test", "auth", "backoffice-login"]
                 },
                 "description": "Endpoint de teste para login backoffice (apenas desenvolvimento)\n\nResposta esperada (200 OK):\n{\"token\": \"...\", \"user\": {...}}"
               }
@@ -377,15 +296,8 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/user/me",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "me"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "me"]
                 },
                 "description": "Retorna dados completos do usuario autenticado.\n\nAutenticacao: Requer header Authorization com JWT token\n\nResposta esperada (200 OK):\n{\"id\": \"user-123\", \"email\": \"usuario@example.com\", \"firstName\": \"Joao\"}"
               }
@@ -410,15 +322,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/profile",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "profile"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "profile"]
                 },
                 "description": "Atualiza informacoes de perfil do usuario.\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -443,15 +348,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/address",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "address"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "address"]
                 },
                 "description": "Atualiza endereco do usuario.\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -476,15 +374,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/change-password",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "change-password"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "change-password"]
                 },
                 "description": "Altera a senha do usuario.\n\nCampos obrigatorios:\n- currentPassword (string)\n- newPassword (string)\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -509,16 +400,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/change-email/request",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "change-email",
-                    "request"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "change-email", "request"]
                 },
                 "description": "Inicia processo de mudanca de email.\n\nResposta esperada (200 OK):\n{\"sent\": true}"
               }
@@ -543,16 +426,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/change-email/confirm",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "change-email",
-                    "confirm"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "change-email", "confirm"]
                 },
                 "description": "Confirma a mudanca de email.\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -569,15 +444,8 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/user/balances",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "balances"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "balances"]
                 },
                 "description": "Retorna saldos de todas as contas do usuario.\n\nResposta esperada (200 OK):\n{\"balances\": [{\"accountId\": \"acc-123\", \"balance\": 1500.50}]}"
               }
@@ -594,16 +462,8 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/user/identities/{{userId}}",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "identities",
-                    "{{userId}}"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "identities", "{{userId}}"]
                 },
                 "description": "Lista identidades do usuario.\n\nResposta esperada (200 OK):\n{\"identities\": [{\"id\": \"id-123\", \"type\": \"cpf\"}]}"
               }
@@ -620,9 +480,7 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/user/setDefaultUserIdentity/{{identityId}}",
-                  "host": [
-                    "{{base_url}}"
-                  ],
+                  "host": ["{{base_url}}"],
                   "path": [
                     "api",
                     "users",
@@ -646,9 +504,7 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/user/setDefaultUserAccount/{{accountId}}",
-                  "host": [
-                    "{{base_url}}"
-                  ],
+                  "host": ["{{base_url}}"],
                   "path": [
                     "api",
                     "users",
@@ -680,9 +536,7 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/setUserAccountAlias/{{accountId}}",
-                  "host": [
-                    "{{base_url}}"
-                  ],
+                  "host": ["{{base_url}}"],
                   "path": [
                     "api",
                     "users",
@@ -707,15 +561,8 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/userAccountInfo/{{accountId}}",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "userAccountInfo",
-                    "{{accountId}}"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "userAccountInfo", "{{accountId}}"]
                 },
                 "description": "Retorna informacoes da conta do usuario autenticado. Requer autenticacao JWT.\n\nResposta esperada (200 OK):\n{\"accountId\": \"acc-123\", \"accountNumber\": \"123456\", \"accountType\": \"checking\"}"
               }
@@ -733,15 +580,8 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/sailpointInfo/{{userId}}",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "sailpointInfo",
-                    "{{userId}}"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "sailpointInfo", "{{userId}}"]
                 },
                 "description": "Retorna informacoes do Sailpoint do usuario. Requer autenticacao JWT.\n\nResposta esperada (200 OK):\n{\"userId\": \"user-123\", \"sailpointId\": \"sp-123\"}"
               }
@@ -758,15 +598,8 @@
                 ],
                 "url": {
                   "raw": "{{base_url}}/api/users/user/signout",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "signout"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "signout"]
                 },
                 "description": "Encerra sessao do usuario.\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -791,15 +624,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/closeAccount",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "closeAccount"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "closeAccount"]
                 },
                 "description": "AVISO: Fecha a conta de forma PERMANENTE.\n\nResposta esperada (200 OK):\n{\"success\": true, \"message\": \"Conta agendada para fechamento\"}"
               }
@@ -824,15 +650,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/liveness",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "liveness"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "liveness"]
                 },
                 "description": "Verifica liveness do usuario.\n\nResposta esperada (200 OK):\n{\"verified\": true}"
               }
@@ -857,16 +676,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/onboarding/{{step}}",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "onboarding",
-                    "{{step}}"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "onboarding", "{{step}}"]
                 },
                 "description": "Avanca onboarding para um step especifico.\n\nParametros:\n- step (path param, numero do step)\n\nResposta esperada (200 OK):\n{\"step\": 2}"
               }
@@ -891,15 +702,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/user/onboarding",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "user",
-                    "onboarding"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "user", "onboarding"]
                 },
                 "description": "Atualiza status do onboarding.\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -924,14 +728,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/api/users/sendMessage",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "sendMessage"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "users", "sendMessage"]
                 },
                 "description": "Envia mensagem.\n\nResposta esperada (200 OK):\n{\"success\": true}"
               }
@@ -962,15 +760,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/user/start",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "onboarding",
-                        "user",
-                        "start"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "onboarding", "user", "start"]
                     },
                     "description": "Inicia onboarding.\n\nResposta esperada (201 Created):\n{\"onboardingId\": \"onb-123\", \"step\": 1}"
                   }
@@ -991,15 +782,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/user/verify-code",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "onboarding",
-                        "user",
-                        "verify-code"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "onboarding", "user", "verify-code"]
                     },
                     "description": "Verifica codigo de onboarding.\n\nResposta esperada (201 Created):\n{\"verified\": true}"
                   }
@@ -1020,9 +804,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/user/send-email-validation",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "onboarding",
@@ -1049,9 +831,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/user/send-phone-validation",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "onboarding",
@@ -1078,15 +858,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/user/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "onboarding",
-                        "user",
-                        "{{userId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "onboarding", "user", "{{userId}}"]
                     },
                     "description": "Atualiza dados no onboarding.\n\nResposta esperada (200 OK):\n{\"updated\": true}"
                   }
@@ -1107,15 +880,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/identity/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "onboarding",
-                        "identity",
-                        "{{userId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "onboarding", "identity", "{{userId}}"]
                     },
                     "description": "Inicia onboarding de identidade.\n\nResposta esperada (201 Created):\n{\"identityId\": \"id-123\"}"
                   }
@@ -1136,9 +902,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/identity/{{identityId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "onboarding",
@@ -1175,9 +939,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/onboarding/identity/ar/upload-document",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "onboarding",
@@ -1201,9 +963,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/api/users/user/onboarding/pending-data/{{userIdentityId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "users",
@@ -1236,9 +996,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/users/user/onboarding/update-specific-data/{{userIdentityId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "users",
@@ -1263,9 +1021,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/api/users/user/onboarding/status/{{userIdentityId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "users",
@@ -1290,9 +1046,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/api/users/user/onboarding/validate/{{userIdentityId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "users",
@@ -1317,9 +1071,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/api/users/user/onboarding/retry/{{userIdentityId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "users",
@@ -1350,14 +1102,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/api/auth/challenge",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "challenge"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "challenge"]
                     },
                     "description": "Gera um desafio criptografico para autenticacao biometrica.\n\nResposta esperada (200 OK):\n{\"challenge\": \"abc123xyz789...\"}"
                   }
@@ -1382,14 +1128,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/auth/verify",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "verify"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "verify"]
                     },
                     "description": "Verifica assinatura biometrica.\n\nResposta esperada (200 OK):\n{\"verified\": true}"
                   }
@@ -1414,14 +1154,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/auth/register-device",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "register-device"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "register-device"]
                     },
                     "description": "Registra dispositivo com suporte a biometria.\n\nResposta esperada (200 OK):\n{\"deviceId\": \"device-123\"}"
                   }
@@ -1446,14 +1180,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/auth/register-device-soft",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "register-device-soft"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "register-device-soft"]
                     },
                     "description": "Registra dispositivo com autenticacao simplificada.\n\nResposta esperada (200 OK):\n{\"deviceId\": \"device-456\"}"
                   }
@@ -1478,15 +1206,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/auth/device/send-sms-validation",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "device",
-                        "send-sms-validation"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "device", "send-sms-validation"]
                     },
                     "description": "Envia codigo SMS para validar dispositivo.\n\nResposta esperada (200 OK):\n{\"sent\": true}"
                   }
@@ -1511,9 +1232,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/auth/device/verify-sms-and-activate",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "api",
                         "auth",
@@ -1544,14 +1263,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/api/auth/revoke-device",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "revoke-device"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "revoke-device"]
                     },
                     "description": "Revoga dispositivo.\n\nResposta esperada (200 OK):\n{\"revoked\": true}"
                   }
@@ -1568,15 +1281,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/api/auth/devices/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "devices",
-                        "{{userId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "devices", "{{userId}}"]
                     },
                     "description": "Lista dispositivos registrados.\n\nResposta esperada (200 OK):\n{\"devices\": [{\"id\": \"device-123\", \"name\": \"Meu iPhone 14\"}]}"
                   }
@@ -1593,15 +1299,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/api/auth/device/health-check",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "api",
-                        "auth",
-                        "device",
-                        "health-check"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["api", "auth", "device", "health-check"]
                     },
                     "description": "Verifica saude do dispositivo.\n\nResposta esperada (200 OK):\n{\"healthy\": true}"
                   }
@@ -1640,15 +1339,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/transactions/pix/cronos/create",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "transactions",
-                    "pix",
-                    "cronos",
-                    "create"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["transactions", "pix", "cronos", "create"]
                 },
                 "description": "Cria uma transacao PIX via Cronos. Busca informacoes do destinatario na API Cronos e retorna dados completos da transacao.\n\nAutenticacao: Requer Bearer Token JWT\n\nCampos obrigatorios:\n- sourceAccountId (string, ID da conta de origem)\n- amount (number, minimo 0.01)\n- targetKeyType (string, enum: cpf|cnpj|email|phone|evp)\n- targetKeyValue (string, valor da chave PIX)\n\nCampos opcionais:\n- description (string, descricao da transferencia)\n\nResposta esperada (200 OK):\n{\n  \"id\": \"uuid-da-transacao\",\n  \"status\": \"pending\",\n  \"amount\": 100.50,\n  \"createdAt\": \"2024-01-12T10:00:00Z\",\n  \"targetName\": \"NOME DO DESTINATARIO\",\n  \"targetAlias\": \"cpf 12345678900\",\n  \"targetTaxDocumentNumber\": \"12345678900\",\n  \"targetTaxDocumentType\": \"CPF\",\n  \"targetBank\": \"Banco do Destinatario\",\n  \"targetAccountNumber\": \"{\\\"bank\\\":\\\"001\\\",\\\"agency\\\":\\\"0001\\\",\\\"number\\\":\\\"12345\\\"}\",\n  \"message\": \"200 transactions.success.created\",\n  \"code\": \"200 transactions.success.created\"\n}\n\nErros possiveis:\n- 400: Dados invalidos ou conta de origem invalida\n- 401: Nao autenticado"
               }
@@ -1673,15 +1365,8 @@
                 },
                 "url": {
                   "raw": "{{base_url}}/transactions/pix/cronos/confirm",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "transactions",
-                    "pix",
-                    "cronos",
-                    "confirm"
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": ["transactions", "pix", "cronos", "confirm"]
                 },
                 "description": "Confirma uma transacao PIX pendente e envia para processamento assincrono via SQS.\n\nAutenticacao: Requer Bearer Token JWT\n\nCampos obrigatorios:\n- transactionId (string, UUID da transacao a ser confirmada)\n\nResposta esperada (200 OK):\n{\n  \"id\": \"uuid-da-transacao\",\n  \"status\": \"process\",\n  \"message\": \"Transaction sent for processing\",\n  \"code\": \"200 transactions.success.confirmed\"\n}\n\nErros possiveis:\n- 400: Transacao nao encontrada ou nao esta em status pending\n- 401: Nao autenticado"
               }
@@ -1708,12 +1393,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/notifications",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "notifications"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["notifications"]
                     },
                     "description": "Lista notificacoes.\n\nResposta esperada (200 OK):\n{\"notifications\": [{\"id\": \"notif-1\", \"title\": \"Notificacao\"}]}"
                   }
@@ -1730,14 +1411,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/notifications/{{notificationId}}/read",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "notifications",
-                        "{{notificationId}}",
-                        "read"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["notifications", "{{notificationId}}", "read"]
                     },
                     "description": "Marca notificacao como lida.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -1754,13 +1429,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/notifications/read-all",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "notifications",
-                        "read-all"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["notifications", "read-all"]
                     },
                     "description": "Marca todas as notificacoes como lidas.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -1777,13 +1447,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/notifications/{{notificationId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "notifications",
-                        "{{notificationId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["notifications", "{{notificationId}}"]
                     },
                     "description": "Deleta notificacao.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -1808,13 +1473,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/notifications/push-token",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "notifications",
-                        "push-token"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["notifications", "push-token"]
                     },
                     "description": "Atualiza push token.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -1831,13 +1491,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/notifications/push-token",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "notifications",
-                        "push-token"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["notifications", "push-token"]
                     },
                     "description": "Retorna push token.\n\nResposta esperada (200 OK):\n{\"pushToken\": \"...\"}"
                   }
@@ -1854,13 +1509,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/notifications/test",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "notifications",
-                        "test"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["notifications", "test"]
                     },
                     "description": "Envia notificacao de teste.\n\nResposta esperada (200 OK):\n{\"sent\": true}"
                   }
@@ -1883,14 +1533,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/campaigns/validate/{{campaignCode}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "campaigns",
-                        "validate",
-                        "{{campaignCode}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["campaigns", "validate", "{{campaignCode}}"]
                     },
                     "description": "Valida codigo da campanha.\n\nResposta esperada (200 OK):\n{\"valid\": true, \"discount\": 20}"
                   }
@@ -1915,13 +1559,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/campaigns/validate",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "campaigns",
-                        "validate"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["campaigns", "validate"]
                     },
                     "description": "Valida codigo da campanha via body.\n\nResposta esperada (200 OK):\n{\"valid\": true}"
                   }
@@ -1946,13 +1585,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/campaigns/use",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "campaigns",
-                        "use"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["campaigns", "use"]
                     },
                     "description": "Usa uma campanha.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -1969,13 +1603,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/campaigns/my",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "campaigns",
-                        "my"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["campaigns", "my"]
                     },
                     "description": "Lista campanhas do usuario.\n\nResposta esperada (200 OK):\n{\"campaigns\": [{\"code\": \"PROMO123\", \"discount\": 10}]}"
                   }
@@ -2004,13 +1633,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/terms/{{serviceType}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "terms",
-                        "{{serviceType}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["terms", "{{serviceType}}"]
                     },
                     "description": "Verifica termos de um servico.\n\nParametros:\n- serviceType (path param)\n\nResposta esperada (200 OK):\n{\"accepted\": true, \"acceptedAt\": \"2024-01-01T00:00:00Z\"}"
                   }
@@ -2027,14 +1651,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/terms/acceptances/list",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "terms",
-                        "acceptances",
-                        "list"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["terms", "acceptances", "list"]
                     },
                     "description": "Lista aceites de termos.\n\nResposta esperada (200 OK):\n{\"acceptances\": [{\"serviceType\": \"terms\", \"acceptedAt\": \"2024-01-01T00:00:00Z\"}]}"
                   }
@@ -2051,14 +1669,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/terms/required/check",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "terms",
-                        "required",
-                        "check"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["terms", "required", "check"]
                     },
                     "description": "Verifica se ha termos requeridos.\n\nResposta esperada (200 OK):\n{\"required\": false}"
                   }
@@ -2083,13 +1695,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/terms/accept",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "terms",
-                        "accept"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["terms", "accept"]
                     },
                     "description": "Aceita termos.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -2112,13 +1719,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions/layout",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions",
-                        "layout"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["actions", "layout"]
                     },
                     "description": "Retorna layout de acoes.\n\nResposta esperada (200 OK):\n{\"layout\": [{\"id\": \"action-1\", \"title\": \"Transferencia\"}]}"
                   }
@@ -2135,13 +1737,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions/home",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions",
-                        "home"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["actions", "home"]
                     },
                     "description": "Retorna acoes da home.\n\nResposta esperada (200 OK):\n{\"actions\": [{\"id\": \"action-1\", \"title\": \"Transferencia\"}]}"
                   }
@@ -2158,13 +1755,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions/services",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions",
-                        "services"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["actions", "services"]
                     },
                     "description": "Retorna servicos disponiveis.\n\nResposta esperada (200 OK):\n{\"services\": [{\"id\": \"service-1\", \"title\": \"PIX\"}]}"
                   }
@@ -2181,13 +1773,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions/modules",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions",
-                        "modules"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["actions", "modules"]
                     },
                     "description": "Lista modulos disponiveis.\n\nResposta esperada (200 OK):\n{\"modules\": [{\"key\": \"pix\", \"name\": \"PIX\"}]}"
                   }
@@ -2204,15 +1791,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions/modules/{{moduleKey}}/enabled",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions",
-                        "modules",
-                        "{{moduleKey}}",
-                        "enabled"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["actions", "modules", "{{moduleKey}}", "enabled"]
                     },
                     "description": "Verifica se modulo esta ativado.\n\nResposta esperada (200 OK):\n{\"enabled\": true}"
                   }
@@ -2229,13 +1809,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions/filtered?section=home",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions",
-                        "filtered"
-                      ],
+                      "host": ["{{base_url}}"],
+                      "path": ["actions", "filtered"],
                       "query": [
                         {
                           "key": "section",
@@ -2258,14 +1833,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions/section/{{section}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions",
-                        "section",
-                        "{{section}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["actions", "section", "{{section}}"]
                     },
                     "description": "Retorna acoes de uma secao.\n\nResposta esperada (200 OK):\n{\"actions\": [...]}"
                   }
@@ -2282,12 +1851,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/actions",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "actions"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["actions"]
                     },
                     "description": "Lista todas as acoes.\n\nResposta esperada (200 OK):\n{\"actions\": [...]}"
                   }
@@ -2310,12 +1875,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/app-info",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "app-info"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["app-info"]
                     },
                     "description": "Retorna informacoes completas da aplicacao.\n\nResposta esperada (200 OK):\n{\"version\": \"1.0.0\", \"features\": {...}}"
                   }
@@ -2332,13 +1893,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/app-info/basic",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "app-info",
-                        "basic"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["app-info", "basic"]
                     },
                     "description": "Retorna informacoes basicas.\n\nResposta esperada (200 OK):\n{\"version\": \"1.0.0\"}"
                   }
@@ -2355,13 +1911,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/app-info/version?version=1.0.0",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "app-info",
-                        "version"
-                      ],
+                      "host": ["{{base_url}}"],
+                      "path": ["app-info", "version"],
                       "query": [
                         {
                           "key": "version",
@@ -2384,13 +1935,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/app-info/news",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "app-info",
-                        "news"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["app-info", "news"]
                     },
                     "description": "Retorna noticias da aplicacao.\n\nResposta esperada (200 OK):\n{\"news\": [{\"id\": \"news-1\", \"title\": \"Nova feature\"}]}"
                   }
@@ -2407,13 +1953,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/app-info/features",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "app-info",
-                        "features"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["app-info", "features"]
                     },
                     "description": "Retorna features disponiveis.\n\nResposta esperada (200 OK):\n{\"features\": {\"biometricAuth\": true, \"twoFactor\": true}}"
                   }
@@ -2452,14 +1993,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/auth/login",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "auth",
-                        "login"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "auth", "login"]
                     },
                     "description": "Autentica administrador.\n\nResposta esperada (200 OK):\n{\"token\": \"...\", \"admin\": {...}}"
                   }
@@ -2476,14 +2011,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/auth/me",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "auth",
-                        "me"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "auth", "me"]
                     },
                     "description": "Retorna dados do admin autenticado.\n\nResposta esperada (200 OK):\n{\"id\": \"admin-123\", \"email\": \"admin@unex.com\"}"
                   }
@@ -2506,14 +2035,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/roles",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "management",
-                        "roles"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "management", "roles"]
                     },
                     "description": "Lista papeis.\n\nResposta esperada (200 OK):\n{\"roles\": [...]}"
                   }
@@ -2530,9 +2053,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/roles/{{roleId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "management",
@@ -2563,14 +2084,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/roles",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "management",
-                        "roles"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "management", "roles"]
                     },
                     "description": "Cria novo papel.\n\nResposta esperada (201 Created):\n{\"roleId\": \"role-123\"}"
                   }
@@ -2595,9 +2110,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/roles/{{roleId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "management",
@@ -2620,9 +2133,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/roles/{{roleId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "management",
@@ -2657,14 +2168,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/users",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "management",
-                        "users"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "management", "users"]
                     },
                     "description": "Lista usuarios.\n\nResposta esperada (200 OK):\n{\"users\": [...]}"
                   }
@@ -2681,9 +2186,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/users/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "management",
@@ -2714,14 +2217,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/users",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "management",
-                        "users"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "management", "users"]
                     },
                     "description": "Cria novo usuario.\n\nResposta esperada (201 Created):\n{\"userId\": \"user-123\"}"
                   }
@@ -2746,9 +2243,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/users/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "management",
@@ -2771,9 +2266,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/management/users/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "management",
@@ -2802,13 +2295,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "clients"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "clients"]
                     },
                     "description": "Lista clientes.\n\nResposta esperada (200 OK):\n{\"clients\": [{\"id\": \"user-1\", \"name\": \"Cliente\"}]}"
                   }
@@ -2825,9 +2313,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/details",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "clients",
@@ -2850,9 +2336,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/accounts",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "clients",
@@ -2875,15 +2359,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/logs",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "clients",
-                        "{{clientId}}",
-                        "logs"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "clients", "{{clientId}}", "logs"]
                     },
                     "description": "Retorna logs do cliente.\n\nResposta esperada (200 OK):\n{\"logs\": [...]}"
                   }
@@ -2900,9 +2377,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/transactions",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "clients",
@@ -2933,14 +2408,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "clients",
-                        "{{clientId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "clients", "{{clientId}}"]
                     },
                     "description": "Atualiza cliente.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -2957,15 +2426,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/block",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "clients",
-                        "{{clientId}}",
-                        "block"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "clients", "{{clientId}}", "block"]
                     },
                     "description": "Bloqueia cliente.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -2982,9 +2444,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/unblock",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "clients",
@@ -3007,9 +2467,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/disable",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "clients",
@@ -3032,9 +2490,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/clients/{{clientId}}/enable",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "clients",
@@ -3069,14 +2525,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/onboarding/users",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "onboarding",
-                        "users"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "onboarding", "users"]
                     },
                     "description": "Lista usuarios em onboarding.\n\nResposta esperada (200 OK):\n{\"users\": [...]}"
                   }
@@ -3093,14 +2543,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/onboarding/pending",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "onboarding",
-                        "pending"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "onboarding", "pending"]
                     },
                     "description": "Lista usuarios pendentes de aprovacao.\n\nResposta esperada (200 OK):\n{\"users\": [...]}"
                   }
@@ -3117,9 +2561,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/onboarding/users/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "onboarding",
@@ -3150,9 +2592,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/onboarding/users/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "onboarding",
@@ -3175,9 +2615,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/onboarding/users/{{userId}}/approve",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "onboarding",
@@ -3201,9 +2639,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/onboarding/users/{{userId}}/reject",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "onboarding",
@@ -3227,9 +2663,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/onboarding/users/{{userId}}/request-correction",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "onboarding",
@@ -3259,13 +2693,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "actions"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "actions"]
                     },
                     "description": "Lista acoes.\n\nResposta esperada (200 OK):\n{\"actions\": [...]}"
                   }
@@ -3282,14 +2711,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions/groups",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "actions",
-                        "groups"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "actions", "groups"]
                     },
                     "description": "Lista grupos de acoes.\n\nResposta esperada (200 OK):\n{\"groups\": [...]}"
                   }
@@ -3306,14 +2729,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions/{{actionId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "actions",
-                        "{{actionId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "actions", "{{actionId}}"]
                     },
                     "description": "Retorna detalhes da acao.\n\nResposta esperada (200 OK):\n{\"action\": {...}}"
                   }
@@ -3338,13 +2755,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "actions"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "actions"]
                     },
                     "description": "Cria nova acao.\n\nResposta esperada (201 Created):\n{\"actionId\": \"action-123\"}"
                   }
@@ -3369,14 +2781,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions/{{actionId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "actions",
-                        "{{actionId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "actions", "{{actionId}}"]
                     },
                     "description": "Atualiza acao.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -3393,9 +2799,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions/{{actionId}}/toggle",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "actions",
@@ -3418,14 +2822,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions/{{actionId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "actions",
-                        "{{actionId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "actions", "{{actionId}}"]
                     },
                     "description": "Deleta acao.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -3450,14 +2848,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions/reorder",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "actions",
-                        "reorder"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "actions", "reorder"]
                     },
                     "description": "Reordena acoes.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -3474,9 +2866,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/actions/check/{{userId}}/{{actionName}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "actions",
@@ -3506,13 +2896,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config"]
                     },
                     "description": "Lista configuracoes.\n\nResposta esperada (200 OK):\n{\"configs\": [...]}"
                   }
@@ -3529,14 +2914,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/groups",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config",
-                        "groups"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config", "groups"]
                     },
                     "description": "Lista grupos de configuracao.\n\nResposta esperada (200 OK):\n{\"groups\": [...]}"
                   }
@@ -3553,15 +2932,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/key/{{key}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config",
-                        "key",
-                        "{{key}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config", "key", "{{key}}"]
                     },
                     "description": "Obtém configuracao por chave.\n\nResposta esperada (200 OK):\n{\"config\": {...}}"
                   }
@@ -3586,13 +2958,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config"]
                     },
                     "description": "Cria configuracao.\n\nResposta esperada (201 Created):\n{\"configId\": \"config-123\"}"
                   }
@@ -3617,14 +2984,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/{{configId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config",
-                        "{{configId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config", "{{configId}}"]
                     },
                     "description": "Atualiza configuracao.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -3641,14 +3002,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/{{configId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config",
-                        "{{configId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config", "{{configId}}"]
                     },
                     "description": "Deleta configuracao.\n\nResposta esperada (200 OK):\n{\"success\": true}"
                   }
@@ -3665,14 +3020,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/modules",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config",
-                        "modules"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config", "modules"]
                     },
                     "description": "Lista modulos.\n\nResposta esperada (200 OK):\n{\"modules\": [...]}"
                   }
@@ -3689,9 +3038,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/modules/{{moduleId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "system-config",
@@ -3722,14 +3069,8 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/modules",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "system-config",
-                        "modules"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "system-config", "modules"]
                     },
                     "description": "Cria modulo.\n\nResposta esperada (201 Created):\n{\"moduleId\": \"mod-123\"}"
                   }
@@ -3754,9 +3095,7 @@
                     },
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/modules/{{moduleId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "system-config",
@@ -3779,9 +3118,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/modules/{{moduleId}}/toggle",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "system-config",
@@ -3805,9 +3142,7 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/system-config/modules/{{moduleId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
+                      "host": ["{{base_url}}"],
                       "path": [
                         "backoffice",
                         "system-config",
@@ -3836,13 +3171,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/logs",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "logs"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "logs"]
                     },
                     "description": "Lista logs do sistema.\n\nResposta esperada (200 OK):\n{\"logs\": [...]}"
                   }
@@ -3859,14 +3189,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/logs/stats",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "logs",
-                        "stats"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "logs", "stats"]
                     },
                     "description": "Retorna estatisticas de logs.\n\nResposta esperada (200 OK):\n{\"stats\": {...}}"
                   }
@@ -3883,14 +3207,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/logs/actions",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "logs",
-                        "actions"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "logs", "actions"]
                     },
                     "description": "Lista acoes registradas.\n\nResposta esperada (200 OK):\n{\"actions\": [...]}"
                   }
@@ -3907,15 +3225,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/logs/user/{{userId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "logs",
-                        "user",
-                        "{{userId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "logs", "user", "{{userId}}"]
                     },
                     "description": "Lista logs de um usuario.\n\nResposta esperada (200 OK):\n{\"logs\": [...]}"
                   }
@@ -3932,14 +3243,8 @@
                     ],
                     "url": {
                       "raw": "{{base_url}}/backoffice/logs/{{logId}}",
-                      "host": [
-                        "{{base_url}}"
-                      ],
-                      "path": [
-                        "backoffice",
-                        "logs",
-                        "{{logId}}"
-                      ]
+                      "host": ["{{base_url}}"],
+                      "path": ["backoffice", "logs", "{{logId}}"]
                     },
                     "description": "Retorna log especifico.\n\nResposta esperada (200 OK):\n{\"log\": {...}}"
                   }
@@ -3961,12 +3266,8 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "health"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["health"]
             },
             "description": "Verifica o status de saude geral da API e seus componentes.\n\nResposta esperada (200 OK):\n{\"status\": \"ok\"}\n\nUso: Monitoramento de saude da API"
           }
@@ -3984,12 +3285,8 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                ""
-              ]
+              "host": ["{{base_url}}"],
+              "path": [""]
             },
             "description": "Retorna uma mensagem de saudacao para confirmar que a API esta acessivel. Nao requer autenticacao.\n\nResposta esperada (200 OK):\n{\"message\": \"API funcionando\", \"version\": \"1.0.0\"}\n\nUso: Teste inicial de conectividade com a API"
           }

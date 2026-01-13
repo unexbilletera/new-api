@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { randomUUID, randomBytes } from 'crypto';
 const bcrypt = require('bcrypt');
 
@@ -15,9 +19,19 @@ import { SmsService } from '../../../shared/sms/sms.service';
 import { EmailService } from '../../../shared/email/email.service';
 import { SignupDto } from '../dto/signup.dto';
 import { SigninDto } from '../dto/signin.dto';
-import { SendEmailValidationDto, VerifyEmailCodeDto } from '../dto/email-validation.dto';
-import { SendPhoneValidationDto, VerifyPhoneCodeDto } from '../dto/phone-validation.dto';
-import { ForgotPasswordDto, VerifyPasswordDto, UnlockAccountDto } from '../dto/password-recovery.dto';
+import {
+  SendEmailValidationDto,
+  VerifyEmailCodeDto,
+} from '../dto/email-validation.dto';
+import {
+  SendPhoneValidationDto,
+  VerifyPhoneCodeDto,
+} from '../dto/phone-validation.dto';
+import {
+  ForgotPasswordDto,
+  VerifyPasswordDto,
+  UnlockAccountDto,
+} from '../dto/password-recovery.dto';
 
 @Injectable()
 export class AuthService {
@@ -136,7 +150,11 @@ export class AuthService {
     let deviceRequired = false;
     if (dto.deviceIdentifier) {
       const existingDevice = await this.prisma.devices.findFirst({
-        where: { userId: user.id, deviceIdentifier: dto.deviceIdentifier, status: 'active' },
+        where: {
+          userId: user.id,
+          deviceIdentifier: dto.deviceIdentifier,
+          status: 'active',
+        },
       });
       deviceRequired = !existingDevice;
     } else {
@@ -183,12 +201,17 @@ export class AuthService {
     };
   }
 
-  async signin(dto: SigninDto, requestContext?: { ipAddress?: string; userAgent?: string }) {
+  async signin(
+    dto: SigninDto,
+    requestContext?: { ipAddress?: string; userAgent?: string },
+  ) {
     try {
       this.systemVersionService.assertVersionValid(dto.systemVersion);
     } catch (versionError) {
       throw new BadRequestException(
-        versionError instanceof Error ? versionError.message : 'users.errors.invalidSystemVersion',
+        versionError instanceof Error
+          ? versionError.message
+          : 'users.errors.invalidSystemVersion',
       );
     }
 
@@ -199,7 +222,8 @@ export class AuthService {
     }
 
     const usernameRegex = /^[A-Za-z0-9]{1,}[\-\_\.]?[A-Za-z0-9]{4,}$/;
-    const emailRegex = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const emailRegex =
+      /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
     if (identifier.length > 255) {
       throw new BadRequestException('users.errors.invalidUsername');
@@ -217,7 +241,9 @@ export class AuthService {
       where: {
         ...where,
         status: { in: ['pending', 'enable', 'error'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
@@ -243,7 +269,10 @@ export class AuthService {
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
-    const isPasswordValid = await PasswordHelper.compare(dto.password, user.password);
+    const isPasswordValid = await PasswordHelper.compare(
+      dto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
       await this.accessLogService.logFailure({
@@ -257,7 +286,11 @@ export class AuthService {
     let deviceRequired = false;
     if (dto.deviceIdentifier) {
       const activeDevice = await this.prisma.devices.findFirst({
-        where: { userId: user.id, deviceIdentifier: dto.deviceIdentifier, status: 'active' },
+        where: {
+          userId: user.id,
+          deviceIdentifier: dto.deviceIdentifier,
+          status: 'active',
+        },
       });
       deviceRequired = !activeDevice;
     } else {
@@ -308,11 +341,17 @@ export class AuthService {
           id: acc.id,
           type: acc.type || '',
           status: acc.status || '',
-          balance: acc.balance ? (typeof acc.balance === 'string' ? acc.balance : acc.balance.toString()) : '0',
+          balance: acc.balance
+            ? typeof acc.balance === 'string'
+              ? acc.balance
+              : acc.balance.toString()
+            : '0',
         })),
       });
     } catch (syncError: any) {
-      this.logger.warn('Cronos sync error (non-blocking)', { error: syncError?.message });
+      this.logger.warn('Cronos sync error (non-blocking)', {
+        error: syncError?.message,
+      });
     }
 
     await this.accessLogService.logSuccess({
@@ -364,7 +403,11 @@ export class AuthService {
 
   async verifyEmailCode(dto: VerifyEmailCodeDto) {
     try {
-      const result = await this.emailService.verifyCode(dto.email, dto.code, true);
+      const result = await this.emailService.verifyCode(
+        dto.email,
+        dto.code,
+        true,
+      );
 
       const user = await this.prisma.users.findFirst({
         where: { email: this.emailService.normalizeEmail(dto.email) },
@@ -405,7 +448,11 @@ export class AuthService {
 
   async verifyPhoneCode(dto: VerifyPhoneCodeDto) {
     try {
-      const result = await this.smsService.verifyCode(dto.phone, dto.code, true);
+      const result = await this.smsService.verifyCode(
+        dto.phone,
+        dto.code,
+        true,
+      );
 
       const user = await this.prisma.users.findFirst({
         where: { phone: this.smsService.normalizePhone(dto.phone) },
@@ -446,7 +493,11 @@ export class AuthService {
       data: { recovery: hashed, updatedAt: new Date() },
     });
 
-    await this.notificationService.sendPasswordRecovery(email, code, user.language);
+    await this.notificationService.sendPasswordRecovery(
+      email,
+      code,
+      user.language,
+    );
 
     return {
       message: 'Password reset code sent to email',
@@ -484,12 +535,16 @@ export class AuthService {
     };
   }
 
-  async unlockAccount(dto: UnlockAccountDto, requestContext?: { ipAddress?: string; userAgent?: string }) {
+  async unlockAccount(
+    dto: UnlockAccountDto,
+    requestContext?: { ipAddress?: string; userAgent?: string },
+  ) {
     if (!dto.id || dto.id.length > 255) {
       throw new BadRequestException('users.errors.invalidId');
     }
 
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
     if (!uuidRegex.test(dto.id)) {
       throw new BadRequestException('users.errors.invalidId');
     }
@@ -502,7 +557,9 @@ export class AuthService {
       where: {
         id: dto.id,
         status: { in: ['pending', 'enable', 'error', 'disable'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
@@ -514,7 +571,10 @@ export class AuthService {
       throw new UnauthorizedException('users.errors.invalidUsernameOrPassword');
     }
 
-    const isPasswordValid = await PasswordHelper.compare(dto.password.trim(), user.password);
+    const isPasswordValid = await PasswordHelper.compare(
+      dto.password.trim(),
+      user.password,
+    );
 
     if (!isPasswordValid) {
       await this.accessLogService.logFailure({
@@ -529,7 +589,9 @@ export class AuthService {
       this.systemVersionService.assertVersionValid(dto.systemVersion);
     } catch (versionError) {
       throw new BadRequestException(
-        versionError instanceof Error ? versionError.message : 'users.errors.invalidSystemVersion',
+        versionError instanceof Error
+          ? versionError.message
+          : 'users.errors.invalidSystemVersion',
       );
     }
 

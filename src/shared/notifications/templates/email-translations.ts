@@ -28,7 +28,8 @@ const translations: Record<Lang, Record<TemplateKey, Copy>> = {
   },
   pt: {
     userEmailVerification: {
-      subject: 'Você modificou seu email na Unex, este é seu código de segurança',
+      subject:
+        'Você modificou seu email na Unex, este é seu código de segurança',
       message: 'o código de segurança para validar sua conta é:',
       action: 'Ir',
     },

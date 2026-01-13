@@ -46,8 +46,7 @@ export class RequestTrackerInterceptor implements NestInterceptor {
           if (data && typeof data === 'object') {
             if ('code' in data && typeof data.code === 'string') {
               responseCode = data.code;
-            }
-            else if ('error' in data && typeof data.error === 'string') {
+            } else if ('error' in data && typeof data.error === 'string') {
               responseCode = data.error;
             }
           }
@@ -71,7 +70,10 @@ export class RequestTrackerInterceptor implements NestInterceptor {
           if (error?.response) {
             const errorResponse = error.response;
             if (typeof errorResponse === 'object' && errorResponse !== null) {
-              if ('error' in errorResponse && typeof errorResponse.error === 'string') {
+              if (
+                'error' in errorResponse &&
+                typeof errorResponse.error === 'string'
+              ) {
                 errorCode = errorResponse.error;
               } else if ('code' in errorResponse) {
                 errorCode = errorResponse.code;
@@ -85,7 +87,9 @@ export class RequestTrackerInterceptor implements NestInterceptor {
 
           this.logger.error(
             'Request failed',
-            error instanceof Error ? error : new Error(error?.message || 'Unknown error'),
+            error instanceof Error
+              ? error
+              : new Error(error?.message || 'Unknown error'),
             {
               method,
               url,
@@ -102,4 +106,3 @@ export class RequestTrackerInterceptor implements NestInterceptor {
     );
   }
 }
-

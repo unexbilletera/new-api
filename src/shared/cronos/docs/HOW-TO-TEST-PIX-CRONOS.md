@@ -45,17 +45,20 @@ aws sqs create-queue \
 Worker processes SQS queue messages in background. Run it in a separate terminal:
 
 **Development:**
+
 ```bash
 npm run start:worker
 ```
 
 **Production:**
+
 ```bash
 npm run build:prod
 npm run start:prod:worker
 ```
 
 Worker will:
+
 - Receive messages from SQS queue
 - Process PIX Cronos transaction jobs
 - Update transaction status in database
@@ -65,6 +68,7 @@ Worker will:
 ### 4. Verify it's working
 
 When worker is running, you should see logs like:
+
 ```
 [INFO] Worker iniciado. Aguardando mensagens da fila SQS...
 [INFO] Worker iniciando...
@@ -72,6 +76,7 @@ When worker is running, you should see logs like:
 ```
 
 When a message is processed:
+
 ```
 [INFO] Processando job: pix_cronos_create (MessageId: ...)
 [INFO] PIX Cronos create job processed successfully for transaction: ...
@@ -84,16 +89,18 @@ When a message is processed:
 **POST** `/transactions/pix/cronos/create`
 
 **Headers:**
+
 ```
 Authorization: Bearer {your_jwt_token}
 Content-Type: application/json
 ```
 
 **Body (JSON):**
+
 ```json
 {
   "sourceAccountId": "uuid-da-conta-origem",
-  "amount": 100.50,
+  "amount": 100.5,
   "targetKeyType": "cpf",
   "targetKeyValue": "12345678900",
   "description": "Transferência PIX teste"
@@ -101,6 +108,7 @@ Content-Type: application/json
 ```
 
 **Fields:**
+
 - `sourceAccountId` (string, required): Source account ID
 - `amount` (number, required): Transfer amount (minimum 0.01)
 - `targetKeyType` (string, required): PIX key type (`cpf`, `cnpj`, `email`, `phone`, `evp`)
@@ -108,6 +116,7 @@ Content-Type: application/json
 - `description` (string, optional): Transfer description
 
 **Success Response (200):**
+
 ```json
 {
   "id": "uuid-da-transacao",
@@ -120,6 +129,7 @@ Content-Type: application/json
 ```
 
 **Error Response (400):**
+
 ```json
 {
   "error": "400 transactions.errors.invalidSourceAccount",
@@ -133,12 +143,14 @@ Content-Type: application/json
 **POST** `/transactions/pix/cronos/confirm`
 
 **Headers:**
+
 ```
 Authorization: Bearer {your_jwt_token}
 Content-Type: application/json
 ```
 
 **Body (JSON):**
+
 ```json
 {
   "transactionId": "uuid-da-transacao-criada"
@@ -146,9 +158,11 @@ Content-Type: application/json
 ```
 
 **Fields:**
+
 - `transactionId` (string, required): ID of previously created transaction
 
 **Success Response (200):**
+
 ```json
 {
   "id": "uuid-da-transacao",
@@ -159,6 +173,7 @@ Content-Type: application/json
 ```
 
 **Error Response (404):**
+
 ```json
 {
   "error": "400 transactions.errors.invalidId",
@@ -174,6 +189,7 @@ Content-Type: application/json
 **POST** `/test/auth/login`
 
 **Body:**
+
 ```json
 {
   "email": "usuario@exemplo.com",
@@ -182,6 +198,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -201,15 +218,17 @@ Copy the `token` value to use in next endpoints.
    - `Authorization`: `Bearer {paste_token_here}`
    - `Content-Type`: `application/json`
 4. In **Body** tab, select **raw** and **JSON**, paste:
+
 ```json
 {
   "sourceAccountId": "uuid-da-sua-conta",
-  "amount": 50.00,
+  "amount": 50.0,
   "targetKeyType": "cpf",
   "targetKeyValue": "12345678900",
   "description": "Teste PIX"
 }
 ```
+
 5. Click **Send**
 
 ### Step 3: Confirm Transaction
@@ -221,11 +240,13 @@ Copy the `token` value to use in next endpoints.
    - `Authorization`: `Bearer {paste_token_here}`
    - `Content-Type`: `application/json`
 5. In **Body** tab, select **raw** and **JSON**, paste:
+
 ```json
 {
   "transactionId": "uuid-da-transacao-do-passo-2"
 }
 ```
+
 6. Click **Send**
 
 ## Postman Environment Variables
@@ -242,13 +263,13 @@ Then use `{{base_url}}`, `{{auth_token}}` and `{{transaction_id}}` in your reque
 
 ## Supported PIX Key Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `cpf` | CPF (11 digits) | `12345678900` |
-| `cnpj` | CNPJ (14 digits) | `12345678000190` |
-| `email` | Valid email | `pessoa@exemplo.com` |
-| `phone` | Phone (+5511999999999) | `+5511999999999` |
-| `evp` | Random key (UUID) | `123e4567-e89b-12d3-a456-426614174000` |
+| Type    | Description            | Example                                |
+| ------- | ---------------------- | -------------------------------------- |
+| `cpf`   | CPF (11 digits)        | `12345678900`                          |
+| `cnpj`  | CNPJ (14 digits)       | `12345678000190`                       |
+| `email` | Valid email            | `pessoa@exemplo.com`                   |
+| `phone` | Phone (+5511999999999) | `+5511999999999`                       |
+| `evp`   | Random key (UUID)      | `123e4567-e89b-12d3-a456-426614174000` |
 
 ## Status Codes
 
@@ -262,14 +283,17 @@ Then use `{{base_url}}`, `{{auth_token}}` and `{{transaction_id}}` in your reque
 ## Common Errors
 
 ### 401 Unauthorized
+
 **Cause**: Invalid or expired token  
 **Solution**: Login again to get a new token
 
 ### 400 Bad Request
+
 **Cause**: Invalid data (non-existent account, invalid amount, etc.)  
 **Solution**: Verify data sent in body
 
 ### 404 Not Found
+
 **Cause**: Transaction not found  
 **Solution**: Verify `transactionId` is correct
 

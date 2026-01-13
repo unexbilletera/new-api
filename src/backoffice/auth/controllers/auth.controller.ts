@@ -65,7 +65,8 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get authenticated user data',
-    description: 'Returns the data of the currently authenticated backoffice user',
+    description:
+      'Returns the data of the currently authenticated backoffice user',
   })
   @ApiResponse({
     status: 200,

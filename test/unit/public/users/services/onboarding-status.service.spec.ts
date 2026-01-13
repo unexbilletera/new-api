@@ -167,7 +167,7 @@ describe('OnboardingStatusService', () => {
       const userId = 'user-123';
 
       service.skipStep.mockRejectedValue(
-        new Error('Cannot skip required step')
+        new Error('Cannot skip required step'),
       );
 
       await expect(service.skipStep(userId, 'biometric')).rejects.toThrow();

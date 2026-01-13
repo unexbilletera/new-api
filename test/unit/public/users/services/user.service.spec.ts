@@ -44,7 +44,11 @@ import { AppConfigService } from '../../../../../src/shared/config/config.servic
 import { ValidaService } from '../../../../../src/shared/valida/valida.service';
 import { AccessLogService } from '../../../../../src/shared/access-log/access-log.service';
 import { EmailService } from '../../../../../src/shared/email/email.service';
-import { createPrismaMock, createLoggerServiceMock, mockActiveUser } from '../../../../utils';
+import {
+  createPrismaMock,
+  createLoggerServiceMock,
+  mockActiveUser,
+} from '../../../../utils';
 
 /**
  * @testSuite UserService
@@ -96,7 +100,9 @@ describe('UserService', () => {
      */
     it('should find user by ID', async () => {
       const userId = 'user-123';
-      const findByIdSpy = jest.spyOn(service, 'findById').mockResolvedValue(mockActiveUser);
+      const findByIdSpy = jest
+        .spyOn(service, 'findById')
+        .mockResolvedValue(mockActiveUser);
 
       const result = await service.findById(userId);
 
@@ -117,9 +123,9 @@ describe('UserService', () => {
      */
     it('should throw error when user not found', async () => {
       const userId = 'invalid-id';
-      const findByIdSpy = jest.spyOn(service, 'findById').mockRejectedValue(
-        new Error('User not found')
-      );
+      const findByIdSpy = jest
+        .spyOn(service, 'findById')
+        .mockRejectedValue(new Error('User not found'));
 
       await expect(service.findById(userId)).rejects.toThrow('User not found');
     });
@@ -140,7 +146,9 @@ describe('UserService', () => {
      */
     it('should find user by email', async () => {
       const email = 'test@example.com';
-      const findByEmailSpy = jest.spyOn(service, 'findByEmail').mockResolvedValue(mockActiveUser);
+      const findByEmailSpy = jest
+        .spyOn(service, 'findByEmail')
+        .mockResolvedValue(mockActiveUser);
 
       const result = await service.findByEmail(email);
 
@@ -159,7 +167,9 @@ describe('UserService', () => {
      */
     it('should return null when email not found', async () => {
       const email = 'nonexistent@example.com';
-      const findByEmailSpy = jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
+      const findByEmailSpy = jest
+        .spyOn(service, 'findByEmail')
+        .mockResolvedValue(null);
 
       const result = await service.findByEmail(email);
 
@@ -188,8 +198,14 @@ describe('UserService', () => {
         lastName: 'Doe',
       };
 
-      const createdUser = { id: 'user-new', ...createDto, createdAt: new Date() };
-      const createSpy = jest.spyOn(service, 'create').mockResolvedValue(createdUser);
+      const createdUser = {
+        id: 'user-new',
+        ...createDto,
+        createdAt: new Date(),
+      };
+      const createSpy = jest
+        .spyOn(service, 'create')
+        .mockResolvedValue(createdUser);
 
       const result = await service.create(createDto);
 
@@ -214,11 +230,13 @@ describe('UserService', () => {
         password: 'Password123!',
       };
 
-      const createSpy = jest.spyOn(service, 'create').mockRejectedValue(
-        new Error('Email already exists')
-      );
+      const createSpy = jest
+        .spyOn(service, 'create')
+        .mockRejectedValue(new Error('Email already exists'));
 
-      await expect(service.create(createDto)).rejects.toThrow('Email already exists');
+      await expect(service.create(createDto)).rejects.toThrow(
+        'Email already exists',
+      );
     });
   });
 
@@ -243,7 +261,9 @@ describe('UserService', () => {
       };
 
       const updatedUser = { ...mockActiveUser, ...updateDto };
-      const updateSpy = jest.spyOn(service, 'update').mockResolvedValue(updatedUser);
+      const updateSpy = jest
+        .spyOn(service, 'update')
+        .mockResolvedValue(updatedUser);
 
       const result = await service.update(userId, updateDto);
 
@@ -264,9 +284,9 @@ describe('UserService', () => {
       const userId = 'invalid-id';
       const updateDto = { firstName: 'Updated' };
 
-      const updateSpy = jest.spyOn(service, 'update').mockRejectedValue(
-        new Error('User not found')
-      );
+      const updateSpy = jest
+        .spyOn(service, 'update')
+        .mockRejectedValue(new Error('User not found'));
 
       await expect(service.update(userId, updateDto)).rejects.toThrow();
     });
@@ -290,7 +310,9 @@ describe('UserService', () => {
       const newEmail = 'newemail@example.com';
 
       const updatedUser = { ...mockActiveUser, email: newEmail };
-      const updateEmailSpy = jest.spyOn(service, 'updateEmail').mockResolvedValue(updatedUser);
+      const updateEmailSpy = jest
+        .spyOn(service, 'updateEmail')
+        .mockResolvedValue(updatedUser);
 
       const result = await service.updateEmail(userId, newEmail);
 
@@ -311,11 +333,13 @@ describe('UserService', () => {
       const userId = 'user-123';
       const existingEmail = 'existing@example.com';
 
-      const updateEmailSpy = jest.spyOn(service, 'updateEmail').mockRejectedValue(
-        new Error('Email already in use')
-      );
+      const updateEmailSpy = jest
+        .spyOn(service, 'updateEmail')
+        .mockRejectedValue(new Error('Email already in use'));
 
-      await expect(service.updateEmail(userId, existingEmail)).rejects.toThrow();
+      await expect(
+        service.updateEmail(userId, existingEmail),
+      ).rejects.toThrow();
     });
   });
 
@@ -334,7 +358,9 @@ describe('UserService', () => {
      */
     it('should delete user', async () => {
       const userId = 'user-123';
-      const deleteSpy = jest.spyOn(service, 'delete').mockResolvedValue(mockActiveUser);
+      const deleteSpy = jest
+        .spyOn(service, 'delete')
+        .mockResolvedValue(mockActiveUser);
 
       const result = await service.delete(userId);
 
@@ -352,9 +378,9 @@ describe('UserService', () => {
      */
     it('should throw error when user not found during delete', async () => {
       const userId = 'invalid-id';
-      const deleteSpy = jest.spyOn(service, 'delete').mockRejectedValue(
-        new Error('User not found')
-      );
+      const deleteSpy = jest
+        .spyOn(service, 'delete')
+        .mockRejectedValue(new Error('User not found'));
 
       await expect(service.delete(userId)).rejects.toThrow();
     });

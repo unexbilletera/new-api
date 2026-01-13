@@ -14,7 +14,10 @@ import {
 
 @Injectable()
 export class ActionsAppService {
-  constructor(private prisma: PrismaService) {}  async getHomeActions(activeOnly = true): Promise<ResponseActionResponseDto[]> {
+  constructor(private prisma: PrismaService) {}
+  async getHomeActions(
+    activeOnly = true,
+  ): Promise<ResponseActionResponseDto[]> {
     const where: any = {};
 
     if (activeOnly) {
@@ -27,7 +30,10 @@ export class ActionsAppService {
     });
 
     return actions.map((a) => this.mapHomeAction(a));
-  }  async getServicesActions(activeOnly = true): Promise<ResponseActionResponseDto[]> {
+  }
+  async getServicesActions(
+    activeOnly = true,
+  ): Promise<ResponseActionResponseDto[]> {
     const where: any = {};
 
     if (activeOnly) {
@@ -40,7 +46,8 @@ export class ActionsAppService {
     });
 
     return actions.map((a) => this.mapServiceAction(a));
-  }  async getActionsBySection(
+  }
+  async getActionsBySection(
     section: ActionSection,
     activeOnly = true,
   ): Promise<ResponseActionResponseDto[]> {
@@ -66,7 +73,8 @@ export class ActionsAppService {
     });
 
     return actions.map((a) => this.mapHomeAction(a));
-  }  async getModules(enabledOnly = false): Promise<ModuleResponseDto[]> {
+  }
+  async getModules(enabledOnly = false): Promise<ModuleResponseDto[]> {
     const where: any = {};
 
     if (enabledOnly) {
@@ -85,7 +93,8 @@ export class ActionsAppService {
       description: undefined,
       enabled: m.isActive === 1,
     }));
-  }  async isModuleEnabled(moduleKey: string): Promise<boolean> {
+  }
+  async isModuleEnabled(moduleKey: string): Promise<boolean> {
     const module = await this.prisma.modules.findFirst({
       where: {
         name: { contains: moduleKey },
@@ -94,7 +103,8 @@ export class ActionsAppService {
     });
 
     return module?.isActive === 1;
-  }  async getFullLayout(): Promise<ResponseLayoutResponseDto> {
+  }
+  async getFullLayout(): Promise<ResponseLayoutResponseDto> {
     const [homeActions, servicesActions, modules] = await Promise.all([
       this.getHomeActions(true),
       this.getServicesActions(true),
@@ -122,7 +132,8 @@ export class ActionsAppService {
       servicesActions,
       modules,
     };
-  }  async getActionsWithModuleFilter(): Promise<ResponseActionResponseDto[]> {
+  }
+  async getActionsWithModuleFilter(): Promise<ResponseActionResponseDto[]> {
     const [homeActions, servicesActions, modules] = await Promise.all([
       this.getHomeActions(true),
       this.getServicesActions(true),
@@ -142,7 +153,8 @@ export class ActionsAppService {
     });
 
     return [...filteredHomeActions, ...filteredServicesActions];
-  }  private mapHomeAction(action: any): ResponseActionResponseDto {
+  }
+  private mapHomeAction(action: any): ResponseActionResponseDto {
     return {
       id: action.id,
       section: action.section || ActionSection.HOME,
@@ -154,14 +166,16 @@ export class ActionsAppService {
       iconUrl: undefined,
       color: undefined,
       route: action.actionValue || undefined,
-      externalUrl: action.actionType === 'external_url' ? action.actionValue : undefined,
+      externalUrl:
+        action.actionType === 'external_url' ? action.actionValue : undefined,
       order: action.order || 0,
       active: action.enabled !== false,
       requiresKyc: false,
       requiresAuth: true,
       moduleKey: action.moduleName || undefined,
     };
-  }  private mapServiceAction(action: any): ResponseActionResponseDto {
+  }
+  private mapServiceAction(action: any): ResponseActionResponseDto {
     return {
       id: action.id,
       section: ActionSection.SERVICES,
@@ -173,7 +187,8 @@ export class ActionsAppService {
       iconUrl: undefined,
       color: undefined,
       route: action.actionValue || undefined,
-      externalUrl: action.actionType === 'external_url' ? action.actionValue : undefined,
+      externalUrl:
+        action.actionType === 'external_url' ? action.actionValue : undefined,
       order: action.order || 0,
       active: action.enabled !== false,
       requiresKyc: false,

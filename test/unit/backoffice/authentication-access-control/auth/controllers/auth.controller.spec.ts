@@ -107,7 +107,9 @@ describe('BackofficeAuthController', () => {
       const dto = { email: 'admin@example.com', password: 'wrongpass' };
       service.login.mockRejectedValue(new Error('Invalid credentials'));
 
-      await expect(controller.login(dto)).rejects.toThrow('Invalid credentials');
+      await expect(controller.login(dto)).rejects.toThrow(
+        'Invalid credentials',
+      );
     });
 
     it('should return 200 OK status code (via HttpCode decorator)', async () => {
@@ -134,7 +136,9 @@ describe('BackofficeAuthController', () => {
       const result = await controller.getMe(mockCurrentUserPayload);
 
       expect(result).toEqual(mockUserResponse);
-      expect(service.getUserById).toHaveBeenCalledWith(mockCurrentUserPayload.id);
+      expect(service.getUserById).toHaveBeenCalledWith(
+        mockCurrentUserPayload.id,
+      );
     });
 
     it('should return current user information', async () => {
@@ -161,7 +165,9 @@ describe('BackofficeAuthController', () => {
     it('should propagate service errors', async () => {
       service.getUserById.mockRejectedValue(new Error('User not found'));
 
-      await expect(controller.getMe(mockCurrentUserPayload)).rejects.toThrow('User not found');
+      await expect(controller.getMe(mockCurrentUserPayload)).rejects.toThrow(
+        'User not found',
+      );
     });
 
     it('should handle different admin roles', async () => {

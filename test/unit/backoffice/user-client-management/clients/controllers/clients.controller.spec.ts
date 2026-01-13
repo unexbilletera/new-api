@@ -39,7 +39,12 @@ describe('ClientsController', () => {
       const query = { search: '', status: 'active' };
       const response = {
         data: [
-          { id: mockClientId, name: 'Client 1', email: 'client1@example.com', status: 'active' },
+          {
+            id: mockClientId,
+            name: 'Client 1',
+            email: 'client1@example.com',
+            status: 'active',
+          },
         ],
         total: 1,
         page: 1,
@@ -57,8 +62,18 @@ describe('ClientsController', () => {
       const query = { page: 1, limit: 10 };
       const response = {
         data: [
-          { id: 'client-1', name: 'Client 1', email: 'client1@example.com', status: 'active' },
-          { id: 'client-2', name: 'Client 2', email: 'client2@example.com', status: 'inactive' },
+          {
+            id: 'client-1',
+            name: 'Client 1',
+            email: 'client1@example.com',
+            status: 'active',
+          },
+          {
+            id: 'client-2',
+            name: 'Client 2',
+            email: 'client2@example.com',
+            status: 'inactive',
+          },
         ],
         total: 2,
         page: 1,
@@ -122,7 +137,9 @@ describe('ClientsController', () => {
     it('should propagate service errors', async () => {
       service.getDetails.mockRejectedValue(new Error('Client not found'));
 
-      await expect(controller.getDetails(mockClientId)).rejects.toThrow('Client not found');
+      await expect(controller.getDetails(mockClientId)).rejects.toThrow(
+        'Client not found',
+      );
     });
   });
 
@@ -199,7 +216,10 @@ describe('ClientsController', () => {
       const result = await controller.getLogs(mockClientId, page, limit);
 
       expect(result).toEqual(response);
-      expect(service.getLogs).toHaveBeenCalledWith(mockClientId, { page, limit });
+      expect(service.getLogs).toHaveBeenCalledWith(mockClientId, {
+        page,
+        limit,
+      });
     });
 
     it('should return paginated access logs', async () => {
@@ -258,10 +278,17 @@ describe('ClientsController', () => {
       };
       service.getTransactions.mockResolvedValue(response as any);
 
-      const result = await controller.getTransactions(mockClientId, page, limit);
+      const result = await controller.getTransactions(
+        mockClientId,
+        page,
+        limit,
+      );
 
       expect(result).toEqual(response);
-      expect(service.getTransactions).toHaveBeenCalledWith(mockClientId, { page, limit });
+      expect(service.getTransactions).toHaveBeenCalledWith(mockClientId, {
+        page,
+        limit,
+      });
     });
 
     it('should return paginated transaction history', async () => {
@@ -301,7 +328,11 @@ describe('ClientsController', () => {
   describe('update', () => {
     it('should delegate to service', async () => {
       const dto = { name: 'Updated Name', email: 'updated@example.com' };
-      const response = { id: mockClientId, name: 'Updated Name', email: 'updated@example.com' };
+      const response = {
+        id: mockClientId,
+        name: 'Updated Name',
+        email: 'updated@example.com',
+      };
       service.update.mockResolvedValue(response as any);
 
       const result = await controller.update(mockClientId, dto);
@@ -312,7 +343,11 @@ describe('ClientsController', () => {
 
     it('should return updated client data', async () => {
       const dto = { name: 'New Name' };
-      const response = { id: mockClientId, name: 'New Name', email: 'client@example.com' };
+      const response = {
+        id: mockClientId,
+        name: 'New Name',
+        email: 'client@example.com',
+      };
       service.update.mockResolvedValue(response as any);
 
       const result = await controller.update(mockClientId, dto);
@@ -324,7 +359,9 @@ describe('ClientsController', () => {
       const dto = {};
       service.update.mockRejectedValue(new Error('Update failed'));
 
-      await expect(controller.update(mockClientId, dto)).rejects.toThrow('Update failed');
+      await expect(controller.update(mockClientId, dto)).rejects.toThrow(
+        'Update failed',
+      );
     });
   });
 

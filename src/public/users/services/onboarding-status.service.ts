@@ -6,7 +6,10 @@ import { OnboardingResponseDto } from '../dto/response';
 export class OnboardingStatusService {
   constructor(private userModel: UserModel) {}
 
-  async onboarding(userId: string, step?: string): Promise<OnboardingResponseDto> {
+  async onboarding(
+    userId: string,
+    step?: string,
+  ): Promise<OnboardingResponseDto> {
     const user = await this.userModel.findByIdWithAll(userId);
 
     if (!user) {

@@ -57,7 +57,10 @@ export class TransactionFactory {
    * @param {ITransactionFactoryOptions} overrides - Overrides for all transactions
    * @returns {any[]} Array of transactions
    */
-  static createMultiple(count: number, overrides: ITransactionFactoryOptions = {}): any[] {
+  static createMultiple(
+    count: number,
+    overrides: ITransactionFactoryOptions = {},
+  ): any[] {
     return Array.from({ length: count }, () => this.create(overrides));
   }
 

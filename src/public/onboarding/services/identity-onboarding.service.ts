@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { OnboardingModel } from '../models/onboarding.model';
 import { OnboardingMapper } from '../mappers/onboarding.mapper';
 import { LoggerService } from '../../../shared/logger/logger.service';
@@ -24,17 +29,25 @@ export class IdentityOnboardingService {
     private s3Service: S3Service,
   ) {}
 
-  async startIdentityOnboarding(userId: string, dto: StartIdentityOnboardingDto) {
+  async startIdentityOnboarding(
+    userId: string,
+    dto: StartIdentityOnboardingDto,
+  ) {
     const user = await this.onboardingModel.findUserById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const country = ((dto.country || dto.countryCode || 'br').toLowerCase() as 'ar' | 'br');
+    const country = (dto.country || dto.countryCode || 'br').toLowerCase() as
+      | 'ar'
+      | 'br';
 
-    const existingIdentity = await this.onboardingModel.findIdentityByUserAndCountry(userId, country);
+    const existingIdentity =
+      await this.onboardingModel.findIdentityByUserAndCountry(userId, country);
     if (existingIdentity) {
-      return this.onboardingMapper.toStartIdentityOnboardingResponseDto(existingIdentity.id);
+      return this.onboardingMapper.toStartIdentityOnboardingResponseDto(
+        existingIdentity.id,
+      );
     }
 
     const identity = await this.onboardingModel.createIdentity({
@@ -44,7 +57,8 @@ export class IdentityOnboardingService {
     });
 
     try {
-      const defaultProfile = await this.onboardingModel.findDefaultSpendingLimitProfile();
+      const defaultProfile =
+        await this.onboardingModel.findDefaultSpendingLimitProfile();
       if (defaultProfile?.id) {
         await this.onboardingModel.createUserIdentitySpendingLimit({
           userIdentityId: identity.id,
@@ -52,20 +66,28 @@ export class IdentityOnboardingService {
         });
       }
     } catch (error) {
-      this.logger.warn('[onboarding] skipping spending limit creation', { error: error?.message || error });
+      this.logger.warn('[onboarding] skipping spending limit creation', {
+        error: error?.message || error,
+      });
     }
 
-    return this.onboardingMapper.toStartIdentityOnboardingResponseDto(identity.id);
+    return this.onboardingMapper.toStartIdentityOnboardingResponseDto(
+      identity.id,
+    );
   }
 
-  async updateIdentityOnboarding(identityId: string, dto: UpdateIdentityOnboardingDto) {
+  async updateIdentityOnboarding(
+    identityId: string,
+    dto: UpdateIdentityOnboardingDto,
+  ) {
     const identity = await this.onboardingModel.findIdentityById(identityId);
     if (!identity) {
       throw new NotFoundException('Identity not found');
     }
 
     const updates: any = {};
-    const onboardingState = identity.users_usersIdentities_userIdTousers?.onboardingState || {
+    const onboardingState = identity.users_usersIdentities_userIdTousers
+      ?.onboardingState || {
       completedSteps: [],
       needsCorrection: [],
     };
@@ -97,10 +119,16 @@ export class IdentityOnboardingService {
       onboardingState,
     });
 
-    return this.onboardingMapper.toUpdateIdentityOnboardingResponseDto(identityId);
+    return this.onboardingMapper.toUpdateIdentityOnboardingResponseDto(
+      identityId,
+    );
   }
 
-  async uploadArgentinaDocument(userId: string, identityId: string, dto: UploadArgentinaDocumentDto) {
+  async uploadArgentinaDocument(
+    userId: string,
+    identityId: string,
+    dto: UploadArgentinaDocumentDto,
+  ) {
     const user = await this.onboardingModel.findUserById(userId);
     const identity = await this.onboardingModel.findIdentityById(identityId);
 
@@ -109,7 +137,9 @@ export class IdentityOnboardingService {
     }
 
     if (identity.country !== 'ar') {
-      throw new BadRequestException('This endpoint is only for Argentine documents');
+      throw new BadRequestException(
+        'This endpoint is only for Argentine documents',
+      );
     }
 
     if (!dto.frontImage || !dto.backImage) {
@@ -120,9 +150,12 @@ export class IdentityOnboardingService {
       throw new BadRequestException('PDF417 data is required');
     }
 
-    const { documentNumber, gender, dateOfBirth, firstName, lastName } = dto.pdf417Data;
+    const { documentNumber, gender, dateOfBirth, firstName, lastName } =
+      dto.pdf417Data;
     if (!documentNumber || !gender || !dateOfBirth || !firstName || !lastName) {
-      throw new BadRequestException('PDF417 data incomplete (documentNumber, gender, dateOfBirth, firstName, lastName are required)');
+      throw new BadRequestException(
+        'PDF417 data incomplete (documentNumber, gender, dateOfBirth, firstName, lastName are required)',
+      );
     }
 
     let renaperValidation;
@@ -149,7 +182,8 @@ export class IdentityOnboardingService {
         throw new ServiceUnavailableException({
           success: false,
           error: 'Serviço de validação temporariamente indisponível',
-          message: 'O serviço de validação de documentos está temporariamente indisponível. Por favor, tente novamente mais tarde.',
+          message:
+            'O serviço de validação de documentos está temporariamente indisponível. Por favor, tente novamente mais tarde.',
           details: {
             code: 'RENAPER_FORBIDDEN',
             type: 'infrastructure_error',
@@ -200,9 +234,12 @@ export class IdentityOnboardingService {
       throw new BadRequestException('Failed to upload images');
     }
 
-    const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
-    const formattedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-    const formattedFullName = `${formattedFirstName} ${formattedLastName}`.trim();
+    const formattedFirstName =
+      firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    const formattedLastName =
+      lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+    const formattedFullName =
+      `${formattedFirstName} ${formattedLastName}`.trim();
 
     const userUpdates: any = {
       firstName: formattedFirstName,
@@ -220,7 +257,10 @@ export class IdentityOnboardingService {
       userUpdates.country = 'ar';
     }
 
-    const onboardingState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
     const state = onboardingState as any;
     if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
       state.completedSteps = [];
@@ -240,14 +280,19 @@ export class IdentityOnboardingService {
       name: formattedFullName,
       identityDocumentType: 'dni',
       identityDocumentNumber: documentNumber,
-      identityDocumentIssueDate: new Date(dto.pdf417Data.documentExpiration || dateOfBirth),
+      identityDocumentIssueDate: new Date(
+        dto.pdf417Data.documentExpiration || dateOfBirth,
+      ),
       identityDocumentIssuer: dto.pdf417Data.documentExpiration || '',
       identityDocumentFrontImage: frontImageUrl,
       identityDocumentBackImage: backImageUrl,
       identityDocumentImageType: 'dni',
     });
 
-    await this.onboardingModel.updateUserOnboardingComplete(userId, userUpdates);
+    await this.onboardingModel.updateUserOnboardingComplete(
+      userId,
+      userUpdates,
+    );
 
     if (user.email) {
       await this.notificationService.sendEmail({
@@ -257,40 +302,61 @@ export class IdentityOnboardingService {
       });
     }
 
-    return this.onboardingMapper.toUploadArgentinaDocumentResponseDto(onboardingState);
+    return this.onboardingMapper.toUploadArgentinaDocumentResponseDto(
+      onboardingState,
+    );
   }
 
   async getOnboardingPendingData(userIdentityId: string) {
-    const identity = await this.onboardingModel.getOnboardingPendingData(userIdentityId);
+    const identity =
+      await this.onboardingModel.getOnboardingPendingData(userIdentityId);
 
-    const state = (identity.users_usersIdentities_userIdTousers?.onboardingState as any) || {
+    const state = (identity.users_usersIdentities_userIdTousers
+      ?.onboardingState as any) || {
       completedSteps: [],
       needsCorrection: [],
     };
     const requiredSteps =
-      identity.country === 'ar' ? ['2.1', '2.2', '2.3', '2.4'] : ['3.1', '3.2', '3.3', '3.4', '3.5'];
+      identity.country === 'ar'
+        ? ['2.1', '2.2', '2.3', '2.4']
+        : ['3.1', '3.2', '3.3', '3.4', '3.5'];
 
-    const pendingSteps = requiredSteps.filter((step) => !state.completedSteps?.includes(step));
-    return this.onboardingMapper.toOnboardingPendingDataResponseDto(pendingSteps, state.needsCorrection || []);
+    const pendingSteps = requiredSteps.filter(
+      (step) => !state.completedSteps?.includes(step),
+    );
+    return this.onboardingMapper.toOnboardingPendingDataResponseDto(
+      pendingSteps,
+      state.needsCorrection || [],
+    );
   }
 
   async getOnboardingStatus(userIdentityId: string) {
-    const identity = await this.onboardingModel.getOnboardingStatus(userIdentityId);
+    const identity =
+      await this.onboardingModel.getOnboardingStatus(userIdentityId);
 
-    const state = (identity.users_usersIdentities_userIdTousers?.onboardingState as any) || { completedSteps: [] };
+    const state = (identity.users_usersIdentities_userIdTousers
+      ?.onboardingState as any) || { completedSteps: [] };
     const requiredSteps =
-      identity.country === 'ar' ? ['2.1', '2.2', '2.3', '2.4'] : ['3.1', '3.2', '3.3', '3.4', '3.5'];
+      identity.country === 'ar'
+        ? ['2.1', '2.2', '2.3', '2.4']
+        : ['3.1', '3.2', '3.3', '3.4', '3.5'];
 
-    return this.onboardingMapper.toOnboardingStatusResponseDto(requiredSteps, state.completedSteps || []);
+    return this.onboardingMapper.toOnboardingStatusResponseDto(
+      requiredSteps,
+      state.completedSteps || [],
+    );
   }
 
   async validateOnboardingData(userIdentityId: string) {
-    const identity = await this.onboardingModel.validateOnboardingData(userIdentityId);
+    const identity =
+      await this.onboardingModel.validateOnboardingData(userIdentityId);
 
     const errors = [] as string[];
     if (!identity.identityDocumentNumber) errors.push('identityDocumentNumber');
-    if (!identity.identityDocumentFrontImage) errors.push('identityDocumentFrontImage');
-    if (!identity.identityDocumentBackImage) errors.push('identityDocumentBackImage');
+    if (!identity.identityDocumentFrontImage)
+      errors.push('identityDocumentFrontImage');
+    if (!identity.identityDocumentBackImage)
+      errors.push('identityDocumentBackImage');
 
     return this.onboardingMapper.toValidateOnboardingDataResponseDto(errors);
   }
@@ -300,7 +366,10 @@ export class IdentityOnboardingService {
     return this.onboardingMapper.toRetryOnboardingResponseDto();
   }
 
-  async updateOnboardingSpecificData(userIdentityId: string, fieldUpdates: any) {
+  async updateOnboardingSpecificData(
+    userIdentityId: string,
+    fieldUpdates: any,
+  ) {
     await this.onboardingModel.updateIdentity(userIdentityId, fieldUpdates);
     return { message: 'Onboarding data updated' };
   }

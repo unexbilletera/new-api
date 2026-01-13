@@ -17,7 +17,10 @@ export class LivenessService {
     private logger: LoggerService,
   ) {}
 
-  async livenessCheck(userId: string, dto: LivenessCheckDto): Promise<LivenessCheckResponseDto> {
+  async livenessCheck(
+    userId: string,
+    dto: LivenessCheckDto,
+  ): Promise<LivenessCheckResponseDto> {
     const user = await this.userModel.findById(userId);
 
     if (!user) {
@@ -68,9 +71,12 @@ export class LivenessService {
               apiPath: '/api',
             });
           } catch (error) {
-            this.logger.warn('[VALIDA] Failed to create enrollment, trying to get status', {
-              error: (error as Error).message,
-            });
+            this.logger.warn(
+              '[VALIDA] Failed to create enrollment, trying to get status',
+              {
+                error: (error as Error).message,
+              },
+            );
             validaEnrollment = await this.validaService.getEnrollmentStatus({
               refId: user.number || user.id,
             });
@@ -80,10 +86,15 @@ export class LivenessService {
             const parts = validaEnrollment.url.split('/').filter(Boolean);
             const validaId = parts[parts.length - 1];
 
-            const notes = (user.notes || '') +
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT CREATED validaId: ${validaId}\n`;
 
-            await this.userModel.updateWithValidaEnrollment(userId, validaId, notes);
+            await this.userModel.updateWithValidaEnrollment(
+              userId,
+              validaId,
+              notes,
+            );
 
             result.next = 'verifyValida';
             result.data.url = validaEnrollment.url;
@@ -111,7 +122,8 @@ export class LivenessService {
               livenessImage = validaEnrollment.images.selfie;
             }
 
-            const notes = (user.notes || '') +
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT VERIFIED validaId: ${user.validaId}\n`;
 
             const currentOnboardingState = (user.onboardingState as any) || {
@@ -130,27 +142,37 @@ export class LivenessService {
               currentOnboardingState.completedSteps.push('1.12');
             }
 
-            await this.userModel.updateWithValidaVerification(userId, livenessImage, notes, currentOnboardingState);
+            await this.userModel.updateWithValidaVerification(
+              userId,
+              livenessImage,
+              notes,
+              currentOnboardingState,
+            );
 
             result.next = 'verifySuccess';
           } else if (
             validaEnrollment.enrollment &&
-            ['failed', 'system-error'].includes(validaEnrollment.enrollment.status || '')
+            ['failed', 'system-error'].includes(
+              validaEnrollment.enrollment.status || '',
+            )
           ) {
-            const notes = (user.notes || '') +
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT ERROR validaId: ${user.validaId}\n`;
 
             await this.userModel.updateValidaStatus(userId, 'error', notes);
 
             result.next = 'verifyWarning';
-            result.data.text = 'Hubo un problema para iniciar el proceso para tu identidad.';
+            result.data.text =
+              'Hubo un problema para iniciar el proceso para tu identidad.';
           } else if (
             validaEnrollment.enrollment &&
             ['new', 'incomplete', 'funnel-end', 'funnel_end'].includes(
-              validaEnrollment.enrollment.status || ''
+              validaEnrollment.enrollment.status || '',
             )
           ) {
-            const notes = (user.notes || '') +
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT PROCESS validaId: ${user.validaId}\n`;
 
             await this.userModel.updateValidaNotes(userId, notes);
@@ -162,7 +184,8 @@ export class LivenessService {
             validaEnrollment.enrollment &&
             validaEnrollment.enrollment.status === 'void'
           ) {
-            const notes = (user.notes || '') +
+            const notes =
+              (user.notes || '') +
               `${new Date().toISOString()} - VALIDA ENROLLMENT CANCELED validaId: ${user.validaId}\n`;
 
             const newEnrollment = await this.validaService.createEnrollment({
@@ -179,7 +202,8 @@ export class LivenessService {
               await this.userModel.updateValidaId(
                 userId,
                 newValidaId,
-                notes + `${new Date().toISOString()} - VALIDA ENROLLMENT CREATED validaId: ${newValidaId}\n`,
+                notes +
+                  `${new Date().toISOString()} - VALIDA ENROLLMENT CREATED validaId: ${newValidaId}\n`,
               );
 
               result.next = 'verifyValida';

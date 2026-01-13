@@ -94,10 +94,12 @@ describe('MessagingService', () => {
       const userId = 'user-123';
 
       service.sendMessage.mockRejectedValue(
-        new Error('Cannot send message to yourself')
+        new Error('Cannot send message to yourself'),
       );
 
-      await expect(service.sendMessage(userId, userId, 'message')).rejects.toThrow();
+      await expect(
+        service.sendMessage(userId, userId, 'message'),
+      ).rejects.toThrow();
     });
   });
 
@@ -159,12 +161,12 @@ describe('MessagingService', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should prevent deleting others\' messages', async () => {
+    it("should prevent deleting others' messages", async () => {
       const userId = 'user-123';
       const messageId = 'msg-from-other';
 
       service.deleteMessage.mockRejectedValue(
-        new Error('Cannot delete message from another user')
+        new Error('Cannot delete message from another user'),
       );
 
       await expect(service.deleteMessage(userId, messageId)).rejects.toThrow();

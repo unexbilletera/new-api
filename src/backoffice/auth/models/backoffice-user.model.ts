@@ -4,7 +4,11 @@ import { Injectable } from '@nestjs/common';
 import { LoginDto } from '../dto/login.dto';
 import { LoginResponseDto } from '../dto/login-response.dto';
 import { JwtService } from '../../../shared/jwt/jwt.service';
-import { ErrorCodes, ErrorHelper, SuccessCodes } from '../../../shared/errors/app-error';
+import {
+  ErrorCodes,
+  ErrorHelper,
+  SuccessCodes,
+} from '../../../shared/errors/app-error';
 
 @Injectable()
 export class BackofficeUserModel {
@@ -23,9 +27,7 @@ export class BackofficeUserModel {
       },
     });
   }
-  async validateCredentials(
-    loginDto: LoginDto,
-  ): Promise<LoginResponseDto> {
+  async validateCredentials(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.findByEmail(loginDto.email);
 
     if (!user) {
@@ -88,4 +90,3 @@ export class BackofficeUserModel {
     return user;
   }
 }
-

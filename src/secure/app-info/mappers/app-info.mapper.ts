@@ -67,7 +67,9 @@ export class AppInfoMapper {
     };
   }
 
-  toFeaturesResponseDto(features: Record<string, boolean>): FeaturesResponseDto {
+  toFeaturesResponseDto(
+    features: Record<string, boolean>,
+  ): FeaturesResponseDto {
     return { features };
   }
 

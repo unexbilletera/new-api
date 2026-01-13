@@ -59,16 +59,11 @@ export function ApiConflictResponses() {
 }
 
 export function ApiSecureCrudEndpoint() {
-  return applyDecorators(
-    ApiAuthWithPermission(),
-    ApiCrudResponses(),
-  );
+  return applyDecorators(ApiAuthWithPermission(), ApiCrudResponses());
 }
 
 export function ApiPublicEndpoint() {
-  return applyDecorators(
-    ApiCommonResponses(),
-  );
+  return applyDecorators(ApiCommonResponses());
 }
 
 export function ApiCreateEndpoint() {
@@ -90,7 +85,5 @@ export function ApiUpdateEndpoint() {
 }
 
 export function ApiDeleteEndpoint() {
-  return applyDecorators(
-    ApiCrudResponses(),
-  );
+  return applyDecorators(ApiCrudResponses());
 }

@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-  Headers,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Headers } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -34,7 +28,8 @@ export class AppInfoController {
   @Get()
   @ApiOperation({
     summary: 'Get complete application information',
-    description: 'Returns all application information including version, news and features',
+    description:
+      'Returns all application information including version, news and features',
   })
   @ApiHeader({
     name: 'x-app-version',
@@ -50,14 +45,17 @@ export class AppInfoController {
     status: 401,
     description: 'Unauthorized - invalid or missing token',
   })
-  async getFullInfo(@Headers('x-app-version') appVersion?: string): Promise<FullAppInfoResponseDto> {
+  async getFullInfo(
+    @Headers('x-app-version') appVersion?: string,
+  ): Promise<FullAppInfoResponseDto> {
     return this.appInfoService.getFullInfo(appVersion);
   }
 
   @Get('basic')
   @ApiOperation({
     summary: 'Get basic application information',
-    description: 'Returns basic application information without news and features',
+    description:
+      'Returns basic application information without news and features',
   })
   @ApiHeader({
     name: 'x-app-version',
@@ -73,14 +71,17 @@ export class AppInfoController {
     status: 401,
     description: 'Unauthorized - invalid or missing token',
   })
-  async getBasicInfo(@Headers('x-app-version') appVersion?: string): Promise<AppInfoResponseDto> {
+  async getBasicInfo(
+    @Headers('x-app-version') appVersion?: string,
+  ): Promise<AppInfoResponseDto> {
     return this.appInfoService.getAppInfo(appVersion);
   }
 
   @Get('version')
   @ApiOperation({
     summary: 'Check application version',
-    description: 'Checks if the current application version is up to date and returns information about available updates',
+    description:
+      'Checks if the current application version is up to date and returns information about available updates',
   })
   @ApiQuery({
     name: 'version',
@@ -119,7 +120,8 @@ export class AppInfoController {
   @Get('news')
   @ApiOperation({
     summary: 'Get application news',
-    description: 'Returns the list of news and updates available in the application',
+    description:
+      'Returns the list of news and updates available in the application',
   })
   @ApiResponse({
     status: 200,
@@ -137,7 +139,8 @@ export class AppInfoController {
   @Get('features')
   @ApiOperation({
     summary: 'Get available features',
-    description: 'Returns the list of available and enabled features in the application',
+    description:
+      'Returns the list of available and enabled features in the application',
   })
   @ApiResponse({
     status: 200,

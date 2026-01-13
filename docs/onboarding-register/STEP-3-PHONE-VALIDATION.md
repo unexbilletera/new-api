@@ -3,6 +3,7 @@
 ## Overview
 
 This step involves sending a validation code to the user's phone number via SMS and verifying it to confirm phone ownership. This step consists of two sub-steps:
+
 - **Step 1.4**: Provide phone number
 - **Step 1.5**: Send phone validation code
 - **Step 1.6**: Verify phone validation code
@@ -43,9 +44,9 @@ No authentication required (public endpoints).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| phone | string | Yes | User's phone number (must be valid phone format) |
+| Field | Type   | Required | Description                                      |
+| ----- | ------ | -------- | ------------------------------------------------ |
+| phone | string | Yes      | User's phone number (must be valid phone format) |
 
 ### Response
 
@@ -76,13 +77,14 @@ No authentication required (public endpoints).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| phone | string | Yes | User's phone number |
+| Field | Type   | Required | Description         |
+| ----- | ------ | -------- | ------------------- |
+| phone | string | Yes      | User's phone number |
 
 ### Response
 
 #### Success Response (200 OK)
+
 ```json
 {
   "success": true,
@@ -93,6 +95,7 @@ No authentication required (public endpoints).
 #### Error Responses
 
 **400 Bad Request - Invalid Phone Number**
+
 ```json
 {
   "statusCode": 400,
@@ -116,12 +119,12 @@ No authentication required (public endpoints).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | string | Yes | User's email address |
-| phone | string | Yes | User's phone number |
-| code | string | Yes | Validation code received via SMS |
-| type | string | Yes | Must be `"phone"` |
+| Field | Type   | Required | Description                      |
+| ----- | ------ | -------- | -------------------------------- |
+| email | string | Yes      | User's email address             |
+| phone | string | Yes      | User's phone number              |
+| code  | string | Yes      | Validation code received via SMS |
+| type  | string | Yes      | Must be `"phone"`                |
 
 ### Response
 
@@ -143,6 +146,7 @@ No authentication required (public endpoints).
 #### Error Responses
 
 **400 Bad Request - Code Not Found or Expired**
+
 ```json
 {
   "statusCode": 400,
@@ -152,6 +156,7 @@ No authentication required (public endpoints).
 ```
 
 **400 Bad Request - Invalid Code**
+
 ```json
 {
   "statusCode": 400,
@@ -163,17 +168,20 @@ No authentication required (public endpoints).
 ## Implementation Details
 
 ### Phone Number Normalization
+
 - Non-digit characters are removed
 - Phone numbers are validated according to country format
 - For Brazil, phone must match Brazilian phone format
 
 ### Send Phone Validation Code
+
 - Generates a 6-digit validation code
 - Sends SMS with validation code (unless `WALLET_SANDBOX_SEND_SMS=false`)
 - Stores code hash in database with expiration time
 - In sandbox mode with `ENABLE_MOCK_CODES=true`, accepts mock codes
 
 ### Verify Phone Validation Code
+
 - Validates the code against stored hash
 - Checks code expiration
 - Marks phone as verified (`phoneVerifiedAt` timestamp)
@@ -182,6 +190,7 @@ No authentication required (public endpoints).
 ## State Management
 
 After successful verification:
+
 - `onboardingState.completedSteps` includes `"1.4"`, `"1.5"`, and `"1.6"`
 - `phoneVerifiedAt` is set to current timestamp
 - User's phone number is stored
@@ -190,6 +199,7 @@ After successful verification:
 ## Mock Codes
 
 When `ENABLE_MOCK_CODES=true`:
+
 - Phone validation can be bypassed with mock codes
 - See [Mock Codes Documentation](../PROVIDER_FEATURES.md) for details
 
@@ -210,6 +220,7 @@ WALLET_SANDBOX_SEND_SMS=true
 ## Example cURL
 
 ### Update Phone Number
+
 ```bash
 curl -X PATCH https://api.example.com/api/onboarding/user/550e8400-e29b-41d4-a716-446655440000 \
   -H "Content-Type: application/json" \
@@ -219,6 +230,7 @@ curl -X PATCH https://api.example.com/api/onboarding/user/550e8400-e29b-41d4-a71
 ```
 
 ### Send Phone Validation Code
+
 ```bash
 curl -X POST https://api.example.com/api/onboarding/user/send-phone-validation \
   -H "Content-Type: application/json" \
@@ -228,6 +240,7 @@ curl -X POST https://api.example.com/api/onboarding/user/send-phone-validation \
 ```
 
 ### Verify Phone Validation Code
+
 ```bash
 curl -X POST https://api.example.com/api/onboarding/user/verify-code \
   -H "Content-Type: application/json" \

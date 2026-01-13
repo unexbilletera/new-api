@@ -24,7 +24,10 @@ import {
   ListBackofficeUsersQueryDto,
 } from '../dto/backoffice-user.dto';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
-import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
+import {
+  BackofficeRoleGuard,
+  MinLevel,
+} from '../../../shared/guards/backoffice-role.guard';
 
 @ApiTags('3.2 Backoffice - Users')
 @ApiBearerAuth('JWT-auth')
@@ -39,14 +42,45 @@ export class BackofficeUsersController {
     summary: 'List backoffice users',
     description: 'Returns a list of backoffice users',
   })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of records per page' })
-  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by name or email' })
-  @ApiQuery({ name: 'status', required: false, type: String, description: 'Filter by status (active/inactive)' })
-  @ApiQuery({ name: 'roleId', required: false, type: String, description: 'Filter by role ID' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of records per page',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search by name or email',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    type: String,
+    description: 'Filter by status (active/inactive)',
+  })
+  @ApiQuery({
+    name: 'roleId',
+    required: false,
+    type: String,
+    description: 'Filter by role ID',
+  })
   @ApiResponse({ status: 200, description: 'Users list returned successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   async list(@Query() query: ListBackofficeUsersQueryDto) {
     return this.usersService.list(query);
   }
@@ -59,8 +93,14 @@ export class BackofficeUsersController {
   })
   @ApiParam({ name: 'id', type: String, description: 'User identifier' })
   @ApiResponse({ status: 200, description: 'User returned successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async get(@Param('id') id: string) {
     return this.usersService.get(id);
@@ -74,8 +114,14 @@ export class BackofficeUsersController {
   })
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   @ApiResponse({ status: 409, description: 'Email is already in use' })
   async create(@Body() dto: CreateBackofficeUserDto) {
     return this.usersService.create(dto);
@@ -90,8 +136,14 @@ export class BackofficeUsersController {
   @ApiParam({ name: 'id', type: String, description: 'User identifier' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 409, description: 'Email is already in use' })
   async update(@Param('id') id: string, @Body() dto: UpdateBackofficeUserDto) {
@@ -107,8 +159,14 @@ export class BackofficeUsersController {
   @ApiParam({ name: 'id', type: String, description: 'User identifier' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 400, description: 'Cannot delete your own user' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing token' })
-  @ApiResponse({ status: 403, description: 'Access denied - Insufficient permission level' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Access denied - Insufficient permission level',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async delete(@Param('id') id: string) {
     return this.usersService.delete(id);

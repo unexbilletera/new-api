@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import {
   CreateActionDto,
@@ -8,7 +12,8 @@ import {
 
 @Injectable()
 export class ActionsService {
-  constructor(private prisma: PrismaService) {}  async listActions(query: ListActionsQueryDto) {
+  constructor(private prisma: PrismaService) {}
+  async listActions(query: ListActionsQueryDto) {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 50;
     const skip = (page - 1) * limit;
@@ -46,7 +51,8 @@ export class ActionsService {
       page,
       limit,
     };
-  }  async getAction(id: string) {
+  }
+  async getAction(id: string) {
     const action = await this.prisma.services_actions.findFirst({
       where: { id },
     });
@@ -56,7 +62,8 @@ export class ActionsService {
     }
 
     return action;
-  }  async createAction(dto: CreateActionDto) {
+  }
+  async createAction(dto: CreateActionDto) {
     const existing = await this.prisma.services_actions.findFirst({
       where: { name: dto.code },
     });
@@ -78,7 +85,8 @@ export class ActionsService {
         updatedAt: new Date(),
       },
     });
-  }  async updateAction(id: string, dto: UpdateActionDto) {
+  }
+  async updateAction(id: string, dto: UpdateActionDto) {
     const action = await this.prisma.services_actions.findFirst({
       where: { id },
     });
@@ -96,7 +104,8 @@ export class ActionsService {
         updatedAt: new Date(),
       },
     });
-  }  async deleteAction(id: string) {
+  }
+  async deleteAction(id: string) {
     const action = await this.prisma.services_actions.findFirst({
       where: { id },
     });
@@ -110,14 +119,16 @@ export class ActionsService {
     });
 
     return { success: true, message: 'Action deleted successfully' };
-  }  async listGroups() {
+  }
+  async listGroups() {
     const actions = await this.prisma.services_actions.findMany({
       select: { moduleName: true },
       distinct: ['moduleName'],
     });
 
     return actions.map((a) => a.moduleName).filter(Boolean);
-  }  async toggleAction(id: string, enabled: boolean) {
+  }
+  async toggleAction(id: string, enabled: boolean) {
     const action = await this.prisma.services_actions.findFirst({
       where: { id },
     });
@@ -130,7 +141,8 @@ export class ActionsService {
       where: { id },
       data: { enabled, updatedAt: new Date() },
     });
-  }  async reorderActions(actions: { id: string; order: number }[]) {
+  }
+  async reorderActions(actions: { id: string; order: number }[]) {
     const updates = actions.map((action) =>
       this.prisma.services_actions.update({
         where: { id: action.id },
@@ -141,7 +153,11 @@ export class ActionsService {
     await Promise.all(updates);
 
     return { success: true, message: 'Actions reordered successfully' };
-  }  async userCanPerformAction(userId: string, actionName: string): Promise<boolean> {
+  }
+  async userCanPerformAction(
+    userId: string,
+    actionName: string,
+  ): Promise<boolean> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id: userId, deletedAt: null },
       include: {

@@ -478,7 +478,8 @@ class DatabaseSeeder {
         userId: user1.id,
         status: 'active',
         deviceIdentifier: 'device-123-abc',
-        publicKeyPem: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq...\n-----END PUBLIC KEY-----',
+        publicKeyPem:
+          '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq...\n-----END PUBLIC KEY-----',
         keyType: 'RSA',
         platform: 'ios',
       },
@@ -788,8 +789,7 @@ class DatabaseSeeder {
 
 const seeder = new DatabaseSeeder();
 
-seeder.seed()
-  .catch((error) => {
-    new Logger('DatabaseSeeder').error('Fatal error during seeding', error);
-    process.exit(1);
-  });
+seeder.seed().catch((error) => {
+  new Logger('DatabaseSeeder').error('Fatal error during seeding', error);
+  process.exit(1);
+});

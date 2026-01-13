@@ -5,8 +5,15 @@ import { ExchangeRatesService } from '../../../shared/exchange/exchange-rates.se
 import { SystemVersionService } from '../../../shared/helpers/system-version.service';
 import { LoggerService } from '../../../shared/logger/logger.service';
 import { UserMapper } from '../mappers/user.mapper';
-import { UpdateUserProfileDto, UpdateAddressDto } from '../dto/user-profile.dto';
-import { UserProfileResponseDto, ProfileUpdateResponseDto, AddressUpdateResponseDto } from '../dto/response';
+import {
+  UpdateUserProfileDto,
+  UpdateAddressDto,
+} from '../dto/user-profile.dto';
+import {
+  UserProfileResponseDto,
+  ProfileUpdateResponseDto,
+  AddressUpdateResponseDto,
+} from '../dto/response';
 
 @Injectable()
 export class UserProfileService {
@@ -19,14 +26,18 @@ export class UserProfileService {
     private userMapper: UserMapper,
   ) {}
 
-  async getCurrentUser(userId: string, systemVersion?: string): Promise<UserProfileResponseDto> {
+  async getCurrentUser(
+    userId: string,
+    systemVersion?: string,
+  ): Promise<UserProfileResponseDto> {
     this.logger.info('[PROFILE] Getting current user', { userId });
 
     const user = await this.userModel.findById(userId);
 
     let forceUpgrade = false;
     if (systemVersion) {
-      const versionResult = this.systemVersionService.validateVersion(systemVersion);
+      const versionResult =
+        this.systemVersionService.validateVersion(systemVersion);
       forceUpgrade = !versionResult.isValid;
     }
 
@@ -35,16 +46,29 @@ export class UserProfileService {
       exchangeRates = await this.exchangeRatesService.getRates();
       this.logger.debug('[PROFILE] Exchange rates obtained successfully');
     } catch (mantecaError: any) {
-      this.logger.warn('[PROFILE] Manteca getRates failed (non-critical)', { error: mantecaError.message });
+      this.logger.warn('[PROFILE] Manteca getRates failed (non-critical)', {
+        error: mantecaError.message,
+      });
       exchangeRates = null;
     }
 
-    this.logger.info('[PROFILE] Current user retrieved successfully', { userId });
-    return this.userMapper.toProfileResponseDto(user, { exchangeRates, forceUpgrade });
+    this.logger.info('[PROFILE] Current user retrieved successfully', {
+      userId,
+    });
+    return this.userMapper.toProfileResponseDto(user, {
+      exchangeRates,
+      forceUpgrade,
+    });
   }
 
-  async updateProfile(userId: string, dto: UpdateUserProfileDto): Promise<ProfileUpdateResponseDto> {
-    this.logger.info('[PROFILE] Updating user profile', { userId, fields: Object.keys(dto) });
+  async updateProfile(
+    userId: string,
+    dto: UpdateUserProfileDto,
+  ): Promise<ProfileUpdateResponseDto> {
+    this.logger.info('[PROFILE] Updating user profile', {
+      userId,
+      fields: Object.keys(dto),
+    });
 
     const user = await this.userModel.findByIdWithValidStatus(userId);
 
@@ -111,7 +135,14 @@ export class UserProfileService {
     }
 
     if (dto.maritalStatus) {
-      const validStatuses = ['single', 'married', 'divorced', 'widowed', 'cohabiting', 'separated'];
+      const validStatuses = [
+        'single',
+        'married',
+        'divorced',
+        'widowed',
+        'cohabiting',
+        'separated',
+      ];
       if (!validStatuses.includes(dto.maritalStatus)) {
         throw new Error('users.errors.invalidMaritalStatus');
       }
@@ -131,7 +162,10 @@ export class UserProfileService {
     return this.userMapper.toProfileUpdateResponseDto(updated);
   }
 
-  async updateAddress(userId: string, dto: UpdateAddressDto): Promise<AddressUpdateResponseDto> {
+  async updateAddress(
+    userId: string,
+    dto: UpdateAddressDto,
+  ): Promise<AddressUpdateResponseDto> {
     const required = ['zipCode', 'street', 'number', 'city', 'state'] as const;
     for (const k of required) {
       if (!dto[k] || String(dto[k]).trim().length === 0) {
@@ -143,8 +177,12 @@ export class UserProfileService {
 
     let targetIdentityId = user.defaultUserIdentityId || null;
     if (!targetIdentityId) {
-      const identities = user.usersIdentities_usersIdentities_userIdTousers || [];
-      identities.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const identities =
+        user.usersIdentities_usersIdentities_userIdTousers || [];
+      identities.sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
       targetIdentityId = identities[0]?.id || null;
     }
     if (!targetIdentityId) {
@@ -161,7 +199,10 @@ export class UserProfileService {
       complement: dto.complement ? String(dto.complement).trim() : null,
     };
 
-    await this.identityModel.updateAddress(targetIdentityId, JSON.stringify(addressPayload));
+    await this.identityModel.updateAddress(
+      targetIdentityId,
+      JSON.stringify(addressPayload),
+    );
 
     return this.userMapper.toAddressUpdateResponseDto(addressPayload);
   }

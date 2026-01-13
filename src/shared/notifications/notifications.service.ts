@@ -33,7 +33,12 @@ export class NotificationService {
     await this.pushAdapter.send(message);
   }
 
-  async sendEmailVerificationCode(email: string, code: string, expiresInMinutes = 5, language?: string) {
+  async sendEmailVerificationCode(
+    email: string,
+    code: string,
+    expiresInMinutes = 5,
+    language?: string,
+  ) {
     const copy = getEmailCopy('userEmailVerification', language);
     const { html, text } = renderCodeEmailTemplate({
       code,
@@ -51,7 +56,11 @@ export class NotificationService {
     });
   }
 
-  async sendPhoneVerificationCode(phone: string, code: string, expiresInMinutes = 5) {
+  async sendPhoneVerificationCode(
+    phone: string,
+    code: string,
+    expiresInMinutes = 5,
+  ) {
     await this.sendSms({
       to: phone,
       message: `Codigo de verificacao: ${code}. Expira em ${expiresInMinutes} minutos.`,

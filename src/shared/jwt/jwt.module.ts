@@ -23,4 +23,3 @@ import { ConfigService } from '../config/config.service';
   exports: [JwtService, NestJwtModule],
 })
 export class JwtModule {}
-

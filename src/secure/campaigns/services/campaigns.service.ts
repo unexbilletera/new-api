@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import {
   CampaignCodeResponseDto,
@@ -10,8 +14,10 @@ import {
 export class CampaignsService {
   constructor(private prisma: PrismaService) {}
 
-  async validateCode(userId: string, code: string): Promise<CampaignValidationResponseDto> {
-
+  async validateCode(
+    userId: string,
+    code: string,
+  ): Promise<CampaignValidationResponseDto> {
     const campaign = await this.prisma.campaign_codes.findFirst({
       where: {
         code: code.toUpperCase(),
@@ -92,7 +98,6 @@ export class CampaignsService {
     code: string,
     transactionId?: string,
   ): Promise<UseCampaignResponseDto> {
-
     const validation = await this.validateCode(userId, code);
 
     if (!validation.valid) {

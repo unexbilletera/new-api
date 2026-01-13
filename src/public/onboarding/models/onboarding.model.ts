@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 
@@ -150,7 +154,11 @@ export class OnboardingModel {
     });
   }
 
-  async createUserCampaignCode(userId: string, campaignCodeId: string, code: string) {
+  async createUserCampaignCode(
+    userId: string,
+    campaignCodeId: string,
+    code: string,
+  ) {
     return this.prisma.user_campaign_codes.create({
       data: {
         id: randomUUID(),

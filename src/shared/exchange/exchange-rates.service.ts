@@ -35,14 +35,16 @@ export interface ExchangeConfigs {
 @Injectable()
 export class ExchangeRatesService {
   private ratesCache: ExchangeRates | null = null;
-  private configCache: Map<string, { value: any; timestamp: number }> = new Map();
+  private configCache: Map<string, { value: any; timestamp: number }> =
+    new Map();
   private readonly CONFIG_CACHE_TTL = 60000;
 
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,
     private logger: LoggerService,
-  ) {}  private async getConfig<T>(key: string, defaultValue: T): Promise<T> {
+  ) {}
+  private async getConfig<T>(key: string, defaultValue: T): Promise<T> {
     const cached = this.configCache.get(key);
     if (cached && Date.now() - cached.timestamp < this.CONFIG_CACHE_TTL) {
       return cached.value as T;
@@ -58,7 +60,8 @@ export class ExchangeRatesService {
     } catch {
       return defaultValue;
     }
-  }  async getExchangeConfigs(): Promise<ExchangeConfigs> {
+  }
+  async getExchangeConfigs(): Promise<ExchangeConfigs> {
     const [
       commissionRateBuy,
       commissionRateSell,
@@ -75,8 +78,14 @@ export class ExchangeRatesService {
       this.getConfig<string>('exchange_supported_currencies', 'BRL,ARS,USD'),
     ]);
 
-    const buyRate = commissionRateBuy !== null ? Number(commissionRateBuy) : Number(commissionRate);
-    const sellRate = commissionRateSell !== null ? Number(commissionRateSell) : Number(commissionRate);
+    const buyRate =
+      commissionRateBuy !== null
+        ? Number(commissionRateBuy)
+        : Number(commissionRate);
+    const sellRate =
+      commissionRateSell !== null
+        ? Number(commissionRateSell)
+        : Number(commissionRate);
 
     return {
       commissionRateBuy: buyRate,
@@ -86,8 +95,13 @@ export class ExchangeRatesService {
       baseCurrency,
       supportedCurrencies: String(supportedCurrencies).split(','),
     };
-  }  private async getPrice(type: 'USDT_ARS' | 'USDT_BRL'): Promise<ExchangePrice> {
-    const mantecaApiUrl = this.configService.get<string>('MANTECA_API_URL') || 'https://api.manteca.dev';
+  }
+  private async getPrice(
+    type: 'USDT_ARS' | 'USDT_BRL',
+  ): Promise<ExchangePrice> {
+    const mantecaApiUrl =
+      this.configService.get<string>('MANTECA_API_URL') ||
+      'https://api.manteca.dev';
     const mantecaApiKey = this.configService.get<string>('MANTECA_API_KEY');
 
     try {
@@ -109,10 +123,15 @@ export class ExchangeRatesService {
         sell: Number(data.sell),
       };
     } catch (error: any) {
-      this.logger.error(`helpers.manteca.getPrice error for ${type}`, error instanceof Error ? error : undefined, { errorMessage: error?.message });
+      this.logger.error(
+        `helpers.manteca.getPrice error for ${type}`,
+        error instanceof Error ? error : undefined,
+        { errorMessage: error?.message },
+      );
       throw new HttpException('Failed to fetch exchange rate', 503);
     }
-  }  async getRates(): Promise<ExchangeRates> {
+  }
+  async getRates(): Promise<ExchangeRates> {
     const exchangeConfigs = await this.getExchangeConfigs();
     const {
       commissionRateBuy = 0.02,
@@ -180,7 +199,8 @@ export class ExchangeRatesService {
 
     this.logger.debug('app.config.manteca.rates', this.ratesCache ?? undefined);
     return this.ratesCache!;
-  }  clearCache(): void {
+  }
+  clearCache(): void {
     this.ratesCache = null;
     this.configCache.clear();
   }

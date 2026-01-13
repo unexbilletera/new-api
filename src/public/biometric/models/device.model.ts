@@ -12,14 +12,21 @@ export class DeviceModel {
     });
   }
 
-  async findDeviceByUserAndIdentifier(userId: string, deviceIdentifier: string) {
+  async findDeviceByUserAndIdentifier(
+    userId: string,
+    deviceIdentifier: string,
+  ) {
     return this.prisma.devices.findFirst({
       where: { userId, deviceIdentifier },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async findDeviceByIdAndUser(deviceId: string, userId: string, status?: string) {
+  async findDeviceByIdAndUser(
+    deviceId: string,
+    userId: string,
+    status?: string,
+  ) {
     const where: any = { id: deviceId, userId };
     if (status) {
       where.status = status;
@@ -27,7 +34,10 @@ export class DeviceModel {
     return this.prisma.devices.findFirst({ where });
   }
 
-  async findActiveDeviceByUserAndIdentifier(userId: string, deviceIdentifier: string) {
+  async findActiveDeviceByUserAndIdentifier(
+    userId: string,
+    deviceIdentifier: string,
+  ) {
     return this.prisma.devices.findFirst({
       where: { userId, deviceIdentifier, status: 'active' },
       orderBy: { createdAt: 'desc' },
@@ -73,7 +83,11 @@ export class DeviceModel {
         publicKeyPem: data.publicKeyPem,
         keyType: data.keyType,
         platform: data.platform,
-        attestation: data.attestation ? (typeof data.attestation === 'string' ? JSON.parse(data.attestation) : data.attestation) : undefined,
+        attestation: data.attestation
+          ? typeof data.attestation === 'string'
+            ? JSON.parse(data.attestation)
+            : data.attestation
+          : undefined,
         status: data.status,
       },
     });
@@ -86,7 +100,12 @@ export class DeviceModel {
     });
   }
 
-  async updateDevicesByUserStatus(userId: string, currentStatus: 'pending' | 'active' | 'revoked', newStatus: 'pending' | 'active' | 'revoked', revokedAt?: Date) {
+  async updateDevicesByUserStatus(
+    userId: string,
+    currentStatus: 'pending' | 'active' | 'revoked',
+    newStatus: 'pending' | 'active' | 'revoked',
+    revokedAt?: Date,
+  ) {
     return this.prisma.devices.updateMany({
       where: { userId, status: currentStatus },
       data: { status: newStatus, ...(revokedAt && { revokedAt }) },

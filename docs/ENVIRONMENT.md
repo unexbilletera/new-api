@@ -9,6 +9,7 @@ The system loads environment variables based on `NODE_ENV`:
 ## Available Scripts
 
 ### Sandbox
+
 ```bash
 npm run start:sandbox:dev   # Development with watch
 npm run start:sandbox        # Simple development
@@ -17,6 +18,7 @@ npm run sandbox-tunnel       # SSH tunnel for remote database
 ```
 
 ### Production
+
 ```bash
 npm run start:prod:dev      # Development with watch
 npm run start:prod:env       # Simple development
@@ -27,6 +29,7 @@ npm run prod-tunnel          # SSH tunnel for remote database
 ## Configuration
 
 The `.env` file should contain:
+
 - `NODE_ENV`: Current environment
 - `WALLET_MYSQL_URL`: Database URL (use `127.0.0.1:3306` with SSH tunnel)
 - `DATABASE_URL`: Alternative database URL
@@ -36,6 +39,7 @@ The `.env` file should contain:
 To connect to remote database (sandbox/production):
 
 1. Start tunnel in separate terminal:
+
    ```bash
    npm run sandbox-tunnel   # or npm run prod-tunnel
    ```

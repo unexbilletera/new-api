@@ -13,11 +13,13 @@ This worker processes messages from AWS SQS queue and executes asynchronous acti
 ## Running
 
 ### Development
+
 ```bash
 npm run start:worker
 ```
 
 ### Production
+
 ```bash
 npm run build:prod
 npm run start:prod:worker
@@ -35,16 +37,18 @@ NODE_ENV=development|sandbox|production
 ## Supported Job Types
 
 ### `pix_cronos_create`
+
 Processes PIX Cronos transaction creation.
 
 **Payload:**
+
 ```json
 {
   "transactionId": "uuid",
   "userId": "uuid",
   "sourceAccountId": "uuid",
   "sourceIdentityId": "uuid",
-  "amount": 100.50,
+  "amount": 100.5,
   "targetKeyType": "cpf",
   "targetKeyValue": "12345678900",
   "description": "PIX Transfer"
@@ -52,9 +56,11 @@ Processes PIX Cronos transaction creation.
 ```
 
 ### `pix_cronos_confirm`
+
 Processes PIX Cronos transaction confirmation.
 
 **Payload:**
+
 ```json
 {
   "transactionId": "uuid",

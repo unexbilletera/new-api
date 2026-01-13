@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { LogResponseDto, ListLogsResponseDto, GetLogDetailsResponseDto } from '../dto/response';
+import {
+  LogResponseDto,
+  ListLogsResponseDto,
+  GetLogDetailsResponseDto,
+} from '../dto/response';
 
 @Injectable()
 export class LogMapper {
@@ -15,7 +19,12 @@ export class LogMapper {
     };
   }
 
-  toListLogsResponseDto(logs: any[], total: number, page: number, limit: number): ListLogsResponseDto {
+  toListLogsResponseDto(
+    logs: any[],
+    total: number,
+    page: number,
+    limit: number,
+  ): ListLogsResponseDto {
     return {
       data: logs.map((l) => this.toLogResponseDto(l)),
       total,

@@ -180,10 +180,12 @@ describe('IdentityService', () => {
       const mockFile = { filename: 'test.pdf' };
 
       service.storeDocument.mockRejectedValue(
-        new Error('Invalid document type')
+        new Error('Invalid document type'),
       );
 
-      await expect(service.storeDocument(userId, 'INVALID', mockFile)).rejects.toThrow();
+      await expect(
+        service.storeDocument(userId, 'INVALID', mockFile),
+      ).rejects.toThrow();
     });
   });
 

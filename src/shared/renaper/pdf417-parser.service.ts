@@ -72,13 +72,18 @@ export class Pdf417ParserService {
     const dateObj = new Date(date);
     const now = new Date();
 
-    return dateObj instanceof Date && !isNaN(dateObj.getTime()) && dateObj <= now;
+    return (
+      dateObj instanceof Date && !isNaN(dateObj.getTime()) && dateObj <= now
+    );
   }
 
   validateData(data: Pdf417Data): ValidationResult {
     const errors: string[] = [];
 
-    if (!data.documentNumber || !this.validateDocumentNumber(data.documentNumber)) {
+    if (
+      !data.documentNumber ||
+      !this.validateDocumentNumber(data.documentNumber)
+    ) {
       errors.push('Invalid document number');
     }
 

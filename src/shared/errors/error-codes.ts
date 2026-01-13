@@ -1,4 +1,3 @@
-
 export enum ErrorCodes {
   USERS_INVALID_PARAMETERS = '400 users.errors.invalidParameters',
   USERS_INVALID_USERNAME = '400 users.errors.invalidUsername',
@@ -76,4 +75,3 @@ export function getStatusCodeFromErrorCode(errorCode: string): number {
 export function isErrorCode(error: string): boolean {
   return /^\d{3}\s+\w+\.errors\.\w+$/.test(error);
 }
-

@@ -62,7 +62,7 @@ describe('API Performance Benchmarks', () => {
     metrics.forEach((metric) => {
       const status = metric.passed ? '✅' : '❌';
       console.log(
-        `${status} ${metric.name}: ${metric.duration}${metric.unit} (threshold: ${metric.threshold}${metric.unit})`
+        `${status} ${metric.name}: ${metric.duration}${metric.unit} (threshold: ${metric.threshold}${metric.unit})`,
       );
     });
     await app.close();
@@ -126,9 +126,7 @@ describe('API Performance Benchmarks', () => {
 
     const startTime = performance.now();
 
-    await request(app.getHttpServer())
-      .get('/api/public/users')
-      .expect(200);
+    await request(app.getHttpServer()).get('/api/public/users').expect(200);
 
     const duration = performance.now() - startTime;
 

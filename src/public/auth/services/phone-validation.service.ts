@@ -2,7 +2,10 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { AuthUserModel } from '../models/user.model';
 import { SmsService } from '../../../shared/sms/sms.service';
 import { AuthMapper } from '../mappers/auth.mapper';
-import { SendPhoneValidationDto, VerifyPhoneCodeDto } from '../dto/phone-validation.dto';
+import {
+  SendPhoneValidationDto,
+  VerifyPhoneCodeDto,
+} from '../dto/phone-validation.dto';
 
 @Injectable()
 export class PhoneValidationService {
@@ -20,12 +23,19 @@ export class PhoneValidationService {
       'sms',
     );
 
-    return this.authMapper.toPhoneValidationResponseDto(result.message, result.debug);
+    return this.authMapper.toPhoneValidationResponseDto(
+      result.message,
+      result.debug,
+    );
   }
 
   async verifyPhoneCode(dto: VerifyPhoneCodeDto) {
     try {
-      const result = await this.smsService.verifyCode(dto.phone, dto.code, true);
+      const result = await this.smsService.verifyCode(
+        dto.phone,
+        dto.code,
+        true,
+      );
 
       const normalizedPhone = this.smsService.normalizePhone(dto.phone);
       const user = await this.userModel.findByUsername(normalizedPhone);
@@ -34,7 +44,10 @@ export class PhoneValidationService {
         await this.userModel.updatePhoneVerified(normalizedPhone);
       }
 
-      return this.authMapper.toPhoneCodeVerificationResponseDto(result.message, result.phone);
+      return this.authMapper.toPhoneCodeVerificationResponseDto(
+        result.message,
+        result.phone,
+      );
     } catch (error) {
       if (error instanceof Error) {
         throw new BadRequestException(error.message);

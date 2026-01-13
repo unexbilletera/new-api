@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
 import {
@@ -11,7 +15,8 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class BackofficeUsersService {
-  constructor(private prisma: PrismaService) {}  async list(query: ListBackofficeUsersQueryDto): Promise<{
+  constructor(private prisma: PrismaService) {}
+  async list(query: ListBackofficeUsersQueryDto): Promise<{
     data: BackofficeUserResponseDto[];
     total: number;
     page: number;
@@ -57,7 +62,8 @@ export class BackofficeUsersService {
       page,
       limit,
     };
-  }  async get(id: string): Promise<BackofficeUserResponseDto> {
+  }
+  async get(id: string): Promise<BackofficeUserResponseDto> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id, deletedAt: null },
       include: { backofficeRoles: true },
@@ -68,8 +74,10 @@ export class BackofficeUsersService {
     }
 
     return this.mapToResponse(user);
-  }  async create(dto: CreateBackofficeUserDto): Promise<BackofficeUserResponseDto> {
-
+  }
+  async create(
+    dto: CreateBackofficeUserDto,
+  ): Promise<BackofficeUserResponseDto> {
     const existing = await this.prisma.backofficeUsers.findUnique({
       where: { email: dto.email.toLowerCase() },
     });
@@ -103,7 +111,11 @@ export class BackofficeUsersService {
     });
 
     return this.mapToResponse(user);
-  }  async update(id: string, dto: UpdateBackofficeUserDto): Promise<BackofficeUserResponseDto> {
+  }
+  async update(
+    id: string,
+    dto: UpdateBackofficeUserDto,
+  ): Promise<BackofficeUserResponseDto> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id, deletedAt: null },
     });
@@ -149,7 +161,8 @@ export class BackofficeUsersService {
     });
 
     return this.mapToResponse(updated);
-  }  async delete(id: string): Promise<{ success: boolean; message: string }> {
+  }
+  async delete(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id, deletedAt: null },
     });

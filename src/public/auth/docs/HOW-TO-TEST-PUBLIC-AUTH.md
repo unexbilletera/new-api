@@ -15,11 +15,13 @@ WARNING: These endpoints are for development/testing only. They should NOT be us
 **POST** `/test/auth/login`
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Body (JSON):**
+
 ```json
 {
   "email": "usuario@exemplo.com",
@@ -28,10 +30,12 @@ Content-Type: application/json
 ```
 
 **Fields:**
+
 - `email` (string, required): App user email
 - `password` (string, required): App user password
 
 **Success Response (200):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -53,6 +57,7 @@ Content-Type: application/json
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "error": "401 users.errors.invalidCredentials",
@@ -66,11 +71,13 @@ Content-Type: application/json
 **POST** `/test/auth/backoffice-login`
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Body (JSON):**
+
 ```json
 {
   "email": "admin@exemplo.com",
@@ -79,10 +86,12 @@ Content-Type: application/json
 ```
 
 **Fields:**
+
 - `email` (string, required): Backoffice user email
 - `password` (string, required): Backoffice user password
 
 **Success Response (200):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -103,6 +112,7 @@ Content-Type: application/json
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "error": "401 backoffice.errors.invalidCredentials",
@@ -120,12 +130,14 @@ Content-Type: application/json
 3. In **Headers** tab, add:
    - `Content-Type`: `application/json`
 4. In **Body** tab, select **raw** and **JSON**, paste:
+
 ```json
 {
   "email": "usuario@exemplo.com",
   "password": "sua-senha"
 }
 ```
+
 5. Click **Send**
 6. Copy the `token` value from response
 
@@ -154,7 +166,9 @@ Then use `{{base_url}}`, `{{app_token}}` and `{{backoffice_token}}` in your requ
 ## Common Error Codes
 
 ### 401 Unauthorized
+
 **Possible causes:**
+
 - `401 users.errors.invalidCredentials`: Invalid credentials
 - `401 users.errors.invalidPassword`: Invalid password
 - `401 users.errors.userInactive`: User inactive
@@ -164,7 +178,9 @@ Then use `{{base_url}}`, `{{app_token}}` and `{{backoffice_token}}` in your requ
 **Solution**: Verify email and password are correct.
 
 ### 400 Bad Request
+
 **Possible causes:**
+
 - `400 users.errors.invalidEmail`: Invalid email
 - `400 users.errors.invalidPassword`: Invalid password
 - `400 backoffice.errors.invalidEmail`: Invalid backoffice email
@@ -180,7 +196,7 @@ Then use `{{base_url}}`, `{{app_token}}` and `{{backoffice_token}}` in your requ
 
 3. **JWT Token**: Returned token can be used in all protected endpoints that require authentication.
 
-4. **Active User**: 
+4. **Active User**:
    - For app mobile: user must have status `enable` and not be deleted
    - For backoffice: user must have status `active` and not be deleted
 
@@ -206,10 +222,10 @@ This allows you to test the complete authentication flow automatically.
 
 ## App vs Backoffice Differences
 
-| Aspect | App Mobile | Backoffice |
-|--------|------------|------------|
-| Table | `users` | `backofficeUsers` |
-| Valid status | `enable` | `active` |
-| Role | `customer` (default) | From `backofficeRoles` table |
-| Response | Includes `identity` | Includes `role` |
-| Endpoint | `/test/auth/login` | `/test/auth/backoffice-login` |
+| Aspect       | App Mobile           | Backoffice                    |
+| ------------ | -------------------- | ----------------------------- |
+| Table        | `users`              | `backofficeUsers`             |
+| Valid status | `enable`             | `active`                      |
+| Role         | `customer` (default) | From `backofficeRoles` table  |
+| Response     | Includes `identity`  | Includes `role`               |
+| Endpoint     | `/test/auth/login`   | `/test/auth/backoffice-login` |

@@ -31,7 +31,10 @@ export class SuspiciousActivityService {
     const reasons: string[] = [];
     let riskScore = 0;
 
-    if (previousFingerprint?.deviceId && currentFingerprint.deviceId !== previousFingerprint.deviceId) {
+    if (
+      previousFingerprint?.deviceId &&
+      currentFingerprint.deviceId !== previousFingerprint.deviceId
+    ) {
       reasons.push('New device detected');
       riskScore += 15;
     }
@@ -41,7 +44,7 @@ export class SuspiciousActivityService {
         previousFingerprint.ipAddress,
         currentFingerprint.ipAddress,
       );
-      
+
       if (ipChanged.riskLevel === 'high') {
         reasons.push(`High-risk IP change: ${ipChanged.reason}`);
         riskScore += 30;
@@ -51,9 +54,11 @@ export class SuspiciousActivityService {
       }
     }
 
-    if (previousFingerprint?.userAgent && 
-        currentFingerprint.userAgent && 
-        previousFingerprint.userAgent !== currentFingerprint.userAgent) {
+    if (
+      previousFingerprint?.userAgent &&
+      currentFingerprint.userAgent &&
+      previousFingerprint.userAgent !== currentFingerprint.userAgent
+    ) {
       reasons.push('User agent changed');
       riskScore += 10;
     }
@@ -64,7 +69,7 @@ export class SuspiciousActivityService {
         currentFingerprint.ipAddress,
         userId,
       );
-      
+
       if (impossibleTravel) {
         reasons.push('Impossible travel detected');
         riskScore += 40;
@@ -72,7 +77,9 @@ export class SuspiciousActivityService {
     }
 
     if (currentFingerprint.ipAddress) {
-      const isMalicious = await this.checkMaliciousIP(currentFingerprint.ipAddress);
+      const isMalicious = await this.checkMaliciousIP(
+        currentFingerprint.ipAddress,
+      );
       if (isMalicious) {
         reasons.push('Known malicious IP address');
         riskScore += 50;
@@ -145,7 +152,10 @@ export class SuspiciousActivityService {
       const oneHour = 60 * 60 * 1000;
 
       if (timeSinceLastLogin < oneHour) {
-        const lastSubnet = lastLogin.ipAddress?.split('.').slice(0, 2).join('.');
+        const lastSubnet = lastLogin.ipAddress
+          ?.split('.')
+          .slice(0, 2)
+          .join('.');
         const currentSubnet = currentIP.split('.').slice(0, 2).join('.');
 
         if (lastSubnet !== currentSubnet) {
@@ -155,19 +165,24 @@ export class SuspiciousActivityService {
 
       return false;
     } catch (error) {
-      this.logger.error('Error checking impossible travel', error instanceof Error ? error : undefined);
+      this.logger.error(
+        'Error checking impossible travel',
+        error instanceof Error ? error : undefined,
+      );
       return false;
     }
   }
 
   private async checkMaliciousIP(ipAddress: string): Promise<boolean> {
-    const suspiciousRanges = [
-    ];
+    const suspiciousRanges = [];
 
-    return suspiciousRanges.some(range => ipAddress.startsWith(range));
+    return suspiciousRanges.some((range) => ipAddress.startsWith(range));
   }
 
-  private async getRecentLoginCount(userId: string, windowMs: number): Promise<number> {
+  private async getRecentLoginCount(
+    userId: string,
+    windowMs: number,
+  ): Promise<number> {
     try {
       const windowStart = new Date(Date.now() - windowMs);
 
@@ -181,7 +196,10 @@ export class SuspiciousActivityService {
         },
       });
     } catch (error) {
-      this.logger.error('Error getting recent login count', error instanceof Error ? error : undefined);
+      this.logger.error(
+        'Error getting recent login count',
+        error instanceof Error ? error : undefined,
+      );
       return 0;
     }
   }
@@ -201,8 +219,12 @@ export class SuspiciousActivityService {
 
   private static extractPlatform(userAgent: string): string {
     const ua = userAgent.toLowerCase();
-    
-    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+
+    if (
+      ua.includes('mobile') ||
+      ua.includes('android') ||
+      ua.includes('iphone')
+    ) {
       return 'mobile';
     }
     if (ua.includes('tablet') || ua.includes('ipad')) {

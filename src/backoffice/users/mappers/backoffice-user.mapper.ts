@@ -44,21 +44,27 @@ export class BackofficeUserMapper {
     };
   }
 
-  toCreateBackofficeUserResponseDto(user: any): CreateBackofficeUserResponseDto {
+  toCreateBackofficeUserResponseDto(
+    user: any,
+  ): CreateBackofficeUserResponseDto {
     return {
       message: 'User created successfully',
       user: this.toBackofficeUserDetailsDto(user),
     };
   }
 
-  toUpdateBackofficeUserResponseDto(user: any): UpdateBackofficeUserResponseDto {
+  toUpdateBackofficeUserResponseDto(
+    user: any,
+  ): UpdateBackofficeUserResponseDto {
     return {
       message: 'User updated successfully',
       user: this.toBackofficeUserDetailsDto(user),
     };
   }
 
-  toDeleteBackofficeUserResponseDto(userId: string): DeleteBackofficeUserResponseDto {
+  toDeleteBackofficeUserResponseDto(
+    userId: string,
+  ): DeleteBackofficeUserResponseDto {
     return {
       message: 'User deleted successfully',
       userId,

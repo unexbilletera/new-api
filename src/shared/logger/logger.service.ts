@@ -32,7 +32,9 @@ export class LoggerService {
     const timestamp = context.timestamp || this.formatTimestamp();
     const levelLabel = this.formatLevelLabel(context.level);
     const basePrefix = `[${timestamp}] [${levelLabel}]`;
-    const prefixPart = context.prefix ? ` ${this.formatPrefix(context.prefix, context.level)}` : '';
+    const prefixPart = context.prefix
+      ? ` ${this.formatPrefix(context.prefix, context.level)}`
+      : '';
     let message = `${basePrefix}${prefixPart} ${this.formatMessage(context.message, context.level)}`;
 
     if (context.data && Object.keys(context.data).length > 0) {
@@ -41,9 +43,7 @@ export class LoggerService {
 
     if (context.args && context.args.length > 0) {
       const formattedArgs = context.args
-        .map((arg) =>
-          typeof arg === 'string' ? arg : JSON.stringify(arg),
-        )
+        .map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg)))
         .join(' ');
       message += ` ${formattedArgs}`;
     }
@@ -120,7 +120,12 @@ export class LoggerService {
     prefixOrMessage: string,
     messageOrData?: string | Record<string, any>,
     ...args: any[]
-  ): { prefix?: string; message: string; data?: Record<string, any>; args?: any[] } {
+  ): {
+    prefix?: string;
+    message: string;
+    data?: Record<string, any>;
+    args?: any[];
+  } {
     if (typeof messageOrData === 'string') {
       return { prefix: prefixOrMessage, message: messageOrData, args };
     }
@@ -131,7 +136,11 @@ export class LoggerService {
   debug(prefix: string, message: string, ...args: any[]): void;
   debug(prefixOrMessage: string, messageOrData?: any, ...args: any[]): void {
     if (this.isDevelopment) {
-      const normalized = this.normalizeMessage(prefixOrMessage, messageOrData, ...args);
+      const normalized = this.normalizeMessage(
+        prefixOrMessage,
+        messageOrData,
+        ...args,
+      );
       this.output({
         level: LogLevel.DEBUG,
         ...normalized,
@@ -142,7 +151,11 @@ export class LoggerService {
   info(message: string, data?: Record<string, any>): void;
   info(prefix: string, message: string, ...args: any[]): void;
   info(prefixOrMessage: string, messageOrData?: any, ...args: any[]): void {
-    const normalized = this.normalizeMessage(prefixOrMessage, messageOrData, ...args);
+    const normalized = this.normalizeMessage(
+      prefixOrMessage,
+      messageOrData,
+      ...args,
+    );
     this.output({
       level: LogLevel.INFO,
       ...normalized,
@@ -152,7 +165,11 @@ export class LoggerService {
   success(message: string, data?: Record<string, any>): void;
   success(prefix: string, message: string, ...args: any[]): void;
   success(prefixOrMessage: string, messageOrData?: any, ...args: any[]): void {
-    const normalized = this.normalizeMessage(prefixOrMessage, messageOrData, ...args);
+    const normalized = this.normalizeMessage(
+      prefixOrMessage,
+      messageOrData,
+      ...args,
+    );
     this.output({
       level: LogLevel.SUCCESS,
       ...normalized,
@@ -162,7 +179,11 @@ export class LoggerService {
   warn(message: string, data?: Record<string, any>): void;
   warn(prefix: string, message: string, ...args: any[]): void;
   warn(prefixOrMessage: string, messageOrData?: any, ...args: any[]): void {
-    const normalized = this.normalizeMessage(prefixOrMessage, messageOrData, ...args);
+    const normalized = this.normalizeMessage(
+      prefixOrMessage,
+      messageOrData,
+      ...args,
+    );
     this.output({
       level: LogLevel.WARN,
       ...normalized,
@@ -177,7 +198,12 @@ export class LoggerService {
     errorOrData?: any,
     ...args: any[]
   ): void {
-    const normalized = this.normalizeMessage(prefixOrMessage, messageOrError as any, errorOrData, ...args);
+    const normalized = this.normalizeMessage(
+      prefixOrMessage,
+      messageOrError as any,
+      errorOrData,
+      ...args,
+    );
     const error =
       messageOrError instanceof Error
         ? messageOrError
@@ -194,7 +220,11 @@ export class LoggerService {
 
   errorWithStack(message: string, error?: Error): void;
   errorWithStack(prefix: string, message: string, error?: Error): void;
-  errorWithStack(prefixOrMessage: string, messageOrError?: any, errorMaybe?: Error): void {
+  errorWithStack(
+    prefixOrMessage: string,
+    messageOrError?: any,
+    errorMaybe?: Error,
+  ): void {
     const hasPrefix = typeof messageOrError === 'string';
     const message = hasPrefix ? (messageOrError as string) : prefixOrMessage;
     const prefix = hasPrefix ? prefixOrMessage : undefined;

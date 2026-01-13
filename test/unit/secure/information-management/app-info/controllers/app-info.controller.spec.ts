@@ -100,7 +100,9 @@ describe('AppInfoController', () => {
     it('should propagate service errors', async () => {
       service.getFullInfo.mockRejectedValue(new Error('Service unavailable'));
 
-      await expect(controller.getFullInfo('1.0.0')).rejects.toThrow('Service unavailable');
+      await expect(controller.getFullInfo('1.0.0')).rejects.toThrow(
+        'Service unavailable',
+      );
     });
   });
 
@@ -228,8 +230,22 @@ describe('AppInfoController', () => {
   describe('getNews', () => {
     it('should delegate to service', async () => {
       const response = [
-        { id: 'news-1', title: 'Update Available', message: 'New version released', active: true, priority: 1, createdAt: new Date() },
-        { id: 'news-2', title: 'Maintenance', message: 'Server maintenance scheduled', active: true, priority: 2, createdAt: new Date() },
+        {
+          id: 'news-1',
+          title: 'Update Available',
+          message: 'New version released',
+          active: true,
+          priority: 1,
+          createdAt: new Date(),
+        },
+        {
+          id: 'news-2',
+          title: 'Maintenance',
+          message: 'Server maintenance scheduled',
+          active: true,
+          priority: 2,
+          createdAt: new Date(),
+        },
       ];
       service.getNews.mockResolvedValue(response);
 
@@ -241,7 +257,14 @@ describe('AppInfoController', () => {
 
     it('should return array of news', async () => {
       const response = [
-        { id: 'news-1', title: 'Update Available', message: 'New version released', active: true, priority: 1, createdAt: new Date() },
+        {
+          id: 'news-1',
+          title: 'Update Available',
+          message: 'New version released',
+          active: true,
+          priority: 1,
+          createdAt: new Date(),
+        },
       ];
       service.getNews.mockResolvedValue(response);
 
@@ -265,7 +288,9 @@ describe('AppInfoController', () => {
     it('should propagate service errors', async () => {
       service.getNews.mockRejectedValue(new Error('Failed to fetch news'));
 
-      await expect(controller.getNews()).rejects.toThrow('Failed to fetch news');
+      await expect(controller.getNews()).rejects.toThrow(
+        'Failed to fetch news',
+      );
     });
   });
 
@@ -320,9 +345,13 @@ describe('AppInfoController', () => {
     });
 
     it('should propagate service errors', async () => {
-      service.getFeatures.mockRejectedValue(new Error('Failed to fetch features'));
+      service.getFeatures.mockRejectedValue(
+        new Error('Failed to fetch features'),
+      );
 
-      await expect(controller.getFeatures()).rejects.toThrow('Failed to fetch features');
+      await expect(controller.getFeatures()).rejects.toThrow(
+        'Failed to fetch features',
+      );
     });
   });
 });

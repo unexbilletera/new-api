@@ -3,6 +3,7 @@
 ## Overview
 
 This step initiates the identity document validation process. The flow differs based on the user's country:
+
 - **Argentina**: RENAPER validation with PDF417 barcode parsing
 - **Brazil**: Cronos onboarding integration
 
@@ -38,11 +39,11 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| countryCode | string | No | Country code (e.g., "AR", "BR") |
-| country | string | No | Country code in lowercase (must be "ar" or "br") |
-| documentType | string | No | Document type (e.g., "dni", "cpf") |
+| Field        | Type   | Required | Description                                      |
+| ------------ | ------ | -------- | ------------------------------------------------ |
+| countryCode  | string | No       | Country code (e.g., "AR", "BR")                  |
+| country      | string | No       | Country code in lowercase (must be "ar" or "br") |
+| documentType | string | No       | Document type (e.g., "dni", "cpf")               |
 
 ### Response
 
@@ -56,7 +57,21 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
   "userId": "550e8400-e29b-41d4-a716-446655440000",
   "country": "ar",
   "onboardingState": {
-    "completedSteps": ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.11", "1.12", "2.1"],
+    "completedSteps": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "1.5",
+      "1.6",
+      "1.7",
+      "1.8",
+      "1.9",
+      "1.10",
+      "1.11",
+      "1.12",
+      "2.1"
+    ],
     "needsCorrection": []
   }
 }
@@ -76,12 +91,12 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 
 ### Request Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| documentNumber | string | No | Identity document number |
-| documentExpiration | string | No | Document expiration date |
-| documentIssuer | string | No | Document issuer |
-| biometricData | object | No | Biometric data (if applicable) |
+| Field              | Type   | Required | Description                    |
+| ------------------ | ------ | -------- | ------------------------------ |
+| documentNumber     | string | No       | Identity document number       |
+| documentExpiration | string | No       | Document expiration date       |
+| documentIssuer     | string | No       | Document issuer                |
+| biometricData      | object | No       | Biometric data (if applicable) |
 
 ### Response
 
@@ -98,6 +113,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 ## Implementation Details
 
 ### Argentina Flow (Step 2.1 - 2.4)
+
 1. **Step 2.1**: Start identity onboarding
    - Creates identity record with country `"ar"`
    - Sets identity status to `pending`
@@ -119,6 +135,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
    - Ready for backoffice approval
 
 ### Brazil Flow (Step 3.1 - 3.5)
+
 1. **Step 3.1**: Start identity onboarding
    - Creates identity record with country `"br"`
    - Sets identity status to `pending`
@@ -144,6 +161,7 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 ## State Management
 
 After starting identity onboarding:
+
 - `onboardingState.completedSteps` includes `"2.1"` (Argentina) or `"3.1"` (Brazil)
 - Identity record is created with status `pending`
 - Next step depends on country:
@@ -153,11 +171,13 @@ After starting identity onboarding:
 ## Country-Specific Details
 
 ### Argentina
+
 - Document type: DNI (Documento Nacional de Identidad)
 - Validation: RENAPER API integration
 - Features: PDF417 barcode parsing, facial validation, document validity check
 
 ### Brazil
+
 - Document type: CPF (Cadastro de Pessoas Físicas)
 - Validation: Cronos onboarding integration
 - Features: Automatic PIX key generation, account creation
@@ -170,6 +190,7 @@ After starting identity onboarding:
 ## Example cURL
 
 ### Start Identity Onboarding (Argentina)
+
 ```bash
 curl -X POST https://api.example.com/api/onboarding/identity/550e8400-e29b-41d4-a716-446655440000 \
   -H "Content-Type: application/json" \
@@ -182,6 +203,7 @@ curl -X POST https://api.example.com/api/onboarding/identity/550e8400-e29b-41d4-
 ```
 
 ### Start Identity Onboarding (Brazil)
+
 ```bash
 curl -X POST https://api.example.com/api/onboarding/identity/550e8400-e29b-41d4-a716-446655440000 \
   -H "Content-Type: application/json" \
@@ -194,6 +216,7 @@ curl -X POST https://api.example.com/api/onboarding/identity/550e8400-e29b-41d4-
 ```
 
 ### Update Identity Information
+
 ```bash
 curl -X PATCH https://api.example.com/api/onboarding/identity/660e8400-e29b-41d4-a716-446655440000 \
   -H "Content-Type: application/json" \
