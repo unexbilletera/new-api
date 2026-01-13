@@ -155,7 +155,39 @@ export class PrismaService
   }
 
   async onModuleInit(): Promise<void> {
-    await this.$connect();
+    try {
+      await this.$connect();
+      this.logger.info('Database connection established successfully');
+    } catch (error: any) {
+      const errorMessage = error?.message || '';
+      let host = 'unknown';
+      let port = 'unknown';
+      
+      const hostPortMatch = errorMessage.match(/at `([^:]+):(\d+)`/);
+      if (hostPortMatch) {
+        host = hostPortMatch[1];
+        port = hostPortMatch[2];
+      } else {
+        const dbUrl = process.env.DATABASE_URL || process.env.WALLET_MYSQL_URL || '';
+        if (dbUrl) {
+          const urlMatch = dbUrl.match(/@([^:]+):(\d+)/);
+          if (urlMatch) {
+            host = urlMatch[1];
+            port = urlMatch[2];
+          }
+        }
+      }
+      
+      this.logger.error(
+        `Database connection failed: Cannot reach database server at ${host}:${port}`,
+        error instanceof Error ? error : new Error(errorMessage),
+        {
+          errorCode: error?.errorCode || 'P1001',
+        },
+      );
+      
+      throw error;
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
