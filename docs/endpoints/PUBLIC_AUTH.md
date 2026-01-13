@@ -6,18 +6,21 @@ Public endpoints that require authentication (Bearer token in Authorization head
 
 ### GET /api/users/user/me ✅ TESTED
 
-**Description:** Get current authenticated user profile  
+**Description:** Get current authenticated user profile (optimized response with essential data only)  
 **Headers (Required):** Authorization Bearer token  
 **Query (Optional):**
 
 - `systemVersion` (string)
+- `include` (string) - Include additional data (e.g., `rates` for exchange rates)
 
 **Test Result:**
 
 - ✅ Endpoint working correctly
-- Returns complete authenticated user profile
+- Returns optimized authenticated user profile with essential data only
 - Status: 200 OK
-- Response includes: user details (id, email, phone, name, status, access, language, country, birthdate, gender, maritalStatus, pep, identities, accounts), forceUpgrade, exchangeRates
+- Response includes: user details (id, email, phone, name, status, access, language, country, birthdate, gender, maritalStatus, emailVerified, phoneVerified, livenessVerified, identities, accounts, onboardingState, createdAt), forceUpgrade
+- Exchange rates (`exchangeRates`) are optional and only included when `?include=rates` is provided
+- Sensitive data (document numbers, PEP status, etc.) is not included in the default response
 
 **Response:** User profile response
 
@@ -45,7 +48,7 @@ Public endpoints that require authentication (Bearer token in Authorization head
 - ✅ Endpoint working correctly
 - Successfully updates user profile information
 - Status: 200 OK
-- Response includes: success, user object with updated fields (id, email, firstName, lastName, phone, name, language, country, birthdate, gender, maritalStatus, image)
+- Response includes: user object with updated fields (id, email, firstName, lastName, phone, name, language, country, birthdate, gender, maritalStatus, image)
 
 ### POST /api/users/user/address ✅ TESTED
 
@@ -71,7 +74,7 @@ Public endpoints that require authentication (Bearer token in Authorization head
 - ✅ Endpoint working correctly
 - Successfully updates user address
 - Status: 200 OK
-- Response includes: success, address object with all fields (zipCode, street, number, neighborhood, city, state, complement)
+- Response includes: address object with all fields (zipCode, street, number, neighborhood, city, state, complement)
 
 ## Account Management
 
@@ -473,9 +476,10 @@ Public endpoints that require authentication (Bearer token in Authorization head
 **Test Result:**
 
 - ✅ Endpoint working correctly
-- Returns user identities list
+- Returns user identities list (optimized response without sensitive document numbers)
 - Status: 200 OK
-- Response includes: identities array with id, country, taxDocumentNumber, taxDocumentType, identityDocumentNumber, identityDocumentType, status, createdAt for each identity
+- Response includes: identities array with id, country, status, type, subtype, name for each identity
+- Sensitive data (taxDocumentNumber, identityDocumentNumber) is not included for security reasons
 
 ### POST /api/users/user/setDefaultUserIdentity/:id
 
