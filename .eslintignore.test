@@ -1,0 +1,21 @@
+# ESLint ignore rules for test files
+# These files have legitimate reasons for excluding certain linting rules
+
+# Generated Prisma files
+generated/
+
+# Node modules
+node_modules/
+
+# Test fixtures and mocks can use 'any' type safely
+test/utils/mocks/
+test/utils/fixtures/
+test/**/*.spec.ts
+test/**/*.e2e-spec.ts
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Build output
+dist/
