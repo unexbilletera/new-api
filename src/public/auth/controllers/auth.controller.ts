@@ -27,7 +27,7 @@ import {
   TokenResponseDto,
 } from '../dto/response';
 
-@ApiTags('Authentication')
+@ApiTags('1. Public - Authentication')
 @Controller('api/users')
 export class AuthController {
   constructor(
@@ -208,7 +208,7 @@ export class AuthController {
   }
 }
 
-@ApiTags('Security')
+@ApiTags('1. Public - Security')
 @Controller('api/security')
 export class SecurityController {
   constructor(private tokenService: TokenService) {}

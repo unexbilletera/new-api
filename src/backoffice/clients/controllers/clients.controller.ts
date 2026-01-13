@@ -21,7 +21,7 @@ import { ListClientsQueryDto, UpdateClientDto, BlockClientDto } from '../dto/cli
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
 import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
 
-@ApiTags('backoffice-clients')
+@ApiTags('3. Backoffice - Clients')
 @ApiBearerAuth('JWT-auth')
 @Controller('backoffice/clients')
 @UseGuards(BackofficeAuthGuard, BackofficeRoleGuard)

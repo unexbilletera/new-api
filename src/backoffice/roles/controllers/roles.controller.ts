@@ -20,7 +20,7 @@ import { CreateRoleDto, UpdateRoleDto } from '../dto/role.dto';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
 import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
 
-@ApiTags('backoffice-roles')
+@ApiTags('3. Backoffice - Roles')
 @ApiBearerAuth('JWT-auth')
 @Controller('backoffice/management/roles')
 @UseGuards(BackofficeAuthGuard, BackofficeRoleGuard)

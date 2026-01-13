@@ -20,7 +20,7 @@ import {
   ListActionsQueryDto,
 } from '../dto/actions.dto';
 
-@ApiTags('Backoffice - Actions')
+@ApiTags('3. Backoffice - Actions')
 @ApiBearerAuth()
 @UseGuards(BackofficeAuthGuard, BackofficeRoleGuard)
 @Controller('backoffice/actions')

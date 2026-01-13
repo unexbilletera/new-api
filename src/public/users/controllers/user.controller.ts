@@ -50,7 +50,7 @@ interface AuthenticatedUser {
   roleId?: string;
 }
 
-@ApiTags('Users')
+@ApiTags('1. Public - Users')
 @ApiBearerAuth('JWT-auth')
 @Controller('api/users')
 export class UserController {

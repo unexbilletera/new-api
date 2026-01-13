@@ -29,7 +29,7 @@ import {
   AcceptTermResponseDto,
 } from '../dto/response';
 
-@ApiTags('terms')
+@ApiTags('2. Secure - Terms')
 @ApiBearerAuth('JWT-auth')
 @Controller('terms')
 @UseGuards(JwtAuthGuard)

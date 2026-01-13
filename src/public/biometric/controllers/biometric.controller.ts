@@ -33,7 +33,7 @@ import {
   CheckDeviceHealthResponseDto,
 } from '../dto/response';
 
-@ApiTags('biometric')
+@ApiTags('1. Public - Biometric')
 @ApiBearerAuth('JWT-auth')
 @Controller('api/auth')
 @UseGuards(JwtAuthGuard)
