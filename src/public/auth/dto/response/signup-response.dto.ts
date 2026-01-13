@@ -37,30 +37,6 @@ export class SignupUserDto {
 }
 
 export class SignupResponseDto {
-  @ApiPropertyOptional({
-    description: 'Success indicator',
-    example: true,
-  })
-  deviceRequired?: boolean;
-
-  @ApiPropertyOptional({
-    description: 'Device type',
-    example: 'mobile',
-  })
-  deviceType?: string;
-
-  @ApiPropertyOptional({
-    description: 'Informational message',
-    example: 'Cadastro realizado successfully',
-  })
-  message?: string;
-
-  @ApiPropertyOptional({
-    description: 'User unique identifier',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  userId?: string;
-
   @ApiProperty({
     description: 'Authenticated user data',
     type: () => SignupUserDto,
@@ -74,6 +50,13 @@ export class SignupResponseDto {
   })
   accessToken: string;
 
+  @ApiPropertyOptional({
+    description: 'Refresh token (optional)',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
+  })
+  refreshToken?: string;
+
   @ApiProperty({
     description: 'Token expiration time in seconds',
     example: 3600,
@@ -84,7 +67,7 @@ export class SignupResponseDto {
 
 export class SignupDeviceRequiredResponseDto {
   @ApiProperty({
-    description: 'Success indicator',
+    description: 'Indicates device registration is required',
     example: true,
   })
   deviceRequired: boolean;
@@ -100,12 +83,6 @@ export class SignupDeviceRequiredResponseDto {
     example: 'It is necessary to register a device to continue',
   })
   message: string;
-
-  @ApiProperty({
-    description: 'User unique identifier',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  userId: string;
 
   @ApiProperty({
     description: 'JWT access token',

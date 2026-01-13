@@ -67,7 +67,7 @@ export class SigninResponseDto {
 
 export class SigninDeviceRequiredResponseDto {
   @ApiProperty({
-    description: 'Success indicator',
+    description: 'Indicates device registration is required',
     example: true,
   })
   deviceRequired: boolean;
@@ -83,12 +83,6 @@ export class SigninDeviceRequiredResponseDto {
     example: 'It is necessary to register a device to continue',
   })
   message: string;
-
-  @ApiProperty({
-    description: 'User unique identifier',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  userId: string;
 
   @ApiProperty({
     description: 'JWT access token',

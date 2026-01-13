@@ -6,12 +6,6 @@ export class ForgotPasswordResponseDto {
     example: 'Recovery code sent to email',
   })
   message: string;
-
-  @ApiPropertyOptional({
-    description: 'Validation data',
-    example: 'Recovery email sent successfully',
-  })
-  debug?: string;
 }
 
 export class VerifyPasswordResponseDto {
@@ -84,12 +78,12 @@ export class UnlockAccountResponseDto {
   })
   accessToken: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Refresh token (optional)',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     type: String,
   })
-  refreshToken: string;
+  refreshToken?: string;
 
   @ApiProperty({
     description: 'Token expiration time in seconds',
