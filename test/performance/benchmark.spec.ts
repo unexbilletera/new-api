@@ -1,12 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
-import { INestApplication } from '@nestjs/common';
-import { LoggerService } from '../../src/shared/logger/logger.service';
-
-const logger = new LoggerService();
-
 describe('Performance - Benchmark Tests', () => {
-  let app: INestApplication | undefined;
+  const log = (message: string) => console.log(`[Benchmark] ${message}`);
 
   const THRESHOLDS = {
     signup: 150,
@@ -17,15 +10,6 @@ describe('Performance - Benchmark Tests', () => {
     notificationsList: 100,
     tokenGeneration: 20,
   };
-
-  beforeAll(async () => {
-  });
-
-  afterAll(async () => {
-    if (app) {
-      await app.close();
-    }
-  });
 
   describe('Authentication Service - Signup Performance', () => {
     it('should complete email validation within threshold', () => {
@@ -40,7 +24,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(isValid).toBe(true);
       expect(duration).toBeLessThan(THRESHOLDS.emailValidation);
-      logger.info(`Email validation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.emailValidation}ms)`);
+      log(`Email validation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.emailValidation}ms)`);
     });
 
     it('should complete phone normalization within threshold', () => {
@@ -55,7 +39,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(normalized.length).toBeGreaterThanOrEqual(11);
       expect(duration).toBeLessThan(THRESHOLDS.phoneValidation);
-      logger.info(`Phone normalization: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.phoneValidation}ms)`);
+      log(`Phone normalization: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.phoneValidation}ms)`);
     });
   });
 
@@ -77,7 +61,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(token).toBeDefined();
       expect(duration).toBeLessThan(THRESHOLDS.tokenGeneration);
-      logger.info(`Token generation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.tokenGeneration}ms)`);
+      log(`Token generation: ${duration.toFixed(3)}ms (threshold: ${THRESHOLDS.tokenGeneration}ms)`);
     });
   });
 
@@ -105,7 +89,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(normalizedUsers.length).toBe(100);
       expect(avgPerUser).toBeLessThan(5);
-      logger.info(`Batch normalization (100 users): ${duration.toFixed(3)}ms avg: ${avgPerUser.toFixed(3)}ms per user`);
+      log(`Batch normalization (100 users): ${duration.toFixed(3)}ms avg: ${avgPerUser.toFixed(3)}ms per user`);
     });
   });
 
@@ -123,7 +107,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(validEmails.length).toBe(1000);
       expect(duration).toBeLessThan(50);
-      logger.info(`1000 email validations: ${duration.toFixed(3)}ms`);
+      log(`1000 email validations: ${duration.toFixed(3)}ms`);
     });
 
     it('should validate phone format efficiently', () => {
@@ -139,7 +123,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(validPhones.length).toBe(1000);
       expect(duration).toBeLessThan(50);
-      logger.info(`1000 phone validations: ${duration.toFixed(3)}ms`);
+      log(`1000 phone validations: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -161,7 +145,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(unread.length).toBeGreaterThan(0);
       expect(duration).toBeLessThan(100);
-      logger.info(`Filter 10k notifications: ${duration.toFixed(3)}ms`);
+      log(`Filter 10k notifications: ${duration.toFixed(3)}ms`);
     });
 
     it('should sort notifications efficiently', () => {
@@ -183,7 +167,7 @@ describe('Performance - Benchmark Tests', () => {
         sorted[sorted.length - 1].createdAt.getTime()
       );
       expect(duration).toBeLessThan(100);
-      logger.info(`Sort 5k notifications: ${duration.toFixed(3)}ms`);
+      log(`Sort 5k notifications: ${duration.toFixed(3)}ms`);
     });
 
     it('should map data transformation efficiently', () => {
@@ -208,7 +192,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(dtos.length).toBe(5000);
       expect(duration).toBeLessThan(50);
-      logger.info(`Transform 5k users to DTO: ${duration.toFixed(3)}ms`);
+      log(`Transform 5k users to DTO: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -235,7 +219,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(Object.keys(merged).length).toBe(1000);
       expect(duration).toBeLessThan(100);
-      logger.info(`Merge 1000 validation results: ${duration.toFixed(3)}ms`);
+      log(`Merge 1000 validation results: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -264,7 +248,7 @@ describe('Performance - Benchmark Tests', () => {
       expect(memoryIncrease).toBeLessThan(50);
       expect(mapped.length).toBe(5000);
 
-      logger.info(`Memory usage: Initial=${(initialMemory / 1024 / 1024).toFixed(2)}MB, After creation=${(afterCreation / 1024 / 1024).toFixed(2)}MB (+${memoryIncrease.toFixed(2)}MB)`);
+      log(`Memory usage: Initial=${(initialMemory / 1024 / 1024).toFixed(2)}MB, After creation=${(afterCreation / 1024 / 1024).toFixed(2)}MB (+${memoryIncrease.toFixed(2)}MB)`);
     });
   });
 
@@ -282,7 +266,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(valid).toBe(10000);
       expect(duration).toBeLessThan(200);
-      logger.info(`10k email regex tests: ${duration.toFixed(3)}ms`);
+      log(`10k email regex tests: ${duration.toFixed(3)}ms`);
     });
 
     it('should handle complex data validation regex', () => {
@@ -305,7 +289,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(valid).toBe(5000);
       expect(duration).toBeLessThan(150);
-      logger.info(`5k complex validation regex: ${duration.toFixed(3)}ms`);
+      log(`5k complex validation regex: ${duration.toFixed(3)}ms`);
     });
   });
 
@@ -327,7 +311,7 @@ describe('Performance - Benchmark Tests', () => {
 
       expect(recent.length).toBeGreaterThan(0);
       expect(duration).toBeLessThan(100);
-      logger.info(`Filter 10k notifications by date: ${duration.toFixed(3)}ms`);
+      log(`Filter 10k notifications by date: ${duration.toFixed(3)}ms`);
     });
   });
 });

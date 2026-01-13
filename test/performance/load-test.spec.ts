@@ -7,11 +7,10 @@ import {
   LoadTestResults,
   LoadTestScenario,
 } from './load-test.config';
-import { LoggerService } from '../../src/shared/logger/logger.service';
-
-const logger = new LoggerService();
 
 describe('Performance - Load Testing', () => {
+  const log = (message: string) => console.log(`[LoadTest] ${message}`);
+  const warn = (message: string) => console.warn(`[LoadTest] ${message}`);
   async function simulateRequest(
     scenario: LoadTestScenario,
     requestNumber: number
@@ -47,8 +46,8 @@ describe('Performance - Load Testing', () => {
     const effectiveDuration = Math.min(scenario.duration, 10);
     const numRequests = Math.max(5, Math.ceil(effectiveDuration * scenario.expectedRPS));
 
-    logger.info(`Running: ${scenario.name}`);
-    logger.info(`Duration: ${scenario.duration}s | Concurrency: ${scenario.concurrency} | Requests: ${numRequests}`);
+    log(`Running: ${scenario.name}`);
+    log(`Duration: ${scenario.duration}s | Concurrency: ${scenario.concurrency} | Requests: ${numRequests}`);
 
     for (let i = 0; i < numRequests; i++) {
       if (i % scenario.concurrency === 0 && i > 0) {
@@ -88,16 +87,16 @@ describe('Performance - Load Testing', () => {
     const validation = validateResults(results_obj, scenario);
     results_obj.passed = validation.valid;
 
-    logger.info(`Results:`);
-    logger.info(`Success Rate: ${(results_obj.successRate * 100).toFixed(2)}% (target: ${(scenario.expectedSuccessRate * 100).toFixed(2)}%)`);
-    logger.info(`Avg Latency: ${results_obj.averageLatency.toFixed(2)}ms (target: ${scenario.expectedLatency}ms)`);
-    logger.info(`P95 Latency: ${results_obj.p95Latency.toFixed(2)}ms`);
-    logger.info(`P99 Latency: ${results_obj.p99Latency.toFixed(2)}ms`);
-    logger.info(`Throughput: ${results_obj.throughput.toFixed(2)} RPS (target: ${scenario.expectedRPS} RPS)`);
+    log(`Results:`);
+    log(`Success Rate: ${(results_obj.successRate * 100).toFixed(2)}% (target: ${(scenario.expectedSuccessRate * 100).toFixed(2)}%)`);
+    log(`Avg Latency: ${results_obj.averageLatency.toFixed(2)}ms (target: ${scenario.expectedLatency}ms)`);
+    log(`P95 Latency: ${results_obj.p95Latency.toFixed(2)}ms`);
+    log(`P99 Latency: ${results_obj.p99Latency.toFixed(2)}ms`);
+    log(`Throughput: ${results_obj.throughput.toFixed(2)} RPS (target: ${scenario.expectedRPS} RPS)`);
 
     if (validation.violations.length > 0) {
-      logger.warn(`Violations:`);
-      validation.violations.forEach(v => logger.warn(`- ${v}`));
+      warn(`Violations:`);
+      validation.violations.forEach(v => warn(`- ${v}`));
     }
 
     return results_obj;
@@ -177,7 +176,7 @@ describe('Performance - Load Testing', () => {
       expect(results.averageLatency).toBeLessThan(120);
       expect(results.p99Latency).toBeLessThan(200);
 
-      logger.info(`Health Check Performance: EXCELLENT`);
+      log(`Health Check Performance: EXCELLENT`);
     }, 60000);
   });
 
@@ -199,7 +198,7 @@ describe('Performance - Load Testing', () => {
       expect(results.successRate).toBeGreaterThanOrEqual(scenario.expectedSuccessRate * 0.85);
       expect(results.averageLatency).toBeLessThan(scenario.expectedLatency * 1.5);
 
-      logger.info(`System recovered from spike: PASSED`);
+      log(`System recovered from spike: PASSED`);
     }, 60000);
 
     it('should handle app info endpoint spike gracefully', async () => {
@@ -229,7 +228,7 @@ describe('Performance - Load Testing', () => {
       expect(results.successRate).toBeGreaterThanOrEqual(0.95);
       expect(results.averageLatency).toBeLessThan(150);
 
-      logger.info(`Sustained load test: PASSED`);
+      log(`Sustained load test: PASSED`);
     }, 180000);
   });
 
@@ -280,10 +279,10 @@ describe('Performance - Load Testing', () => {
       expect(p99).toBeGreaterThan(150);
       expect(avg).toBeLessThan(120);
 
-      logger.info(`Latency Distribution:`);
-      logger.info(`Average: ${avg.toFixed(2)}ms`);
-      logger.info(`P95: ${p95.toFixed(2)}ms`);
-      logger.info(`P99: ${p99.toFixed(2)}ms`);
+      log(`Latency Distribution:`);
+      log(`Average: ${avg.toFixed(2)}ms`);
+      log(`P95: ${p95.toFixed(2)}ms`);
+      log(`P99: ${p99.toFixed(2)}ms`);
     });
   });
 
@@ -317,9 +316,9 @@ describe('Performance - Load Testing', () => {
         results.push({ concurrency, timePerRequest });
       }
 
-      logger.info(`Concurrency Performance:`);
+      log(`Concurrency Performance:`);
       results.forEach(r => {
-        logger.info(`${r.concurrency} concurrent: ${r.timePerRequest.toFixed(2)}ms per request`);
+        log(`${r.concurrency} concurrent: ${r.timePerRequest.toFixed(2)}ms per request`);
       });
 
       const baseline = results[0].timePerRequest;
@@ -338,7 +337,7 @@ describe('Performance - Load Testing', () => {
         { name: 'Backoffice Clients', errorRate: 0.08 },
       ];
 
-      logger.info(`Error Rate Analysis:`);
+      log(`Error Rate Analysis:`);
 
       scenarioResults.forEach(result => {
         const status =
@@ -346,7 +345,7 @@ describe('Performance - Load Testing', () => {
           result.errorRate < 0.05 ? 'WARN' :
           'FAIL';
 
-        logger.info(`${status} ${result.name}: ${(result.errorRate * 100).toFixed(2)}% error rate`);
+        log(`${status} ${result.name}: ${(result.errorRate * 100).toFixed(2)}% error rate`);
 
         if (result.errorRate >= 0.10) {
           expect(result.errorRate).toBeLessThanOrEqual(0.10);
