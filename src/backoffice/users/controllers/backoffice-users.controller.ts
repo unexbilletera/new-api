@@ -26,7 +26,7 @@ import {
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
 import { BackofficeRoleGuard, MinLevel } from '../../../shared/guards/backoffice-role.guard';
 
-@ApiTags('3. Backoffice - Users')
+@ApiTags('3.2 Backoffice - Users')
 @ApiBearerAuth('JWT-auth')
 @Controller('backoffice/management/users')
 @UseGuards(BackofficeAuthGuard, BackofficeRoleGuard)

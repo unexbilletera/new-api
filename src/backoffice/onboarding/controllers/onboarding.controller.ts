@@ -19,7 +19,7 @@ import {
   RequestCorrectionDto,
 } from '../dto/onboarding.dto';
 
-@ApiTags('3. Backoffice - Onboarding')
+@ApiTags('3.3 Backoffice - Onboarding')
 @ApiBearerAuth()
 @UseGuards(BackofficeAuthGuard, BackofficeRoleGuard)
 @Controller('backoffice/onboarding')

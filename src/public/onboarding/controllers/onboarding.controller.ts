@@ -37,7 +37,7 @@ import {
   RetryOnboardingResponseDto,
 } from '../dto/response';
 
-@ApiTags('1. Public - Onboarding')
+@ApiTags('1.3 Public - Onboarding')
 @Controller('api/onboarding')
 export class OnboardingController {
   constructor(
@@ -229,7 +229,7 @@ export class OnboardingController {
   }
 }
 
-@ApiTags('1. Public - Onboarding')
+@ApiTags('1.3 Public - Onboarding')
 @ApiBearerAuth('JWT-auth')
 @Controller('api/users')
 export class UserOnboardingController {

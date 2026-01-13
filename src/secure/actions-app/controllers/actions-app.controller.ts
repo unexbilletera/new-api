@@ -24,7 +24,7 @@ import {
   ActionsWithModuleFilterResponseDto,
 } from '../dto/response';
 
-@ApiTags('2. Secure - Actions')
+@ApiTags('2.3 Secure - Actions')
 @ApiBearerAuth('JWT-auth')
 @Controller('actions')
 @UseGuards(JwtAuthGuard)

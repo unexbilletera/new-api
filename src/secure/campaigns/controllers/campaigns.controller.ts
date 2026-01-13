@@ -26,7 +26,7 @@ import {
   ListUserCampaignsResponseDto,
 } from '../dto/response';
 
-@ApiTags('2. Secure - Campaigns')
+@ApiTags('2.2 Secure - Campaigns')
 @ApiBearerAuth('JWT-auth')
 @Controller('campaigns')
 @UseGuards(JwtAuthGuard)

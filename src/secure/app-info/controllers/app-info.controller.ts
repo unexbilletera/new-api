@@ -24,7 +24,7 @@ import {
   FeaturesResponseDto,
 } from '../dto/response';
 
-@ApiTags('2. Secure - App Info')
+@ApiTags('2.3 Secure - App Info')
 @ApiBearerAuth('JWT-auth')
 @Controller('app-info')
 @UseGuards(JwtAuthGuard)

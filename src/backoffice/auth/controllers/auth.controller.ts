@@ -32,7 +32,7 @@ interface CurrentUserPayload {
   };
 }
 
-@ApiTags('3. Backoffice - Authentication')
+@ApiTags('3.1 Backoffice - Authentication')
 @Controller('backoffice/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

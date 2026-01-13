@@ -23,7 +23,7 @@ import {
   UpdateModuleDto,
 } from '../dto/system-config.dto';
 
-@ApiTags('3. Backoffice - System Config')
+@ApiTags('3.3 Backoffice - System Config')
 @ApiBearerAuth()
 @UseGuards(BackofficeAuthGuard, BackofficeRoleGuard)
 @Controller('backoffice/system-config')

@@ -27,7 +27,7 @@ interface CurrentUserPayload {
   roleId: string;
 }
 
-@ApiTags('2. Secure - Transactions')
+@ApiTags('2.1 Secure - Transactions')
 @Controller('transactions/pix/cronos')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')

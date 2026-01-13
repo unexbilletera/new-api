@@ -37,7 +37,7 @@ import {
   SendTestPushResponseDto,
 } from '../dto/response';
 
-@ApiTags('2. Secure - Notifications')
+@ApiTags('2.2 Secure - Notifications')
 @ApiBearerAuth('JWT-auth')
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)
