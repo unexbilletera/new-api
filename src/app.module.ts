@@ -13,6 +13,8 @@ import { RenaperModule } from './shared/renaper/renaper.module';
 import { BindModule } from './shared/bind/bind.module';
 import { StorageModule } from './shared/storage/storage.module';
 import { MantecaModule } from './shared/manteca/manteca.module';
+import { CursorPaginatorService } from './shared/pagination/cursor-paginator.service';
+import { QueryHelpers } from './shared/database/query.helpers';
 
 import { PublicAuthModule } from './public/auth/auth.module';
 import { PublicOnboardingModule } from './public/onboarding/onboarding.module';
@@ -77,6 +79,12 @@ import { HealthModule } from './health/health.module';
     WebhooksModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppModel, AppMapper],
+  providers: [
+    AppService,
+    AppModel,
+    AppMapper,
+    CursorPaginatorService,
+    QueryHelpers,
+  ],
 })
 export class AppModule {}
