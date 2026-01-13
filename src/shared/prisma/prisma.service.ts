@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { LoggerService } from '../logger/logger.service';
 import type {
   PrismaClient as GeneratedPrismaClient,
   Prisma,
@@ -46,7 +47,29 @@ export class PrismaService
   ) => GeneratedPrismaClient)
   implements OnModuleInit, OnModuleDestroy, GeneratedPrismaClient
 {
-  constructor() {
+  private readonly softDeleteModels = [
+    'users',
+    'usersIdentities',
+    'usersAccounts',
+    'transactions',
+    'transactionsLogs',
+    'accreditations',
+    'benefits',
+    'cards',
+    'campaign_codes',
+    'devices',
+    'challenges',
+    'contacts',
+    'notifications',
+    'stores',
+    'branches',
+    'sailpoints',
+    'backofficeLogs',
+    'backofficeRoles',
+    'backofficeUsers',
+  ];
+
+  constructor(private logger: LoggerService) {
     super({
       log: [
         {
@@ -62,6 +85,49 @@ export class PrismaService
     });
 
     this.setupQueryLogger();
+    this.setupSoftDeleteMiddleware();
+    this.setupSlowQueryLogging();
+  }
+
+  private setupSoftDeleteMiddleware(): void {
+    this.$use(async (params, next) => {
+      const { model, action, args } = params;
+
+      if (
+        model &&
+        this.softDeleteModels.includes(model as string) &&
+        action &&
+        ['findUnique', 'findFirst', 'findMany', 'count'].includes(action as string)
+      ) {
+        if (args.where) {
+          args.where = {
+            AND: [args.where, { deletedAt: null }],
+          };
+        } else {
+          args.where = { deletedAt: null };
+        }
+      }
+
+      return next(params);
+    });
+  }
+
+  private setupSlowQueryLogging(): void {
+    this.$use(async (params, next) => {
+      const start = Date.now();
+      const result = await next(params);
+      const duration = Date.now() - start;
+
+      if (duration > 1000) {
+        const model = params.model || 'unknown';
+        const action = params.action || 'unknown';
+        this.logger.warn(
+          `Slow query detected: ${model}.${action} took ${duration}ms`,
+        );
+      }
+
+      return result;
+    });
   }
 
   private setupQueryLogger(): void {
