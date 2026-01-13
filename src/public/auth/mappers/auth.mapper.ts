@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {
   SignupResponseDto,
-  SignupUserDto,
   SignupDeviceRequiredResponseDto,
   SigninResponseDto,
-  SigninUserDto,
   SigninDeviceRequiredResponseDto,
   EmailValidationResponseDto,
   EmailCodeVerificationResponseDto,
@@ -13,7 +11,6 @@ import {
   ForgotPasswordResponseDto,
   VerifyPasswordResponseDto,
   UnlockAccountResponseDto,
-  UnlockAccountUserDto,
   TokenResponseDto,
 } from '../dto/response';
 
@@ -45,8 +42,7 @@ export class AuthMapper {
     return {
       deviceRequired: true,
       deviceType,
-      message: 'Device registration required after signup',
-      userId: user.id,
+      message: 'It is necessary to register a device to continue',
       accessToken: token,
       user: {
         id: user.id,
@@ -72,7 +68,6 @@ export class AuthMapper {
         phone: user.phone,
       },
       accessToken: token,
-      refreshToken: token,
       expiresIn,
     };
   }
@@ -85,8 +80,7 @@ export class AuthMapper {
     return {
       deviceRequired: true,
       deviceType,
-      message: 'Device registration required',
-      userId: user.id,
+      message: 'It is necessary to register a device to continue',
       accessToken: token,
       user: {
         id: user.id,
@@ -98,13 +92,9 @@ export class AuthMapper {
     };
   }
 
-  toEmailValidationResponseDto(
-    message: string,
-    debug?: string,
-  ): EmailValidationResponseDto {
+  toEmailValidationResponseDto(message: string): EmailValidationResponseDto {
     return {
       message,
-      debug,
     };
   }
 
@@ -119,13 +109,9 @@ export class AuthMapper {
     };
   }
 
-  toPhoneValidationResponseDto(
-    message: string,
-    debug?: string,
-  ): PhoneValidationResponseDto {
+  toPhoneValidationResponseDto(message: string): PhoneValidationResponseDto {
     return {
       message,
-      debug,
     };
   }
 
@@ -140,13 +126,9 @@ export class AuthMapper {
     };
   }
 
-  toForgotPasswordResponseDto(
-    message: string,
-    debug?: string,
-  ): ForgotPasswordResponseDto {
+  toForgotPasswordResponseDto(message: string): ForgotPasswordResponseDto {
     return {
       message,
-      debug,
     };
   }
 
@@ -170,7 +152,6 @@ export class AuthMapper {
         access: user.access,
       },
       accessToken: token,
-      refreshToken: token,
       expiresIn,
       message: 'Account unlocked successfully',
     };

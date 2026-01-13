@@ -23,10 +23,7 @@ export class PhoneValidationService {
       'sms',
     );
 
-    return this.authMapper.toPhoneValidationResponseDto(
-      result.message,
-      result.debug,
-    );
+    return this.authMapper.toPhoneValidationResponseDto(result.message);
   }
 
   async verifyPhoneCode(dto: VerifyPhoneCodeDto) {

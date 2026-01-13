@@ -23,10 +23,7 @@ export class EmailValidationService {
       true,
     );
 
-    return this.authMapper.toEmailValidationResponseDto(
-      result.message,
-      result.debug,
-    );
+    return this.authMapper.toEmailValidationResponseDto(result.message);
   }
 
   async verifyEmailCode(dto: VerifyEmailCodeDto) {

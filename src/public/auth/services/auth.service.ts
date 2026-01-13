@@ -17,6 +17,7 @@ import { ExchangeRatesService } from '../../../shared/exchange/exchange-rates.se
 import { SystemVersionService } from '../../../shared/helpers/system-version.service';
 import { SmsService } from '../../../shared/sms/sms.service';
 import { EmailService } from '../../../shared/email/email.service';
+import { AuthMapper } from '../mappers/auth.mapper';
 import { SignupDto } from '../dto/signup.dto';
 import { SigninDto } from '../dto/signin.dto';
 import {
@@ -46,6 +47,7 @@ export class AuthService {
     private logger: LoggerService,
     private smsService: SmsService,
     private emailService: EmailService,
+    private authMapper: AuthMapper,
   ) {}
 
   private generateNumericCode(length = 8): string {
@@ -173,32 +175,14 @@ export class AuthService {
     const token = await this.jwtService.generateToken(payload);
 
     if (deviceRequired) {
-      return {
-        deviceRequired: true,
-        deviceType: 'soft',
-        message: 'Device registration required after signup',
-        userId: user.id,
-        accessToken: token,
-        user: {
-          id: user.id,
-          email: user.email,
-          phone: user.phone,
-          username: user.username,
-        },
-      };
+      return this.authMapper.toSignupDeviceRequiredResponseDto(
+        user,
+        token,
+        'soft',
+      );
     }
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-      },
-      accessToken: token,
-      expiresIn: 3600,
-    };
+    return this.authMapper.toSignupResponseDto(user, token);
   }
 
   async signin(
@@ -308,18 +292,11 @@ export class AuthService {
       };
       const tempToken = await this.jwtService.generateToken(tempPayload);
 
-      return {
-        deviceRequired: true,
-        deviceType: 'hard',
-        message: 'Device registration required',
-        userId: user.id,
-        accessToken: tempToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          phone: user.phone,
-        },
-      };
+      return this.authMapper.toSigninDeviceRequiredResponseDto(
+        user,
+        tempToken,
+        'hard',
+      );
     }
 
     try {
@@ -373,18 +350,7 @@ export class AuthService {
 
     const token = await this.jwtService.generateToken(payload);
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-      },
-      accessToken: token,
-      refreshToken: token,
-      expiresIn: 3600,
-    };
+    return this.authMapper.toSigninResponseDto(user, token);
   }
 
   async sendEmailValidation(dto: SendEmailValidationDto) {
@@ -632,13 +598,7 @@ export class AuthService {
 
       const token = await this.jwtService.generateToken(payload);
 
-      return {
-        user: updatedUser,
-        accessToken: token,
-        refreshToken: token,
-        expiresIn: 3600,
-        message: 'Account unlocked successfully',
-      };
+      return this.authMapper.toUnlockAccountResponseDto(updatedUser, token);
     }
 
     throw new BadRequestException('users.errors.accountNotLocked');

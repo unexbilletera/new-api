@@ -69,7 +69,6 @@ export class PasswordRecoveryService {
 
     return this.authMapper.toForgotPasswordResponseDto(
       'Password reset code sent to email',
-      process.env.NODE_ENV === 'development' ? code : undefined,
     );
   }
 
