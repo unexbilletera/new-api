@@ -11,6 +11,12 @@
 
 Authenticates backoffice users (administrators) and returns a JWT token for accessing administrative endpoints.
 
+## Code References
+
+**Controller:** `src/backoffice/auth/controllers/auth.controller.ts`
+**Service:** N/A (logic in model)
+**Model:** `src/backoffice/auth/models/backoffice-user.model.ts`
+
 ## Endpoints
 
 ### POST /backoffice/auth/login

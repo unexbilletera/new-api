@@ -11,6 +11,12 @@
 
 Register a new user account in the system. This is the entry point for new users in the mobile application.
 
+## Code References
+
+**Controller:** `src/public/auth/controllers/auth.controller.ts` (AuthController)
+**Service:** `src/public/auth/services/signup.service.ts`
+**Model:** `src/public/auth/models/user.model.ts`
+
 ## Endpoint
 
 ### POST /api/users/user/signup

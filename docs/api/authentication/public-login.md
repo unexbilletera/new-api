@@ -11,6 +11,12 @@
 
 Authenticates users from the mobile application and returns a JWT token for accessing protected endpoints.
 
+## Code References
+
+**Controller:** `src/public/auth/controllers/auth.controller.ts` (AuthController)
+**Service:** `src/public/auth/services/signin.service.ts`
+**Model:** `src/public/auth/models/user.model.ts`
+
 ## Endpoint
 
 ### POST /api/users/user/signin
