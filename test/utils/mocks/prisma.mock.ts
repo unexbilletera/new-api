@@ -36,7 +36,6 @@ import { PrismaService } from '../../../src/shared/prisma/prisma.service';
  */
 export function createPrismaMock(): jest.Mocked<PrismaService> {
   return {
-    // User entities
     users: {
       findUnique: jest.fn(),
       findFirst: jest.fn(),
@@ -47,7 +46,6 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
       upsert: jest.fn(),
     },
 
-    // Authentication entities
     email_validation_codes: {
       findFirst: jest.fn(),
       create: jest.fn(),
@@ -67,7 +65,6 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
       delete: jest.fn(),
     },
 
-    // Account entities
     user_accounts: {
       findUnique: jest.fn(),
       findMany: jest.fn(),
@@ -82,7 +79,6 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
       delete: jest.fn(),
     },
 
-    // Transaction entities
     transactions: {
       findUnique: jest.fn(),
       findMany: jest.fn(),
@@ -96,7 +92,6 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
       update: jest.fn(),
     },
 
-    // Notification entities
     notifications: {
       findMany: jest.fn(),
       create: jest.fn(),
@@ -108,7 +103,6 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
       findMany: jest.fn(),
     },
 
-    // Campaign entities
     campaigns: {
       findUnique: jest.fn(),
       findMany: jest.fn(),
@@ -120,13 +114,11 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
       update: jest.fn(),
     },
 
-    // Terms entities
     terms_conditions: {
       findMany: jest.fn(),
       findFirst: jest.fn(),
     },
 
-    // Session entities
     sessions: {
       create: jest.fn(),
       update: jest.fn(),
@@ -134,12 +126,10 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
       findUnique: jest.fn(),
     },
 
-    // Access log entities
     access_logs: {
       create: jest.fn(),
     },
 
-    // General utilities
     $connect: jest.fn().mockResolvedValue(undefined),
     $disconnect: jest.fn().mockResolvedValue(undefined),
     $transaction: jest.fn(),
@@ -153,7 +143,6 @@ export function createPrismaMock(): jest.Mocked<PrismaService> {
  *
  * @example
  * const prisma = createPrismaMock();
- * // ... run some tests ...
  * resetPrismaMock(prisma);
  */
 export function resetPrismaMock(prisma: jest.Mocked<PrismaService>): void {
