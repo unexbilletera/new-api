@@ -315,7 +315,7 @@ describe('UserOnboardingService', () => {
 
       expect(onboardingModel.updateUserOnboarding).toHaveBeenCalledWith(
         userId,
-        expect.objectContaining({ phone: '5511999999999' }),
+        expect.objectContaining({ phone: '+55 11999999999' }),
       );
     });
 

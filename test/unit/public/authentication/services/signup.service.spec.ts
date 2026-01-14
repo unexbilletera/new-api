@@ -112,13 +112,13 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         'newuser@example.com',
-        '5511999999999',
+        '+55 11999999999',
       );
       expect(validationCodeModel.getValidatedEmailCode).toHaveBeenCalledWith(
         'newuser@example.com',
       );
       expect(validationCodeModel.getValidatedPhoneCode).toHaveBeenCalledWith(
-        '5511999999999',
+        '+55 11999999999',
       );
       expect(userModel.create).toHaveBeenCalled();
       expect(result).toHaveProperty('user');
@@ -157,7 +157,7 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         expect.any(String),
-        '5511999999999',
+        '+55 11999999999',
       );
     });
 
@@ -261,7 +261,7 @@ describe('SignupService', () => {
       ).toHaveBeenCalledWith('newuser@example.com');
       expect(
         validationCodeModel.deletePhoneValidationCodes,
-      ).toHaveBeenCalledWith('5511999999999');
+      ).toHaveBeenCalledWith('+55 11999999999');
     });
   });
 
@@ -342,7 +342,7 @@ describe('SignupService', () => {
 
       expect(userModel.exists).toHaveBeenCalledWith(
         expect.any(String),
-        '5511999999999',
+        '+55 11999999999',
       );
     });
 

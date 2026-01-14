@@ -350,10 +350,7 @@ describe('OnboardingController', () => {
         payload,
       );
 
-      const result = await userController.getPendingData(
-        mockUserId,
-        mockUserIdentityId,
-      );
+      const result = await userController.getPendingData(mockUserIdentityId);
 
       expect(result).toEqual(payload);
       expect(
@@ -370,10 +367,7 @@ describe('OnboardingController', () => {
         payload,
       );
 
-      const result = await userController.getPendingData(
-        mockUserId,
-        mockUserIdentityId,
-      );
+      const result = await userController.getPendingData(mockUserIdentityId);
 
       expect(Array.isArray(result.pendingFields)).toBe(true);
       expect(Array.isArray(result.needsCorrection)).toBe(true);
@@ -387,7 +381,6 @@ describe('OnboardingController', () => {
       );
 
       const result = await userController.updateSpecificData(
-        mockUserId,
         mockUserIdentityId,
         dto,
       );
@@ -406,10 +399,7 @@ describe('OnboardingController', () => {
       };
       identityOnboardingService.getOnboardingStatus.mockResolvedValue(payload);
 
-      const result = await userController.getStatus(
-        mockUserId,
-        mockUserIdentityId,
-      );
+      const result = await userController.getStatus(mockUserIdentityId);
 
       expect(result).toEqual(payload);
       expect(
@@ -425,10 +415,7 @@ describe('OnboardingController', () => {
       };
       identityOnboardingService.getOnboardingStatus.mockResolvedValue(payload);
 
-      const result = await userController.getStatus(
-        mockUserId,
-        mockUserIdentityId,
-      );
+      const result = await userController.getStatus(mockUserIdentityId);
 
       expect(result.completionPercentage).toEqual(75);
       expect(result.status).toBeDefined();
@@ -440,10 +427,7 @@ describe('OnboardingController', () => {
         payload,
       );
 
-      const result = await userController.validate(
-        mockUserId,
-        mockUserIdentityId,
-      );
+      const result = await userController.validate(mockUserIdentityId);
 
       expect(result).toEqual(payload);
       expect(
@@ -460,10 +444,7 @@ describe('OnboardingController', () => {
         payload,
       );
 
-      const result = await userController.validate(
-        mockUserId,
-        mockUserIdentityId,
-      );
+      const result = await userController.validate(mockUserIdentityId);
 
       expect(result.isValid).toBe(false);
       expect(Array.isArray(result.errors)).toBe(true);
@@ -476,7 +457,7 @@ describe('OnboardingController', () => {
       const payload = { message: 'Onboarding data resubmitted' };
       identityOnboardingService.retryOnboarding.mockResolvedValue(payload);
 
-      const result = await userController.retry(mockUserId, mockUserIdentityId);
+      const result = await userController.retry(mockUserIdentityId);
 
       expect(result).toEqual(payload);
       expect(identityOnboardingService.retryOnboarding).toHaveBeenCalledWith(
@@ -490,7 +471,7 @@ describe('OnboardingController', () => {
       );
 
       await expect(
-        userController.retry(mockUserId, mockUserIdentityId),
+        userController.retry(mockUserIdentityId),
       ).rejects.toThrow('Retry failed');
     });
   });

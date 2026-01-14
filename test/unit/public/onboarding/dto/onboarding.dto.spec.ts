@@ -301,8 +301,8 @@ describe('UpdateUserOnboardingDto Validation', () => {
         lastName: 'Doe',
         birthdate: '1990-01-15',
         phone: '+5511987654321',
-        gender: 'masculino',
-        maritalStatus: 'solteiro',
+        gender: 'male',
+        maritalStatus: 'single',
         country: 'BR',
       });
 
@@ -344,8 +344,8 @@ describe('UpdateUserOnboardingDto Validation', () => {
         lastName: 'Silva',
         birthdate: '2004-10-29',
         phone: '+5511987654321',
-        gender: 'feminino',
-        maritalStatus: 'solteiro',
+        gender: 'female',
+        maritalStatus: 'single',
         country: 'BR',
         campaignCode: 'CAMPAIGN123',
         cpf: '12345678900',
