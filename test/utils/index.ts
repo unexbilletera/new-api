@@ -19,14 +19,12 @@
  * } from '@test/utils';
  */
 
-// Mocks
 export { createPrismaMock, resetPrismaMock } from './mocks/prisma.mock';
 export { createJwtServiceMock, createValidJwtToken } from './mocks/jwt.mock';
 export { createEmailServiceMock } from './mocks/email.mock';
 export { createSmsServiceMock } from './mocks/sms.mock';
 export { createLoggerServiceMock } from './mocks/logger.mock';
 
-// Fixtures
 export {
   mockActiveUser,
   mockPendingUser,
@@ -39,14 +37,12 @@ export {
   mockUserIdentity,
 } from './fixtures/user.fixture';
 
-// Factories
 export { UserFactory } from './factories/user.factory';
 export { TransactionFactory } from './factories/transaction.factory';
 export { NotificationFactory } from './factories/notification.factory';
 export { SessionFactory } from './factories/session.factory';
 export { BiometricFactory } from './factories/biometric.factory';
 
-// Helpers
 export {
   createTestModule,
   createMockProvider,
