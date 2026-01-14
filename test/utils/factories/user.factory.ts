@@ -14,16 +14,9 @@
  * Supports partial overrides and bulk creation.
  *
  * @example
- * // Create default user
  * const user = UserFactory.create();
- *
- * // Create with custom data
  * const adminUser = UserFactory.create({ role: 'ADMIN', email: 'admin@test.com' });
- *
- * // Create multiple users
  * const users = UserFactory.createMultiple(5);
- *
- * // Create with nested relations
  * const userWithAccount = UserFactory.createWithAccount();
  */
 
