@@ -1,72 +1,134 @@
 # API Documentation
 
-This section contains comprehensive API reference documentation for all endpoints.
+**Status:** `stable`
+**Last Updated:** 2026-01-14
+**Owner:** Unex Development Team
+
+## Overview
+
+Comprehensive API reference organized by domains, resources, and complete end-to-end flows.
+
+## Quick Navigation
+
+### By Domain
+
+- [Authentication](authentication/README.md) - User and backoffice authentication
+- [Users](users/README.md) - Profile management and validation
+- [Onboarding](onboarding/README.md) - KYC onboarding process
+- [Transactions](transactions/README.md) - Financial operations
+- [Notifications](notifications/README.md) - Push notifications
+- [Backoffice](backoffice/README.md) - Administrative operations
+
+### By Flow
+
+Complete end-to-end user journeys:
+
+- [User Registration Flow](flows/user-registration-flow.md) - Signup to active account
+- [PIX Transaction Flow](flows/pix-transaction-flow.md) - Create and confirm PIX transfer
+- [Onboarding Flow Diagram](onboarding/flow-diagram.md) - Complete onboarding process
+
+### Resources
+
+- [Error Codes](error-codes.md) - Complete error code reference
+- [CHANGELOG](CHANGELOG.md) - API changes history
+
+## API Structure
+
+### Authentication Domain
+
+**Public Authentication:**
+- `POST /api/users/user/signin` - [Login](authentication/public-login.md)
+- `POST /api/users/user/signup` - [Signup](authentication/public-signup.md)
+
+**Backoffice Authentication:**
+- `POST /backoffice/auth/login` - [Backoffice Login](authentication/backoffice-login.md)
+- `GET /backoffice/auth/me` - [Get Profile](authentication/backoffice-login.md#get-profile)
+
+### Users Domain
+
+**Profile Management:**
+- `GET /api/users/user/me` - Get user profile
+- `POST /api/users/user/profile` - Update profile
+- `POST /api/users/user/address` - Update address
+
+**Validation:**
+- Email validation endpoints
+- Phone validation endpoints
+- Password management
+
+### Onboarding Domain
+
+**8-Step Process:**
+1. `POST /api/public/onboarding/start` - [Start](onboarding/steps/01-start-onboarding.md)
+2. Email validation - [Step 2](onboarding/steps/02-email-validation.md)
+3. Phone validation - [Step 3](onboarding/steps/03-phone-validation.md)
+4. Password creation - [Step 4](onboarding/steps/04-password.md)
+5. Personal data - [Step 5](onboarding/steps/05-personal-data.md)
+6. Liveness verification - [Step 6](onboarding/steps/06-liveness-verification.md)
+7. Identity onboarding - [Step 7](onboarding/steps/07-identity-onboarding.md)
+8. Document upload - [Step 8](onboarding/steps/08-document-upload.md)
+
+See [Onboarding Overview](onboarding/README.md) for complete flow.
+
+### Transactions Domain
+
+**PIX Cronos:**
+- `POST /transactions/pix/cronos/create` - Create PIX transaction
+- `POST /transactions/pix/cronos/confirm` - Confirm transaction
+
+**History:**
+- `GET /transactions/history` - List transactions
+- `GET /transactions/:id` - Get transaction details
+
+See [Transactions Overview](transactions/README.md).
+
+### Notifications Domain
+
+**Management:**
+- `GET /notifications` - List notifications
+- `PATCH /notifications/:id/read` - Mark as read
+- `DELETE /notifications/:id` - Delete notification
+
+**Push Notifications:**
+- `POST /notifications/push-token` - Update token
+- `GET /notifications/push-token` - Get token
+
+See [Notifications Overview](notifications/README.md).
+
+### Backoffice Domain
+
+**Administrative Operations:**
+- Client management
+- User administration
+- Onboarding approval
+- System configuration
+
+See [Backoffice Overview](backoffice/README.md).
 
 ## Authentication
 
-All authenticated endpoints require a JWT token in the Authorization header:
+### Public Endpoints
+
+Most endpoints require JWT authentication:
 
 ```
-Authorization: Bearer <token>
+Authorization: Bearer {token}
 ```
 
-## Endpoint Categories
+Obtain token via:
+- `POST /api/users/user/signin` - Public login
+- `POST /backoffice/auth/login` - Backoffice login
 
-### [Public - No Authentication Required](public-no-auth.md)
+### No Authentication Required
 
-Public endpoints accessible without authentication:
-
-- Health checks and system status
-- User authentication and registration
-- Email and phone validation
-- Password recovery
-- Initial onboarding flow
-- Test endpoints
-
-### [Public - Authentication Required](public-auth.md)
-
-Public endpoints that require user authentication:
-
-- User profile management
-- Account management
-- Identity onboarding
-- Biometric registration
-- Device management
-- Identity and account information
-
-### [Secure - Authentication Required](secure-auth.md)
-
-Secure endpoints for authenticated users:
-
-- Push notifications
-- App actions and modules
-- App information and news
-- Campaign codes
-- Terms of service acceptance
-- PIX transactions
-
-### [Backoffice - Authentication Required](backoffice-auth.md)
-
-Administrative endpoints for backoffice users:
-
-- Backoffice authentication
-- Client management
-- User onboarding approval
-- Action and service management
-- System configuration
-- User and role management
-
-## Onboarding Process
-
-The user registration flow follows a multi-step onboarding process:
-
-- [Onboarding Documentation](onboarding/)
+- Health checks (`GET /`, `GET /health`)
+- Signup endpoint
+- Email/phone validation (initial steps)
+- Start onboarding
 
 ## Error Handling
 
-All endpoints follow a standard error response format. See [Error Codes](error-codes.md) for complete reference.
-
-### Error Response Format
+All endpoints return standardized error responses:
 
 ```json
 {
@@ -76,34 +138,63 @@ All endpoints follow a standard error response format. See [Error Codes](error-c
 }
 ```
 
-### Success Response Format
-
-```json
-{
-  "data": { ... },
-  "message": "200 users.success.operationComplete",
-  "code": "200 users.success.operationComplete"
-}
-```
+See [Error Codes](error-codes.md) for complete reference.
 
 ## Rate Limiting
 
-Authentication endpoints have rate limiting enabled to prevent abuse:
+Rate limits by endpoint type:
 
-- Login: 5 requests per minute
-- Registration: 3 requests per minute
-- Password reset: 3 requests per hour
-
-## API Versioning
-
-Currently, the API does not use versioning. Breaking changes will be communicated in advance and migration guides provided.
+- **Authentication**: 5 requests/minute
+- **Validation**: 3 requests/minute
+- **Transactions**: 10 requests/minute
+- **General**: 100 requests/minute
 
 ## Testing
 
-Use the `/api/public/test` endpoints for development and testing without affecting production data.
+### Manual Testing
 
-## References
+- [Public Auth Testing](../guides/testing-public-auth.md)
+- [Backoffice Auth Testing](../guides/testing-backoffice-auth.md)
+- [PIX Cronos Testing](../guides/testing-pix-cronos.md)
+- [Cronos cURL Testing](../guides/testing-cronos-curl.md)
+
+### Automated Testing
+
+```bash
+# Unit tests
+npm run test:unit
+
+# E2E tests
+npm run test:e2e
+
+# Specific test
+npm run test:e2e -- auth.e2e-spec.ts
+```
+
+See [Testing Guide](../guides/testing.md).
+
+## Environments
+
+- **Development**: `http://localhost:3000`
+- **Sandbox**: Staging environment with test data
+- **Production**: Live environment
+
+## Versioning
+
+Current version: **v1.0**
+
+API follows semantic versioning. Breaking changes will be communicated in advance with migration guides.
+
+## Support
+
+For issues or questions:
+- Check [Error Codes](error-codes.md)
+- Review domain-specific documentation
+- Check [CHANGELOG](CHANGELOG.md) for recent changes
+
+## Related Documentation
 
 - [Architecture Overview](../architecture/overview.md)
-- [Error Codes](error-codes.md)
-- [Authentication Guide](../guides/authentication.md)
+- [Security & Performance](../operations/security-performance.md)
+- [Provider Features](../operations/provider-features.md)
+- [Module Example](../guides/module-example.md)
