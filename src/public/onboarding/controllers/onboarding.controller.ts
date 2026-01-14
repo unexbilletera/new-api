@@ -32,7 +32,7 @@ import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { UserOnboardingService } from '../services/user-onboarding.service';
 import { VerificationService } from '../services/verification.service';
 import { IdentityOnboardingService } from '../services/identity-onboarding.service';
-import { EmailValidationService } from '../../auth/services/email-validation.service';
+import { EmailValidationOnboardingService } from '../services/email-validation-onboarding.service';
 import { PhoneValidationService } from '../../auth/services/phone-validation.service';
 import {
   StartUserOnboardingResponseDto,
@@ -54,7 +54,7 @@ export class OnboardingController {
     private userOnboardingService: UserOnboardingService,
     private verificationService: VerificationService,
     private identityOnboardingService: IdentityOnboardingService,
-    private emailValidationService: EmailValidationService,
+    private emailValidationOnboardingService: EmailValidationOnboardingService,
     private phoneValidationService: PhoneValidationService,
   ) {}
 
@@ -112,7 +112,7 @@ export class OnboardingController {
     description: 'Invalid email or already registered',
   })
   async sendEmailValidation(@Body() dto: SendEmailValidationDto) {
-    return this.emailValidationService.sendEmailValidation(dto);
+    return this.emailValidationOnboardingService.sendEmailValidation(dto);
   }
 
   @Post('user/send-phone-validation')

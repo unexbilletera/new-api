@@ -66,9 +66,14 @@ export class VerificationService {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const onboardingState = (user.onboardingState as any) || {
-      completedSteps: [],
-      needsCorrection: [],
+    const userOnboardingState = (user.onboardingState as any) || null;
+    const onboardingState = {
+      completedSteps: userOnboardingState?.completedSteps
+        ? [...userOnboardingState.completedSteps]
+        : [],
+      needsCorrection: userOnboardingState?.needsCorrection
+        ? [...userOnboardingState.needsCorrection]
+        : [],
     };
 
     if (dto.type === 'email') {

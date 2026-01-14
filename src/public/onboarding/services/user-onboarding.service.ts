@@ -93,9 +93,14 @@ export class UserOnboardingService {
       throw new Error('users.errors.userNotFound');
     }
 
-    const currentState = (user.onboardingState as any) || {
-      completedSteps: [],
-      needsCorrection: [],
+    const userOnboardingState = (user.onboardingState as any) || null;
+    const currentState = {
+      completedSteps: userOnboardingState?.completedSteps
+        ? [...userOnboardingState.completedSteps]
+        : [],
+      needsCorrection: userOnboardingState?.needsCorrection
+        ? [...userOnboardingState.needsCorrection]
+        : [],
     };
     const dataToUpdate: any = {};
     let completedStep = '';

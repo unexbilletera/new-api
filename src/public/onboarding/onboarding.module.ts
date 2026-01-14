@@ -11,13 +11,13 @@ import {
   UserOnboardingController,
 } from './controllers/onboarding.controller';
 import { OnboardingService } from './services/onboarding.service';
-import { AuthService } from '../auth/services/auth.service';
 import { PublicAuthModule } from '../auth/auth.module';
 import { OnboardingModel } from './models/onboarding.model';
 import { OnboardingMapper } from './mappers/onboarding.mapper';
 import { UserOnboardingService } from './services/user-onboarding.service';
 import { VerificationService } from './services/verification.service';
 import { IdentityOnboardingService } from './services/identity-onboarding.service';
+import { EmailValidationOnboardingService } from './services/email-validation-onboarding.service';
 
 @Module({
   imports: [
@@ -38,6 +38,7 @@ import { IdentityOnboardingService } from './services/identity-onboarding.servic
     VerificationService,
     IdentityOnboardingService,
     OnboardingService,
+    EmailValidationOnboardingService,
   ],
   exports: [
     OnboardingService,
