@@ -1,4 +1,4 @@
-import { IsPhoneNumber, IsString } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SendPhoneValidationDto {
@@ -6,7 +6,10 @@ export class SendPhoneValidationDto {
     description: 'User phone number',
     example: '+5511987654321',
   })
-  @IsPhoneNumber('BR')
+  @Matches(/^\+\d{12,14}$/, {
+    message:
+      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
+  })
   phone: string;
 }
 
@@ -15,7 +18,10 @@ export class VerifyPhoneCodeDto {
     description: 'User phone number',
     example: '+5511987654321',
   })
-  @IsPhoneNumber('BR')
+  @Matches(/^\+\d{12,14}$/, {
+    message:
+      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
+  })
   phone: string;
 
   @ApiProperty({

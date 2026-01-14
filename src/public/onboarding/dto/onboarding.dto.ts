@@ -24,7 +24,10 @@ export class VerifyOnboardingCodeDto {
   type: 'email' | 'phone';
 
   @IsOptional()
-  @IsPhoneNumber('BR')
+  @Matches(/^\+\d{12,14}$/, {
+    message:
+      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
+  })
   phone?: string;
 }
 
@@ -38,7 +41,10 @@ export class UpdateUserOnboardingDto {
   lastName?: string;
 
   @IsOptional()
-  @IsString()
+  @Matches(/^\+\d{12,14}$/, {
+    message:
+      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
+  })
   phone?: string;
 
   @IsOptional()

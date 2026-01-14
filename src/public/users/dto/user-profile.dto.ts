@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsObject } from 'class-validator';
+import { IsString, IsOptional, IsObject, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class GetUserProfileDto {}
@@ -25,7 +25,10 @@ export class UpdateUserProfileDto {
     example: '+5511987654321',
   })
   @IsOptional()
-  @IsString()
+  @Matches(/^\+\d{12,14}$/, {
+    message:
+      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
+  })
   phone?: string;
 
   @ApiPropertyOptional({

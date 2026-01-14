@@ -44,7 +44,10 @@ export class SignupDto {
     description: 'User phone number',
     example: '+5511987654321',
   })
-  @IsString()
+  @Matches(/^\+\d{12,14}$/, {
+    message:
+      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
+  })
   phone: string;
 
   @ApiProperty({
