@@ -350,7 +350,7 @@ export class SystemConfigController {
   async toggleModule(
     @Param('id', ParseIntPipe) id: number,
     @Body('isActive') isActive: boolean,
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<any> {
     return this.systemConfigService.toggleModule(id, isActive);
   }
 
