@@ -50,7 +50,6 @@ class DatabaseSeeder {
   private async cleanupDatabase(): Promise<void> {
     this.logger.log('Cleaning up existing data');
 
-    // Disable foreign key checks for cleanup
     await this.prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0');
 
     await this.prisma.transactionsWsLogs.deleteMany();
@@ -78,7 +77,6 @@ class DatabaseSeeder {
     await this.prisma.backofficeRoles.deleteMany();
     await this.prisma.challenges.deleteMany();
 
-    // Re-enable foreign key checks
     await this.prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1');
 
     this.logger.log('Data cleaned up');

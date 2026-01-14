@@ -5,7 +5,6 @@ import { PrismaService } from '../../../shared/prisma/prisma.service';
 export class LogModel {
   constructor(private prisma: PrismaService) {}
 
-  // access_logs table does not exist - using users_access_log
   async list(where: any, skip: number, take: number) {
     return this.prisma.users_access_log.findMany({
       where,
