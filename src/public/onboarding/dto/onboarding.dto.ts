@@ -57,6 +57,9 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^(ar|br)$/i, {
+    message: 'Country must be "ar" (Argentina) or "br" (Brazil)',
+  })
   country?: string;
 
   @IsOptional()
@@ -68,10 +71,17 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^(male|female)$/i, {
+    message: 'Gender must be "male" or "female"',
+  })
   gender?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(/^(single|married|divorced|widowed|cohabiting|separated)$/i, {
+    message:
+      'Marital status must be one of: "single", "married", "divorced", "widowed", "cohabiting", "separated"',
+  })
   maritalStatus?: string;
 
   @IsOptional()
