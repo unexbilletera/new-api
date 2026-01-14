@@ -2,11 +2,28 @@
 
 **Status:** `stable`
 **Last Updated:** 2026-01-14
+**Last Testing:** 2026-01-14
+**Test Status:** ✅ PASSED
 **Owner:** Unex Development Team
+**Version:** v1.0
 
 ## Overview
 
 The onboarding process is a comprehensive multi-step KYC (Know Your Customer) workflow that guides new users through account verification, identity confirmation, and document submission to comply with regulatory requirements.
+
+## Code References
+
+**Controller:** `src/public/onboarding/controllers/onboarding.controller.ts`
+**Services:**
+- `src/public/onboarding/services/user-onboarding.service.ts`
+- `src/public/onboarding/services/verification.service.ts`
+- `src/public/onboarding/services/identity-onboarding.service.ts`
+- `src/public/onboarding/services/email-validation-onboarding.service.ts`
+- `src/public/auth/services/phone-validation.service.ts`
+
+**Models:**
+- `src/public/onboarding/models/user-onboarding.model.ts`
+- `src/public/onboarding/models/identity-onboarding.model.ts`
 
 ## Complete Flow
 

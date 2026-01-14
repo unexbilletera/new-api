@@ -1,9 +1,10 @@
 # Public Signup
 
 **Status:** `stable`
+**Last Updated:** 2026-01-14
 **Last Testing:** 2026-01-14
 **Test Status:** ✅ PASSED
-**Author:** Authentication Team
+**Owner:** Unex Development Team
 **Version:** v1.0
 
 ## Overview
