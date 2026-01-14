@@ -24,7 +24,7 @@ import {
   UpdateTransactionalPasswordDto,
 } from '../dto';
 import { LoggerService } from '../../../shared/logger/logger.service';
-import { CurrentUserPayloadDtoDto } from '../../../common/dto';
+import type { CurrentUserPayloadDto } from '../../../common/dto';
 
 @ApiTags('2.3 Secure - Transactional Password')
 @Controller('transactional-password')
