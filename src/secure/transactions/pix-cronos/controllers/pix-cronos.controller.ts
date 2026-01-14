@@ -20,7 +20,7 @@ import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ConfirmPixCronosDto } from '../dto/confirm-pix-cronos.dto';
 import { SuccessCodes } from '../../../../shared/errors/app-error';
 import { LoggerService } from '../../../../shared/logger/logger.service';
-import { CurrentUserPayloadDtoDto } from '../../../../common/dto';
+import type { CurrentUserPayloadDto } from '../../../../common/dto';
 
 @ApiTags('2.1 Secure - Transactions')
 @Controller('transactions/pix/cronos')
