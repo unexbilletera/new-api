@@ -4,7 +4,6 @@ import {
   IsOptional,
   IsObject,
   Matches,
-  IsPhoneNumber,
 } from 'class-validator';
 import {
   ValidationOptions,
