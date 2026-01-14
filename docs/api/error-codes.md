@@ -9,7 +9,7 @@ This document lists all error and success codes used in the API, following the p
 
 ## Error Codes
 
-### USERS ERRORS (400)
+### Users Errors (400)
 
 | Code                                              | Description                     | Translation                     |
 | ------------------------------------------------- | ------------------------------- | ------------------------------- |
@@ -24,7 +24,7 @@ This document lists all error and success codes used in the API, following the p
 | `400 users.errors.failBindChangeAliasSame`        | Alias is the same               | Alias is the same               |
 | `400 users.errors.failBindChangeAliasInvalid`     | Invalid alias                   | Invalid alias                   |
 
-### USERS ERRORS (401)
+### Users Errors (401)
 
 | Code                                  | Description         | Translation               |
 | ------------------------------------- | ------------------- | ------------------------- |
@@ -36,7 +36,7 @@ This document lists all error and success codes used in the API, following the p
 | `401 users.errors.userInactive`       | User inactive       | User inactive             |
 | `401 users.errors.userDeleted`        | User deleted        | User deleted              |
 
-### BACKOFFICE ERRORS (400)
+### Backoffice Errors (400)
 
 | Code                                       | Description          | Translation          |
 | ------------------------------------------ | -------------------- | -------------------- |
@@ -46,7 +46,7 @@ This document lists all error and success codes used in the API, following the p
 | `400 backoffice.errors.userNotFound`       | User not found       | User not found       |
 | `400 backoffice.errors.invalidUserAccount` | Invalid user account | Invalid user account |
 
-### BACKOFFICE ERRORS (401)
+### Backoffice Errors (401)
 
 | Code                                            | Description              | Translation               |
 | ----------------------------------------------- | ------------------------ | ------------------------- |
@@ -58,7 +58,7 @@ This document lists all error and success codes used in the API, following the p
 | `401 backoffice.errors.userDeleted`             | User deleted             | User deleted              |
 | `401 backoffice.errors.insufficientPermissions` | Insufficient permissions | Insufficient permissions  |
 
-### TRANSACTIONS ERRORS (400)
+### Transactions Errors (400)
 
 | Code                                                     | Description                        | Translation                        |
 | -------------------------------------------------------- | ---------------------------------- | ---------------------------------- |
@@ -92,7 +92,7 @@ This document lists all error and success codes used in the API, following the p
 | `400 transactions.errors.spendingLimitExceeded`          | Spending limit exceeded            | Spending limit exceeded            |
 | `400 transactions.errors.arsAccountNotFound`             | ARS account not found              | ARS account not found              |
 
-### GENERIC ERRORS
+### Generic Errors
 
 | Code                              | Description           | Translation           |
 | --------------------------------- | --------------------- | --------------------- |
@@ -102,7 +102,7 @@ This document lists all error and success codes used in the API, following the p
 
 ## Success Codes
 
-### USERS SUCCESS (200)
+### Users Success (200)
 
 | Code                                | Description                   | Translation                   |
 | ----------------------------------- | ----------------------------- | ----------------------------- |
@@ -113,7 +113,7 @@ This document lists all error and success codes used in the API, following the p
 | `200 users.success.profileUpdated`  | Profile updated successfully  | Profile updated successfully  |
 | `200 users.success.passwordChanged` | Password changed successfully | Password changed successfully |
 
-### BACKOFFICE SUCCESS (200)
+### Backoffice Success (200)
 
 | Code                                     | Description                   | Translation                   |
 | ---------------------------------------- | ----------------------------- | ----------------------------- |
@@ -122,7 +122,7 @@ This document lists all error and success codes used in the API, following the p
 | `200 backoffice.success.profileUpdated`  | Profile updated successfully  | Profile updated successfully  |
 | `200 backoffice.success.passwordChanged` | Password changed successfully | Password changed successfully |
 
-### TRANSACTIONS SUCCESS (200)
+### Transactions Success (200)
 
 | Code                                 | Description                        | Translation                        |
 | ------------------------------------ | ---------------------------------- | ---------------------------------- |
@@ -131,7 +131,7 @@ This document lists all error and success codes used in the API, following the p
 | `200 transactions.success.cancelled` | Transaction cancelled successfully | Transaction cancelled successfully |
 | `200 transactions.success.completed` | Transaction completed successfully | Transaction completed successfully |
 
-### GENERIC SUCCESS
+### Generic Success
 
 | Code                                  | Description                 | Translation                 |
 | ------------------------------------- | --------------------------- | --------------------------- |
@@ -166,3 +166,9 @@ This document lists all error and success codes used in the API, following the p
 1. Add code to appropriate enum (`error-codes.ts` or `success-codes.ts`)
 2. Update this document with description and translation
 3. Use code in code through `ErrorCodes` or `SuccessCodes`
+
+## References
+
+- [Public API Documentation](public-no-auth.md)
+- [Secure API Documentation](secure-auth.md)
+- [Backoffice API Documentation](backoffice-auth.md)

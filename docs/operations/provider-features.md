@@ -1,6 +1,6 @@
-# Provider Features
+# Payment Provider Features
 
-This document lists all features/capabilities of each payment provider, without focusing on specific endpoints. The goal is to understand what each provider can do before centralizing everything in unique endpoints.
+This document lists capabilities of each payment provider to understand integration options before centralizing into unified endpoints.
 
 ## CRONOS
 
@@ -39,9 +39,9 @@ This document lists all features/capabilities of each payment provider, without 
 
 ### Technical Features
 
-- **Webhook**: Receives transaction notifications (cashin, cashout, etc.)
-- **Health Check**: Checks integration status
-- **Transactional Token**: Sends token for transaction validation
+- **Webhook**: Transaction notifications (cashin, cashout)
+- **Health Check**: Integration status verification
+- **Transactional Token**: Token for transaction validation
 - **Statements**: Bank statement queries
 - **Accounts**: Bank account management
 
@@ -55,6 +55,11 @@ This document lists all features/capabilities of each payment provider, without 
 - `payment_qr` - Payment via QR Code
 - `recharge_cronos` - Mobile recharge
 - `transfer` - Transfer between users
+
+### Region
+
+- Primary: Brazil (BRL)
+- Secondary: Argentina (ARS)
 
 ## BIND
 
@@ -85,7 +90,7 @@ This document lists all features/capabilities of each payment provider, without 
 
 ### Technical Features
 
-- **Webhook**: Receives transfer notifications (cashin, cashout)
+- **Webhook**: Transfer notifications (cashin, cashout)
 - **Accounts API**: Account query and management
 - **Transfers API**: Query of performed transfers
 - **Transactions API**: Transaction queries
@@ -99,7 +104,7 @@ This document lists all features/capabilities of each payment provider, without 
 
 ### Region
 
-- **Argentina only (ARS)**
+- Argentina only (ARS)
 - Does not support Brazil or other currencies
 
 ## GIRE
@@ -110,7 +115,7 @@ This document lists all features/capabilities of each payment provider, without 
    - Bill payment (invoices)
    - Bill query by barcode
    - Bill query by company and payment method
-   - Support for multiple companies (utilities, services, etc.)
+   - Support for multiple companies (utilities, services)
 
 2. **Recharges**
    - Mobile recharge (prepaid)
@@ -127,14 +132,14 @@ This document lists all features/capabilities of each payment provider, without 
 
 ### Technical Features
 
-- **Webhook**: Receives payment and recharge notifications
+- **Webhook**: Payment and recharge notifications
   - `cashin/consulta` - Cashin query
   - `cashin/pago` - Payment receipt confirmation
   - `cashout/consulta` - Cashout query
   - `cashout/pago` - Payment send confirmation
   - `reversa` - Transaction reversal
 - **Companies API**: Company search by name
-- **Payment Modes API**: Lists payment methods of a company
+- **Payment Modes API**: Lists payment methods per company
 - **Bills API**: Invoice/bill queries
 - **Operations API**: Query of performed operations
 - **Ticket**: Operation receipt generation
@@ -147,7 +152,7 @@ This document lists all features/capabilities of each payment provider, without 
 
 ### Region
 
-- **Argentina only (ARS)**
+- Argentina only (ARS)
 - Focused on Argentine payments and services
 
 ## MANTECA
@@ -158,7 +163,7 @@ This document lists all features/capabilities of each payment provider, without 
    - Conversion ARS → BRL (ramp-on: ARS out, BRL in)
    - Conversion BRL → ARS (ramp-off: BRL out, ARS in)
    - Real-time quotes
-   - Support for synthetic operations (Synthetic Operations)
+   - Support for synthetic operations
    - Status tracking via webhook
 
 2. **QR Code Payments**
@@ -173,29 +178,29 @@ This document lists all features/capabilities of each payment provider, without 
 
 ### Technical Features
 
-- **Webhook**: Receives notifications for multiple events:
-  - `SYNTHETIC_STATUS_UPDATE` - Synthetic operation status update (exchange)
+- **Webhook**: Multiple event notifications
+  - `SYNTHETIC_STATUS_UPDATE` - Exchange status update
   - `WITHDRAW_STATUS_UPDATE` - Withdrawal status update
   - `ORDER_STATUS_UPDATE` - Order status update
-- **Synthetic API**: Synthetic operation queries (exchange)
+- **Synthetic API**: Exchange operation queries
 - **Withdraw API**: Withdrawal queries
 - **Rates API**: Currency quote queries
-- **Health Check**: Checks integration status
-- **Webhook Signature**: Signature generation for webhook validation
-- **Check Synthetic Status**: Direct status query of a synthetic operation
+- **Health Check**: Integration status
+- **Webhook Signature**: Signature generation for validation
+- **Check Synthetic Status**: Direct status query
 
 ### Supported Transaction Types
 
 - `cashout_manteca_qr_ar` - Manteca QR Withdrawal (Argentina)
 - `cashout_manteca_qr_br` - Manteca QR Withdrawal (Brazil)
-- `cashout_manteca_exchange_ar` - Manteca Exchange (ARS out, BRL in)
-- `cashout_manteca_exchange_br` - Manteca Exchange (BRL out, ARS in)
-- `cashin_manteca_exchange_ar` - Manteca Exchange Cashin (ARS receipt after exchange)
-- `cashin_manteca_exchange_br` - Manteca Exchange Cashin (BRL receipt after exchange)
+- `cashout_manteca_exchange_ar` - Exchange (ARS out, BRL in)
+- `cashout_manteca_exchange_br` - Exchange (BRL out, ARS in)
+- `cashin_manteca_exchange_ar` - Exchange Cashin (ARS receipt)
+- `cashin_manteca_exchange_br` - Exchange Cashin (BRL receipt)
 
 ### Region
 
-- **Argentina and Brazil**
+- Argentina and Brazil
 - Focused on currency conversion and QR payments
 
 ## COELSA
@@ -227,7 +232,7 @@ This document lists all features/capabilities of each payment provider, without 
 
 ### Region
 
-- **Brazil**
+- Brazil
 - Integration with Brazilian payment system
 
 ## Comparative Summary
@@ -246,24 +251,66 @@ This document lists all features/capabilities of each payment provider, without 
 | **Webhook**               | Yes    | Yes  | Yes  | Yes                 | No     |
 | **Main Region**           | BR     | AR   | AR   | AR + BR             | BR     |
 
-## Common Features (Centralize)
+## Common Patterns
 
-### 1. Transaction Creation
+### Transaction Creation
 
-- All providers use the same flow: `createTransaction` → `confirmTransaction`
-- Difference is only in transaction `type`
+All providers follow similar flow:
+1. Create transaction
+2. Confirm transaction
+3. Receive webhook update
 
-### 2. Transaction Confirmation
+Difference is transaction `type` parameter.
 
-- All use `confirmTransaction` after creating
+### Transaction Confirmation
+
+- All use confirmation step after creation
 - Processing is asynchronous via webhook
+- Status updates sent to webhook endpoint
 
-### 3. Webhooks
+### Webhooks
 
-- All providers send webhooks to update status
-- Asynchronous processing (SQS queue)
+- All providers send status update webhooks
+- Asynchronous processing via SQS queue
+- Standardized webhook handling
 
-### 4. Transaction Query
+### Transaction Query
 
-- All allow querying status of created transaction
-- Search by transaction ID
+- Query transaction status by ID
+- Search transaction history
+- Filter by date range and status
+
+## Integration Strategy
+
+### Centralized Endpoints
+
+Unified endpoints that route to appropriate provider:
+
+- `/transactions/create` - Route by transaction type
+- `/transactions/confirm` - Confirm pending transaction
+- `/transactions/:id` - Query transaction status
+- `/transactions/history` - List user transactions
+
+### Provider Selection
+
+Automatic provider selection based on:
+
+- Transaction type
+- User region (AR/BR)
+- Currency (ARS/BRL)
+- Available balance
+
+### Error Handling
+
+Standardized error responses across providers:
+
+- Timeout errors
+- Insufficient balance
+- Invalid credentials
+- Provider unavailable
+
+## References
+
+- [Architecture Overview](../architecture/overview.md)
+- [API Documentation](../api/)
+- [Security and Performance](security-performance.md)

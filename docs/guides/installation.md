@@ -1,5 +1,11 @@
 # Installation and Configuration
 
+## Prerequisites
+
+- Node.js 18+ and npm
+- MySQL database
+- Access to environment-specific configurations
+
 ## Installation
 
 ```bash
@@ -19,7 +25,7 @@ JWT_SECRET="your-jwt-secret-here"
 JWT_EXPIRES_IN=1d
 ```
 
-## Running
+## Running the Application
 
 ### Development
 
@@ -43,7 +49,7 @@ npm run start:sandbox:dev  # Sandbox API with watch
 npm run sandbox-tunnel     # SSH tunnel (separate terminal)
 ```
 
-### Production
+### Production with Tunnel
 
 ```bash
 npm run start:prod:dev     # Production API with watch
@@ -57,3 +63,9 @@ npm run prod-tunnel        # SSH tunnel (separate terminal)
 - `JWT_SECRET`: Secret for JWT signing
 - `JWT_EXPIRES_IN`: Token expiration time (e.g., 1d, 24h)
 - `NODE_ENV`: Environment (development, sandbox, production)
+
+## Next Steps
+
+- Review [Environment Configuration](environment.md)
+- Check [Architecture Overview](../architecture/overview.md)
+- Read [Git Workflow Guide](git-workflow.md)
