@@ -19,7 +19,6 @@ export class TransactionalPasswordService {
     password: string,
   ): Promise<{ message: string; code: string }> {
     try {
-      // Check if user already has a transactional password
       const hasPassword = await this.model.hasPassword(userId);
       if (hasPassword) {
         this.logger.warn(
@@ -30,10 +29,8 @@ export class TransactionalPasswordService {
         );
       }
 
-      // Hash the password
       const hashedPassword = await PasswordHelper.hash(password);
 
-      // Save to database
       await this.model.create(userId, hashedPassword);
 
       this.logger.success(
@@ -114,7 +111,6 @@ export class TransactionalPasswordService {
     newPassword: string,
   ): Promise<{ message: string; code: string }> {
     try {
-      // Validate current password
       const isCurrentValid = await this.validatePassword(userId, currentPassword);
       if (!isCurrentValid) {
         this.logger.warn(
@@ -125,7 +121,6 @@ export class TransactionalPasswordService {
         );
       }
 
-      // Check if new password is same as current
       if (currentPassword === newPassword) {
         this.logger.warn(
           `User attempted to update transactional password with same value - userId: ${userId}`,
@@ -135,7 +130,6 @@ export class TransactionalPasswordService {
         );
       }
 
-      // Hash and save new password
       const hashedPassword = await PasswordHelper.hash(newPassword);
       await this.model.update(userId, hashedPassword);
 

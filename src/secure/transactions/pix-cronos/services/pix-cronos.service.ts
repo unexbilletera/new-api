@@ -141,7 +141,6 @@ export class PixCronosService {
         userId,
       );
 
-      // Validate transactional password if user has one configured
       const userHasPassword = await this.transactionalPasswordService.hasPassword(userId);
       if (userHasPassword) {
         if (!transactionalPassword) {
@@ -171,7 +170,6 @@ export class PixCronosService {
           );
         }
       } else {
-        // User doesn't have transactional password yet - they must create one first
         this.logger.warn(
           `[PixCronosService] Transaction confirmation attempted without transactional password configured - userId: ${userId}`,
           'confirmTransaction',
