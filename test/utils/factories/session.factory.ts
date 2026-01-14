@@ -35,7 +35,7 @@ export class SessionFactory {
    */
   static create(overrides: ISessionFactoryOptions = {}): any {
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
+    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     return {
       id: overrides.id ?? uuid(),
       userId: overrides.userId ?? uuid(),
@@ -68,7 +68,7 @@ export class SessionFactory {
    * @returns {any} Expired session
    */
   static createExpired(overrides: ISessionFactoryOptions = {}): any {
-    const pastDate = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+    const pastDate = new Date(Date.now() - 60 * 60 * 1000);
     return this.create({ ...overrides, expiresAt: pastDate });
   }
 }
