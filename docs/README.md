@@ -63,8 +63,8 @@ Location: `operations/`
 
 ### Getting Started
 - [Installation Guide](guides/installation.md)
-- [Development Setup](guides/development.md)
 - [Environment Configuration](guides/environment.md)
+- [Git Workflow](guides/git-workflow.md)
 
 ### Architecture
 - [System Overview](architecture/overview.md)
@@ -73,8 +73,11 @@ Location: `operations/`
 
 ### Development
 - [Testing Guide](guides/testing.md)
-- [Code Standards](guides/code-standards.md)
-- [Git Workflow](guides/git-workflow.md)
+- [Module Example](guides/module-example.md)
+- [Public Auth Testing](guides/testing-public-auth.md)
+- [Backoffice Auth Testing](guides/testing-backoffice-auth.md)
+- [PIX Cronos Testing](guides/testing-pix-cronos.md)
+- [Cronos cURL Testing](guides/testing-cronos-curl.md)
 
 ### API Reference
 - [Authentication](api/authentication.md)
