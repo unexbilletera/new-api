@@ -27,10 +27,7 @@ import { AppConfigService } from '../../../../../src/shared/config/config.servic
 import { ValidaService } from '../../../../../src/shared/valida/valida.service';
 import { AccessLogService } from '../../../../../src/shared/access-log/access-log.service';
 import { EmailService } from '../../../../../src/shared/email/email.service';
-import {
-  createPrismaMock,
-  createLoggerServiceMock,
-} from '../../../../utils';
+import { createPrismaMock, createLoggerServiceMock } from '../../../../utils';
 
 /**
  * @testSuite UserService

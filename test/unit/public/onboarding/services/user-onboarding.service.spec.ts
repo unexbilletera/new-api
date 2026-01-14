@@ -290,7 +290,9 @@ describe('UserOnboardingService', () => {
         },
       };
 
-      onboardingModel.updateUserOnboarding.mockResolvedValue(updatedUser as any);
+      onboardingModel.updateUserOnboarding.mockResolvedValue(
+        updatedUser as any,
+      );
       onboardingMapper.toUpdateUserOnboardingResponseDto.mockReturnValue({
         success: true,
       } as any);
@@ -367,7 +369,9 @@ describe('UserOnboardingService', () => {
 
       await service.updateUserOnboarding(userId, dto);
 
-      expect(onboardingModel.findCampaignCode).toHaveBeenCalledWith('PROMO2024');
+      expect(onboardingModel.findCampaignCode).toHaveBeenCalledWith(
+        'PROMO2024',
+      );
       expect(onboardingModel.createUserCampaignCode).toHaveBeenCalledWith(
         userId,
         'campaign-123',

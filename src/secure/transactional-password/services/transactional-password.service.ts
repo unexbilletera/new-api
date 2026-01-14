@@ -1,7 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { TransactionalPasswordModel } from '../models/transactional-password.model';
 import { PasswordHelper } from '../../../shared/security/password.helper';
-import { ErrorHelper, ErrorCodes, SuccessCodes } from '../../../shared/errors/app-error';
+import {
+  ErrorHelper,
+  ErrorCodes,
+  SuccessCodes,
+} from '../../../shared/errors/app-error';
 import { LoggerService } from '../../../shared/logger/logger.service';
 
 @Injectable()
@@ -46,7 +50,10 @@ export class TransactionalPasswordService {
         throw error;
       }
 
-      this.logger.error(`Failed to create transactional password - userId: ${userId}`, error as Error);
+      this.logger.error(
+        `Failed to create transactional password - userId: ${userId}`,
+        error as Error,
+      );
       throw ErrorHelper.internalServerError(ErrorCodes.INTERNAL_SERVER_ERROR);
     }
   }
@@ -111,7 +118,10 @@ export class TransactionalPasswordService {
     newPassword: string,
   ): Promise<{ message: string; code: string }> {
     try {
-      const isCurrentValid = await this.validatePassword(userId, currentPassword);
+      const isCurrentValid = await this.validatePassword(
+        userId,
+        currentPassword,
+      );
       if (!isCurrentValid) {
         this.logger.warn(
           `User attempted to update transactional password with incorrect current password - userId: ${userId}`,

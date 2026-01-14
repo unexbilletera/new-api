@@ -3,9 +3,15 @@
  * @description Integration tests for complete onboarding flow with real backend
  */
 
-import { IntegrationHttpClient, createHttpClient } from '../helpers/http-client.helper';
+import {
+  IntegrationHttpClient,
+  createHttpClient,
+} from '../helpers/http-client.helper';
 import { TestUser, createTestUser } from '../helpers/test-data.helper';
-import { IntegrationTestLogger, createIntegrationLogger } from '../helpers/logger.helper';
+import {
+  IntegrationTestLogger,
+  createIntegrationLogger,
+} from '../helpers/logger.helper';
 
 describe('Onboarding Integration Tests', () => {
   let httpClient: IntegrationHttpClient;
@@ -25,7 +31,10 @@ describe('Onboarding Integration Tests', () => {
 
   beforeEach(() => {
     testUser = createTestUser('br');
-    logger.debug('Test user generated', { email: testUser.email, phone: testUser.phone });
+    logger.debug('Test user generated', {
+      email: testUser.email,
+      phone: testUser.phone,
+    });
   });
 
   describe('Complete Onboarding Flow', () => {
@@ -40,46 +49,64 @@ describe('Onboarding Integration Tests', () => {
         language: 'pt',
       });
 
-      logger.info('Signup response received', { status: signupResponse.status });
+      logger.info('Signup response received', {
+        status: signupResponse.status,
+      });
       expect(signupResponse.status).toBe(201);
       expect(signupResponse.data).toHaveProperty('success', true);
       userId = signupResponse.data.userId;
       logger.success('User created successfully', { userId });
 
       logger.step(2, 'Send email validation code');
-      const sendEmailResponse = await httpClient.post('/api/users/user/sendEmailValidation', {
-        email: testUser.email,
-      });
+      const sendEmailResponse = await httpClient.post(
+        '/api/users/user/sendEmailValidation',
+        {
+          email: testUser.email,
+        },
+      );
 
-      logger.info('Email validation code send response', { status: sendEmailResponse.status });
+      logger.info('Email validation code send response', {
+        status: sendEmailResponse.status,
+      });
       expect(sendEmailResponse.status).toBe(200);
       logger.success('Email validation code sent');
 
       logger.step(3, 'Verify email code');
-      const emailCode = process.env.ENABLE_MOCK_CODES === 'true' ? '123456' : '999999';
-      const verifyEmailResponse = await httpClient.post('/api/users/user/verifyEmailCode', {
-        email: testUser.email,
-        code: emailCode,
-      });
+      const emailCode =
+        process.env.ENABLE_MOCK_CODES === 'true' ? '123456' : '999999';
+      const verifyEmailResponse = await httpClient.post(
+        '/api/users/user/verifyEmailCode',
+        {
+          email: testUser.email,
+          code: emailCode,
+        },
+      );
 
       logger.info('Email verification response', {
         status: verifyEmailResponse.status,
-        mockCodesEnabled: process.env.ENABLE_MOCK_CODES === 'true'
+        mockCodesEnabled: process.env.ENABLE_MOCK_CODES === 'true',
       });
       expect([200, 400]).toContain(verifyEmailResponse.status);
 
       if (verifyEmailResponse.status === 200) {
         logger.success('Email verified successfully');
       } else {
-        logger.warn('Email verification failed - expected in real environment without mock codes');
+        logger.warn(
+          'Email verification failed - expected in real environment without mock codes',
+        );
       }
 
       logger.step(4, 'Send phone validation code');
-      const sendPhoneResponse = await httpClient.post('/api/users/user/sendPhoneValidation', {
-        phone: testUser.phone,
-      });
+      const sendPhoneResponse = await httpClient.post(
+        '/api/users/user/sendPhoneValidation',
+        {
+          phone: testUser.phone,
+        },
+      );
 
-      logger.info('SMS validation code send response', { status: sendPhoneResponse.status });
+      logger.info('SMS validation code send response', {
+        status: sendPhoneResponse.status,
+      });
       expect([200, 400]).toContain(sendPhoneResponse.status);
 
       if (sendPhoneResponse.status === 200) {
@@ -89,13 +116,19 @@ describe('Onboarding Integration Tests', () => {
       }
 
       logger.step(5, 'Verify phone code');
-      const phoneCode = process.env.ENABLE_MOCK_CODES === 'true' ? '123456' : '999999';
-      const verifyPhoneResponse = await httpClient.post('/api/users/user/verifyPhoneCode', {
-        phone: testUser.phone,
-        code: phoneCode,
-      });
+      const phoneCode =
+        process.env.ENABLE_MOCK_CODES === 'true' ? '123456' : '999999';
+      const verifyPhoneResponse = await httpClient.post(
+        '/api/users/user/verifyPhoneCode',
+        {
+          phone: testUser.phone,
+          code: phoneCode,
+        },
+      );
 
-      logger.info('Phone verification response', { status: verifyPhoneResponse.status });
+      logger.info('Phone verification response', {
+        status: verifyPhoneResponse.status,
+      });
       expect([200, 400]).toContain(verifyPhoneResponse.status);
 
       if (verifyPhoneResponse.status === 200) {
@@ -122,15 +155,20 @@ describe('Onboarding Integration Tests', () => {
         });
 
         logger.step(7, 'Update user profile with personal data');
-        const updateProfileResponse = await httpClient.post('/api/users/user/profile', {
-          firstName: testUser.firstName,
-          lastName: testUser.lastName,
-          birthdate: testUser.birthdate,
-          gender: 'male',
-          maritalStatus: 'single',
-        });
+        const updateProfileResponse = await httpClient.post(
+          '/api/users/user/profile',
+          {
+            firstName: testUser.firstName,
+            lastName: testUser.lastName,
+            birthdate: testUser.birthdate,
+            gender: 'male',
+            maritalStatus: 'single',
+          },
+        );
 
-        logger.info('Profile update response', { status: updateProfileResponse.status });
+        logger.info('Profile update response', {
+          status: updateProfileResponse.status,
+        });
         expect([200, 401]).toContain(updateProfileResponse.status);
 
         if (updateProfileResponse.status === 200) {
@@ -142,7 +180,9 @@ describe('Onboarding Integration Tests', () => {
         logger.step(8, 'Retrieve user profile');
         const profileResponse = await httpClient.get('/api/users/user/me');
 
-        logger.info('Profile retrieval response', { status: profileResponse.status });
+        logger.info('Profile retrieval response', {
+          status: profileResponse.status,
+        });
         expect([200, 401]).toContain(profileResponse.status);
 
         if (profileResponse.status === 200) {
@@ -210,7 +250,10 @@ describe('Onboarding Integration Tests', () => {
           language: 'pt',
         });
 
-        logger.info('Invalid email response', { email: invalidEmail, status: response.status });
+        logger.info('Invalid email response', {
+          email: invalidEmail,
+          status: response.status,
+        });
         expect(response.status).toBe(400);
       }
 
@@ -237,7 +280,10 @@ describe('Onboarding Integration Tests', () => {
           language: 'pt',
         });
 
-        logger.info('Invalid phone response', { phone: invalidPhone, status: response.status });
+        logger.info('Invalid phone response', {
+          phone: invalidPhone,
+          status: response.status,
+        });
         expect(response.status).toBe(400);
       }
 
@@ -257,10 +303,15 @@ describe('Onboarding Integration Tests', () => {
         language: 'pt',
       });
 
-      logger.info('Signup response for state tracking', { status: signupResponse.status });
+      logger.info('Signup response for state tracking', {
+        status: signupResponse.status,
+      });
       expect([201, 400]).toContain(signupResponse.status);
 
-      if (signupResponse.status === 201 && signupResponse.data.onboardingState) {
+      if (
+        signupResponse.status === 201 &&
+        signupResponse.data.onboardingState
+      ) {
         const onboardingState = signupResponse.data.onboardingState;
         logger.success('Onboarding state tracked', { state: onboardingState });
       } else {

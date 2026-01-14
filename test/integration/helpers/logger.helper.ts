@@ -82,7 +82,9 @@ export class IntegrationTestLogger {
    */
   step(stepNumber: number, stepName: string): void {
     const timestamp = this.formatTimestamp();
-    console.log(`[${timestamp}] [STEP ${stepNumber}] [${this.context}] ${stepName}`);
+    console.log(
+      `[${timestamp}] [STEP ${stepNumber}] [${this.context}] ${stepName}`,
+    );
   }
 
   /**
@@ -143,6 +145,8 @@ export class IntegrationTestLogger {
  * @param context - Context identifier for the logger
  * @returns New logger instance
  */
-export const createIntegrationLogger = (context: string): IntegrationTestLogger => {
+export const createIntegrationLogger = (
+  context: string,
+): IntegrationTestLogger => {
   return new IntegrationTestLogger(context);
 };

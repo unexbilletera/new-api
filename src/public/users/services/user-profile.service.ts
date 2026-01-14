@@ -31,7 +31,10 @@ export class UserProfileService {
     systemVersion?: string,
     includeRates?: boolean,
   ): Promise<UserProfileResponseDto> {
-    this.logger.info('[PROFILE] Getting current user', { userId, includeRates });
+    this.logger.info('[PROFILE] Getting current user', {
+      userId,
+      includeRates,
+    });
 
     const user = await this.userModel.findById(userId);
 

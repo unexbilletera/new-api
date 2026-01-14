@@ -35,14 +35,14 @@ export class QueryHelpers {
     fields: string[],
   ): Record<'OR', any[]> {
     return {
-      OR: fields.map(field => ({
+      OR: fields.map((field) => ({
         [field]: { contains: searchTerm, mode: 'insensitive' },
       })),
     };
   }
 
   static mergeConditions(...conditions: any[]): { AND: any[] } | any {
-    const filtered = conditions.filter(c => c && Object.keys(c).length > 0);
+    const filtered = conditions.filter((c) => c && Object.keys(c).length > 0);
     return filtered.length > 0 ? { AND: filtered } : {};
   }
 
@@ -54,9 +54,10 @@ export class QueryHelpers {
     return values && values.length > 0 ? { notIn: values } : undefined;
   }
 
-  static buildLikeCondition(
-    value: string,
-  ): { contains: string; mode: 'insensitive' } {
+  static buildLikeCondition(value: string): {
+    contains: string;
+    mode: 'insensitive';
+  } {
     return {
       contains: value,
       mode: 'insensitive',

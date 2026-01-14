@@ -50,10 +50,7 @@ export class EmailValidationOnboardingService {
       throw new BadRequestException('users.errors.invalidParameters');
     }
 
-    if (
-      completedSteps.includes('1.2') &&
-      completedSteps.includes('1.3')
-    ) {
+    if (completedSteps.includes('1.2') && completedSteps.includes('1.3')) {
       this.logger.warn(
         '[ONBOARDING] User has already validated email (steps 1.2 and 1.3 completed)',
         {

@@ -162,13 +162,14 @@ export class PrismaService
       const errorMessage = error?.message || '';
       let host = 'unknown';
       let port = 'unknown';
-      
+
       const hostPortMatch = errorMessage.match(/at `([^:]+):(\d+)`/);
       if (hostPortMatch) {
         host = hostPortMatch[1];
         port = hostPortMatch[2];
       } else {
-        const dbUrl = process.env.DATABASE_URL || process.env.WALLET_MYSQL_URL || '';
+        const dbUrl =
+          process.env.DATABASE_URL || process.env.WALLET_MYSQL_URL || '';
         if (dbUrl) {
           const urlMatch = dbUrl.match(/@([^:]+):(\d+)/);
           if (urlMatch) {
@@ -177,7 +178,7 @@ export class PrismaService
           }
         }
       }
-      
+
       this.logger.error(
         `Database connection failed: Cannot reach database server at ${host}:${port}`,
         error instanceof Error ? error : new Error(errorMessage),
@@ -185,7 +186,7 @@ export class PrismaService
           errorCode: error?.errorCode || 'P1001',
         },
       );
-      
+
       throw error;
     }
   }

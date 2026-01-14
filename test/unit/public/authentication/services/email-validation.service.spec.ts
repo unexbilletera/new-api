@@ -223,7 +223,9 @@ describe('EmailValidationService', () => {
       expect(userModel.updateEmailVerified).toHaveBeenCalledWith(
         'test@example.com',
       );
-      expect(authMapper.toEmailCodeVerificationResponseDto).toHaveBeenCalledWith(
+      expect(
+        authMapper.toEmailCodeVerificationResponseDto,
+      ).toHaveBeenCalledWith(
         emailServiceResult.message,
         emailServiceResult.email,
       );
@@ -236,7 +238,10 @@ describe('EmailValidationService', () => {
         message: 'Email verified successfully',
         email: 'newuser@example.com',
       };
-      const verifyNewUserDto = { email: 'newuser@example.com', code: '12345678' };
+      const verifyNewUserDto = {
+        email: 'newuser@example.com',
+        code: '12345678',
+      };
       const mapperResult = {
         message: 'Email verified successfully',
         email: 'newuser@example.com',

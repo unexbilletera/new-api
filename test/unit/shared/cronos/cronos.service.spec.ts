@@ -31,7 +31,10 @@ import { CronosService } from '../../../../src/shared/cronos/cronos.service';
 import { ConfigService } from '../../../../src/shared/config/config.service';
 import { LoggerService } from '../../../../src/shared/logger/logger.service';
 import { PrismaService } from '../../../../src/shared/prisma/prisma.service';
-import { createLoggerServiceMock, createPrismaMock } from '../../../utils/mocks';
+import {
+  createLoggerServiceMock,
+  createPrismaMock,
+} from '../../../utils/mocks';
 
 jest.mock('node-fetch', () => {
   const actualFetch = jest.requireActual('node-fetch');
@@ -237,21 +240,27 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           statusText: 'OK',
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           statusText: 'OK',
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify(mockTransferResponse)),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify(mockTransferResponse)),
           status: 200,
           statusText: 'OK',
           headers: { forEach: jest.fn() },
@@ -268,7 +277,9 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           statusText: 'OK',
           headers: { forEach: jest.fn() },
@@ -282,7 +293,9 @@ describe('CronosService', () => {
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify(mockTransferResponse)),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify(mockTransferResponse)),
           status: 200,
           statusText: 'OK',
           headers: { forEach: jest.fn() },
@@ -298,13 +311,17 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
@@ -361,19 +378,25 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify(mockConfirmResponse)),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify(mockConfirmResponse)),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any);
@@ -412,13 +435,17 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
@@ -474,13 +501,17 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
@@ -510,38 +541,46 @@ describe('CronosService', () => {
     });
 
     it('should throw error when document is missing', async () => {
-      await expect(
-        service.getAccountBalance({ document: '' }),
-      ).rejects.toThrow('Missing document. Invalid parameters');
+      await expect(service.getAccountBalance({ document: '' })).rejects.toThrow(
+        'Missing document. Invalid parameters',
+      );
     });
 
     it('should get account balance successfully', async () => {
-      const mockBalanceResponse = { amount: 1000.50, balance: 1000.50 };
+      const mockBalanceResponse = { amount: 1000.5, balance: 1000.5 };
 
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify(mockBalanceResponse)),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify(mockBalanceResponse)),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any);
 
-      const result = await service.getAccountBalance({ document: '12345678901' });
+      const result = await service.getAccountBalance({
+        document: '12345678901',
+      });
 
       expect(result).toBeDefined();
-      expect(result.amount).toBe(1000.50);
+      expect(result.amount).toBe(1000.5);
     });
   });
 
@@ -571,19 +610,25 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify(mockTransactionsResponse)),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify(mockTransactionsResponse)),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any);
@@ -622,7 +667,9 @@ describe('CronosService', () => {
     it('should return early when no BR identity found', async () => {
       await service.syncCronosBalance({
         userId: 'user-123',
-        userIdentities: [{ country: 'us', status: 'enable', taxDocumentNumber: '123' }],
+        userIdentities: [
+          { country: 'us', status: 'enable', taxDocumentNumber: '123' },
+        ],
         userAccounts: [],
       });
 
@@ -632,8 +679,12 @@ describe('CronosService', () => {
     it('should return early when no Cronos account found', async () => {
       await service.syncCronosBalance({
         userId: 'user-123',
-        userIdentities: [{ country: 'br', status: 'enable', taxDocumentNumber: '12345678901' }],
-        userAccounts: [{ id: 'acc-1', type: 'other', status: 'enable', balance: '100' }],
+        userIdentities: [
+          { country: 'br', status: 'enable', taxDocumentNumber: '12345678901' },
+        ],
+        userAccounts: [
+          { id: 'acc-1', type: 'other', status: 'enable', balance: '100' },
+        ],
       });
 
       expect(logger.warn).toHaveBeenCalled();
@@ -645,19 +696,25 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify(mockBalanceResponse)),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify(mockBalanceResponse)),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any);
@@ -668,8 +725,12 @@ describe('CronosService', () => {
 
       await service.syncCronosBalance({
         userId: 'user-123',
-        userIdentities: [{ country: 'br', status: 'enable', taxDocumentNumber: '12345678901' }],
-        userAccounts: [{ id: 'acc-1', type: 'cronos', status: 'enable', balance: '1000' }],
+        userIdentities: [
+          { country: 'br', status: 'enable', taxDocumentNumber: '12345678901' },
+        ],
+        userAccounts: [
+          { id: 'acc-1', type: 'cronos', status: 'enable', balance: '1000' },
+        ],
       });
 
       expect(logger.warn).toHaveBeenCalled();
@@ -695,19 +756,25 @@ describe('CronosService', () => {
       it('should start onboarding successfully', async () => {
         const mockResponse = { individual_id: 'ind-123' };
 
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
-          status: 200,
-          headers: { forEach: jest.fn() },
-        } as any).mockResolvedValueOnce({
-          ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify(mockResponse)),
-          status: 200,
-          headers: { forEach: jest.fn() },
-        } as any);
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            text: jest
+              .fn()
+              .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+            status: 200,
+            headers: { forEach: jest.fn() },
+          } as any)
+          .mockResolvedValueOnce({
+            ok: true,
+            text: jest.fn().mockResolvedValue(JSON.stringify(mockResponse)),
+            status: 200,
+            headers: { forEach: jest.fn() },
+          } as any);
 
-        const result = await service.onboardingStart({ document: '12345678901' });
+        const result = await service.onboardingStart({
+          document: '12345678901',
+        });
 
         expect(result).toBeDefined();
         expect(result.individual_id).toBe('ind-123');
@@ -717,19 +784,31 @@ describe('CronosService', () => {
     describe('onboardingStep1', () => {
       it('should throw error when cronosId is missing', async () => {
         await expect(
-          service.onboardingStep1({ cronosId: '', name: 'Test', email: 'test@test.com' }),
+          service.onboardingStep1({
+            cronosId: '',
+            name: 'Test',
+            email: 'test@test.com',
+          }),
         ).rejects.toThrow('Missing cronosId. Invalid parameters');
       });
 
       it('should throw error when name is missing', async () => {
         await expect(
-          service.onboardingStep1({ cronosId: 'ind-123', name: '', email: 'test@test.com' }),
+          service.onboardingStep1({
+            cronosId: 'ind-123',
+            name: '',
+            email: 'test@test.com',
+          }),
         ).rejects.toThrow('Missing name. Invalid parameters');
       });
 
       it('should throw error when email is missing', async () => {
         await expect(
-          service.onboardingStep1({ cronosId: 'ind-123', name: 'Test', email: '' }),
+          service.onboardingStep1({
+            cronosId: 'ind-123',
+            name: 'Test',
+            email: '',
+          }),
         ).rejects.toThrow('Missing email. Invalid parameters');
       });
     });
@@ -737,19 +816,31 @@ describe('CronosService', () => {
     describe('onboardingStep2', () => {
       it('should throw error when cronosId is missing', async () => {
         await expect(
-          service.onboardingStep2({ cronosId: '', phonePrefix: '+55', phoneNumber: '123456789' }),
+          service.onboardingStep2({
+            cronosId: '',
+            phonePrefix: '+55',
+            phoneNumber: '123456789',
+          }),
         ).rejects.toThrow('Missing cronosId. Invalid parameters');
       });
 
       it('should throw error when phonePrefix is missing', async () => {
         await expect(
-          service.onboardingStep2({ cronosId: 'ind-123', phonePrefix: '', phoneNumber: '123456789' }),
+          service.onboardingStep2({
+            cronosId: 'ind-123',
+            phonePrefix: '',
+            phoneNumber: '123456789',
+          }),
         ).rejects.toThrow('Missing phonePrefix. Invalid parameters');
       });
 
       it('should throw error when phoneNumber is missing', async () => {
         await expect(
-          service.onboardingStep2({ cronosId: 'ind-123', phonePrefix: '+55', phoneNumber: '' }),
+          service.onboardingStep2({
+            cronosId: 'ind-123',
+            phonePrefix: '+55',
+            phoneNumber: '',
+          }),
         ).rejects.toThrow('Missing phoneNumber. Invalid parameters');
       });
     });
@@ -757,25 +848,45 @@ describe('CronosService', () => {
     describe('onboardingStep3', () => {
       it('should throw error when cronosId is missing', async () => {
         await expect(
-          service.onboardingStep3({ cronosId: '', documentType: 'rg', documentFace: 'front', fileUrl: 'http://test.com' }),
+          service.onboardingStep3({
+            cronosId: '',
+            documentType: 'rg',
+            documentFace: 'front',
+            fileUrl: 'http://test.com',
+          }),
         ).rejects.toThrow('Missing cronosId. Invalid parameters');
       });
 
       it('should throw error when documentType is missing', async () => {
         await expect(
-          service.onboardingStep3({ cronosId: 'ind-123', documentType: '', documentFace: 'front', fileUrl: 'http://test.com' }),
+          service.onboardingStep3({
+            cronosId: 'ind-123',
+            documentType: '',
+            documentFace: 'front',
+            fileUrl: 'http://test.com',
+          }),
         ).rejects.toThrow('Missing documentType. Invalid parameters');
       });
 
       it('should throw error when documentFace is missing', async () => {
         await expect(
-          service.onboardingStep3({ cronosId: 'ind-123', documentType: 'rg', documentFace: '', fileUrl: 'http://test.com' }),
+          service.onboardingStep3({
+            cronosId: 'ind-123',
+            documentType: 'rg',
+            documentFace: '',
+            fileUrl: 'http://test.com',
+          }),
         ).rejects.toThrow('Missing documentFace. Invalid parameters');
       });
 
       it('should throw error when fileUrl is missing', async () => {
         await expect(
-          service.onboardingStep3({ cronosId: 'ind-123', documentType: 'rg', documentFace: 'front', fileUrl: '' }),
+          service.onboardingStep3({
+            cronosId: 'ind-123',
+            documentType: 'rg',
+            documentFace: 'front',
+            fileUrl: '',
+          }),
         ).rejects.toThrow('Missing fileUrl. Invalid parameters');
       });
     });
@@ -873,9 +984,9 @@ describe('CronosService', () => {
 
     describe('getOnboardingStatus', () => {
       it('should throw error when cronosId is missing', async () => {
-        await expect(service.getOnboardingStatus({ cronosId: '' })).rejects.toThrow(
-          'Missing cronosId. Invalid parameters',
-        );
+        await expect(
+          service.getOnboardingStatus({ cronosId: '' }),
+        ).rejects.toThrow('Missing cronosId. Invalid parameters');
       });
     });
   });
@@ -943,13 +1054,17 @@ describe('CronosService', () => {
         mockFetch
           .mockResolvedValueOnce({
             ok: true,
-            text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+            text: jest
+              .fn()
+              .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
             status: 200,
             headers: { forEach: jest.fn() },
           } as any)
           .mockResolvedValueOnce({
             ok: true,
-            text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
+            text: jest
+              .fn()
+              .mockResolvedValue(JSON.stringify({ token: mockUserToken })),
             status: 200,
             headers: { forEach: jest.fn() },
           } as any)
@@ -996,7 +1111,9 @@ describe('CronosService', () => {
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
-          text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockAppToken })),
+          text: jest
+            .fn()
+            .mockResolvedValue(JSON.stringify({ token: mockAppToken })),
           status: 200,
           headers: { forEach: jest.fn() },
         } as any)

@@ -53,9 +53,7 @@ export class OnboardingController {
   @ApiQuery({ name: 'page', required: false, description: 'Page' })
   @ApiQuery({ name: 'limit', required: false, description: 'Limit per page' })
   @MinLevel(1)
-  async listUsers(
-    @Query() query: ListOnboardingQueryDto,
-  ): Promise<{
+  async listUsers(@Query() query: ListOnboardingQueryDto): Promise<{
     data: OnboardingUserDto[];
     total: number;
     page: number;
@@ -67,9 +65,7 @@ export class OnboardingController {
   @Get('pending')
   @ApiOperation({ summary: 'List users pending approval' })
   @MinLevel(1)
-  async getPendingUsers(
-    @Query() query: ListOnboardingQueryDto,
-  ): Promise<{
+  async getPendingUsers(@Query() query: ListOnboardingQueryDto): Promise<{
     data: OnboardingUserDto[];
     total: number;
     page: number;

@@ -9,7 +9,13 @@ import { PixCronosTransactionModel } from './models/pix-cronos-transaction.model
 import { TransactionalPasswordModule } from '../../transactional-password/transactional-password.module';
 
 @Module({
-  imports: [PrismaModule, SqsModule, CronosModule, JwtModule, TransactionalPasswordModule],
+  imports: [
+    PrismaModule,
+    SqsModule,
+    CronosModule,
+    JwtModule,
+    TransactionalPasswordModule,
+  ],
   controllers: [PixCronosController],
   providers: [PixCronosService, PixCronosTransactionModel],
   exports: [PixCronosService],

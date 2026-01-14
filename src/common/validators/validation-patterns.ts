@@ -140,7 +140,10 @@ export const ValidationMessages = {
  * Usage: @Matches(...ValidationOptions.CODE_6_DIGITS)
  */
 export const ValidationOptions = {
-  CODE_6_DIGITS: [ValidationPatterns.CODE_6_DIGITS, { message: ValidationMessages.CODE_6_DIGITS }],
+  CODE_6_DIGITS: [
+    ValidationPatterns.CODE_6_DIGITS,
+    { message: ValidationMessages.CODE_6_DIGITS },
+  ],
   PASSWORD_6_DIGITS: [
     ValidationPatterns.PASSWORD_6_DIGITS,
     { message: ValidationMessages.PASSWORD_6_DIGITS },
@@ -156,14 +159,26 @@ export const ValidationOptions = {
   ],
   CPF: [ValidationPatterns.CPF, { message: ValidationMessages.CPF }],
   CNPJ: [ValidationPatterns.CNPJ, { message: ValidationMessages.CNPJ }],
-  ZIP_CODE_BR: [ValidationPatterns.ZIP_CODE_BR, { message: ValidationMessages.ZIP_CODE_BR }],
+  ZIP_CODE_BR: [
+    ValidationPatterns.ZIP_CODE_BR,
+    { message: ValidationMessages.ZIP_CODE_BR },
+  ],
   COUNTRY_CODE_2: [
     ValidationPatterns.COUNTRY_CODE_2,
     { message: ValidationMessages.COUNTRY_CODE_2 },
   ],
-  STATE_CODE_2: [ValidationPatterns.STATE_CODE_2, { message: ValidationMessages.STATE_CODE_2 }],
-  LANGUAGE: [ValidationPatterns.LANGUAGE, { message: ValidationMessages.LANGUAGE }],
-  TIMEZONE: [ValidationPatterns.TIMEZONE, { message: ValidationMessages.TIMEZONE }],
+  STATE_CODE_2: [
+    ValidationPatterns.STATE_CODE_2,
+    { message: ValidationMessages.STATE_CODE_2 },
+  ],
+  LANGUAGE: [
+    ValidationPatterns.LANGUAGE,
+    { message: ValidationMessages.LANGUAGE },
+  ],
+  TIMEZONE: [
+    ValidationPatterns.TIMEZONE,
+    { message: ValidationMessages.TIMEZONE },
+  ],
   GENDER: [ValidationPatterns.GENDER, { message: ValidationMessages.GENDER }],
   MARITAL_STATUS: [
     ValidationPatterns.MARITAL_STATUS,
@@ -174,7 +189,10 @@ export const ValidationOptions = {
     ValidationPatterns.VALIDATION_TYPE,
     { message: ValidationMessages.VALIDATION_TYPE },
   ],
-  VERSION: [ValidationPatterns.VERSION, { message: ValidationMessages.VERSION }],
+  VERSION: [
+    ValidationPatterns.VERSION,
+    { message: ValidationMessages.VERSION },
+  ],
 } as const;
 
 /**
@@ -189,8 +207,14 @@ export const SpecializedValidationOptions = {
     ValidationPatterns.PASSWORD_6_DIGITS,
     { message: 'New password must be exactly 6 digits' },
   ],
-  ACCOUNT_ID: [ValidationPatterns.UUID, { message: 'Account ID must be a valid UUID' }],
-  IDENTITY_ID: [ValidationPatterns.UUID, { message: 'Identity ID must be a valid UUID' }],
+  ACCOUNT_ID: [
+    ValidationPatterns.UUID,
+    { message: 'Account ID must be a valid UUID' },
+  ],
+  IDENTITY_ID: [
+    ValidationPatterns.UUID,
+    { message: 'Identity ID must be a valid UUID' },
+  ],
   SOURCE_ACCOUNT_ID: [
     ValidationPatterns.UUID,
     { message: 'Source account ID must be a valid UUID' },

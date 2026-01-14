@@ -141,7 +141,8 @@ export class PixCronosService {
         userId,
       );
 
-      const userHasPassword = await this.transactionalPasswordService.hasPassword(userId);
+      const userHasPassword =
+        await this.transactionalPasswordService.hasPassword(userId);
       if (userHasPassword) {
         if (!transactionalPassword) {
           this.logger.warn(
@@ -154,10 +155,11 @@ export class PixCronosService {
           );
         }
 
-        const isPasswordValid = await this.transactionalPasswordService.validatePassword(
-          userId,
-          transactionalPassword,
-        );
+        const isPasswordValid =
+          await this.transactionalPasswordService.validatePassword(
+            userId,
+            transactionalPassword,
+          );
 
         if (!isPasswordValid) {
           this.logger.warn(

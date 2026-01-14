@@ -75,7 +75,10 @@ describe('OnboardingController', () => {
           provide: IdentityOnboardingService,
           useValue: identityOnboardingService,
         },
-        { provide: EmailValidationOnboardingService, useValue: emailValidationService },
+        {
+          provide: EmailValidationOnboardingService,
+          useValue: emailValidationService,
+        },
         { provide: PhoneValidationService, useValue: phoneValidationService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: JwtAuthGuard, useValue: mockAuthGuard },
@@ -470,9 +473,9 @@ describe('OnboardingController', () => {
         new Error('Retry failed'),
       );
 
-      await expect(
-        userController.retry(mockUserIdentityId),
-      ).rejects.toThrow('Retry failed');
+      await expect(userController.retry(mockUserIdentityId)).rejects.toThrow(
+        'Retry failed',
+      );
     });
   });
 });

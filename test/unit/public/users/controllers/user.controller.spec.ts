@@ -116,7 +116,11 @@ describe('UserController', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe(mockActiveUser.id);
-      expect(service.getCurrentUser).toHaveBeenCalledWith(userId, undefined, false);
+      expect(service.getCurrentUser).toHaveBeenCalledWith(
+        userId,
+        undefined,
+        false,
+      );
     });
 
     /**

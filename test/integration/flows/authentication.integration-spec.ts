@@ -3,9 +3,15 @@
  * @description Integration tests for authentication flows (login, logout, password management)
  */
 
-import { IntegrationHttpClient, createHttpClient } from '../helpers/http-client.helper';
+import {
+  IntegrationHttpClient,
+  createHttpClient,
+} from '../helpers/http-client.helper';
 import { TestUser, createTestUser } from '../helpers/test-data.helper';
-import { IntegrationTestLogger, createIntegrationLogger } from '../helpers/logger.helper';
+import {
+  IntegrationTestLogger,
+  createIntegrationLogger,
+} from '../helpers/logger.helper';
 
 describe('Authentication Integration Tests', () => {
   let httpClient: IntegrationHttpClient;
@@ -89,7 +95,9 @@ describe('Authentication Integration Tests', () => {
           password: testUser.password,
         });
 
-        logger.info('Signin with phone response', { status: loginResponse.status });
+        logger.info('Signin with phone response', {
+          status: loginResponse.status,
+        });
         expect([200, 401]).toContain(loginResponse.status);
 
         if (loginResponse.status === 200) {
@@ -110,7 +118,9 @@ describe('Authentication Integration Tests', () => {
         password: 'wrongpassword',
       });
 
-      logger.info('Invalid credentials response', { status: loginResponse.status });
+      logger.info('Invalid credentials response', {
+        status: loginResponse.status,
+      });
       expect(loginResponse.status).toBe(401);
       expect(loginResponse.data.message).toBeDefined();
       logger.success('Invalid credentials correctly rejected');
@@ -126,7 +136,9 @@ describe('Authentication Integration Tests', () => {
         password: '123456',
       });
 
-      logger.info('Non-existent user response', { status: loginResponse.status });
+      logger.info('Non-existent user response', {
+        status: loginResponse.status,
+      });
       expect(loginResponse.status).toBe(401);
       logger.success('Non-existent user correctly rejected');
 
@@ -161,7 +173,9 @@ describe('Authentication Integration Tests', () => {
           logger.step(1, 'Access protected route');
           const profileResponse = await httpClient.get('/api/users/user/me');
 
-          logger.info('Protected route response', { status: profileResponse.status });
+          logger.info('Protected route response', {
+            status: profileResponse.status,
+          });
           expect(profileResponse.status).toBe(200);
           expect(profileResponse.data.email).toBe(testUser.email);
           logger.success('Protected route accessible with valid token');
@@ -220,7 +234,9 @@ describe('Authentication Integration Tests', () => {
           httpClient.setAuthToken(authToken);
 
           logger.step(1, 'Execute logout');
-          const logoutResponse = await httpClient.post('/api/users/user/signout');
+          const logoutResponse = await httpClient.post(
+            '/api/users/user/signout',
+          );
 
           logger.info('Logout response', { status: logoutResponse.status });
           expect([200, 401]).toContain(logoutResponse.status);
@@ -258,12 +274,17 @@ describe('Authentication Integration Tests', () => {
 
           const newPassword = '654321';
           logger.step(1, 'Change password');
-          const changePasswordResponse = await httpClient.post('/api/users/user/change-password', {
-            currentPassword: testUser.password,
-            newPassword: newPassword,
-          });
+          const changePasswordResponse = await httpClient.post(
+            '/api/users/user/change-password',
+            {
+              currentPassword: testUser.password,
+              newPassword: newPassword,
+            },
+          );
 
-          logger.info('Password change response', { status: changePasswordResponse.status });
+          logger.info('Password change response', {
+            status: changePasswordResponse.status,
+          });
           expect([200, 401]).toContain(changePasswordResponse.status);
 
           if (changePasswordResponse.status === 200) {
@@ -271,12 +292,17 @@ describe('Authentication Integration Tests', () => {
 
             logger.step(2, 'Signin with new password');
             httpClient.clearAuthToken();
-            const newLoginResponse = await httpClient.post('/api/users/user/signin', {
-              identifier: testUser.email,
-              password: newPassword,
-            });
+            const newLoginResponse = await httpClient.post(
+              '/api/users/user/signin',
+              {
+                identifier: testUser.email,
+                password: newPassword,
+              },
+            );
 
-            logger.info('Signin with new password response', { status: newLoginResponse.status });
+            logger.info('Signin with new password response', {
+              status: newLoginResponse.status,
+            });
             expect([200, 401]).toContain(newLoginResponse.status);
             if (newLoginResponse.status === 200) {
               logger.success('Signin with new password successful');

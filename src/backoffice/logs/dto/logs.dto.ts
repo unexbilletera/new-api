@@ -55,12 +55,18 @@ export class ListLogsQueryDto {
 }
 
 export class LogStatsQueryDto {
-  @ApiPropertyOptional({ description: 'Start date (ISO 8601)', example: '2024-01-01' })
+  @ApiPropertyOptional({
+    description: 'Start date (ISO 8601)',
+    example: '2024-01-01',
+  })
   @IsOptional()
   @IsDateString()
   startDate?: string;
 
-  @ApiPropertyOptional({ description: 'End date (ISO 8601)', example: '2024-01-31' })
+  @ApiPropertyOptional({
+    description: 'End date (ISO 8601)',
+    example: '2024-01-31',
+  })
   @IsOptional()
   @IsDateString()
   endDate?: string;

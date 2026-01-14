@@ -173,9 +173,7 @@ export class TransactionalPasswordController {
       'TransactionalPasswordController.getStatus',
     );
 
-    const status = await this.transactionalPasswordService.getStatus(
-      user.id,
-    );
+    const status = await this.transactionalPasswordService.getStatus(user.id);
 
     return {
       ...status,

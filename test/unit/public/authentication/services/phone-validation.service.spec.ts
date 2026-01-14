@@ -243,10 +243,9 @@ describe('PhoneValidationService', () => {
       expect(userModel.updatePhoneVerified).toHaveBeenCalledWith(
         '5511999999999',
       );
-      expect(authMapper.toPhoneCodeVerificationResponseDto).toHaveBeenCalledWith(
-        smsServiceResult.message,
-        smsServiceResult.phone,
-      );
+      expect(
+        authMapper.toPhoneCodeVerificationResponseDto,
+      ).toHaveBeenCalledWith(smsServiceResult.message, smsServiceResult.phone);
       expect(result).toEqual(mapperResult);
     });
 
@@ -436,7 +435,12 @@ describe('PhoneValidationService', () => {
 
       const result = await service.sendPhoneValidation(emptyPhoneDto);
 
-      expect(smsService.sendValidationCode).toHaveBeenCalledWith('', 6, 5, 'sms');
+      expect(smsService.sendValidationCode).toHaveBeenCalledWith(
+        '',
+        6,
+        5,
+        'sms',
+      );
       expect(result).toEqual(mapperResult);
     });
 
@@ -468,7 +472,7 @@ describe('PhoneValidationService', () => {
       const result = await service.sendPhoneValidation(specialPhoneDto);
 
       expect(smsService.sendValidationCode).toHaveBeenCalledWith(
-        '+++---()()' ,
+        '+++---()()',
         6,
         5,
         'sms',

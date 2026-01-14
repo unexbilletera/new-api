@@ -3,7 +3,10 @@ import { PrismaClient } from '@prisma/client';
 import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
-export class PrismaExtendedService extends PrismaClient implements OnModuleInit {
+export class PrismaExtendedService
+  extends PrismaClient
+  implements OnModuleInit
+{
   private readonly softDeleteModels = [
     'users',
     'usersIdentities',

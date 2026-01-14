@@ -10,7 +10,8 @@ export class ConfirmPixCronosDto {
   transactionId: string;
 
   @ApiProperty({
-    description: 'Transactional password (4 digits) - required if user has one configured',
+    description:
+      'Transactional password (4 digits) - required if user has one configured',
     example: '1234',
     minLength: 4,
     maxLength: 4,

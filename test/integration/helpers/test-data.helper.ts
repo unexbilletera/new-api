@@ -62,7 +62,9 @@ export class TestDataGenerator {
    * @returns 11-digit CPF string
    */
   static generateCPF(): string {
-    return Array.from({ length: 11 }, () => Math.floor(Math.random() * 10)).join('');
+    return Array.from({ length: 11 }, () =>
+      Math.floor(Math.random() * 10),
+    ).join('');
   }
 
   /**
@@ -70,7 +72,9 @@ export class TestDataGenerator {
    * @returns 14-digit CNPJ string
    */
   static generateCNPJ(): string {
-    return Array.from({ length: 14 }, () => Math.floor(Math.random() * 10)).join('');
+    return Array.from({ length: 14 }, () =>
+      Math.floor(Math.random() * 10),
+    ).join('');
   }
 
   /**
@@ -78,7 +82,9 @@ export class TestDataGenerator {
    * @returns 8-digit DNI string
    */
   static generateDNI(): string {
-    return Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('');
+    return Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join(
+      '',
+    );
   }
 
   /**
@@ -87,7 +93,14 @@ export class TestDataGenerator {
    */
   static generateName(): string {
     const firstNames = ['João', 'Maria', 'Pedro', 'Ana', 'Carlos', 'Julia'];
-    const lastNames = ['Silva', 'Santos', 'Oliveira', 'Souza', 'Costa', 'Ferreira'];
+    const lastNames = [
+      'Silva',
+      'Santos',
+      'Oliveira',
+      'Souza',
+      'Costa',
+      'Ferreira',
+    ];
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     return `${firstName} ${lastName}`;
@@ -121,7 +134,10 @@ export const createTestUser = (country: Country = 'br'): TestUser => {
     firstName,
     lastName,
     birthdate: TestDataGenerator.generateBirthdate(),
-    document: country === 'br' ? TestDataGenerator.generateCPF() : TestDataGenerator.generateDNI(),
+    document:
+      country === 'br'
+        ? TestDataGenerator.generateCPF()
+        : TestDataGenerator.generateDNI(),
     country,
   };
 };

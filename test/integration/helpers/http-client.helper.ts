@@ -19,7 +19,8 @@ export class IntegrationHttpClient {
    * @param baseURL - Base URL for API requests (defaults to API_BASE_URL env var or localhost:3000)
    */
   constructor(baseURL?: string) {
-    this.baseURL = baseURL || process.env.API_BASE_URL || 'http://localhost:3000';
+    this.baseURL =
+      baseURL || process.env.API_BASE_URL || 'http://localhost:3000';
     this.client = axios.create({
       baseURL: this.baseURL,
       timeout: 30000,
@@ -48,7 +49,10 @@ export class IntegrationHttpClient {
    * @param config - Optional axios configuration
    * @returns Promise with axios response
    */
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.get<T>(url, this.buildConfig(config));
   }
 
@@ -59,7 +63,11 @@ export class IntegrationHttpClient {
    * @param config - Optional axios configuration
    * @returns Promise with axios response
    */
-  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async post<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.post<T>(url, data, this.buildConfig(config));
   }
 
@@ -70,7 +78,11 @@ export class IntegrationHttpClient {
    * @param config - Optional axios configuration
    * @returns Promise with axios response
    */
-  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async patch<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.patch<T>(url, data, this.buildConfig(config));
   }
 
@@ -80,7 +92,10 @@ export class IntegrationHttpClient {
    * @param config - Optional axios configuration
    * @returns Promise with axios response
    */
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.client.delete<T>(url, this.buildConfig(config));
   }
 

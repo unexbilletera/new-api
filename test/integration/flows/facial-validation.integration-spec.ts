@@ -3,9 +3,15 @@
  * @description Integration tests for liveness verification with and without Valida
  */
 
-import { IntegrationHttpClient, createHttpClient } from '../helpers/http-client.helper';
+import {
+  IntegrationHttpClient,
+  createHttpClient,
+} from '../helpers/http-client.helper';
 import { TestUser, createTestUser } from '../helpers/test-data.helper';
-import { IntegrationTestLogger, createIntegrationLogger } from '../helpers/logger.helper';
+import {
+  IntegrationTestLogger,
+  createIntegrationLogger,
+} from '../helpers/logger.helper';
 
 describe('Facial Validation Integration Tests', () => {
   let httpClient: IntegrationHttpClient;
@@ -59,11 +65,15 @@ describe('Facial Validation Integration Tests', () => {
           logger.success('User authenticated');
 
           logger.step(2, 'Upload liveness photo');
-          const mockBase64Image = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8A';
+          const mockBase64Image =
+            'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8A';
 
-          const livenessResponse = await httpClient.patch(`/api/onboarding/user/${userId}`, {
-            livenessImage: mockBase64Image,
-          });
+          const livenessResponse = await httpClient.patch(
+            `/api/onboarding/user/${userId}`,
+            {
+              livenessImage: mockBase64Image,
+            },
+          );
 
           logger.info('Liveness upload response', {
             status: livenessResponse.status,
@@ -76,7 +86,9 @@ describe('Facial Validation Integration Tests', () => {
             logger.success('Liveness photo uploaded successfully');
             expect(livenessResponse.data).toHaveProperty('success');
           } else {
-            logger.warn('Liveness upload failed', { error: livenessResponse.data.message });
+            logger.warn('Liveness upload failed', {
+              error: livenessResponse.data.message,
+            });
           }
         }
       }
@@ -104,10 +116,15 @@ describe('Facial Validation Integration Tests', () => {
         ];
 
         for (const invalidFormat of invalidFormats) {
-          logger.debug('Testing invalid image format', { format: invalidFormat.substring(0, 30) });
-          const response = await httpClient.patch(`/api/onboarding/user/${userId}`, {
-            livenessImage: invalidFormat,
+          logger.debug('Testing invalid image format', {
+            format: invalidFormat.substring(0, 30),
           });
+          const response = await httpClient.patch(
+            `/api/onboarding/user/${userId}`,
+            {
+              livenessImage: invalidFormat,
+            },
+          );
 
           logger.info('Invalid format response', { status: response.status });
           expect([400, 404]).toContain(response.status);
@@ -151,10 +168,13 @@ describe('Facial Validation Integration Tests', () => {
           logger.success('User authenticated', { userId });
 
           logger.step(2, 'Submit Valida enrollment data');
-          const validaResponse = await httpClient.post('/api/users/user/liveness', {
-            validaId: `valida_test_${Date.now()}`,
-            refId: userId,
-          });
+          const validaResponse = await httpClient.post(
+            '/api/users/user/liveness',
+            {
+              validaId: `valida_test_${Date.now()}`,
+              refId: userId,
+            },
+          );
 
           logger.info('Valida liveness response', {
             status: validaResponse.status,
@@ -167,9 +187,13 @@ describe('Facial Validation Integration Tests', () => {
             logger.success('Valida liveness verification completed');
             expect(validaResponse.data).toHaveProperty('success');
           } else if (validaResponse.status === 500) {
-            logger.warn('Valida service error', { error: validaResponse.data.message });
+            logger.warn('Valida service error', {
+              error: validaResponse.data.message,
+            });
           } else {
-            logger.warn('Valida verification failed', { error: validaResponse.data.message });
+            logger.warn('Valida verification failed', {
+              error: validaResponse.data.message,
+            });
           }
         }
       }
@@ -213,7 +237,10 @@ describe('Facial Validation Integration Tests', () => {
               refId: userId,
             });
 
-            logger.info('Invalid Valida ID response', { validaId: invalidId, status: response.status });
+            logger.info('Invalid Valida ID response', {
+              validaId: invalidId,
+              status: response.status,
+            });
             expect([400, 500]).toContain(response.status);
           }
 
@@ -247,11 +274,13 @@ describe('Facial Validation Integration Tests', () => {
           httpClient.setAuthToken(authToken);
 
           logger.step(1, 'Check initial liveness status');
-          const initialProfileResponse = await httpClient.get('/api/users/user/me');
+          const initialProfileResponse =
+            await httpClient.get('/api/users/user/me');
 
           if (initialProfileResponse.status === 200) {
             logger.info('Initial liveness status', {
-              livenessVerified: !!initialProfileResponse.data.livenessVerifiedAt,
+              livenessVerified:
+                !!initialProfileResponse.data.livenessVerifiedAt,
             });
             logger.success('Liveness verification status tracked');
           }

@@ -215,10 +215,13 @@ describe('UserProfileService', () => {
         forceUpgrade: false,
       });
       expect(result).toEqual(expectedResponse);
-      expect(logger.info).toHaveBeenCalledWith('[PROFILE] Getting current user', {
-        userId,
-        includeRates: undefined,
-      });
+      expect(logger.info).toHaveBeenCalledWith(
+        '[PROFILE] Getting current user',
+        {
+          userId,
+          includeRates: undefined,
+        },
+      );
     });
 
     /**
@@ -256,7 +259,9 @@ describe('UserProfileService', () => {
       };
 
       userModel.findById.mockResolvedValue(mockUser as any);
-      exchangeRatesService.getRates.mockRejectedValue(new Error('Manteca API error'));
+      exchangeRatesService.getRates.mockRejectedValue(
+        new Error('Manteca API error'),
+      );
       userMapper.toProfileResponseDto.mockReturnValue(expectedResponse as any);
 
       await service.getCurrentUser(userId, undefined, true);
@@ -266,10 +271,13 @@ describe('UserProfileService', () => {
         '[PROFILE] Manteca getRates failed (non-critical)',
         { error: 'Manteca API error' },
       );
-      expect(userMapper.toProfileResponseDto).toHaveBeenCalledWith(mockUser as any, {
-        exchangeRates: null,
-        forceUpgrade: false,
-      });
+      expect(userMapper.toProfileResponseDto).toHaveBeenCalledWith(
+        mockUser as any,
+        {
+          exchangeRates: null,
+          forceUpgrade: false,
+        },
+      );
     });
 
     /**
@@ -283,16 +291,23 @@ describe('UserProfileService', () => {
       };
 
       userModel.findById.mockResolvedValue(mockUser as any);
-      systemVersionService.validateVersion.mockReturnValue({ isValid: false } as any);
+      systemVersionService.validateVersion.mockReturnValue({
+        isValid: false,
+      } as any);
       userMapper.toProfileResponseDto.mockReturnValue(expectedResponse as any);
 
       await service.getCurrentUser(userId, systemVersion);
 
-      expect(systemVersionService.validateVersion).toHaveBeenCalledWith(systemVersion);
-      expect(userMapper.toProfileResponseDto).toHaveBeenCalledWith(mockUser as any, {
-        exchangeRates: null,
-        forceUpgrade: true,
-      });
+      expect(systemVersionService.validateVersion).toHaveBeenCalledWith(
+        systemVersion,
+      );
+      expect(userMapper.toProfileResponseDto).toHaveBeenCalledWith(
+        mockUser as any,
+        {
+          exchangeRates: null,
+          forceUpgrade: true,
+        },
+      );
     });
 
     /**
@@ -306,16 +321,23 @@ describe('UserProfileService', () => {
       };
 
       userModel.findById.mockResolvedValue(mockUser as any);
-      systemVersionService.validateVersion.mockReturnValue({ isValid: true } as any);
+      systemVersionService.validateVersion.mockReturnValue({
+        isValid: true,
+      } as any);
       userMapper.toProfileResponseDto.mockReturnValue(expectedResponse as any);
 
       await service.getCurrentUser(userId, systemVersion);
 
-      expect(systemVersionService.validateVersion).toHaveBeenCalledWith(systemVersion);
-      expect(userMapper.toProfileResponseDto).toHaveBeenCalledWith(mockUser as any, {
-        exchangeRates: null,
-        forceUpgrade: false,
-      });
+      expect(systemVersionService.validateVersion).toHaveBeenCalledWith(
+        systemVersion,
+      );
+      expect(userMapper.toProfileResponseDto).toHaveBeenCalledWith(
+        mockUser as any,
+        {
+          exchangeRates: null,
+          forceUpgrade: false,
+        },
+      );
     });
 
     /**
@@ -323,7 +345,10 @@ describe('UserProfileService', () => {
      */
     it('should not validate version when systemVersion is not provided', async () => {
       userModel.findById.mockResolvedValue(mockUser as any);
-      userMapper.toProfileResponseDto.mockReturnValue({ user: {}, forceUpgrade: false } as any);
+      userMapper.toProfileResponseDto.mockReturnValue({
+        user: {},
+        forceUpgrade: false,
+      } as any);
 
       await service.getCurrentUser(userId);
 
@@ -338,7 +363,9 @@ describe('UserProfileService', () => {
         new NotFoundException('users.errors.userNotFound'),
       );
 
-      await expect(service.getCurrentUser(userId)).rejects.toThrow(NotFoundException);
+      await expect(service.getCurrentUser(userId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -349,7 +376,11 @@ describe('UserProfileService', () => {
   describe('updateProfile', () => {
     const userId = 'user-123';
     const mockUser = createMockUser();
-    const mockUpdatedUser = { ...mockUser, firstName: 'Jane', lastName: 'Smith' };
+    const mockUpdatedUser = {
+      ...mockUser,
+      firstName: 'Jane',
+      lastName: 'Smith',
+    };
 
     /**
      * @test Should update profile with valid first name
@@ -360,16 +391,21 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUpdatedUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue(expectedResponse as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue(
+        expectedResponse as any,
+      );
 
       const result = await service.updateProfile(userId, dto);
 
       expect(userModel.findByIdWithValidStatus).toHaveBeenCalledWith(userId);
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        firstName: 'Jane',
-        name: 'jane Doe',
-        updatedAt: expect.any(Date),
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          firstName: 'Jane',
+          name: 'jane Doe',
+          updatedAt: expect.any(Date),
+        }),
+      );
       expect(result).toEqual(expectedResponse);
     });
 
@@ -381,15 +417,20 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUpdatedUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        lastName: 'Smith',
-        name: 'John SMITH',
-        updatedAt: expect.any(Date),
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          lastName: 'Smith',
+          name: 'John SMITH',
+          updatedAt: expect.any(Date),
+        }),
+      );
     });
 
     /**
@@ -400,16 +441,21 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUpdatedUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        firstName: 'Jane',
-        lastName: 'Smith',
-        name: 'jane smith',
-        updatedAt: expect.any(Date),
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          firstName: 'Jane',
+          lastName: 'Smith',
+          name: 'jane smith',
+          updatedAt: expect.any(Date),
+        }),
+      );
     });
 
     /**
@@ -459,13 +505,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        phone: '+5411999888777',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          phone: '+5411999888777',
+        }),
+      );
     });
 
     /**
@@ -489,13 +540,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        language: 'en',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          language: 'en',
+        }),
+      );
     });
 
     /**
@@ -506,13 +562,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        country: 'ar',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          country: 'ar',
+        }),
+      );
     });
 
     /**
@@ -523,13 +584,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        country: 'br',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          country: 'br',
+        }),
+      );
     });
 
     /**
@@ -553,13 +619,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        birthdate: expect.any(Date),
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          birthdate: expect.any(Date),
+        }),
+      );
     });
 
     /**
@@ -596,13 +667,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        gender: 'male',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          gender: 'male',
+        }),
+      );
     });
 
     /**
@@ -613,13 +689,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        gender: 'female',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          gender: 'female',
+        }),
+      );
     });
 
     /**
@@ -639,20 +720,32 @@ describe('UserProfileService', () => {
      * @test Should update valid marital status
      */
     it('should update maritalStatus with valid value', async () => {
-      const validStatuses = ['single', 'married', 'divorced', 'widowed', 'cohabiting', 'separated'];
+      const validStatuses = [
+        'single',
+        'married',
+        'divorced',
+        'widowed',
+        'cohabiting',
+        'separated',
+      ];
 
       for (const status of validStatuses) {
         const dto = { maritalStatus: status };
 
         userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
         userModel.updateProfile.mockResolvedValue(mockUser as any);
-        userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+        userMapper.toProfileUpdateResponseDto.mockReturnValue({
+          success: true,
+        } as any);
 
         await service.updateProfile(userId, dto);
 
-        expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-          maritalStatus: status,
-        }));
+        expect(userModel.updateProfile).toHaveBeenCalledWith(
+          userId,
+          expect.objectContaining({
+            maritalStatus: status,
+          }),
+        );
       }
     });
 
@@ -673,17 +766,24 @@ describe('UserProfileService', () => {
      * @test Should update profile picture URL
      */
     it('should update profilePicture.url', async () => {
-      const dto = { profilePicture: { url: 'https://example.com/profile.jpg' } };
+      const dto = {
+        profilePicture: { url: 'https://example.com/profile.jpg' },
+      };
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        image: 'https://example.com/profile.jpg',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          image: 'https://example.com/profile.jpg',
+        }),
+      );
     });
 
     /**
@@ -694,9 +794,9 @@ describe('UserProfileService', () => {
         new NotFoundException('users.errors.userNotFound'),
       );
 
-      await expect(service.updateProfile(userId, { firstName: 'Test' })).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.updateProfile(userId, { firstName: 'Test' }),
+      ).rejects.toThrow(NotFoundException);
     });
 
     /**
@@ -706,15 +806,22 @@ describe('UserProfileService', () => {
       const dto = { firstName: 'Jane' };
       const userWithLastName = { ...mockUser, lastName: 'Smith' };
 
-      userModel.findByIdWithValidStatus.mockResolvedValue(userWithLastName as any);
+      userModel.findByIdWithValidStatus.mockResolvedValue(
+        userWithLastName as any,
+      );
       userModel.updateProfile.mockResolvedValue(mockUpdatedUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        name: 'Jane Smith',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          name: 'Jane Smith',
+        }),
+      );
     });
 
     /**
@@ -724,15 +831,22 @@ describe('UserProfileService', () => {
       const dto = { lastName: 'Wilson' };
       const userWithFirstName = { ...mockUser, firstName: 'John' };
 
-      userModel.findByIdWithValidStatus.mockResolvedValue(userWithFirstName as any);
+      userModel.findByIdWithValidStatus.mockResolvedValue(
+        userWithFirstName as any,
+      );
       userModel.updateProfile.mockResolvedValue(mockUpdatedUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        name: 'John Wilson',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          name: 'John Wilson',
+        }),
+      );
     });
   });
 
@@ -804,7 +918,9 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithIdentities.mockResolvedValue(mockUser as any);
       identityModel.updateAddress.mockResolvedValue({} as any);
-      userMapper.toAddressUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toAddressUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateAddress(userId, minimalAddressDto);
 
@@ -825,9 +941,9 @@ describe('UserProfileService', () => {
         state: 'SP',
       };
 
-      await expect(service.updateAddress(userId, invalidDto as any)).rejects.toThrow(
-        'users.errors.invalidAddress',
-      );
+      await expect(
+        service.updateAddress(userId, invalidDto as any),
+      ).rejects.toThrow('users.errors.invalidAddress');
     });
 
     /**
@@ -841,9 +957,9 @@ describe('UserProfileService', () => {
         state: 'SP',
       };
 
-      await expect(service.updateAddress(userId, invalidDto as any)).rejects.toThrow(
-        'users.errors.invalidAddress',
-      );
+      await expect(
+        service.updateAddress(userId, invalidDto as any),
+      ).rejects.toThrow('users.errors.invalidAddress');
     });
 
     /**
@@ -857,9 +973,9 @@ describe('UserProfileService', () => {
         state: 'SP',
       };
 
-      await expect(service.updateAddress(userId, invalidDto as any)).rejects.toThrow(
-        'users.errors.invalidAddress',
-      );
+      await expect(
+        service.updateAddress(userId, invalidDto as any),
+      ).rejects.toThrow('users.errors.invalidAddress');
     });
 
     /**
@@ -873,9 +989,9 @@ describe('UserProfileService', () => {
         state: 'SP',
       };
 
-      await expect(service.updateAddress(userId, invalidDto as any)).rejects.toThrow(
-        'users.errors.invalidAddress',
-      );
+      await expect(
+        service.updateAddress(userId, invalidDto as any),
+      ).rejects.toThrow('users.errors.invalidAddress');
     });
 
     /**
@@ -889,9 +1005,9 @@ describe('UserProfileService', () => {
         city: 'São Paulo',
       };
 
-      await expect(service.updateAddress(userId, invalidDto as any)).rejects.toThrow(
-        'users.errors.invalidAddress',
-      );
+      await expect(
+        service.updateAddress(userId, invalidDto as any),
+      ).rejects.toThrow('users.errors.invalidAddress');
     });
 
     /**
@@ -916,14 +1032,26 @@ describe('UserProfileService', () => {
         ...mockUser,
         defaultUserIdentityId: null,
         usersIdentities_usersIdentities_userIdTousers: [
-          { id: 'identity-old', createdAt: new Date('2024-01-01'), status: 'enable' },
-          { id: 'identity-new', createdAt: new Date('2025-01-01'), status: 'enable' },
+          {
+            id: 'identity-old',
+            createdAt: new Date('2024-01-01'),
+            status: 'enable',
+          },
+          {
+            id: 'identity-new',
+            createdAt: new Date('2025-01-01'),
+            status: 'enable',
+          },
         ],
       };
 
-      userModel.findByIdWithIdentities.mockResolvedValue(userWithoutDefault as any);
+      userModel.findByIdWithIdentities.mockResolvedValue(
+        userWithoutDefault as any,
+      );
       identityModel.updateAddress.mockResolvedValue({} as any);
-      userMapper.toAddressUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toAddressUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateAddress(userId, validAddressDto);
 
@@ -943,11 +1071,13 @@ describe('UserProfileService', () => {
         usersIdentities_usersIdentities_userIdTousers: [],
       };
 
-      userModel.findByIdWithIdentities.mockResolvedValue(userWithNoIdentities as any);
-
-      await expect(service.updateAddress(userId, validAddressDto)).rejects.toThrow(
-        'users.errors.identityNotFound',
+      userModel.findByIdWithIdentities.mockResolvedValue(
+        userWithNoIdentities as any,
       );
+
+      await expect(
+        service.updateAddress(userId, validAddressDto),
+      ).rejects.toThrow('users.errors.identityNotFound');
     });
 
     /**
@@ -958,9 +1088,9 @@ describe('UserProfileService', () => {
         new NotFoundException('users.errors.userNotFound'),
       );
 
-      await expect(service.updateAddress(userId, validAddressDto)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.updateAddress(userId, validAddressDto),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -980,13 +1110,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        firstName: 'John Doe',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          firstName: 'John Doe',
+        }),
+      );
     });
 
     /**
@@ -997,13 +1132,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        firstName: 'John',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          firstName: 'John',
+        }),
+      );
     });
 
     /**
@@ -1014,13 +1154,18 @@ describe('UserProfileService', () => {
 
       userModel.findByIdWithValidStatus.mockResolvedValue(mockUser as any);
       userModel.updateProfile.mockResolvedValue(mockUser as any);
-      userMapper.toProfileUpdateResponseDto.mockReturnValue({ success: true } as any);
+      userMapper.toProfileUpdateResponseDto.mockReturnValue({
+        success: true,
+      } as any);
 
       await service.updateProfile(userId, dto);
 
-      expect(userModel.updateProfile).toHaveBeenCalledWith(userId, expect.objectContaining({
-        firstName: 'John',
-      }));
+      expect(userModel.updateProfile).toHaveBeenCalledWith(
+        userId,
+        expect.objectContaining({
+          firstName: 'John',
+        }),
+      );
     });
   });
 });
