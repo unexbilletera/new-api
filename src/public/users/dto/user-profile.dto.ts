@@ -75,6 +75,9 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
+  @Matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, {
+    message: 'Birthdate must be in YYYY-MM-DD format (e.g., 2004-10-29)',
+  })
   birthdate?: string;
 
   @ApiPropertyOptional({
