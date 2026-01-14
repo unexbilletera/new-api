@@ -6,7 +6,7 @@ export class NotificationModel {
   constructor(private prisma: PrismaService) {}
 
   async getNotification(notificationId: string) {
-    return this.prisma.notifications.findUnique({
+    return this.prisma.notifications.findFirst({
       where: { id: notificationId },
     });
   }

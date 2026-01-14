@@ -283,7 +283,7 @@ export class OnboardingService {
       fields: Object.keys(dto),
     });
 
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
 
@@ -326,7 +326,7 @@ export class OnboardingService {
           const validToOk = !campaign.validTo || campaign.validTo >= now;
           if (validFromOk && validToOk) {
             const existingUserCode =
-              await this.prisma.user_campaign_codes.findUnique({
+              await this.prisma.user_campaign_codes.findFirst({
                 where: { userId },
               });
             if (!existingUserCode) {
@@ -483,7 +483,7 @@ export class OnboardingService {
     userId: string,
     dto: StartIdentityOnboardingDto,
   ) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
 
@@ -552,7 +552,7 @@ export class OnboardingService {
     identityId: string,
     dto: UpdateIdentityOnboardingDto,
   ) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: identityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -605,8 +605,8 @@ export class OnboardingService {
     identityId: string,
     dto: UploadArgentinaDocumentDto,
   ) {
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: identityId },
     });
 
@@ -674,7 +674,7 @@ export class OnboardingService {
   }
 
   async getOnboardingPendingData(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: userIdentityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -715,7 +715,7 @@ export class OnboardingService {
   }
 
   async getOnboardingStatus(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: userIdentityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -745,7 +745,7 @@ export class OnboardingService {
   }
 
   async validateOnboardingData(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: userIdentityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -765,7 +765,7 @@ export class OnboardingService {
   }
 
   async retryOnboarding(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: userIdentityId },
     });
     if (!identity) {

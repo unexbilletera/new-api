@@ -63,7 +63,7 @@ export class LogsService {
     };
   }
   async get(id: string): Promise<LogResponseDto> {
-    const log = await this.prisma.backofficeLogs.findUnique({
+    const log = await this.prisma.backofficeLogs.findFirst({
       where: { id },
       include: {
         backofficeUsers: {

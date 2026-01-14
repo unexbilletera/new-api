@@ -577,7 +577,7 @@ export class AuthService {
         userAgent: requestContext?.userAgent,
       });
 
-      const updatedUser = await this.prisma.users.findUnique({
+      const updatedUser = await this.prisma.users.findFirst({
         where: { id: user.id },
         select: {
           id: true,

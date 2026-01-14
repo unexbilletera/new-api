@@ -19,7 +19,7 @@ export class ActionModel {
   }
 
   async findById(id: string) {
-    return this.prisma.home_actions.findUnique({
+    return this.prisma.home_actions.findFirst({
       where: { id },
     });
   }

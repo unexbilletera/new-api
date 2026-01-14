@@ -39,7 +39,7 @@ export class BackofficeAuthGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyToken(token);
-      const user = await this.prisma.backofficeUsers.findUnique({
+      const user = await this.prisma.backofficeUsers.findFirst({
         where: { id: payload.userId },
         include: {
           backofficeRoles: true,

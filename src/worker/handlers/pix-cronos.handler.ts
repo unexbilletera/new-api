@@ -27,7 +27,7 @@ export class PixCronosHandler {
     );
 
     try {
-      const transaction = await this.prisma.transactions.findUnique({
+      const transaction = await this.prisma.transactions.findFirst({
         where: { id: payload.transactionId },
       });
 
@@ -215,7 +215,7 @@ export class PixCronosHandler {
           return;
         }
 
-        const sourceAccount = await this.prisma.usersAccounts.findUnique({
+        const sourceAccount = await this.prisma.usersAccounts.findFirst({
           where: { id: transaction.sourceAccountId },
         });
 

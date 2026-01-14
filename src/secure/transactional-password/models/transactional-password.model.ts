@@ -13,7 +13,7 @@ export class TransactionalPasswordModel {
    * Check if user has transactional password configured
    */
   async hasPassword(userId: string): Promise<boolean> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       select: { transactionalPassword: true } as any,
     });
@@ -35,7 +35,7 @@ export class TransactionalPasswordModel {
    * Find hashed password by userId for validation
    */
   async findByUserId(userId: string): Promise<string | null> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       select: { transactionalPassword: true } as any,
     });

@@ -166,7 +166,7 @@ export class BiometricService {
   async generateChallenge(dto: GenerateChallengeDto) {
     const { userId, deviceId } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -208,7 +208,7 @@ export class BiometricService {
       signatureFormat = 'der',
     } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -220,7 +220,7 @@ export class BiometricService {
       throw new NotFoundException('auth.errors.deviceNotFound');
     }
 
-    const challengeRecord = await this.prisma.challenges.findUnique({
+    const challengeRecord = await this.prisma.challenges.findFirst({
       where: { id: challengeId },
     });
     if (!challengeRecord) {
@@ -311,7 +311,7 @@ export class BiometricService {
       throw new BadRequestException('auth.errors.invalidPublicKey');
     }
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -401,7 +401,7 @@ export class BiometricService {
       throw new BadRequestException('auth.errors.invalidPublicKey');
     }
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -450,7 +450,7 @@ export class BiometricService {
   ) {
     const { deviceId } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -486,7 +486,7 @@ export class BiometricService {
   async verifySmsAndActivate(userId: string, dto: VerifySmsChallengeDto) {
     const { deviceId, code } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -542,7 +542,7 @@ export class BiometricService {
   async revokeDevice(userId: string, dto: RevokeDeviceDto) {
     const { deviceId } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -568,7 +568,7 @@ export class BiometricService {
   }
 
   async listUserDevices(userId: string) {
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }

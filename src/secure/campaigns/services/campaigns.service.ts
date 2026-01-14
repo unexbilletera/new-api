@@ -114,7 +114,7 @@ export class CampaignsService {
       };
     }
 
-    const campaign = await this.prisma.campaign_codes.findUnique({
+    const campaign = await this.prisma.campaign_codes.findFirst({
       where: { id: validation.campaign!.id },
     });
 

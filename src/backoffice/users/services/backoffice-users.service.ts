@@ -78,7 +78,7 @@ export class BackofficeUsersService {
   async create(
     dto: CreateBackofficeUserDto,
   ): Promise<BackofficeUserResponseDto> {
-    const existing = await this.prisma.backofficeUsers.findUnique({
+    const existing = await this.prisma.backofficeUsers.findFirst({
       where: { email: dto.email.toLowerCase() },
     });
 
@@ -86,7 +86,7 @@ export class BackofficeUsersService {
       throw new ConflictException('Email já está em uso');
     }
 
-    const role = await this.prisma.backofficeRoles.findUnique({
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id: dto.roleId },
     });
 
@@ -125,7 +125,7 @@ export class BackofficeUsersService {
     }
 
     if (dto.email && dto.email.toLowerCase() !== user.email) {
-      const existing = await this.prisma.backofficeUsers.findUnique({
+      const existing = await this.prisma.backofficeUsers.findFirst({
         where: { email: dto.email.toLowerCase() },
       });
       if (existing) {
@@ -134,7 +134,7 @@ export class BackofficeUsersService {
     }
 
     if (dto.roleId) {
-      const role = await this.prisma.backofficeRoles.findUnique({
+      const role = await this.prisma.backofficeRoles.findFirst({
         where: { id: dto.roleId },
       });
       if (!role) {

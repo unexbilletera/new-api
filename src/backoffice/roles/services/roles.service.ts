@@ -18,7 +18,7 @@ export class RolesService {
     return roles.map(this.mapToResponse);
   }
   async get(id: string): Promise<RoleResponseDto> {
-    const role = await this.prisma.backofficeRoles.findUnique({
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id },
     });
 
@@ -51,7 +51,7 @@ export class RolesService {
     return this.mapToResponse(role);
   }
   async update(id: string, dto: UpdateRoleDto): Promise<RoleResponseDto> {
-    const role = await this.prisma.backofficeRoles.findUnique({
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id },
     });
 
@@ -81,7 +81,7 @@ export class RolesService {
     return this.mapToResponse(updated);
   }
   async delete(id: string): Promise<{ success: boolean; message: string }> {
-    const role = await this.prisma.backofficeRoles.findUnique({
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id },
     });
 

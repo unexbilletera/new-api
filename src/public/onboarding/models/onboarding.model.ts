@@ -11,7 +11,7 @@ export class OnboardingModel {
   constructor(private prisma: PrismaService) {}
 
   async findUserById(userId: string) {
-    return this.prisma.users.findUnique({
+    return this.prisma.users.findFirst({
       where: { id: userId },
     });
   }
@@ -77,7 +77,7 @@ export class OnboardingModel {
   }
 
   async findIdentityById(identityId: string) {
-    return this.prisma.usersIdentities.findUnique({
+    return this.prisma.usersIdentities.findFirst({
       where: { id: identityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -85,7 +85,7 @@ export class OnboardingModel {
 
   async findIdentityByUserAndCountry(userId: string, country: 'ar' | 'br') {
     return this.prisma.usersIdentities.findFirst({
-      where: { userId, country, deletedAt: null },
+      where: { userId, country },
     });
   }
 
@@ -149,7 +149,7 @@ export class OnboardingModel {
   }
 
   async findUserCampaignCode(userId: string) {
-    return this.prisma.user_campaign_codes.findUnique({
+    return this.prisma.user_campaign_codes.findFirst({
       where: { userId },
     });
   }

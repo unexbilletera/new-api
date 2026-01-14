@@ -7,7 +7,7 @@ export class DeviceModel {
   constructor(private prisma: PrismaService) {}
 
   async findUserById(userId: string) {
-    return this.prisma.users.findUnique({
+    return this.prisma.users.findFirst({
       where: { id: userId },
     });
   }
@@ -113,7 +113,7 @@ export class DeviceModel {
   }
 
   async findChallengeById(challengeId: string) {
-    return this.prisma.challenges.findUnique({
+    return this.prisma.challenges.findFirst({
       where: { id: challengeId },
     });
   }

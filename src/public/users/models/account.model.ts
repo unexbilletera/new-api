@@ -6,7 +6,7 @@ export class AccountModel {
   constructor(private prisma: PrismaService) {}
 
   async findById(accountId: string) {
-    const account = await this.prisma.usersAccounts.findUnique({
+    const account = await this.prisma.usersAccounts.findFirst({
       where: { id: accountId },
     });
 

@@ -17,7 +17,7 @@ export class BackofficeUserModel {
     private jwtService: JwtService,
   ) {}
   async findByEmail(email: string) {
-    return this.prisma.backofficeUsers.findUnique({
+    return this.prisma.backofficeUsers.findFirst({
       where: { email },
       include: {
         backofficeRoles: true,
@@ -70,7 +70,7 @@ export class BackofficeUserModel {
     };
   }
   async findById(id: string) {
-    const user = await this.prisma.backofficeUsers.findUnique({
+    const user = await this.prisma.backofficeUsers.findFirst({
       where: { id },
       include: {
         backofficeRoles: true,

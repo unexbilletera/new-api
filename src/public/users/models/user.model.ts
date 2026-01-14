@@ -69,7 +69,7 @@ export class UserModel {
   constructor(private prisma: PrismaService) {}
 
   async findById(userId: string): Promise<UserWithRelations> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       include: {
         usersIdentities_usersIdentities_userIdTousers: {
@@ -114,7 +114,7 @@ export class UserModel {
   }
 
   async findByIdSimple(userId: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
 
@@ -167,7 +167,7 @@ export class UserModel {
   }
 
   async findByIdWithIdentities(userId: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       include: {
         usersIdentities_usersIdentities_userIdTousers: {
@@ -383,7 +383,7 @@ export class UserModel {
   }
 
   async getAccountById(accountId: string) {
-    const account = await this.prisma.usersAccounts.findUnique({
+    const account = await this.prisma.usersAccounts.findFirst({
       where: { id: accountId },
     });
 
@@ -402,7 +402,7 @@ export class UserModel {
   }
 
   async findByIdWithAll(userId: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       include: {
         usersIdentities_usersIdentities_userIdTousers: true,

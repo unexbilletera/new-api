@@ -48,7 +48,7 @@ export class UserService {
   async getCurrentUser(userId: string, systemVersion?: string) {
     this.logger.info('[PROFILE] Getting current user', { userId });
 
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       include: {
         usersIdentities_usersIdentities_userIdTousers: {
@@ -162,7 +162,7 @@ export class UserService {
       throw new BadRequestException('users.errors.invalidEmail');
     }
 
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
     if (!user) {
@@ -227,7 +227,7 @@ export class UserService {
       newEmail: dto.newEmail,
     });
 
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
     if (!user) {
@@ -298,7 +298,7 @@ export class UserService {
       }
     }
 
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       include: {
         usersIdentities_usersIdentities_userIdTousers: {
@@ -634,7 +634,7 @@ export class UserService {
   }
 
   async livenessCheck(userId: string, dto: LivenessCheckDto) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
 
@@ -930,7 +930,7 @@ export class UserService {
   }
 
   async onboarding(userId: string, step?: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       include: {
         usersIdentities_usersIdentities_userIdTousers: true,
@@ -967,7 +967,7 @@ export class UserService {
   }
 
   async getUserAccountInfo(accountId: string) {
-    const account = await this.prisma.usersAccounts.findUnique({
+    const account = await this.prisma.usersAccounts.findFirst({
       where: { id: accountId },
     });
 

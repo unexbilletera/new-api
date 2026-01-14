@@ -20,7 +20,7 @@ export class LogModel {
   }
 
   async findById(id: string) {
-    return this.prisma.users_access_log.findUnique({
+    return this.prisma.users_access_log.findFirst({
       where: { id },
     });
   }

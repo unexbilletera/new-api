@@ -131,7 +131,7 @@ export class NotificationsService {
   }
 
   async getPushToken(userId: string): Promise<{ pushToken: string | null }> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       select: { mobileDevicePush: true, browserDevicePush: true },
     });
@@ -145,7 +145,7 @@ export class NotificationsService {
     userId: string,
     dto: TestPushDto,
   ): Promise<{ success: boolean; message: string }> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       select: { mobileDevicePush: true, browserDevicePush: true },
     });

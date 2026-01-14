@@ -97,7 +97,7 @@ export class PrismaService
         model &&
         this.softDeleteModels.includes(model as string) &&
         action &&
-        ['findUnique', 'findFirst', 'findMany', 'count'].includes(action as string)
+        ['findFirst', 'findMany', 'count'].includes(action as string)
       ) {
         if (args.where) {
           args.where = {

@@ -167,7 +167,7 @@ export class ClientsService {
   }
 
   private async fetchClientDetails(id: string): Promise<ClientDetailsDto> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id },
       select: {
         id: true,
@@ -239,7 +239,7 @@ export class ClientsService {
     };
   }
   async update(id: string, dto: UpdateClientDto): Promise<ClientResponseDto> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id },
       select: { id: true },
     });
@@ -390,7 +390,7 @@ export class ClientsService {
     return this.cache.getOrSet(
       cacheKey,
       async () => {
-        const user = await this.prisma.users.findUnique({
+        const user = await this.prisma.users.findFirst({
           where: { id },
           select: { id: true },
         });
