@@ -74,28 +74,27 @@
 
 ---
 
-## 4. Public Onboarding (14 endpoints)
+## 4. Public Onboarding (13 endpoints)
 
 ### OnboardingController
-1. `POST /api/onboarding/start` ❓
-2. `PATCH /api/onboarding/user/:id` ❓
-3. `GET /api/onboarding/pending` ❓
-4. `GET /api/onboarding/status/:id` ❓
-5. `POST /api/onboarding/validate` ❓
-6. `POST /api/onboarding/retry/:id` ❓
-7. `GET /api/onboarding/user/:userId/step/:step` ❓
-8. `POST /api/onboarding/user/email` ❓
+1. `POST /api/onboarding/user/start` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:61](src/public/onboarding/controllers/onboarding.controller.ts#L61)
+2. `POST /api/onboarding/user/verify-code` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:81](src/public/onboarding/controllers/onboarding.controller.ts#L81)
+3. `POST /api/onboarding/user/send-email-validation` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:101](src/public/onboarding/controllers/onboarding.controller.ts#L101)
+4. `POST /api/onboarding/user/send-phone-validation` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:118](src/public/onboarding/controllers/onboarding.controller.ts#L118)
+5. `PATCH /api/onboarding/user/:userId` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:135](src/public/onboarding/controllers/onboarding.controller.ts#L135)
+6. `POST /api/onboarding/identity/:userId` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:165](src/public/onboarding/controllers/onboarding.controller.ts#L165)
+7. `PATCH /api/onboarding/identity/:identityId` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:195](src/public/onboarding/controllers/onboarding.controller.ts#L195)
+8. `POST /api/onboarding/identity/ar/upload-document` ✅ [src/public/onboarding/controllers/onboarding.controller.ts:228](src/public/onboarding/controllers/onboarding.controller.ts#L228)
 
 ### UserOnboardingController
-9. `POST /api/onboarding/user/phone` ❓
-10. `PATCH /api/onboarding/user/personal-info` ❓
-11. `PATCH /api/onboarding/user/identity` ❓
-12. `GET /api/onboarding/user/campaign-code` ❓
-13. `POST /api/onboarding/user/address` ❓
-14. `PATCH /api/onboarding/user/complete` ❓
+9. `GET /api/users/user/onboarding/pending-data/:userIdentityId` ✅ (JWT) [src/public/onboarding/controllers/onboarding.controller.ts:260](src/public/onboarding/controllers/onboarding.controller.ts#L260)
+10. `POST /api/users/user/onboarding/update-specific-data/:userIdentityId` ✅ (JWT) [src/public/onboarding/controllers/onboarding.controller.ts:294](src/public/onboarding/controllers/onboarding.controller.ts#L294)
+11. `GET /api/users/user/onboarding/status/:userIdentityId` ✅ (JWT) [src/public/onboarding/controllers/onboarding.controller.ts:328](src/public/onboarding/controllers/onboarding.controller.ts#L328)
+12. `GET /api/users/user/onboarding/validate/:userIdentityId` ✅ (JWT) [src/public/onboarding/controllers/onboarding.controller.ts:359](src/public/onboarding/controllers/onboarding.controller.ts#L359)
+13. `POST /api/users/user/onboarding/retry/:userIdentityId` ✅ (JWT) [src/public/onboarding/controllers/onboarding.controller.ts:392](src/public/onboarding/controllers/onboarding.controller.ts#L392)
 
-**Documentation Status:** Partial (steps documented, main endpoints unclear)
-**Needs Review:** All 14 endpoints
+**Documentation Status:** ✅ Complete
+**Needs Review:** None
 
 ---
 
