@@ -4,6 +4,8 @@ import {
   IsOptional,
   IsObject,
   Matches,
+  ValidateIf,
+  IsNotEmpty,
 } from 'class-validator';
 import {
   ValidationOptions,
@@ -78,7 +80,8 @@ export class UpdateUserOnboardingDto {
   @Matches(...ValidationOptions.PEP)
   pep?: string;
 
-  @IsOptional()
+  @ValidateIf((o) => o.pep === '1')
+  @IsNotEmpty({ message: 'pepSince is required when pep is 1' })
   @IsString()
   @Matches(...SpecializedValidationOptions.PEP_SINCE)
   pepSince?: string;

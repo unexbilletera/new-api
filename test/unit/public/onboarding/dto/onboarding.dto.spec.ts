@@ -363,4 +363,82 @@ describe('UpdateUserOnboardingDto Validation', () => {
       expect(errors).toHaveLength(0);
     });
   });
+
+  describe('PEP and pepSince Validation', () => {
+    /**
+     * @test Should allow pep = "0" without pepSince
+     * @given A DTO with pep = "0" and no pepSince
+     * @when validate() is called
+     * @then Should have no validation errors
+     */
+    it('should allow pep = "0" without pepSince', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        firstName: 'John',
+        pep: '0',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    /**
+     * @test Should require pepSince when pep = "1"
+     * @given A DTO with pep = "1" but no pepSince
+     * @when validate() is called
+     * @then Should have validation error for pepSince
+     */
+    it('should require pepSince when pep = "1"', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        firstName: 'John',
+        pep: '1',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors.length).toBeGreaterThan(0);
+      const pepSinceError = errors.find((e) => e.property === 'pepSince');
+      expect(pepSinceError).toBeDefined();
+      expect(pepSinceError?.constraints).toHaveProperty('isNotEmpty');
+    });
+
+    /**
+     * @test Should allow pep = "1" with valid pepSince
+     * @given A DTO with pep = "1" and valid pepSince date
+     * @when validate() is called
+     * @then Should have no validation errors
+     */
+    it('should allow pep = "1" with valid pepSince', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        firstName: 'John',
+        pep: '1',
+        pepSince: '2020-01-15',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    /**
+     * @test Should reject invalid pepSince format
+     * @given A DTO with pep = "1" and invalid pepSince format
+     * @when validate() is called
+     * @then Should have validation error for pepSince format
+     */
+    it('should reject invalid pepSince format when pep = "1"', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        firstName: 'John',
+        pep: '1',
+        pepSince: '15/01/2020', // Invalid format
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors.length).toBeGreaterThan(0);
+      const pepSinceError = errors.find((e) => e.property === 'pepSince');
+      expect(pepSinceError).toBeDefined();
+      expect(pepSinceError?.constraints).toHaveProperty('matches');
+    });
+  });
 });
