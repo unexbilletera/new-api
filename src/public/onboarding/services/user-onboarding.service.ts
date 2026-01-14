@@ -30,7 +30,11 @@ export class UserOnboardingService {
   }
 
   private normalizePhone(phone?: string): string | undefined {
-    return phone ? phone.replace(/\D/g, '') : undefined;
+    if (!phone) return undefined;
+    // Remove all non-digit characters except +
+    const cleaned = phone.replace(/[^\d+]/g, '');
+    // Add space after country code: +5512988870530 -> +55 12988870530
+    return cleaned.replace(/^(\+\d{2})(\d+)$/, '$1 $2');
   }
 
   async startUserOnboarding(dto: StartUserOnboardingDto) {

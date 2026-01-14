@@ -66,7 +66,10 @@ export class AuthService {
   }
 
   private normalizePhone(phone: string): string {
-    return phone.replace(/\D/g, '');
+    // Remove all non-digit characters except +
+    const cleaned = phone.replace(/[^\d+]/g, '');
+    // Add space after country code: +5512988870530 -> +55 12988870530
+    return cleaned.replace(/^(\+\d{2})(\d+)$/, '$1 $2');
   }
 
   private async hashCode(code: string): Promise<string> {
