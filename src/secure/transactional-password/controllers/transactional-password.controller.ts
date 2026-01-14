@@ -24,12 +24,7 @@ import {
   UpdateTransactionalPasswordDto,
 } from '../dto';
 import { LoggerService } from '../../../shared/logger/logger.service';
-
-interface CurrentUserPayload {
-  userId: string;
-  email: string;
-  roleId: string;
-}
+import { CurrentUserPayloadDtoDto } from '../../../common/dto';
 
 @ApiTags('2.3 Secure - Transactional Password')
 @Controller('transactional-password')
@@ -42,7 +37,7 @@ export class TransactionalPasswordController {
   ) {}
 
   @Post('create')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create transactional password',
     description:
@@ -52,7 +47,7 @@ export class TransactionalPasswordController {
     type: CreateTransactionalPasswordDto,
   })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Transactional password created successfully',
     schema: {
       type: 'object',
@@ -72,16 +67,16 @@ export class TransactionalPasswordController {
     description: 'Unauthorized - missing or invalid JWT token',
   })
   async create(
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() user: CurrentUserPayloadDto,
     @Body() dto: CreateTransactionalPasswordDto,
   ) {
     this.logger.info(
-      `User creating transactional password - userId: ${user.userId}`,
+      `User creating transactional password - userId: ${user.id}`,
       'TransactionalPasswordController.create',
     );
 
     return await this.transactionalPasswordService.createPassword(
-      user.userId,
+      user.id,
       dto.password,
     );
   }
@@ -117,22 +112,22 @@ export class TransactionalPasswordController {
     description: 'Unauthorized - missing or invalid JWT token',
   })
   async validate(
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() user: CurrentUserPayloadDto,
     @Body() dto: ValidateTransactionalPasswordDto,
   ) {
     this.logger.info(
-      `User validating transactional password - userId: ${user.userId}`,
+      `User validating transactional password - userId: ${user.id}`,
       'TransactionalPasswordController.validate',
     );
 
     const isValid = await this.transactionalPasswordService.validatePassword(
-      user.userId,
+      user.id,
       dto.password,
     );
 
     if (!isValid) {
       this.logger.warn(
-        `Transactional password validation failed - userId: ${user.userId}`,
+        `Transactional password validation failed - userId: ${user.id}`,
         'TransactionalPasswordController.validate',
       );
     }
@@ -172,14 +167,14 @@ export class TransactionalPasswordController {
     status: 401,
     description: 'Unauthorized - missing or invalid JWT token',
   })
-  async getStatus(@CurrentUser() user: CurrentUserPayload) {
+  async getStatus(@CurrentUser() user: CurrentUserPayloadDto) {
     this.logger.info(
-      `User checking transactional password status - userId: ${user.userId}`,
+      `User checking transactional password status - userId: ${user.id}`,
       'TransactionalPasswordController.getStatus',
     );
 
     const status = await this.transactionalPasswordService.getStatus(
-      user.userId,
+      user.id,
     );
 
     return {
@@ -219,16 +214,16 @@ export class TransactionalPasswordController {
     description: 'Unauthorized - missing or invalid JWT token',
   })
   async update(
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() user: CurrentUserPayloadDto,
     @Body() dto: UpdateTransactionalPasswordDto,
   ) {
     this.logger.info(
-      `User updating transactional password - userId: ${user.userId}`,
+      `User updating transactional password - userId: ${user.id}`,
       'TransactionalPasswordController.update',
     );
 
     return await this.transactionalPasswordService.updatePassword(
-      user.userId,
+      user.id,
       dto.currentPassword,
       dto.newPassword,
     );

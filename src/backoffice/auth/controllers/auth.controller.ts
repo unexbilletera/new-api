@@ -19,18 +19,7 @@ import { LoginResponseDto } from '../dto/login-response.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
-
-interface CurrentUserPayload {
-  id: string;
-  email: string;
-  name: string;
-  roleId: string;
-  role: {
-    id: string;
-    name: string;
-    level: number;
-  };
-}
+import { CurrentUserPayloadDto } from '../../../common/dto';
 
 @ApiTags('3.1 Backoffice - Authentication')
 @Controller('backoffice/auth')
@@ -78,7 +67,7 @@ export class AuthController {
     description: 'Invalid or expired token',
   })
   async getMe(
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() user: CurrentUserPayloadDto,
   ): Promise<UserResponseDto> {
     return await this.authService.getUserById(user.id);
   }

@@ -26,6 +26,8 @@ import {
   RejectUserDto,
   ApproveUserDto,
   RequestCorrectionDto,
+  UpdateUserInfoDto,
+  OnboardingUserDto,
 } from '../dto/onboarding.dto';
 
 @ApiTags('3.3 Backoffice - Onboarding')
@@ -51,14 +53,28 @@ export class OnboardingController {
   @ApiQuery({ name: 'page', required: false, description: 'Page' })
   @ApiQuery({ name: 'limit', required: false, description: 'Limit per page' })
   @MinLevel(1)
-  async listUsers(@Query() query: ListOnboardingQueryDto) {
+  async listUsers(
+    @Query() query: ListOnboardingQueryDto,
+  ): Promise<{
+    data: OnboardingUserDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     return this.onboardingService.listUsers(query);
   }
 
   @Get('pending')
   @ApiOperation({ summary: 'List users pending approval' })
   @MinLevel(1)
-  async getPendingUsers(@Query() query: ListOnboardingQueryDto) {
+  async getPendingUsers(
+    @Query() query: ListOnboardingQueryDto,
+  ): Promise<{
+    data: OnboardingUserDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     return this.onboardingService.getPendingUsers(query);
   }
 
@@ -66,7 +82,7 @@ export class OnboardingController {
   @ApiOperation({ summary: 'User details in onboarding' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @MinLevel(1)
-  async getUserDetails(@Param('id') id: string) {
+  async getUserDetails(@Param('id') id: string): Promise<OnboardingUserDto> {
     return this.onboardingService.getUserDetails(id);
   }
 
@@ -74,15 +90,21 @@ export class OnboardingController {
   @ApiOperation({ summary: 'Update user information' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @MinLevel(2)
-  async updateUserInfo(@Param('id') id: string, @Body() data: any) {
-    return this.onboardingService.updateUserInfo(id, data);
+  async updateUserInfo(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserInfoDto,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.onboardingService.updateUserInfo(id, dto);
   }
 
   @Post('users/:id/approve')
   @ApiOperation({ summary: 'Approve user' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @MinLevel(2)
-  async approveUser(@Param('id') id: string, @Body() dto: ApproveUserDto) {
+  async approveUser(
+    @Param('id') id: string,
+    @Body() dto: ApproveUserDto,
+  ): Promise<{ success: boolean; message: string; cronosData?: any }> {
     return this.onboardingService.approveUser(id, dto);
   }
 
@@ -90,7 +112,10 @@ export class OnboardingController {
   @ApiOperation({ summary: 'Reject user' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @MinLevel(2)
-  async rejectUser(@Param('id') id: string, @Body() dto: RejectUserDto) {
+  async rejectUser(
+    @Param('id') id: string,
+    @Body() dto: RejectUserDto,
+  ): Promise<{ success: boolean; message: string }> {
     return this.onboardingService.rejectUser(id, dto);
   }
 
@@ -101,7 +126,7 @@ export class OnboardingController {
   async requestCorrection(
     @Param('id') id: string,
     @Body() dto: RequestCorrectionDto,
-  ) {
+  ): Promise<{ success: boolean; message: string }> {
     return this.onboardingService.requestCorrection(id, dto);
   }
 }

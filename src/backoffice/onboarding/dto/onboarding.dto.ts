@@ -1,11 +1,27 @@
-import { IsString, IsOptional, IsArray, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsArray,
+  IsUUID,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class ListOnboardingQueryDto {
   @IsOptional()
-  page?: number;
+  @IsNumber()
+  @Type(() => Number)
+  @Min(1)
+  page?: number = 1;
 
   @IsOptional()
-  limit?: number;
+  @IsNumber()
+  @Type(() => Number)
+  @Min(1)
+  @Max(100)
+  limit?: number = 10;
 
   @IsOptional()
   @IsString()
@@ -50,6 +66,20 @@ export class RequestCorrectionDto {
   @IsString()
   @IsOptional()
   message?: string;
+}
+
+export class UpdateUserInfoDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
 }
 
 export class OnboardingUserDto {

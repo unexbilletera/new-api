@@ -15,7 +15,6 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiParam,
-  ApiBody,
 } from '@nestjs/swagger';
 import { SendEmailValidationDto } from '../../auth/dto/email-validation.dto';
 import { SendPhoneValidationDto } from '../../auth/dto/phone-validation.dto';
@@ -28,7 +27,6 @@ import {
   UploadArgentinaDocumentDto,
 } from '../dto/onboarding.dto';
 import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
-import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { UserOnboardingService } from '../services/user-onboarding.service';
 import { VerificationService } from '../services/verification.service';
 import { IdentityOnboardingService } from '../services/identity-onboarding.service';
@@ -283,7 +281,6 @@ export class UserOnboardingController {
     description: 'Identity not found',
   })
   async getPendingData(
-    @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
   ): Promise<OnboardingPendingDataResponseDto> {
     return this.identityOnboardingService.getOnboardingPendingData(
@@ -315,10 +312,9 @@ export class UserOnboardingController {
     description: 'Invalid or expired token',
   })
   async updateSpecificData(
-    @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
-    @Body() dto: any,
-  ) {
+    @Body() dto: UpdateIdentityOnboardingDto,
+  ): Promise<{ message: string }> {
     return this.identityOnboardingService.updateOnboardingSpecificData(
       userIdentityId,
       dto,
@@ -350,7 +346,6 @@ export class UserOnboardingController {
     description: 'Identity not found',
   })
   async getStatus(
-    @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
   ): Promise<OnboardingStatusResponseDto> {
     return this.identityOnboardingService.getOnboardingStatus(userIdentityId);
@@ -381,7 +376,6 @@ export class UserOnboardingController {
     description: 'Invalid or expired token',
   })
   async validate(
-    @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
   ): Promise<ValidateOnboardingDataResponseDto> {
     return this.identityOnboardingService.validateOnboardingData(
@@ -416,7 +410,6 @@ export class UserOnboardingController {
     description: 'Identity not found',
   })
   async retry(
-    @CurrentUser('id') userId: string,
     @Param('userIdentityId') userIdentityId: string,
   ): Promise<RetryOnboardingResponseDto> {
     return this.identityOnboardingService.retryOnboarding(userIdentityId);

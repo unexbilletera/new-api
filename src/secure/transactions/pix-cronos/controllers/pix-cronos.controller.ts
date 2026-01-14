@@ -20,12 +20,7 @@ import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ConfirmPixCronosDto } from '../dto/confirm-pix-cronos.dto';
 import { SuccessCodes } from '../../../../shared/errors/app-error';
 import { LoggerService } from '../../../../shared/logger/logger.service';
-
-interface CurrentUserPayload {
-  userId: string;
-  email: string;
-  roleId: string;
-}
+import { CurrentUserPayloadDtoDto } from '../../../../common/dto';
 
 @ApiTags('2.1 Secure - Transactions')
 @Controller('transactions/pix/cronos')
@@ -38,7 +33,7 @@ export class PixCronosController {
   ) {}
 
   @Post('create')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create PIX Cronos transaction',
     description:
@@ -46,7 +41,7 @@ export class PixCronosController {
   })
   @ApiBody({ type: CreatePixCronosDto })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Transaction created successfully',
     schema: {
       type: 'object',
@@ -81,12 +76,12 @@ export class PixCronosController {
   })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   async create(
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() user: CurrentUserPayloadDto,
     @Body() dto: CreatePixCronosDto,
   ) {
     try {
       const transaction = await this.pixCronosService.createTransaction(
-        user.userId,
+        user.id,
         dto,
       );
 
@@ -138,12 +133,12 @@ export class PixCronosController {
   })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   async confirm(
-    @CurrentUser() user: CurrentUserPayload,
+    @CurrentUser() user: CurrentUserPayloadDto,
     @Body() dto: ConfirmPixCronosDto,
   ) {
     try {
       const result = await this.pixCronosService.confirmTransaction(
-        user.userId,
+        user.id,
         dto.transactionId,
         dto.transactionalPassword,
       );

@@ -8,7 +8,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { LogsService } from '../services/logs.service';
-import { ListLogsQueryDto } from '../dto/logs.dto';
+import { ListLogsQueryDto, LogStatsQueryDto } from '../dto/logs.dto';
 import { BackofficeAuthGuard } from '../../../shared/guards/backoffice-auth.guard';
 import {
   BackofficeRoleGuard,
@@ -55,7 +55,7 @@ export class LogsController {
     status: 403,
     description: 'Insufficient access level',
   })
-  async list(@Query() query: ListLogsQueryDto) {
+  async list(@Query() query: ListLogsQueryDto): Promise<any> {
     return this.logsService.list(query);
   }
 
@@ -64,20 +64,6 @@ export class LogsController {
     summary: 'Get log statistics',
     description:
       'Returns aggregated log statistics within a period (Requires minimum level 2)',
-  })
-  @ApiQuery({
-    name: 'startDate',
-    required: false,
-    type: String,
-    description: 'Start date (ISO 8601)',
-    example: '2024-01-01',
-  })
-  @ApiQuery({
-    name: 'endDate',
-    required: false,
-    type: String,
-    description: 'End date (ISO 8601)',
-    example: '2024-01-31',
   })
   @ApiResponse({
     status: 200,
@@ -91,11 +77,8 @@ export class LogsController {
     status: 403,
     description: 'Insufficient access level',
   })
-  async stats(
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-  ) {
-    return this.logsService.stats(startDate, endDate);
+  async stats(@Query() query: LogStatsQueryDto): Promise<any> {
+    return this.logsService.stats(query.startDate, query.endDate);
   }
 
   @Get('actions')
@@ -116,7 +99,7 @@ export class LogsController {
     status: 403,
     description: 'Insufficient access level',
   })
-  async getActions() {
+  async getActions(): Promise<string[]> {
     return this.logsService.getActions();
   }
 
@@ -164,7 +147,7 @@ export class LogsController {
   async getUserLogs(
     @Param('userId') userId: string,
     @Query() query: ListLogsQueryDto,
-  ) {
+  ): Promise<any> {
     return this.logsService.getUserLogs(userId, query);
   }
 
@@ -195,7 +178,7 @@ export class LogsController {
     status: 404,
     description: 'Log not found',
   })
-  async get(@Param('id') id: string) {
+  async get(@Param('id') id: string): Promise<any> {
     return this.logsService.get(id);
   }
 }
