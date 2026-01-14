@@ -410,7 +410,7 @@ describe('PasswordService', () => {
 
       service.checkPasswordExpiry.mockResolvedValue({
         expired: false,
-        expiresIn: 45, // days
+        expiresIn: 45,
       });
 
       const result = await service.checkPasswordExpiry(userId);

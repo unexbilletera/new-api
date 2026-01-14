@@ -33,7 +33,6 @@ import { LoggerService } from '../../../../src/shared/logger/logger.service';
 import { PrismaService } from '../../../../src/shared/prisma/prisma.service';
 import { createLoggerServiceMock, createPrismaMock } from '../../../utils/mocks';
 
-// Mock node-fetch
 jest.mock('node-fetch', () => {
   const actualFetch = jest.requireActual('node-fetch');
   return {
@@ -43,7 +42,6 @@ jest.mock('node-fetch', () => {
   };
 });
 
-// Mock socks-proxy-agent
 jest.mock('socks-proxy-agent', () => ({
   SocksProxyAgent: jest.fn().mockImplementation(() => ({})),
 }));
@@ -159,7 +157,6 @@ describe('CronosService', () => {
         return mockConfig[key];
       });
 
-      // Should not throw during initialization
       expect(() => service.onModuleInit()).not.toThrow();
     });
 
@@ -237,7 +234,6 @@ describe('CronosService', () => {
     });
 
     it('should create PIX transfer successfully with user auth', async () => {
-      // Mock app token response
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
@@ -246,7 +242,6 @@ describe('CronosService', () => {
           statusText: 'OK',
           headers: { forEach: jest.fn() },
         } as any)
-        // Mock user token response
         .mockResolvedValueOnce({
           ok: true,
           text: jest.fn().mockResolvedValue(JSON.stringify({ token: mockUserToken })),
@@ -254,7 +249,6 @@ describe('CronosService', () => {
           statusText: 'OK',
           headers: { forEach: jest.fn() },
         } as any)
-        // Mock transfer response
         .mockResolvedValueOnce({
           ok: true,
           text: jest.fn().mockResolvedValue(JSON.stringify(mockTransferResponse)),
@@ -271,7 +265,6 @@ describe('CronosService', () => {
     });
 
     it('should fallback to app token when user auth fails', async () => {
-      // Mock app token response
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
@@ -280,7 +273,6 @@ describe('CronosService', () => {
           statusText: 'OK',
           headers: { forEach: jest.fn() },
         } as any)
-        // Mock user token failure
         .mockResolvedValueOnce({
           ok: false,
           text: jest.fn().mockResolvedValue('{"error": "User not found"}'),
@@ -288,7 +280,6 @@ describe('CronosService', () => {
           statusText: 'Unauthorized',
           headers: { forEach: jest.fn() },
         } as any)
-        // Mock app token refresh
         .mockResolvedValueOnce({
           ok: true,
           text: jest.fn().mockResolvedValue(JSON.stringify(mockTransferResponse)),
@@ -472,8 +463,6 @@ describe('CronosService', () => {
       });
       service.onModuleInit();
 
-      // When userPassword is not configured, the service attempts the request
-      // and may fail during token acquisition
       await expect(
         service.confirmTransactionPassword({ document: '123' }),
       ).rejects.toThrow();
@@ -621,7 +610,6 @@ describe('CronosService', () => {
     });
 
     it('should handle missing userId gracefully', async () => {
-      // When userId is empty, service returns early without throwing
       await expect(
         service.syncCronosBalance({
           userId: '',

@@ -246,7 +246,7 @@ describe('ProfileService', () => {
       const userId = 'user-123';
       const mockFile = {
         filename: 'large.jpg',
-        size: 10485760, // 10MB
+        size: 10485760,
       };
 
       service.uploadProfilePicture.mockRejectedValue(

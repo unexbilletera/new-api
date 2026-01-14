@@ -57,7 +57,6 @@ describe('API Performance Benchmarks', () => {
   });
 
   afterAll(async () => {
-    // Print performance report
     console.log('\n=== PERFORMANCE BENCHMARK RESULTS ===');
     metrics.forEach((metric) => {
       const status = metric.passed ? '✅' : '❌';
@@ -118,7 +117,6 @@ describe('API Performance Benchmarks', () => {
    * - Measures: Database query, serialization
    */
   it('should retrieve users list within performance threshold', async () => {
-    // Seed data
     const users = UserFactory.createMultiple(20);
     await prisma.users.createMany({
       data: users,
@@ -141,7 +139,6 @@ describe('API Performance Benchmarks', () => {
 
     expect(duration).toBeLessThan(200);
 
-    // Cleanup
     await prisma.users.deleteMany({});
   });
 
@@ -160,9 +157,7 @@ describe('API Performance Benchmarks', () => {
     const startTime = performance.now();
 
     for (let i = 0; i < iterations; i++) {
-      // Simulate token validation
       await new Promise((resolve) => {
-        // Mock validation process
         process.nextTick(resolve);
       });
     }
@@ -199,20 +194,18 @@ describe('API Performance Benchmarks', () => {
 
     const initialMemory = process.memoryUsage().heapUsed;
 
-    // Create test data
     const users = UserFactory.createMultiple(100);
     await prisma.users.createMany({
       data: users,
     });
 
     const finalMemory = process.memoryUsage().heapUsed;
-    const memoryGrowth = (finalMemory - initialMemory) / 1024 / 1024; // Convert to MB
+    const memoryGrowth = (finalMemory - initialMemory) / 1024 / 1024;
 
     console.log(`Memory growth: ${memoryGrowth.toFixed(2)}MB`);
 
     expect(memoryGrowth).toBeLessThan(50);
 
-    // Cleanup
     await prisma.users.deleteMany({});
   });
 });
