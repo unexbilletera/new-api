@@ -377,7 +377,7 @@ describe('OnboardingController', () => {
     });
 
     it('updateSpecificData should delegate to service', async () => {
-      const dto = { field: 'firstName', value: 'John' };
+      const dto = { documentNumber: '12345678' };
       const payload = { message: 'Onboarding data updated' };
       identityOnboardingService.updateOnboardingSpecificData.mockResolvedValue(
         payload,
