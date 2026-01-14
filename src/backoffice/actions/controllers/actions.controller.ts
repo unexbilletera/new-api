@@ -103,7 +103,7 @@ export class ActionsController {
     description: 'Forbidden - insufficient permissions',
   })
   @MinLevel(1)
-  async listGroups(): Promise<string[]> {
+  async listGroups(): Promise<(string | null)[]> {
     return this.actionsService.listGroups();
   }
 
@@ -225,7 +225,7 @@ export class ActionsController {
   async toggleAction(
     @Param('id') id: string,
     @Body('enabled') enabled: boolean,
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<any> {
     return this.actionsService.toggleAction(id, enabled);
   }
 
