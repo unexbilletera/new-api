@@ -70,7 +70,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 \`\`\`
 CampaignsController.validateByParam()
   └─> CampaignsService.validateCode()
-      └─> prisma.campaigns.findUnique()
+      └─> prisma.campaigns.findFirst()
 \`\`\`
 
 ---

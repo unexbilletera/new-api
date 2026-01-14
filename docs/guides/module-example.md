@@ -159,7 +159,7 @@ export class BackofficeUserModel {
   constructor(private prisma: PrismaService) {}
 
   async validateCredentials(email: string, password: string): Promise<User | null> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { email },
       select: {
         id: true,

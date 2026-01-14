@@ -94,7 +94,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 UserController.getCurrentUser()
   └─> UserProfileService.getCurrentUser()
       └─> UserProfileModel.findById()
-          └─> prisma.users.findUnique()
+          └─> prisma.users.findFirst()
 ```
 
 ---

@@ -83,7 +83,7 @@ Content-Type: application/json
 TransactionalPasswordController.create()
   └─> TransactionalPasswordService.createPassword()
       ├─> TransactionalPasswordModel.hasPassword()  // Check if exists
-      │   └─> prisma.users.findUnique()
+      │   └─> prisma.users.findFirst()
       └─> TransactionalPasswordModel.create()
           └─> prisma.users.update()  // Hash with bcrypt
 ```
@@ -156,7 +156,7 @@ Content-Type: application/json
 TransactionalPasswordController.validate()
   └─> TransactionalPasswordService.validatePassword()
       └─> TransactionalPasswordModel.validate()
-          ├─> prisma.users.findUnique()  // Get hash
+          ├─> prisma.users.findFirst()  // Get hash
           └─> bcrypt.compare()  // Validate
 ```
 
@@ -269,7 +269,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 TransactionalPasswordController.hasPassword()
   └─> TransactionalPasswordService.hasPassword()
       └─> TransactionalPasswordModel.hasPassword()
-          └─> prisma.users.findUnique()
+          └─> prisma.users.findFirst()
 ```
 
 ---

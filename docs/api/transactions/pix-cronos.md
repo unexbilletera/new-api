@@ -126,7 +126,7 @@ Content-Type: application/json
 PixCronosController.create()
   └─> PixCronosService.createTransaction()
       ├─> AccountModel.findById()  // Validate source account
-      │   └─> prisma.accounts.findUnique()
+      │   └─> prisma.accounts.findFirst()
       ├─> AccountModel.validateBalance()  // Check balance
       ├─> CronosApiService.createPIX()  // Fetch recipient data
       │   └─> HTTP POST to Cronos API
@@ -224,7 +224,7 @@ Content-Type: application/json
 PixCronosController.confirm()
   └─> PixCronosService.confirmTransaction()
       ├─> PixCronosTransactionModel.findById()  // Validate transaction
-      │   └─> prisma.transactions.findUnique()
+      │   └─> prisma.transactions.findFirst()
       ├─> TransactionalPasswordService.validate()  // Check password
       │   └─> bcrypt.compare()
       ├─> PixCronosTransactionModel.updateStatus()  // Set to "process"
