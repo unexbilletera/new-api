@@ -156,7 +156,6 @@ export const mockUser = {
   id: 'test-user-id',
   email: 'test@example.com',
   status: 'enable',
-  // ...
 };
 ```
 

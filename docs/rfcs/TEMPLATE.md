@@ -32,7 +32,6 @@ Detailed technical explanation including:
 ### Code Examples
 
 ```typescript
-// Example of how the feature will be used
 ```
 
 ### Migration Strategy
