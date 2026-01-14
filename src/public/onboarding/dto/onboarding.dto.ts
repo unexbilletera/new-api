@@ -17,6 +17,9 @@ export class VerifyOnboardingCodeDto {
   email: string;
 
   @IsString()
+  @Matches(/^\d{6}$/, {
+    message: 'Code must be exactly 6 digits',
+  })
   code: string;
 
   @IsString()
@@ -48,7 +51,9 @@ export class UpdateUserOnboardingDto {
   phone?: string;
 
   @IsOptional()
-  @Matches(/^\d{6}$/)
+  @Matches(/^\d{6}$/, {
+    message: 'Password must be exactly 6 digits',
+  })
   password?: string;
 
   @IsOptional()
@@ -93,6 +98,9 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, {
+    message: 'PEP since date must be in YYYY-MM-DD format',
+  })
   pepSince?: string;
 
   @IsOptional()
@@ -101,6 +109,9 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^\d{11}$/, {
+    message: 'CPF must be exactly 11 digits',
+  })
   cpf?: string;
 
   @IsOptional()
@@ -119,6 +130,9 @@ export class UpdateUserOnboardingDto {
 export class StartIdentityOnboardingDto {
   @IsOptional()
   @IsString()
+  @Matches(/^[A-Z]{2}$/i, {
+    message: 'Country code must be a 2-letter ISO country code',
+  })
   countryCode?: string;
 
   @IsOptional()
@@ -137,6 +151,9 @@ export class UpdateIdentityOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, {
+    message: 'Document expiration must be in YYYY-MM-DD format',
+  })
   documentExpiration?: string;
 
   @IsOptional()

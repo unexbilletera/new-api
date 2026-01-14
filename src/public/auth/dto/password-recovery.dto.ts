@@ -2,7 +2,6 @@ import {
   IsEmail,
   IsString,
   Matches,
-  MinLength,
   IsOptional,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -29,6 +28,9 @@ export class VerifyPasswordDto {
     example: '123456',
   })
   @IsString()
+  @Matches(/^\d{6}$/, {
+    message: 'Code must be exactly 6 digits',
+  })
   code: string;
 
   @ApiProperty({
@@ -36,7 +38,9 @@ export class VerifyPasswordDto {
     example: '654321',
   })
   @IsString()
-  @Matches(/^\d{6}$/)
+  @Matches(/^\d{6}$/, {
+    message: 'Password must be exactly 6 digits',
+  })
   newPassword: string;
 }
 
@@ -56,7 +60,9 @@ export class UnlockAccountDto {
     example: '123456',
   })
   @IsString()
-  @MinLength(1)
+  @Matches(/^\d{6}$/, {
+    message: 'Password must be exactly 6 digits',
+  })
   password: string;
 
   @ApiPropertyOptional({

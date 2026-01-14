@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsOptional, Min, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  Min,
+  IsEnum,
+  Matches,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum PixKeyType {
@@ -15,6 +22,9 @@ export class CreatePixCronosDto {
     example: 'uuid-da-conta-origem',
   })
   @IsString()
+  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
+    message: 'Source account ID must be a valid UUID',
+  })
   sourceAccountId: string;
 
   @ApiProperty({
