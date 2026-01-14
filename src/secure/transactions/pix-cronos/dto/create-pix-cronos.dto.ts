@@ -7,6 +7,7 @@ import {
   Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { SpecializedValidationOptions } from 'src/common/validators';
 
 export enum PixKeyType {
   CPF = 'cpf',
@@ -22,9 +23,7 @@ export class CreatePixCronosDto {
     example: 'uuid-da-conta-origem',
   })
   @IsString()
-  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
-    message: 'Source account ID must be a valid UUID',
-  })
+  @Matches(...SpecializedValidationOptions.SOURCE_ACCOUNT_ID)
   sourceAccountId: string;
 
   @ApiProperty({

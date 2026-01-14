@@ -1,5 +1,6 @@
 import { IsEmail, IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ValidationOptions } from 'src/common/validators';
 
 export class SendEmailValidationDto {
   @ApiProperty({
@@ -23,8 +24,6 @@ export class VerifyEmailCodeDto {
     example: '123456',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Code must be exactly 6 digits',
-  })
+  @Matches(...ValidationOptions.CODE_6_DIGITS)
   code: string;
 }

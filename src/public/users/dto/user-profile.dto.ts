@@ -5,6 +5,10 @@ import {
   Matches,
   IsEmail,
 } from 'class-validator';
+import {
+  ValidationOptions,
+  SpecializedValidationOptions,
+} from 'src/common/validators';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class GetUserProfileDto {}
@@ -31,10 +35,7 @@ export class UpdateUserProfileDto {
     example: '+5511987654321',
   })
   @IsOptional()
-  @Matches(/^\+\d{12,14}$/, {
-    message:
-      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
-  })
+  @Matches(...ValidationOptions.PHONE_INTERNATIONAL)
   phone?: string;
 
   @ApiPropertyOptional({
@@ -57,9 +58,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^(pt|es|en)$/i, {
-    message: 'Language must be pt, es, or en',
-  })
+  @Matches(...ValidationOptions.LANGUAGE)
   language?: string;
 
   @ApiPropertyOptional({
@@ -68,9 +67,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^[A-Za-z_]+\/[A-Za-z_]+$/, {
-    message: 'Timezone must be in format like America/Sao_Paulo',
-  })
+  @Matches(...ValidationOptions.TIMEZONE)
   timezone?: string;
 
   @ApiPropertyOptional({
@@ -79,9 +76,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^[A-Z]{2}$/i, {
-    message: 'Country must be a 2-letter ISO country code',
-  })
+  @Matches(...ValidationOptions.COUNTRY_CODE_2)
   country?: string;
 
   @ApiPropertyOptional({
@@ -90,35 +85,25 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, {
-    message: 'Birthdate must be in YYYY-MM-DD format (e.g., 2004-10-29)',
-  })
+  @Matches(...SpecializedValidationOptions.BIRTHDATE)
   birthdate?: string;
 
   @ApiPropertyOptional({
     description: "User's gender",
-    example: 'masculino',
+    example: 'male',
   })
   @IsOptional()
   @IsString()
-  @Matches(/^(masculino|feminino|outro|male|female|other)$/i, {
-    message: 'Gender must be masculino, feminino, outro, male, female, or other',
-  })
+  @Matches(...ValidationOptions.GENDER)
   gender?: string;
 
   @ApiPropertyOptional({
     description: "User's marital status",
-    example: 'solteiro',
+    example: 'single',
   })
   @IsOptional()
   @IsString()
-  @Matches(
-    /^(solteiro|casado|divorciado|viúvo|viuvo|união_estável|uniao_estavel|separado|single|married|divorced|widowed|cohabiting|separated)$/i,
-    {
-      message:
-        'Marital status must be solteiro, casado, divorciado, viúvo, união_estável, separado, single, married, divorced, widowed, cohabiting, or separated',
-    },
-  )
+  @Matches(...ValidationOptions.MARITAL_STATUS)
   maritalStatus?: string;
 }
 
@@ -138,9 +123,7 @@ export class CloseAccountDto {
     example: '123456',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Password must be exactly 6 digits',
-  })
+  @Matches(...ValidationOptions.PASSWORD_6_DIGITS)
   password: string;
 
   @ApiPropertyOptional({
@@ -210,9 +193,7 @@ export class SetDefaultIdentityDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsString()
-  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
-    message: 'Identity ID must be a valid UUID',
-  })
+  @Matches(...SpecializedValidationOptions.IDENTITY_ID)
   identityId: string;
 }
 
@@ -222,9 +203,7 @@ export class SetDefaultAccountDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsString()
-  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
-    message: 'Account ID must be a valid UUID',
-  })
+  @Matches(...SpecializedValidationOptions.ACCOUNT_ID)
   accountId: string;
 }
 
@@ -234,9 +213,7 @@ export class SetUserAccountAliasDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsString()
-  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
-    message: 'Account ID must be a valid UUID',
-  })
+  @Matches(...SpecializedValidationOptions.ACCOUNT_ID)
   accountId: string;
 
   @ApiProperty({
@@ -253,9 +230,7 @@ export class ChangePasswordDto {
     example: '123456',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Current password must be exactly 6 digits',
-  })
+  @Matches(...SpecializedValidationOptions.CURRENT_PASSWORD)
   currentPassword: string;
 
   @ApiProperty({
@@ -263,9 +238,7 @@ export class ChangePasswordDto {
     example: '654321',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'New password must be exactly 6 digits',
-  })
+  @Matches(...SpecializedValidationOptions.NEW_PASSWORD)
   newPassword: string;
 }
 
@@ -291,9 +264,7 @@ export class ConfirmEmailChangeDto {
     example: '123456',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Code must be exactly 6 digits',
-  })
+  @Matches(...ValidationOptions.CODE_6_DIGITS)
   code: string;
 }
 
@@ -303,9 +274,7 @@ export class UpdateAddressDto {
     example: '01310-100',
   })
   @IsString()
-  @Matches(/^\d{5}-\d{3}$/, {
-    message: 'Zip code must be in format XXXXX-XXX',
-  })
+  @Matches(...ValidationOptions.ZIP_CODE_BR)
   zipCode: string;
 
   @ApiProperty({
@@ -342,9 +311,7 @@ export class UpdateAddressDto {
     example: 'SP',
   })
   @IsString()
-  @Matches(/^[A-Z]{2}$/i, {
-    message: 'State must be a 2-letter code',
-  })
+  @Matches(...ValidationOptions.STATE_CODE_2)
   state: string;
 
   @ApiPropertyOptional({

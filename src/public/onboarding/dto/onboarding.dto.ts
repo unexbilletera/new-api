@@ -6,6 +6,10 @@ import {
   Matches,
   IsPhoneNumber,
 } from 'class-validator';
+import {
+  ValidationOptions,
+  SpecializedValidationOptions,
+} from 'src/common/validators';
 
 export class StartUserOnboardingDto {
   @IsEmail()
@@ -17,20 +21,15 @@ export class VerifyOnboardingCodeDto {
   email: string;
 
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Code must be exactly 6 digits',
-  })
+  @Matches(...ValidationOptions.CODE_6_DIGITS)
   code: string;
 
   @IsString()
-  @Matches(/^(email|phone)$/)
+  @Matches(...ValidationOptions.VALIDATION_TYPE)
   type: 'email' | 'phone';
 
   @IsOptional()
-  @Matches(/^\+\d{12,14}$/, {
-    message:
-      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
-  })
+  @Matches(...ValidationOptions.PHONE_INTERNATIONAL)
   phone?: string;
 }
 
@@ -44,16 +43,11 @@ export class UpdateUserOnboardingDto {
   lastName?: string;
 
   @IsOptional()
-  @Matches(/^\+\d{12,14}$/, {
-    message:
-      'Phone must start with + followed by 12-14 digits (e.g., +5512988870530 for BR or +541127564556 for AR)',
-  })
+  @Matches(...ValidationOptions.PHONE_INTERNATIONAL)
   phone?: string;
 
   @IsOptional()
-  @Matches(/^\d{6}$/, {
-    message: 'Password must be exactly 6 digits',
-  })
+  @Matches(...ValidationOptions.PASSWORD_6_DIGITS)
   password?: string;
 
   @IsOptional()
@@ -62,45 +56,32 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^(ar|br)$/i, {
-    message: 'Country must be "ar" (Argentina) or "br" (Brazil)',
-  })
+  @Matches(...SpecializedValidationOptions.COUNTRY_AR_BR)
   country?: string;
 
   @IsOptional()
   @IsString()
-  @Matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, {
-    message: 'Birthdate must be in YYYY-MM-DD format (e.g., 2004-10-29)',
-  })
+  @Matches(...SpecializedValidationOptions.BIRTHDATE)
   birthdate?: string;
 
   @IsOptional()
   @IsString()
-  @Matches(/^(male|female)$/i, {
-    message: 'Gender must be "male" or "female"',
-  })
+  @Matches(...ValidationOptions.GENDER)
   gender?: string;
 
   @IsOptional()
   @IsString()
-  @Matches(/^(single|married|divorced|widowed|cohabiting|separated)$/i, {
-    message:
-      'Marital status must be one of: "single", "married", "divorced", "widowed", "cohabiting", "separated"',
-  })
+  @Matches(...ValidationOptions.MARITAL_STATUS)
   maritalStatus?: string;
 
   @IsOptional()
   @IsString()
-  @Matches(/^[01]$/, {
-    message: 'PEP must be "0" (not a PEP) or "1" (is a PEP)',
-  })
+  @Matches(...ValidationOptions.PEP)
   pep?: string;
 
   @IsOptional()
   @IsString()
-  @Matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, {
-    message: 'PEP since date must be in YYYY-MM-DD format',
-  })
+  @Matches(...SpecializedValidationOptions.PEP_SINCE)
   pepSince?: string;
 
   @IsOptional()
@@ -109,9 +90,7 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^\d{11}$/, {
-    message: 'CPF must be exactly 11 digits',
-  })
+  @Matches(...ValidationOptions.CPF)
   cpf?: string;
 
   @IsOptional()
@@ -130,13 +109,11 @@ export class UpdateUserOnboardingDto {
 export class StartIdentityOnboardingDto {
   @IsOptional()
   @IsString()
-  @Matches(/^[A-Z]{2}$/i, {
-    message: 'Country code must be a 2-letter ISO country code',
-  })
+  @Matches(...ValidationOptions.COUNTRY_CODE_2)
   countryCode?: string;
 
   @IsOptional()
-  @Matches(/^(ar|br)$/i)
+  @Matches(...SpecializedValidationOptions.COUNTRY_AR_BR)
   country?: string;
 
   @IsOptional()
@@ -151,9 +128,7 @@ export class UpdateIdentityOnboardingDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, {
-    message: 'Document expiration must be in YYYY-MM-DD format',
-  })
+  @Matches(...SpecializedValidationOptions.DOCUMENT_EXPIRATION)
   documentExpiration?: string;
 
   @IsOptional()

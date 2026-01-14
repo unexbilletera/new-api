@@ -5,6 +5,10 @@ import {
   IsOptional,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ValidationOptions,
+  SpecializedValidationOptions,
+} from 'src/common/validators';
 
 export class ForgotPasswordDto {
   @ApiProperty({
@@ -28,9 +32,7 @@ export class VerifyPasswordDto {
     example: '123456',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Code must be exactly 6 digits',
-  })
+  @Matches(...ValidationOptions.CODE_6_DIGITS)
   code: string;
 
   @ApiProperty({
@@ -38,9 +40,7 @@ export class VerifyPasswordDto {
     example: '654321',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Password must be exactly 6 digits',
-  })
+  @Matches(...SpecializedValidationOptions.NEW_PASSWORD)
   newPassword: string;
 }
 
@@ -50,9 +50,7 @@ export class UnlockAccountDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @IsString()
-  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, {
-    message: 'users.errors.invalidId',
-  })
+  @Matches(...ValidationOptions.UUID)
   id: string;
 
   @ApiProperty({
@@ -60,9 +58,7 @@ export class UnlockAccountDto {
     example: '123456',
   })
   @IsString()
-  @Matches(/^\d{6}$/, {
-    message: 'Password must be exactly 6 digits',
-  })
+  @Matches(...ValidationOptions.PASSWORD_6_DIGITS)
   password: string;
 
   @ApiPropertyOptional({

@@ -1,5 +1,9 @@
 import { IsString, MinLength, IsOptional, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ValidationOptions,
+  SpecializedValidationOptions,
+} from 'src/common/validators';
 
 export class SigninDto {
   @ApiProperty({
@@ -24,9 +28,7 @@ export class SigninDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^\d+(\.\d+)*$/, {
-    message: 'System version must be in format like 14.5',
-  })
+  @Matches(...ValidationOptions.VERSION)
   systemVersion?: string;
 
   @ApiPropertyOptional({
@@ -35,9 +37,7 @@ export class SigninDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
-    message: 'Device identifier must be a valid UUID',
-  })
+  @Matches(...SpecializedValidationOptions.DEVICE_IDENTIFIER)
   deviceIdentifier?: string;
 
   @ApiPropertyOptional({
