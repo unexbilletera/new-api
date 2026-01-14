@@ -145,6 +145,7 @@ export class PixCronosController {
       const result = await this.pixCronosService.confirmTransaction(
         user.userId,
         dto.transactionId,
+        dto.transactionalPassword,
       );
 
       return {

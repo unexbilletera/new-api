@@ -6,9 +6,10 @@ import { JwtModule } from '../../../shared/jwt/jwt.module';
 import { PixCronosController } from './controllers/pix-cronos.controller';
 import { PixCronosService } from './services/pix-cronos.service';
 import { PixCronosTransactionModel } from './models/pix-cronos-transaction.model';
+import { TransactionalPasswordModule } from '../../transactional-password/transactional-password.module';
 
 @Module({
-  imports: [PrismaModule, SqsModule, CronosModule, JwtModule],
+  imports: [PrismaModule, SqsModule, CronosModule, JwtModule, TransactionalPasswordModule],
   controllers: [PixCronosController],
   providers: [PixCronosService, PixCronosTransactionModel],
   exports: [PixCronosService],

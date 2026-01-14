@@ -5,6 +5,7 @@ import { PixCronosTransactionModel } from '../models/pix-cronos-transaction.mode
 import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ErrorCodes, ErrorHelper } from '../../../../shared/errors/app-error';
 import { LoggerService } from '../../../../shared/logger/logger.service';
+import { TransactionalPasswordService } from '../../../transactional-password/services/transactional-password.service';
 
 @Injectable()
 export class PixCronosService {
@@ -13,6 +14,7 @@ export class PixCronosService {
     private sqsService: SqsService,
     private cronosService: CronosService,
     private logger: LoggerService,
+    private transactionalPasswordService: TransactionalPasswordService,
   ) {}
 
   async createTransaction(
@@ -127,6 +129,7 @@ export class PixCronosService {
   async confirmTransaction(
     userId: string,
     transactionId: string,
+    transactionalPassword?: string,
   ): Promise<{
     id: string;
     status: string;
@@ -137,6 +140,47 @@ export class PixCronosService {
         transactionId,
         userId,
       );
+
+      // Validate transactional password if user has one configured
+      const userHasPassword = await this.transactionalPasswordService.hasPassword(userId);
+      if (userHasPassword) {
+        if (!transactionalPassword) {
+          this.logger.warn(
+            `[PixCronosService] Transaction confirmation attempted without transactional password - userId: ${userId}`,
+            'confirmTransaction',
+          );
+          throw ErrorHelper.badRequest(
+            ErrorCodes.TRANSACTIONAL_PASSWORD_NOT_PROVIDED,
+            'Transactional password is required to confirm this transaction',
+          );
+        }
+
+        const isPasswordValid = await this.transactionalPasswordService.validatePassword(
+          userId,
+          transactionalPassword,
+        );
+
+        if (!isPasswordValid) {
+          this.logger.warn(
+            `[PixCronosService] Transaction confirmation failed - invalid transactional password - userId: ${userId}`,
+            'confirmTransaction',
+          );
+          throw ErrorHelper.badRequest(
+            ErrorCodes.TRANSACTIONAL_PASSWORD_INCORRECT,
+            'Invalid transactional password',
+          );
+        }
+      } else {
+        // User doesn't have transactional password yet - they must create one first
+        this.logger.warn(
+          `[PixCronosService] Transaction confirmation attempted without transactional password configured - userId: ${userId}`,
+          'confirmTransaction',
+        );
+        throw ErrorHelper.badRequest(
+          ErrorCodes.TRANSACTIONAL_PASSWORD_NOT_CREATED,
+          'You must create a transactional password first. Please use the transactional password creation endpoint.',
+        );
+      }
 
       await this.transactionModel.updateStatus(transaction.id, 'process');
 

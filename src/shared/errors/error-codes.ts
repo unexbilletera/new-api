@@ -62,6 +62,14 @@ export enum ErrorCodes {
   TRANSACTIONS_SPENDING_LIMIT_EXCEEDED = '400 transactions.errors.spendingLimitExceeded',
   TRANSACTIONS_ARS_ACCOUNT_NOT_FOUND = '400 transactions.errors.arsAccountNotFound',
 
+  TRANSACTIONAL_PASSWORD_NOT_CREATED = '400 transactionalPassword.errors.notCreated',
+  TRANSACTIONAL_PASSWORD_INVALID = '400 transactionalPassword.errors.invalidPassword',
+  TRANSACTIONAL_PASSWORD_INCORRECT = '400 transactionalPassword.errors.incorrectPassword',
+  TRANSACTIONAL_PASSWORD_ALREADY_EXISTS = '400 transactionalPassword.errors.alreadyExists',
+  TRANSACTIONAL_PASSWORD_INVALID_FORMAT = '400 transactionalPassword.errors.invalidFormat',
+  TRANSACTIONAL_PASSWORD_SAME_AS_CURRENT = '400 transactionalPassword.errors.sameAsCurrent',
+  TRANSACTIONAL_PASSWORD_NOT_PROVIDED = '400 transactionalPassword.errors.notProvided',
+
   INTERNAL_SERVER_ERROR = '500 server.errors.internalError',
   NOT_FOUND = '404 server.errors.notFound',
   FORBIDDEN = '403 server.errors.forbidden',
