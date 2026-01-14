@@ -17,7 +17,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   rootDir: '../../',
-  testMatch: ['<rootDir>/test/integration/**/*.spec.ts'],
+  testMatch: ['<rootDir>/test/integration/**/*.integration-spec.ts'],
   moduleNameMapper: {
     '^@src/(.*)$': '<rootDir>/src/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
@@ -38,7 +38,6 @@ module.exports = {
     'generated/',
   ],
   testTimeout: 30000,
-  setupFilesAfterEnv: ['<rootDir>/test/config/setup.ts'],
   transform: {
     '^.+\\.(t|j)s$': [
       'ts-jest',
