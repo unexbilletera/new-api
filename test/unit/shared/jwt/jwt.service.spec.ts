@@ -73,7 +73,6 @@ describe('JwtService', () => {
 
     nestJwtService = {
       signAsync: jest.fn().mockImplementation((payload: any) => {
-        // Generate different tokens based on payload
         const payloadStr = JSON.stringify(payload);
         const tokenId = Buffer.from(payloadStr)
           .toString('base64')
@@ -143,7 +142,6 @@ describe('JwtService', () => {
      * @complexity O(1) - Two token generations
      */
     it('should generate different tokens for different payloads', async () => {
-      // Mock different tokens for different payloads
       (nestJwtService.signAsync as jest.Mock)
         .mockResolvedValueOnce('header.token1.signature')
         .mockResolvedValueOnce('header.token2.signature');
@@ -315,7 +313,6 @@ describe('JwtService', () => {
      * @complexity O(1) - Token refresh
      */
     it('should generate new token from valid token', async () => {
-      // Mock different tokens for original and refreshed
       (nestJwtService.signAsync as jest.Mock)
         .mockResolvedValueOnce('header.original.signature')
         .mockResolvedValueOnce('header.refreshed.signature');
