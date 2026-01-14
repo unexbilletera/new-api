@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { AuthService } from '../../../../../src/public/auth/services/auth.service';
 import { PrismaService } from '../../../../../src/shared/prisma/prisma.service';
 import { LoggerService } from '../../../../../src/shared/logger/logger.service';
@@ -11,6 +11,7 @@ import { ExchangeRatesService } from '../../../../../src/shared/exchange/exchang
 import { SystemVersionService } from '../../../../../src/shared/helpers/system-version.service';
 import { SmsService } from '../../../../../src/shared/sms/sms.service';
 import { EmailService } from '../../../../../src/shared/email/email.service';
+import { AuthMapper } from '../../../../../src/public/auth/mappers/auth.mapper';
 import { PasswordHelper } from '../../../../../src/shared/helpers/password.helper';
 
 describe('AuthService', () => {
@@ -25,6 +26,7 @@ describe('AuthService', () => {
   let systemVersionService: jest.Mocked<SystemVersionService>;
   let smsService: jest.Mocked<SmsService>;
   let emailService: jest.Mocked<EmailService>;
+  let authMapper: jest.Mocked<AuthMapper>;
 
   const mockUser = {
     id: 'user-123',
@@ -34,6 +36,7 @@ describe('AuthService', () => {
     lastName: 'Doe',
     password: 'hashed_password',
     status: 'active',
+    access: 'customer',
   };
 
   beforeEach(async () => {
@@ -106,6 +109,14 @@ describe('AuthService', () => {
       normalizeEmail: jest.fn((email) => email.toLowerCase().trim()),
     } as unknown as jest.Mocked<EmailService>;
 
+    authMapper = {
+      toSignupResponseDto: jest.fn(),
+      toSignupDeviceRequiredResponseDto: jest.fn(),
+      toSigninResponseDto: jest.fn(),
+      toSigninDeviceRequiredResponseDto: jest.fn(),
+      toUnlockAccountResponseDto: jest.fn(),
+    } as unknown as jest.Mocked<AuthMapper>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -119,6 +130,7 @@ describe('AuthService', () => {
         { provide: SystemVersionService, useValue: systemVersionService },
         { provide: SmsService, useValue: smsService },
         { provide: EmailService, useValue: emailService },
+        { provide: AuthMapper, useValue: authMapper },
       ],
     }).compile();
 
@@ -377,6 +389,7 @@ describe('AuthService', () => {
       const dto = {
         id: '550e8400-e29b-41d4-a716-446655440000',
         password: 'ValidPassword123!',
+        systemVersion: '1.0.0',
       };
 
       (prisma.users.findFirst as jest.Mock).mockResolvedValue({
@@ -389,6 +402,18 @@ describe('AuthService', () => {
       (prisma.users.update as jest.Mock).mockResolvedValue({
         ...mockUser,
         status: 'enable',
+      });
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        id: dto.id,
+        status: 'enable',
+      });
+      systemVersionService.assertVersionValid.mockReturnValue(undefined);
+      authMapper.toUnlockAccountResponseDto.mockReturnValue({
+        message: 'Account unlocked successfully',
+        user: mockUser,
+        accessToken: 'token',
+        expiresIn: 3600,
       });
 
       const result = await service.unlockAccount(dto, {

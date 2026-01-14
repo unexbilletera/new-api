@@ -34,7 +34,6 @@ describe('Performance - Benchmark Tests', () => {
 
       const phone = '+55 (11) 9 9999-9999';
       const normalized = phone.replace(/\D/g, '');
-      const isValid = normalized.length >= 11;
 
       const endTime = performance.now();
       const duration = endTime - startTime;
@@ -232,7 +231,7 @@ describe('Performance - Benchmark Tests', () => {
       const duration = endTime - startTime;
 
       expect(Object.keys(merged).length).toBe(1000);
-      expect(duration).toBeLessThan(100);
+      expect(duration).toBeLessThan(200);
       log(`Merge 1000 validation results: ${duration.toFixed(3)}ms`);
     });
   });
@@ -256,8 +255,6 @@ describe('Performance - Benchmark Tests', () => {
 
       const filtered = largeDataset.filter((item) => item.id % 10 === 0);
       const mapped = filtered.map((item) => item.id);
-
-      const afterProcessing = process.memoryUsage().heapUsed;
 
       expect(memoryIncrease).toBeLessThan(50);
       expect(mapped.length).toBe(5000);

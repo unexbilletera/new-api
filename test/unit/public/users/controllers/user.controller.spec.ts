@@ -10,25 +10,9 @@
  *
  * @author Unex Development Team
  * @since 2.0.0
- * @lastModified 2026-01-13
+ * @lastModified 2026-01-14
  *
  * @see {@link ../../../../../src/public/users/controllers/user.controller.ts} for implementation
- *
- * @coverage
- * - Lines: 95%
- * - Statements: 95%
- * - Functions: 93%
- * - Branches: 90%
- *
- * @testScenarios
- * - Get current user profile
- * - Get user by ID
- * - Update user profile
- * - Update user email
- * - List all users
- * - Delete user account
- * - Validate input parameters
- * - Handle authorization errors
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
@@ -45,7 +29,7 @@ import { AccountService } from '../../../../../src/public/users/services/account
 import { OnboardingStatusService } from '../../../../../src/public/users/services/onboarding-status.service';
 import { MessagingService } from '../../../../../src/public/users/services/messaging.service';
 import { JwtAuthGuard } from '../../../../../src/shared/guards/jwt-auth.guard';
-import { mockActiveUser, createLoggerServiceMock } from '../../../../utils';
+import { mockActiveUser } from '../../../../utils';
 
 /**
  * @testSuite UserController
@@ -54,7 +38,6 @@ import { mockActiveUser, createLoggerServiceMock } from '../../../../utils';
 describe('UserController', () => {
   let controller: any;
   let service: any;
-  let logger: jest.Mocked<any>;
 
   /**
    * @setup
@@ -85,8 +68,6 @@ describe('UserController', () => {
     };
     const onboardingStatusService = { getStatus: jest.fn() };
     const messagingService = { sendMessage: jest.fn() };
-
-    logger = createLoggerServiceMock();
 
     const mockAuthGuard: CanActivate = {
       canActivate: jest.fn(() => true),
@@ -126,8 +107,6 @@ describe('UserController', () => {
      * @given Authenticated user request
      * @when getProfile() is called
      * @then Should return user object with all profile data
-     *
-     * @complexity O(1) - Simple data return
      */
     it('should return current user profile', async () => {
       const userId = 'user-123';
@@ -137,7 +116,7 @@ describe('UserController', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe(mockActiveUser.id);
-      expect(service.getCurrentUser).toHaveBeenCalledWith(userId, undefined);
+      expect(service.getCurrentUser).toHaveBeenCalledWith(userId, undefined, false);
     });
 
     /**
@@ -145,8 +124,6 @@ describe('UserController', () => {
      * @given User with complete profile
      * @when getCurrentUser() is called
      * @then Response should contain email, name, status fields
-     *
-     * @complexity O(1) - Direct return
      */
     it('should include all required profile fields', async () => {
       const userId = 'user-123';
@@ -161,16 +138,6 @@ describe('UserController', () => {
   });
 
   /**
-   * @testGroup getUserById
-   * @description Tests for retrieving user by ID - SKIPPED (method doesn't exist in controller)
-   */
-  describe.skip('getUserById', () => {
-    it('should get user by ID', async () => {
-      // Method doesn't exist in controller
-    });
-  });
-
-  /**
    * @testGroup updateProfile
    * @description Tests for updating user profile information
    */
@@ -180,8 +147,6 @@ describe('UserController', () => {
      * @given Valid user ID and update data
      * @when updateProfile() is called
      * @then Should return updated user object
-     *
-     * @complexity O(1) - Single update
      */
     it('should update user profile', async () => {
       const userId = 'user-123';
@@ -207,8 +172,6 @@ describe('UserController', () => {
      * @given Partial update DTO
      * @when updateProfile() is called
      * @then Should only update provided fields
-     *
-     * @complexity O(1) - Selective update
      */
     it('should handle partial updates', async () => {
       const userId = 'user-123';
@@ -228,167 +191,6 @@ describe('UserController', () => {
   });
 
   /**
-   * @testGroup updateEmail
-   * @description Tests for changing user email address - SKIPPED (uses requestEmailChange instead)
-   */
-  describe.skip('updateEmail', () => {
-    /**
-     * @test Should update user email successfully
-     * @given Valid user ID and new email
-     * @when updateEmail() is called
-     * @then Should return user with updated email
-     *
-     * @complexity O(1) - Email update
-     */
-    it('should update user email', async () => {
-      const userId = 'user-123';
-      const newEmail = 'newemail@example.com';
-
-      const updatedUser = { ...mockActiveUser, email: newEmail };
-      service.updateEmail.mockResolvedValue(updatedUser);
-
-      const result = await controller.updateEmail(userId, { email: newEmail });
-
-      expect(result.email).toBe(newEmail);
-      expect(service.updateEmail).toHaveBeenCalledWith(userId, newEmail);
-    });
-
-    /**
-     * @test Should reject invalid email format
-     * @given Invalid email address
-     * @when updateEmail() is called
-     * @then Should throw BadRequestException
-     *
-     * @complexity O(1) - Validation
-     * @edge-case Tests email format validation
-     */
-    it('should reject invalid email format', async () => {
-      const userId = 'user-123';
-      const invalidEmail = 'not-an-email';
-
-      const updateDto = { email: invalidEmail };
-
-      // Controller should validate before calling service
-      expect(() => controller.updateEmail(userId, updateDto)).toBeDefined();
-    });
-
-    /**
-     * @test Should reject duplicate email
-     * @given Email already in use
-     * @when updateEmail() is called
-     * @then Should throw error
-     *
-     * @complexity O(1) - Constraint check
-     * @edge-case Tests email uniqueness
-     */
-    it('should reject duplicate email on update', async () => {
-      const userId = 'user-123';
-      const existingEmail = 'existing@example.com';
-
-      service.updateEmail.mockRejectedValue(new Error('Email already in use'));
-
-      await expect(
-        controller.updateEmail(userId, { email: existingEmail }),
-      ).rejects.toThrow();
-    });
-  });
-
-  /**
-   * @testGroup listUsers
-   * @description Tests for retrieving paginated user list - SKIPPED (method doesn't exist in controller)
-   */
-  describe.skip('listUsers', () => {
-    /**
-     * @test Should retrieve paginated user list
-     * @given Valid pagination parameters
-     * @when listUsers() is called
-     * @then Should return users with pagination metadata
-     *
-     * @complexity O(n) where n = page size
-     */
-    it('should list users with pagination', async () => {
-      const paginationDto = { page: 1, limit: 10 };
-      const response = {
-        data: [mockActiveUser],
-        total: 1,
-        page: 1,
-        limit: 10,
-      };
-
-      service.findAll.mockResolvedValue(response);
-
-      const result = await controller.listUsers(paginationDto);
-
-      expect(result.data).toBeDefined();
-      expect(result.total).toBe(1);
-      expect(service.findAll).toHaveBeenCalledWith(paginationDto);
-    });
-
-    /**
-     * @test Should handle invalid page number
-     * @given Page number less than 1
-     * @when listUsers() is called
-     * @then Should use default or throw validation error
-     *
-     * @complexity O(1) - Validation
-     */
-    it('should handle pagination defaults', async () => {
-      const paginationDto = { page: 0, limit: 10 };
-      const response = {
-        data: [],
-        total: 0,
-        page: 1,
-        limit: 10,
-      };
-
-      service.findAll.mockResolvedValue(response);
-
-      await controller.listUsers(paginationDto);
-
-      expect(service.findAll).toHaveBeenCalled();
-    });
-  });
-
-  /**
-   * @testGroup deleteUser
-   * @description Tests for deleting user account - SKIPPED (uses closeAccount instead)
-   */
-  describe.skip('deleteUser', () => {
-    /**
-     * @test Should delete user successfully
-     * @given Valid user ID
-     * @when deleteUser() is called
-     * @then Should confirm deletion
-     *
-     * @complexity O(1) - Delete operation
-     */
-    it('should delete user', async () => {
-      const userId = 'user-123';
-      service.delete.mockResolvedValue(mockActiveUser);
-
-      const result = await controller.deleteUser(userId);
-
-      expect(result).toBeDefined();
-      expect(service.delete).toHaveBeenCalledWith(userId);
-    });
-
-    /**
-     * @test Should throw error when deleting non-existent user
-     * @given Invalid user ID
-     * @when deleteUser() is called
-     * @then Should throw NotFoundException
-     *
-     * @complexity O(1) - Error response
-     */
-    it('should throw error when user not found', async () => {
-      const userId = 'invalid-id';
-      service.delete.mockRejectedValue(new Error('User not found'));
-
-      await expect(controller.deleteUser(userId)).rejects.toThrow();
-    });
-  });
-
-  /**
    * @testGroup instantiation
    * @description Tests for controller initialization
    */
@@ -398,8 +200,6 @@ describe('UserController', () => {
      * @given Proper module configuration
      * @when Controller is instantiated
      * @then Should be defined
-     *
-     * @complexity O(1) - Instantiation
      */
     it('should be defined', () => {
       expect(controller).toBeDefined();

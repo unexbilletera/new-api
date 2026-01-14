@@ -8,7 +8,7 @@ import {
 import { UserOnboardingService } from '../../../../../../src/public/onboarding/services/user-onboarding.service';
 import { VerificationService } from '../../../../../../src/public/onboarding/services/verification.service';
 import { IdentityOnboardingService } from '../../../../../../src/public/onboarding/services/identity-onboarding.service';
-import { EmailValidationService } from '../../../../../../src/public/auth/services/email-validation.service';
+import { EmailValidationOnboardingService } from '../../../../../../src/public/onboarding/services/email-validation-onboarding.service';
 import { PhoneValidationService } from '../../../../../../src/public/auth/services/phone-validation.service';
 import { JwtAuthGuard } from '../../../../../../src/shared/guards/jwt-auth.guard';
 
@@ -18,7 +18,7 @@ describe('OnboardingController', () => {
   let userOnboardingService: jest.Mocked<UserOnboardingService>;
   let verificationService: jest.Mocked<VerificationService>;
   let identityOnboardingService: jest.Mocked<IdentityOnboardingService>;
-  let emailValidationService: jest.Mocked<EmailValidationService>;
+  let emailValidationService: jest.Mocked<EmailValidationOnboardingService>;
   let phoneValidationService: jest.Mocked<PhoneValidationService>;
 
   const mockUserId = 'user-123';
@@ -48,7 +48,7 @@ describe('OnboardingController', () => {
 
     emailValidationService = {
       sendEmailValidation: jest.fn(),
-    } as unknown as jest.Mocked<EmailValidationService>;
+    } as unknown as jest.Mocked<EmailValidationOnboardingService>;
 
     phoneValidationService = {
       sendPhoneValidation: jest.fn(),
@@ -75,7 +75,7 @@ describe('OnboardingController', () => {
           provide: IdentityOnboardingService,
           useValue: identityOnboardingService,
         },
-        { provide: EmailValidationService, useValue: emailValidationService },
+        { provide: EmailValidationOnboardingService, useValue: emailValidationService },
         { provide: PhoneValidationService, useValue: phoneValidationService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: JwtAuthGuard, useValue: mockAuthGuard },
