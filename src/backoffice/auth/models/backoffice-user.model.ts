@@ -18,10 +18,7 @@ export class BackofficeUserModel {
   ) {}
   async findByEmail(email: string) {
     return this.prisma.backofficeUsers.findUnique({
-      where: {
-        email,
-        deletedAt: null,
-      },
+      where: { email },
       include: {
         backofficeRoles: true,
       },
@@ -74,10 +71,7 @@ export class BackofficeUserModel {
   }
   async findById(id: string) {
     const user = await this.prisma.backofficeUsers.findUnique({
-      where: {
-        id,
-        deletedAt: null,
-      },
+      where: { id },
       include: {
         backofficeRoles: true,
       },
