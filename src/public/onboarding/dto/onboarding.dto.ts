@@ -76,6 +76,9 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^[01]$/, {
+    message: 'PEP must be "0" (not a PEP) or "1" (is a PEP)',
+  })
   pep?: string;
 
   @IsOptional()
