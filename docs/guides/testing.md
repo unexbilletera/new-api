@@ -28,7 +28,18 @@ Test individual business logic in services and data access in models.
 npm run test:integration
 ```
 
-Test complete request flows from controller to database.
+Test complete API flows with real backend, database, and authentication. Uses **local Docker database** with **real sandbox integrator credentials**.
+
+**Quick Start:**
+1. Start Docker: `docker-compose up -d`
+2. Setup database: `WALLET_MYSQL_URL="mysql://root:root123@localhost:3306/unex" npx prisma db push`
+3. Copy config: `cp .env.test.example .env.test`
+4. Start API: `npm run start:dev`
+5. Run tests: `npm run test:integration`
+
+**Important:** Integration tests use local Docker to avoid polluting remote sandbox database.
+
+See [Integration Testing Guide](testing-integration.md) for complete documentation.
 
 ### E2E Tests
 
@@ -54,9 +65,13 @@ npm run test:cov
 
 Generate coverage report. Target: 80%+ coverage.
 
-## Manual Testing Guides
+## Automated Testing Guides
 
-### Authentication Testing
+### Integration Testing
+
+- [Integration Testing Guide](testing-integration.md) - Complete guide for integration tests with real backend
+
+### Manual Testing Guides
 
 - [Public Authentication Testing](testing-public-auth.md) - Test public API authentication
 - [Backoffice Authentication Testing](testing-backoffice-auth.md) - Test backoffice authentication
@@ -89,14 +104,22 @@ test/unit/
 
 ### Integration Tests
 
-Located in `test/integration/`, testing controller + service + model:
+Located in `test/integration/`, testing complete API flows with real backend:
 
 ```
 test/integration/
-├── public/
-├── secure/
-└── backoffice/
+├── flows/
+│   ├── onboarding.integration-spec.ts
+│   ├── authentication.integration-spec.ts
+│   └── facial-validation.integration-spec.ts
+└── helpers/
+    ├── http-client.helper.ts
+    ├── test-data.helper.ts
+    ├── logger.helper.ts
+    └── index.ts
 ```
+
+See [Integration Testing Guide](testing-integration.md) for detailed documentation.
 
 ### E2E Tests
 
@@ -122,9 +145,10 @@ test/e2e/
 ### Integration Testing
 
 - **Real interactions**: Test actual component collaboration
-- **Database**: Use test database or transactions
-- **Mock externals**: Mock external APIs and services
-- **Cleanup**: Reset state between tests
+- **Local Docker**: Always use local Docker database to avoid polluting remote data
+- **Sandbox integrators**: Use real sandbox credentials for external services (Bind, Cronos, Valida)
+- **Mock codes**: Enable `ENABLE_MOCK_CODES=true` for faster validation tests
+- **Cleanup**: Reset state between tests with unique test data
 
 ### E2E Testing
 
