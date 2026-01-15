@@ -158,6 +158,7 @@ export class LivenessCheckDto {
   })
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.IMAGE_DATA_URL)
   image?: string;
 }
 

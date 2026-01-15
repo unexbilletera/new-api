@@ -364,6 +364,164 @@ describe('UpdateUserOnboardingDto Validation', () => {
     });
   });
 
+  /**
+   * @testGroup Liveness Image Field Validation
+   * @description Tests for base64 image data URL validation
+   */
+  describe('Liveness Image Field Validation', () => {
+    /**
+     * @test Should accept valid JPEG base64 image
+     * @given A valid base64 JPEG data URL
+     * @when validate() is called
+     * @then Should have no validation errors
+     */
+    it('should accept valid JPEG base64 image', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: 'data:image/jpeg;base64,/9j/4AAQSkZJRg',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    /**
+     * @test Should accept valid PNG base64 image
+     * @given A valid base64 PNG data URL
+     * @when validate() is called
+     * @then Should have no validation errors
+     */
+    it('should accept valid PNG base64 image', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    /**
+     * @test Should reject image without data URL prefix
+     * @given A base64 string without the data URL prefix
+     * @when validate() is called
+     * @then Should have validation error for Matches
+     */
+    it('should reject image without data URL prefix', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: '/9j/4AAQSkZJRg',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].property).toBe('livenessImage');
+      expect(errors[0].constraints).toHaveProperty('matches');
+    });
+
+    /**
+     * @test Should reject image with incorrect MIME type
+     * @given A data URL with non-image MIME type
+     * @when validate() is called
+     * @then Should have validation error for Matches
+     */
+    it('should reject image with incorrect MIME type', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: 'data:text/plain;base64,aGVsbG8gd29ybGQ=',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].property).toBe('livenessImage');
+      expect(errors[0].constraints).toHaveProperty('matches');
+    });
+
+    /**
+     * @test Should reject image without base64 indicator
+     * @given A data URL without ;base64, separator
+     * @when validate() is called
+     * @then Should have validation error for Matches
+     */
+    it('should reject image without base64 indicator', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: 'data:image/jpeg,/9j/4AAQSkZJRg',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].property).toBe('livenessImage');
+      expect(errors[0].constraints).toHaveProperty('matches');
+    });
+
+    /**
+     * @test Should reject plain text
+     * @given A plain text string instead of data URL
+     * @when validate() is called
+     * @then Should have validation error for Matches
+     */
+    it('should reject plain text', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: 'not-a-valid-image',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].property).toBe('livenessImage');
+      expect(errors[0].constraints).toHaveProperty('matches');
+    });
+
+    /**
+     * @test Should reject empty string
+     * @given An empty string for livenessImage
+     * @when validate() is called
+     * @then Should have validation error for Matches
+     */
+    it('should reject empty string', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: '',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].property).toBe('livenessImage');
+      expect(errors[0].constraints).toHaveProperty('matches');
+    });
+
+    /**
+     * @test Should accept undefined (optional field)
+     * @given No livenessImage provided
+     * @when validate() is called
+     * @then Should have no validation errors
+     */
+    it('should accept undefined livenessImage (optional field)', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {});
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    /**
+     * @test Should accept null (optional field)
+     * @given Null value for livenessImage
+     * @when validate() is called
+     * @then Should have no validation errors
+     */
+    it('should accept null livenessImage (optional field)', async () => {
+      const dto = plainToInstance(UpdateUserOnboardingDto, {
+        livenessImage: null,
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
   describe('PEP and pepSince Validation', () => {
     /**
      * @test Should allow pep = "0" without pepSince

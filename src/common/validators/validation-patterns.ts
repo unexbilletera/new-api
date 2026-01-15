@@ -108,6 +108,14 @@ export const ValidationPatterns = {
    * Used for: system version, app version
    */
   VERSION: /^\d+(\.\d+)*$/,
+
+  /**
+   * Base64 image data URL: must include proper MIME type and base64 prefix
+   * Used for: image uploads (liveness, documents, profile pictures)
+   * Accepted formats: jpeg, jpg, png, webp
+   */
+  IMAGE_DATA_URL:
+    /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/]+=*$/,
 } as const;
 
 /**
@@ -133,6 +141,8 @@ export const ValidationMessages = {
   PEP: 'PEP must be "0" (not a PEP) or "1" (is a PEP)',
   VALIDATION_TYPE: 'Type must be email or phone',
   VERSION: 'System version must be in format like 14.5',
+  IMAGE_DATA_URL:
+    'Image must be a valid base64 data URL (e.g., data:image/jpeg;base64,...)',
 } as const;
 
 /**
@@ -192,6 +202,10 @@ export const ValidationOptions = {
   VERSION: [
     ValidationPatterns.VERSION,
     { message: ValidationMessages.VERSION },
+  ],
+  IMAGE_DATA_URL: [
+    ValidationPatterns.IMAGE_DATA_URL,
+    { message: ValidationMessages.IMAGE_DATA_URL },
   ],
 } as const;
 

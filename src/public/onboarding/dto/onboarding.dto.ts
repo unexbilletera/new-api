@@ -88,6 +88,7 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.IMAGE_DATA_URL)
   livenessImage?: string;
 
   @IsOptional()
@@ -144,10 +145,12 @@ export class UpdateIdentityOnboardingDto {
 
 export class UploadArgentinaDocumentDto {
   @IsString()
+  @Matches(...ValidationOptions.IMAGE_DATA_URL)
   frontImage: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.IMAGE_DATA_URL)
   backImage?: string;
 
   @IsOptional()

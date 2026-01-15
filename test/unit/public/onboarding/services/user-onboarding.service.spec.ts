@@ -562,7 +562,9 @@ describe('UserOnboardingService', () => {
     });
 
     it('should process liveness image when Valida is disabled', async () => {
-      const dto = { livenessImage: 'base64-image-data' };
+      const dto = {
+        livenessImage: 'data:image/jpeg;base64,/9j/4AAQSkZJRg',
+      };
       const userWithEmail = { ...mockUser, email: 'test@example.com' };
 
       onboardingModel.findUserById.mockResolvedValue(userWithEmail as any);
@@ -586,7 +588,9 @@ describe('UserOnboardingService', () => {
     });
 
     it('should not send email when Valida is enabled', async () => {
-      const dto = { livenessImage: 'base64-image-data' };
+      const dto = {
+        livenessImage: 'data:image/jpeg;base64,/9j/4AAQSkZJRg',
+      };
 
       onboardingModel.updateUserOnboarding.mockResolvedValue(mockUser as any);
       onboardingMapper.toUpdateUserOnboardingResponseDto.mockReturnValue(
