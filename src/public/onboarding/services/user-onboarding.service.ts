@@ -156,6 +156,8 @@ export class UserOnboardingService {
     }
 
     if (dto.livenessImage) {
+      dataToUpdate.livenessImage = dto.livenessImage;
+      dataToUpdate.livenessVerifiedAt = new Date();
       await this.processLivenessImage(
         userId,
         dto.livenessImage,
@@ -260,10 +262,6 @@ export class UserOnboardingService {
         '[ONBOARDING] Using simple photo validation (Valida disabled)',
         { userId },
       );
-      const dataToUpdate = {
-        livenessImage,
-        livenessVerifiedAt: new Date(),
-      };
 
       if (!currentState.completedSteps.includes('1.11'))
         currentState.completedSteps.push('1.11');
@@ -280,6 +278,7 @@ export class UserOnboardingService {
 
       this.logger.info('[ONBOARDING] Simple liveness verification completed', {
         userId,
+        completedSteps: currentState.completedSteps,
       });
     } else {
       this.logger.info(
