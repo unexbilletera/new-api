@@ -120,7 +120,7 @@ Content-Type: application/json
 
 ## Business Rules
 
-1. **User Status**: User must have status `enable`
+1. **User Status**: User must have status `pending` or `enable`
 2. **Password Validation**: Password validated using bcrypt
 3. **Brute-Force Protection**: Rate limiting applied (5 requests/minute)
 4. **Device Registration**: Device may require registration if new

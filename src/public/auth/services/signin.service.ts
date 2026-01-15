@@ -76,7 +76,7 @@ export class SigninService {
     const user = await this.prisma.users.findFirst({
       where: {
         ...where,
-        status: { in: ['pending', 'enable', 'error'] },
+        status: { in: ['pending', 'enable'] },
         access: {
           in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
         },
