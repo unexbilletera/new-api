@@ -1059,7 +1059,6 @@ model users {
   email                                                 String?                 @unique(map: "email") @db.VarChar(100)
   username                                              String?                 @unique(map: "username") @db.VarChar(50)
   password                                              String?                 @db.VarChar(100)
-  transactionalPassword                                 String?                 @db.VarChar(255)
   recovery                                              String?                 @db.VarChar(100)
   systemVersion                                         String?                 @db.VarChar(10)
   mobileDevice                                          String?                 @db.Text
@@ -1135,7 +1134,6 @@ model users {
   @@index([status, isBlocked, isDisabled, lastLoginAt], map: "idx_user_status_blocked_disabled")
   @@index([email, deletedAt], map: "idx_email_deleted")
   @@index([lastLoginAt, createdAt], map: "idx_login_created")
-  @@index([transactionalPassword, createdAt], map: "idx_transactional_password_created")
 }
 
 model usersAccounts {
