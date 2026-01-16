@@ -17,7 +17,10 @@
 
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { UpdateUserOnboardingDto, UpdateIdentityOnboardingDto } from '../../../../../src/public/onboarding/dto/onboarding.dto';
+import {
+  UpdateUserOnboardingDto,
+  UpdateIdentityOnboardingDto,
+} from '../../../../../src/public/onboarding/dto/onboarding.dto';
 
 /**
  * @testSuite UpdateUserOnboardingDto Validation
@@ -393,7 +396,8 @@ describe('UpdateUserOnboardingDto Validation', () => {
      */
     it('should accept valid PNG base64 image', async () => {
       const dto = plainToInstance(UpdateUserOnboardingDto, {
-        livenessImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        livenessImage:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
       });
 
       const errors = await validate(dto);

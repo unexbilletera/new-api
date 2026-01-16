@@ -75,9 +75,7 @@ describe('IdentityOnboardingService - updateIdentityOnboarding', () => {
       ],
     }).compile();
 
-    service = module.get<IdentityOnboardingService>(
-      IdentityOnboardingService,
-    );
+    service = module.get<IdentityOnboardingService>(IdentityOnboardingService);
   });
 
   describe('CPF Handling', () => {
@@ -345,7 +343,9 @@ describe('IdentityOnboardingService - updateIdentityOnboarding', () => {
 
       await service.updateIdentityOnboarding('identity-123', dto);
 
-      expect(mockOnboardingModel.updateUserOnboardingComplete).toHaveBeenCalledWith(
+      expect(
+        mockOnboardingModel.updateUserOnboardingComplete,
+      ).toHaveBeenCalledWith(
         'user-123',
         expect.objectContaining({
           onboardingState: expect.objectContaining({
@@ -368,7 +368,9 @@ describe('IdentityOnboardingService - updateIdentityOnboarding', () => {
 
       await service.updateIdentityOnboarding('identity-123', dto);
 
-      expect(mockOnboardingModel.updateUserOnboardingComplete).toHaveBeenCalledWith(
+      expect(
+        mockOnboardingModel.updateUserOnboardingComplete,
+      ).toHaveBeenCalledWith(
         'user-123',
         expect.objectContaining({
           onboardingState: expect.objectContaining({
@@ -388,9 +390,7 @@ describe('IdentityOnboardingService - updateIdentityOnboarding', () => {
           },
         },
       };
-      mockOnboardingModel.findIdentityById.mockResolvedValue(
-        identityWithStep,
-      );
+      mockOnboardingModel.findIdentityById.mockResolvedValue(identityWithStep);
 
       const dto: UpdateIdentityOnboardingDto = {
         cpf: '12345678900',
@@ -437,7 +437,9 @@ describe('IdentityOnboardingService - updateIdentityOnboarding', () => {
 
       await service.updateIdentityOnboarding('identity-123', dto);
 
-      expect(mockOnboardingModel.updateUserOnboardingComplete).toHaveBeenCalledWith(
+      expect(
+        mockOnboardingModel.updateUserOnboardingComplete,
+      ).toHaveBeenCalledWith(
         'user-123',
         expect.objectContaining({
           onboardingState: expect.objectContaining({

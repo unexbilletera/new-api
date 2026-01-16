@@ -150,8 +150,7 @@ export class IdentityOnboardingService {
         updates.taxDocumentType = 'CPF';
       } else {
         updates.identityDocumentNumber = dto.documentNumber;
-        updates.identityDocumentType =
-          identity.country === 'ar' ? 'DNI' : 'RG';
+        updates.identityDocumentType = identity.country === 'ar' ? 'DNI' : 'RG';
       }
     }
 
