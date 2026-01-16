@@ -1478,6 +1478,20 @@ export class CronosService implements OnModuleInit {
   }
 
   /**
+   * Obtém o webhookSecret configurado (para validação de webhooks)
+   */
+  getWebhookSecret(): string {
+    return this.config?.webhookSecret || '';
+  }
+
+  /**
+   * Verifica se o Cronos está habilitado
+   */
+  isEnabled(): boolean {
+    return this.config?.enable || false;
+  }
+
+  /**
    * Mapeia o tipo de chave PIX para o formato esperado pela Cronos
    */
   private mapKeyTypeToCronos(keyType: string): string {

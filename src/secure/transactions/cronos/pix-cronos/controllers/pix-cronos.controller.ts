@@ -13,13 +13,14 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../../../shared/guards/jwt-auth.guard';
-import { CurrentUser } from '../../../../shared/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
+import { JwtAuthGuard } from '../../../../../shared/guards/jwt-auth.guard';
+import { CurrentUser } from '../../../../../shared/decorators/current-user.decorator';
 import { PixCronosService } from '../services/pix-cronos.service';
 import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ConfirmPixCronosDto } from '../dto/confirm-pix-cronos.dto';
-import { SuccessCodes } from '../../../../shared/errors/app-error';
-import { ColoredLogger } from '../../../../shared/utils/logger-colors';
+import { SuccessCodes } from '../../../../../shared/errors/app-error';
+import { ColoredLogger } from '../../../../../shared/utils/logger-colors';
 
 interface CurrentUserPayload {
   userId: string;
@@ -38,6 +39,7 @@ export class PixCronosController {
   constructor(private pixCronosService: PixCronosService) {}
 
   @Post('create')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requisições por minuto
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Criar transação PIX Cronos',
@@ -106,6 +108,7 @@ export class PixCronosController {
   }
 
   @Post('confirm')
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requisições por minuto
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Confirmar transação PIX Cronos',

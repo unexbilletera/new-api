@@ -1,8 +1,15 @@
 import { Module } from '@nestjs/common';
-import { PixCronosModule } from './pix-cronos/pix-cronos.module';
+import { PixCronosModule } from './cronos/pix-cronos/pix-cronos.module';
+import { BoletoCronosModule } from './cronos/boleto/boleto-cronos.module';
+import { BoletoGireModule } from './gire/boleto/boleto-gire.module';
 import { PrismaModule } from '../../shared/prisma/prisma.module';
 @Module({
-  imports: [PrismaModule, PixCronosModule],
+  imports: [
+    PrismaModule,
+    PixCronosModule,
+    BoletoCronosModule,
+    BoletoGireModule,
+  ],
   controllers: [],
   providers: [],
   exports: [],

@@ -58,7 +58,8 @@
     "docker:prisma:migrate": "docker exec -it unex-api npx prisma migrate dev",
     "docker:prisma:push": "docker exec -it unex-api npx prisma db push",
     "docker:prisma:studio": "npx prisma studio",
-    "prod-tunnel": "ssh -i ./pem/UNEX-PROD-PEM.pem -L 3306:unex-prod-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@18.224.174.89",
+    "redis-tunnel": "ssh -i /Users/brunosiqueira/Downloads/UNEX-PROD-PEM.pem    -L 6379:clustercfg.redis-cache-api.zsbm8t.use2.cache.amazonaws.com:6379   -N -T ubuntu@18.224.174.89",
+    "prod-tunnel": "ssh -i /Users/brunosiqueira/Downloads/UNEX-PROD-PEM.pem -L 3306:unex-prod-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@18.224.174.89",
     "sandbox-tunnel": "ssh -i ./pem/UNEX-SANDBOX-PEM.pem -L 3306:unex-sandbox-rds.ch0e6k6ioo2q.us-east-2.rds.amazonaws.com:3306 -D 8080 -N -C -o ServerAliveInterval=30 ubuntu@13.58.89.194"
   },
   "dependencies": {
@@ -71,11 +72,13 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-fastify": "^11.1.11",
     "@nestjs/swagger": "^8.0.7",
+    "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^5.0.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "fastify": "^5.6.2",
+    "ioredis": "^5.9.1",
     "node-fetch": "^2.7.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
@@ -84,7 +87,6 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "autocannon": "^7.14.0",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
@@ -96,6 +98,7 @@
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
+    "autocannon": "^7.14.0",
     "concurrently": "^9.2.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
