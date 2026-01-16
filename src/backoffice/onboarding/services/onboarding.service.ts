@@ -140,10 +140,23 @@ export class OnboardingService {
       throw new BadRequestException('User is not in onboarding process');
     }
 
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
+    const state = onboardingState as any;
+    if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
+      state.completedSteps = [];
+    }
+    if (!state.completedSteps.includes('3.3')) {
+      state.completedSteps.push('3.3');
+    }
+
     await this.prisma.users.update({
       where: { id: userId },
       data: {
         status: 'enable',
+        onboardingState: state,
         updatedAt: new Date(),
       },
     });
