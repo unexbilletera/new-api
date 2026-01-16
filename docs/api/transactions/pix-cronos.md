@@ -33,7 +33,14 @@ Create a new PIX transaction via Cronos API.
 ```
 Authorization: Bearer {token}
 Content-Type: application/json
+X-Idempotency-Key: {uuid} (optional)
 ```
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | Bearer JWT token |
+| `Content-Type` | Yes | `application/json` |
+| `X-Idempotency-Key` | No | Unique key (UUID) to prevent duplicate transactions. If provided, the server will return the existing transaction if one with the same key already exists for this user. |
 
 #### Request Body
 
@@ -299,6 +306,47 @@ SQS_TRANSACTIONS_QUEUE_URL=https://sqs.us-east-2.amazonaws.com/.../queue
 - Rate limiting on endpoints
 - Audit logging for all operations
 - Transaction timeout for unconfirmed transfers
+- Idempotency key support for duplicate prevention
+
+## Idempotency
+
+The create endpoint supports idempotent requests via the `X-Idempotency-Key` header.
+
+### How it works
+
+1. Client generates a unique key (UUID recommended) before making the request
+2. Client includes the key in the `X-Idempotency-Key` header
+3. If a transaction with this key already exists for the user, the existing transaction is returned
+4. If no transaction exists, a new one is created and associated with the key
+
+### Benefits
+
+- **Prevents duplicate transactions**: Network timeouts or retries won't create multiple transactions
+- **Safe retries**: Clients can safely retry failed requests without risk of double-spending
+- **Consistent responses**: Same request always returns the same transaction
+
+### Example
+
+```bash
+# First request - creates transaction
+curl -X POST /transactions/pix/cronos/create \
+  -H "Authorization: Bearer {token}" \
+  -H "X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000" \
+  -d '{"sourceAccountId": "...", "amount": 100}'
+
+# Retry with same key - returns existing transaction (no duplicate created)
+curl -X POST /transactions/pix/cronos/create \
+  -H "Authorization: Bearer {token}" \
+  -H "X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000" \
+  -d '{"sourceAccountId": "...", "amount": 100}'
+```
+
+### Best Practices
+
+- Always use a UUID v4 for the idempotency key
+- Generate a new key for each unique transaction intent
+- Store the key client-side until the transaction is confirmed
+- Keys are scoped per user (same key can be used by different users)
 
 ## Error Codes
 
@@ -336,6 +384,7 @@ npm run test:e2e -- pix-cronos.e2e-spec.ts
 ```bash
 POST /transactions/pix/cronos/create
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000
 
 {
   "sourceAccountId": "account-uuid",

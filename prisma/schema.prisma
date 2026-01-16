@@ -889,6 +889,7 @@ model transactions {
   targetBank                                                          String?               @db.VarChar(100)
   mantecaId                                                           String?               @db.VarChar(50)
   reverseMantecaId                                                    String?               @db.VarChar(50)
+  idempotencyKey                                                      String?               @unique(map: "idempotencyKey") @db.VarChar(64)
   accreditations                                                      accreditations[]
   exchange_rate_codes                                                 exchange_rate_codes[]
   ramp_operations_ramp_operations_debit_transaction_idTotransactions  ramp_operations[]     @relation("ramp_operations_debit_transaction_idTotransactions")

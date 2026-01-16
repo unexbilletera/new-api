@@ -100,6 +100,19 @@ export class PixCronosTransactionModel {
     }
   }
 
+  async findByIdempotencyKey(userId: string, idempotencyKey: string) {
+    const transaction = await this.prisma.transactions.findFirst({
+      where: {
+        userId: userId,
+        idempotencyKey: idempotencyKey,
+        type: 'cashout_cronos',
+        deletedAt: null,
+      },
+    });
+
+    return transaction;
+  }
+
   async create(data: {
     userId: string;
     amount: number;
@@ -116,6 +129,7 @@ export class PixCronosTransactionModel {
     targetBank?: string;
     targetAccountNumber?: string;
     cronosId?: string;
+    idempotencyKey?: string;
   }) {
     const now = new Date();
     const transaction = await this.prisma.transactions.create({
@@ -139,6 +153,7 @@ export class PixCronosTransactionModel {
         targetBank: data.targetBank || null,
         targetAccountNumber: data.targetAccountNumber || null,
         cronosId: data.cronosId || null,
+        idempotencyKey: data.idempotencyKey || null,
         createdAt: now,
         updatedAt: now,
       },

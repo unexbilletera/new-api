@@ -1331,6 +1331,11 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "X-Idempotency-Key",
+                    "value": "{{$guid}}",
+                    "description": "Chave unica para evitar transacoes duplicadas. Use um UUID."
                   }
                 ],
                 "body": {
@@ -1342,7 +1347,7 @@
                   "host": ["{{base_url}}"],
                   "path": ["transactions", "pix", "cronos", "create"]
                 },
-                "description": "Cria uma transacao PIX via Cronos. Busca informacoes do destinatario na API Cronos e retorna dados completos da transacao.\n\nAutenticacao: Requer Bearer Token JWT\n\nCampos obrigatorios:\n- sourceAccountId (string, ID da conta de origem)\n- amount (number, minimo 0.01)\n- targetKeyType (string, enum: cpf|cnpj|email|phone|evp)\n- targetKeyValue (string, valor da chave PIX)\n\nCampos opcionais:\n- description (string, descricao da transferencia)\n\nResposta esperada (200 OK):\n{\n  \"id\": \"uuid-da-transacao\",\n  \"status\": \"pending\",\n  \"amount\": 100.50,\n  \"createdAt\": \"2024-01-12T10:00:00Z\",\n  \"targetName\": \"NOME DO DESTINATARIO\",\n  \"targetAlias\": \"cpf 12345678900\",\n  \"targetTaxDocumentNumber\": \"12345678900\",\n  \"targetTaxDocumentType\": \"CPF\",\n  \"targetBank\": \"Banco do Destinatario\",\n  \"targetAccountNumber\": \"{\\\"bank\\\":\\\"001\\\",\\\"agency\\\":\\\"0001\\\",\\\"number\\\":\\\"12345\\\"}\",\n  \"message\": \"200 transactions.success.created\",\n  \"code\": \"200 transactions.success.created\"\n}\n\nErros possiveis:\n- 400: Dados invalidos ou conta de origem invalida\n- 401: Nao autenticado"
+                "description": "Cria uma transacao PIX via Cronos. Busca informacoes do destinatario na API Cronos e retorna dados completos da transacao.\n\nAutenticacao: Requer Bearer Token JWT\n\nHeaders:\n- Authorization: Bearer token (obrigatorio)\n- X-Idempotency-Key: UUID unico (opcional) - Previne transacoes duplicadas. Se uma transacao com esta chave ja existir, retorna a transacao existente.\n\nCampos obrigatorios:\n- sourceAccountId (string, ID da conta de origem)\n- amount (number, minimo 0.01)\n- targetKeyType (string, enum: cpf|cnpj|email|phone|evp)\n- targetKeyValue (string, valor da chave PIX)\n\nCampos opcionais:\n- description (string, descricao da transferencia)\n\nResposta esperada (200 OK):\n{\n  \"id\": \"uuid-da-transacao\",\n  \"status\": \"pending\",\n  \"amount\": 100.50,\n  \"createdAt\": \"2024-01-12T10:00:00Z\",\n  \"targetName\": \"NOME DO DESTINATARIO\",\n  \"targetAlias\": \"cpf 12345678900\",\n  \"targetTaxDocumentNumber\": \"12345678900\",\n  \"targetTaxDocumentType\": \"CPF\",\n  \"targetBank\": \"Banco do Destinatario\",\n  \"targetAccountNumber\": \"{\\\"bank\\\":\\\"001\\\",\\\"agency\\\":\\\"0001\\\",\\\"number\\\":\\\"12345\\\"}\",\n  \"message\": \"200 transactions.success.created\",\n  \"code\": \"200 transactions.success.created\"\n}\n\nErros possiveis:\n- 400: Dados invalidos ou conta de origem invalida\n- 401: Nao autenticado"
               }
             },
             {

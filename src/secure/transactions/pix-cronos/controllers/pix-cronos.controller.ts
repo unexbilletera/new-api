@@ -5,6 +5,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Headers,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -12,6 +13,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../../shared/decorators/current-user.decorator';
@@ -37,7 +39,14 @@ export class PixCronosController {
   @ApiOperation({
     summary: 'Create PIX Cronos transaction',
     description:
-      'Creates a new PIX transaction and fetches recipient information from the Cronos API. Returns recipient data (name, document, bank, account).',
+      'Creates a new PIX transaction and fetches recipient information from the Cronos API. Returns recipient data (name, document, bank, account). Supports idempotency via X-Idempotency-Key header.',
+  })
+  @ApiHeader({
+    name: 'X-Idempotency-Key',
+    description:
+      'Unique key to ensure idempotent requests. If a transaction with this key already exists for the user, the existing transaction is returned instead of creating a duplicate.',
+    required: false,
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @ApiBody({ type: CreatePixCronosDto })
   @ApiResponse({
@@ -78,11 +87,13 @@ export class PixCronosController {
   async create(
     @CurrentUser() user: CurrentUserPayloadDto,
     @Body() dto: CreatePixCronosDto,
+    @Headers('x-idempotency-key') idempotencyKey?: string,
   ) {
     try {
       const transaction = await this.pixCronosService.createTransaction(
         user.id,
         dto,
+        idempotencyKey,
       );
 
       return {

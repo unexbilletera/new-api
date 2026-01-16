@@ -20,6 +20,7 @@ export class PixCronosService {
   async createTransaction(
     userId: string,
     dto: CreatePixCronosDto,
+    idempotencyKey?: string,
   ): Promise<{
     id: string;
     status: string;
@@ -33,6 +34,39 @@ export class PixCronosService {
     targetAccountNumber?: string;
   }> {
     try {
+      // Check for existing transaction with same idempotency key
+      if (idempotencyKey) {
+        const existingTransaction =
+          await this.transactionModel.findByIdempotencyKey(
+            userId,
+            idempotencyKey,
+          );
+
+        if (existingTransaction) {
+          this.logger.info(
+            '[PixCronosService]',
+            `Returning existing transaction for idempotencyKey: ${idempotencyKey}`,
+          );
+          return {
+            id: existingTransaction.id,
+            status: existingTransaction.status,
+            amount: existingTransaction.amount
+              ? Number(existingTransaction.amount)
+              : 0,
+            createdAt: existingTransaction.createdAt,
+            targetName: existingTransaction.targetName || undefined,
+            targetAlias: existingTransaction.targetAlias || undefined,
+            targetTaxDocumentNumber:
+              existingTransaction.targetTaxDocumentNumber || undefined,
+            targetTaxDocumentType:
+              existingTransaction.targetTaxDocumentType || undefined,
+            targetBank: existingTransaction.targetBank || undefined,
+            targetAccountNumber:
+              existingTransaction.targetAccountNumber || undefined,
+          };
+        }
+      }
+
       const { identity } = await this.transactionModel.findSourceAccount(
         userId,
         dto.sourceAccountId,
@@ -98,6 +132,7 @@ export class PixCronosService {
         targetKeyType: dto.targetKeyType,
         targetKeyValue: dto.targetKeyValue,
         description: dto.description,
+        idempotencyKey,
         ...targetInfo,
       });
 
