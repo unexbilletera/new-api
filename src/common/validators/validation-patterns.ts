@@ -9,9 +9,21 @@
 export const ValidationPatterns = {
   /**
    * Verification code: exactly 6 digits
-   * Used for: email verification, SMS verification, password recovery
+   * Used for: SMS verification, phone validation
    */
   CODE_6_DIGITS: /^\d{6}$/,
+
+  /**
+   * Verification code: exactly 8 digits
+   * Used for: email verification, password recovery
+   */
+  CODE_8_DIGITS: /^\d{8}$/,
+
+  /**
+   * Verification code: 6 or 8 digits
+   * Used for: onboarding verification (supports both email and phone codes)
+   */
+  CODE_6_OR_8_DIGITS: /^\d{6}$|^\d{8}$/,
 
   /**
    * Password: exactly 6 digits
@@ -123,6 +135,8 @@ export const ValidationPatterns = {
  */
 export const ValidationMessages = {
   CODE_6_DIGITS: 'Code must be exactly 6 digits',
+  CODE_8_DIGITS: 'Code must be exactly 8 digits',
+  CODE_6_OR_8_DIGITS: 'Code must be exactly 6 or 8 digits',
   PASSWORD_6_DIGITS: 'Password must be exactly 6 digits',
   UUID: 'Must be a valid UUID',
   DATE_YYYY_MM_DD: 'Date must be in YYYY-MM-DD format (e.g., 2004-10-29)',
@@ -153,6 +167,14 @@ export const ValidationOptions = {
   CODE_6_DIGITS: [
     ValidationPatterns.CODE_6_DIGITS,
     { message: ValidationMessages.CODE_6_DIGITS },
+  ],
+  CODE_8_DIGITS: [
+    ValidationPatterns.CODE_8_DIGITS,
+    { message: ValidationMessages.CODE_8_DIGITS },
+  ],
+  CODE_6_OR_8_DIGITS: [
+    ValidationPatterns.CODE_6_OR_8_DIGITS,
+    { message: ValidationMessages.CODE_6_OR_8_DIGITS },
   ],
   PASSWORD_6_DIGITS: [
     ValidationPatterns.PASSWORD_6_DIGITS,

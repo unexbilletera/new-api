@@ -21,9 +21,9 @@ export class VerifyEmailCodeDto {
 
   @ApiProperty({
     description: 'Verification code sent for email validation',
-    example: '123456',
+    example: '12345678',
   })
   @IsString()
-  @Matches(...ValidationOptions.CODE_6_DIGITS)
+  @Matches(...ValidationOptions.CODE_8_DIGITS)
   code: string;
 }

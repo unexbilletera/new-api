@@ -22,7 +22,7 @@ export class VerifyOnboardingCodeDto {
   email: string;
 
   @IsString()
-  @Matches(...ValidationOptions.CODE_6_DIGITS)
+  @Matches(...ValidationOptions.CODE_6_OR_8_DIGITS)
   code: string;
 
   @IsString()
