@@ -142,7 +142,7 @@ export class UpdateIdentityOnboardingDto {
   @IsString()
   @Matches(...SpecializedValidationOptions.DOCUMENT_EXPIRATION)
   rgExpiration?: string;
-x
+
   @IsOptional()
   @IsString()
   documentNumber?: string;
