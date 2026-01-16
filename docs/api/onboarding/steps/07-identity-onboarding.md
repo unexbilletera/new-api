@@ -79,7 +79,18 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 
 ## Update Identity Information
 
-### Request Body
+### Request Body (Brazil - Recommended)
+
+```json
+{
+  "cpf": "12345678900",
+  "rg": "MG1234567",
+  "rgIssuer": "SSP-SP",
+  "rgExpiration": "2030-12-31"
+}
+```
+
+### Request Body (Argentina - Recommended)
 
 ```json
 {
@@ -91,12 +102,65 @@ Requires JWT Bearer token (obtained after completing Phase 1 user onboarding).
 
 ### Request Fields
 
-| Field              | Type   | Required | Description                    |
-| ------------------ | ------ | -------- | ------------------------------ |
-| documentNumber     | string | No       | Identity document number       |
-| documentExpiration | string | No       | Document expiration date       |
-| documentIssuer     | string | No       | Document issuer                |
-| biometricData      | object | No       | Biometric data (if applicable) |
+| Field              | Type   | Required | Description                                          |
+| ------------------ | ------ | -------- | ---------------------------------------------------- |
+| cpf                | string | Yes (BR) | CPF (11 digits) - Mandatory tax document in Brazil   |
+| rg                 | string | No       | RG (Identity document) - Optional identity document in Brazil |
+| rgIssuer           | string | No       | RG issuer (ex: SSP-SP, DETRAN-MG)                   |
+| rgExpiration       | string | No       | RG expiration date (YYYY-MM-DD)                     |
+| documentNumber     | string | No       | Document number (deprecated - use cpf or rg)        |
+| documentExpiration | string | No       | Document expiration date (deprecated)                |
+| documentIssuer     | string | No       | Document issuer (deprecated - use rgIssuer)         |
+| biometricData      | object | No       | Biometric data (if applicable)                       |
+
+### Brazil Flow (Step 3.2)
+
+**Important**: In Brazil:
+- **CPF** is the mandatory tax document (11 digits)
+- **RG** is the optional identity document (6-10 digits)
+
+You can send CPF and RG together or separately:
+
+```json
+{
+  "cpf": "12345678900",
+  "rg": "MG1234567",
+  "rgIssuer": "SSP-SP",
+  "rgExpiration": "2030-12-31"
+}
+```
+
+Or in separate requests:
+
+**First request - CPF**:
+```json
+{
+  "cpf": "12345678900"
+}
+```
+
+**Second request - RG**:
+```json
+{
+  "rg": "MG1234567",
+  "rgIssuer": "SSP-SP",
+  "rgExpiration": "2030-12-31"
+}
+```
+
+### Legacy Compatibility
+
+Old fields still work for backward compatibility:
+
+```json
+{
+  "documentNumber": "12345678900",
+  "documentExpiration": "2025-12-31",
+  "documentIssuer": "SSP-SP"
+}
+```
+
+**Note**: For Brazil, the system attempts to infer whether it's CPF (11 digits) or RG. It is recommended to use the new fields (`cpf`, `rg`, `rgIssuer`, `rgExpiration`) to avoid ambiguity.
 
 ### Response
 

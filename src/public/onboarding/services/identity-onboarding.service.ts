@@ -92,16 +92,46 @@ export class IdentityOnboardingService {
       needsCorrection: [],
     };
 
-    if (dto.documentNumber) {
-      updates.identityDocumentNumber = dto.documentNumber;
-      updates.taxDocumentNumber = dto.documentNumber;
+    if (dto.cpf) {
+      updates.taxDocumentNumber = dto.cpf;
+      updates.taxDocumentType = 'CPF';
     }
-    if (dto.documentIssuer) {
+
+    if (dto.rg) {
+      updates.identityDocumentNumber = dto.rg;
+      updates.identityDocumentType = 'RG';
+    }
+
+    if (dto.rgIssuer) {
+      updates.identityDocumentIssuer = dto.rgIssuer;
+    }
+
+    if (dto.rgExpiration) {
+      updates.identityDocumentIssueDate = new Date(dto.rgExpiration);
+    }
+
+    if (dto.documentNumber && !dto.cpf && !dto.rg) {
+      if (
+        identity.country === 'br' &&
+        dto.documentNumber.replace(/\D/g, '').length === 11
+      ) {
+        updates.taxDocumentNumber = dto.documentNumber;
+        updates.taxDocumentType = 'CPF';
+      } else {
+        updates.identityDocumentNumber = dto.documentNumber;
+        updates.identityDocumentType =
+          identity.country === 'ar' ? 'DNI' : 'RG';
+      }
+    }
+
+    if (dto.documentIssuer && !dto.rgIssuer) {
       updates.identityDocumentIssuer = dto.documentIssuer;
     }
-    if (dto.documentExpiration) {
+
+    if (dto.documentExpiration && !dto.rgExpiration) {
       updates.identityDocumentIssueDate = new Date(dto.documentExpiration);
     }
+
     if (dto.biometricData) {
       updates.notes = JSON.stringify(dto.biometricData);
     }
@@ -110,8 +140,10 @@ export class IdentityOnboardingService {
     if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
       state.completedSteps = [];
     }
-    if (!state.completedSteps.includes('2.2')) {
-      state.completedSteps.push('2.2');
+
+    const stepToComplete = identity.country === 'ar' ? '2.2' : '3.2';
+    if (!state.completedSteps.includes(stepToComplete)) {
+      state.completedSteps.push(stepToComplete);
     }
 
     await this.onboardingModel.updateIdentity(identityId, updates);

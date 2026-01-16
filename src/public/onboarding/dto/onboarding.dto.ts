@@ -127,6 +127,24 @@ export class StartIdentityOnboardingDto {
 export class UpdateIdentityOnboardingDto {
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.CPF)
+  cpf?: string;
+
+  @IsOptional()
+  @IsString()
+  rg?: string;
+
+  @IsOptional()
+  @IsString()
+  rgIssuer?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(...SpecializedValidationOptions.DOCUMENT_EXPIRATION)
+  rgExpiration?: string;
+x
+  @IsOptional()
+  @IsString()
   documentNumber?: string;
 
   @IsOptional()
