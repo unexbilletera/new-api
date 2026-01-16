@@ -126,8 +126,7 @@ export const ValidationPatterns = {
    * Used for: image uploads (liveness, documents, profile pictures)
    * Accepted formats: jpeg, jpg, png, webp
    */
-  IMAGE_DATA_URL:
-    /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/]+=*$/,
+  IMAGE_DATA_URL: /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/]+=*$/,
 } as const;
 
 /**

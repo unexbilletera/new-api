@@ -23,7 +23,10 @@ export class CreatePixCronosDto {
     example: 'uuid-da-conta-origem',
   })
   @IsString()
-  @Matches(SpecializedValidationOptions.SOURCE_ACCOUNT_ID[0], SpecializedValidationOptions.SOURCE_ACCOUNT_ID[1])
+  @Matches(
+    SpecializedValidationOptions.SOURCE_ACCOUNT_ID[0],
+    SpecializedValidationOptions.SOURCE_ACCOUNT_ID[1],
+  )
   sourceAccountId: string;
 
   @ApiProperty({
