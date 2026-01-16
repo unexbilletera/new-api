@@ -94,7 +94,6 @@ export class TransactionCreationService {
         throw error;
       }
       this.logger.warn(`Spending limit check failed: ${error.message}`);
-      // Continue without blocking if service fails
     }
   }
 
@@ -154,7 +153,6 @@ export class TransactionCreationService {
       },
     });
 
-    // Create transaction log
     await this.prisma.transactionsLogs.create({
       data: {
         id: uuidv4(),
@@ -214,7 +212,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for transfer
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -258,7 +255,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for transfer
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -268,7 +264,6 @@ export class TransactionCreationService {
       );
     }
 
-    // Determine if auto-exchange is needed
     const sourceCountry = sourceAccount.usersIdentities?.country?.toLowerCase();
     const isPix = dto.targetType.startsWith('pix_');
     const isCvu = dto.targetType === 'cvu' || dto.targetType === 'cbu';
@@ -276,15 +271,10 @@ export class TransactionCreationService {
     let relatedExchangeId: string | undefined;
     let finalSourceAccountId = dto.sourceAccountId;
 
-    // PIX requires BRL, CVU/CBU requires ARS
     if (isPix && sourceCountry === 'ar') {
-      // Need auto-exchange ARS → BRL
       this.logger.log('Auto-exchange needed: ARS → BRL for PIX transfer');
-      // Auto-exchange would be created here in full implementation
     } else if (isCvu && sourceCountry === 'br') {
-      // Need auto-exchange BRL → ARS
       this.logger.log('Auto-exchange needed: BRL → ARS for CVU transfer');
-      // Auto-exchange would be created here in full implementation
     }
 
     const transaction = await this.createTransactionRecord({
@@ -322,7 +312,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for boleto
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -368,7 +357,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for boleto
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -414,7 +402,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for boleto
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -460,7 +447,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for QR
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -508,7 +494,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for QR
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -556,7 +541,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for QR
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -604,7 +588,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Check spending limits for QR
     if (sourceAccount.usersIdentities?.id) {
       await this.checkSpendingLimits(
         sourceAccount.usersIdentities.id,
@@ -652,7 +635,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Validate rate code
     const rateCodeValid = await this.rateCodeService.validateRateCode(
       dto.rateCode,
       user.id,
@@ -678,7 +660,6 @@ export class TransactionCreationService {
       },
     });
 
-    // Mark rate code as used
     await this.rateCodeService.markRateCodeAsUsed(dto.rateCode, transaction.id);
 
     return {
@@ -703,7 +684,6 @@ export class TransactionCreationService {
       user.id,
     );
 
-    // Validate rate code
     const rateCodeValid = await this.rateCodeService.validateRateCode(
       dto.rateCode,
       user.id,
@@ -729,7 +709,6 @@ export class TransactionCreationService {
       },
     });
 
-    // Mark rate code as used
     await this.rateCodeService.markRateCodeAsUsed(dto.rateCode, transaction.id);
 
     return {
@@ -1016,7 +995,6 @@ export class TransactionCreationService {
       },
     });
 
-    // Create transaction log
     await this.prisma.transactionsLogs.create({
       data: {
         id: uuidv4(),
@@ -1032,10 +1010,8 @@ export class TransactionCreationService {
       },
     });
 
-    // Update spending tracking
     if (transaction.sourceIdentityId) {
       try {
-        // Get identity country
         const identity = await this.prisma.usersIdentities.findUnique({
           where: { id: transaction.sourceIdentityId },
           select: { country: true },
@@ -1094,7 +1070,6 @@ export class TransactionCreationService {
       },
     });
 
-    // Create transaction log
     await this.prisma.transactionsLogs.create({
       data: {
         id: uuidv4(),
@@ -1203,11 +1178,9 @@ export class TransactionCreationService {
     const result = await this.selectTransaction(transactionId, user);
     const transaction = result.transaction;
 
-    // Generate ticket HTML
     const ticketHtml = this.generateTicketHtml(transaction);
 
     if (contentType === 'pdf') {
-      // Return data for PDF generation (would need PDF library integration)
       return {
         success: true,
         contentType: 'pdf',

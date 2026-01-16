@@ -6,7 +6,6 @@ import { SearchQueryDto } from '../../../shared/crud/dto/search-query.dto';
 export class UsersDataService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Users Identities
   async searchIdentities(query: SearchQueryDto, userId?: string) {
     const {
       page = 1,
@@ -120,7 +119,6 @@ export class UsersDataService {
     });
   }
 
-  // Users Identities Grants
   async searchGrants(query: SearchQueryDto, userId?: string) {
     const {
       page = 1,
@@ -199,7 +197,6 @@ export class UsersDataService {
     });
   }
 
-  // Users Accounts
   async searchAccounts(query: SearchQueryDto, userId?: string) {
     const {
       page = 1,

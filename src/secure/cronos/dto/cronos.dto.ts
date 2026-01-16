@@ -70,7 +70,6 @@ export class CronosProxyDto {
   params?: any;
 }
 
-// Response DTOs
 export class RechargeCompanyDto {
   @ApiProperty()
   id: string;

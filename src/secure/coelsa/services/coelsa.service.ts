@@ -13,7 +13,6 @@ export class CoelsaService {
   async getOperationStatus(operationId: string): Promise<any> {
     this.logger.log(`Getting COELSA operation status: ${operationId}`);
 
-    // Try to find in transactions
     const transaction = await this.prisma.transactions.findFirst({
       where: {
         OR: [{ coelsaId: operationId }, { id: operationId }],
@@ -41,8 +40,6 @@ export class CoelsaService {
   async getMerchantByCuit(cuit: string): Promise<any> {
     this.logger.log(`Searching merchant by CUIT: ${cuit}`);
 
-    // This would call COELSA API
-    // For now, return mock data based on CUIT format
     return {
       cuit,
       name: `Merchant ${cuit}`,
@@ -165,7 +162,6 @@ export class CoelsaService {
    */
   async proxyRequest(api: string, body?: any): Promise<any> {
     this.logger.log(`Proxying request to COELSA: ${api}`);
-    // This would be implemented to call the COELSA API directly
     return {
       message: 'Proxy request not implemented',
       api,

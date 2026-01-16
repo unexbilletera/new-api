@@ -82,7 +82,6 @@ export class MantecaWebhookService {
     const mantecaSyntheticId = data.id;
     const mantecaStatus = data.status;
 
-    // Find transaction by mantecaId
     const transaction = await this.prisma.transactions.findFirst({
       where: { mantecaId: mantecaSyntheticId },
     });
@@ -92,13 +91,11 @@ export class MantecaWebhookService {
         `No transaction found with mantecaId: ${mantecaSyntheticId}`,
       );
 
-      // Check if it's a ramp operation
       const rampOperation = await this.prisma.ramp_operations.findFirst({
         where: { manteca_operation_id: mantecaSyntheticId },
       });
 
       if (rampOperation) {
-        // Update ramp operation status
         const newStatus = this.mapMantecaStatusToRampStatus(mantecaStatus);
         await this.prisma.ramp_operations.update({
           where: { id: rampOperation.id },
@@ -126,13 +123,11 @@ export class MantecaWebhookService {
       };
     }
 
-    // Map Manteca status to transaction status
     const newStatus = this.mapMantecaStatusToTransactionStatus(
       mantecaStatus,
       transaction.type,
     );
 
-    // Update transaction
     await this.prisma.transactions.update({
       where: { id: transaction.id },
       data: {
@@ -141,7 +136,6 @@ export class MantecaWebhookService {
       },
     });
 
-    // Log the update
     await this.prisma.transactionsLogs.create({
       data: {
         id: uuidv4(),
@@ -182,7 +176,6 @@ export class MantecaWebhookService {
     const withdrawId = data.id;
     const withdrawStatus = data.status;
 
-    // Only process final statuses
     const finalStatuses = ['EXECUTED', 'CANCELLED', 'FAILED'];
     if (!finalStatuses.includes(withdrawStatus)) {
       return {
@@ -192,7 +185,6 @@ export class MantecaWebhookService {
       };
     }
 
-    // Try to find transaction by mantecaId or externalId
     let transaction = await this.prisma.transactions.findFirst({
       where: {
         mantecaId: withdrawId,
@@ -200,7 +192,6 @@ export class MantecaWebhookService {
       },
     });
 
-    // Try using externalId if not found
     if (!transaction && data.externalId) {
       const baseTransactionId = data.externalId.replace(/-rampOff$/, '');
       transaction = await this.prisma.transactions.findUnique({
@@ -217,10 +208,8 @@ export class MantecaWebhookService {
       };
     }
 
-    // Map status
     const newStatus = this.mapWithdrawStatusToTransactionStatus(withdrawStatus);
 
-    // Update transaction
     await this.prisma.transactions.update({
       where: { id: transaction.id },
       data: {
@@ -229,7 +218,6 @@ export class MantecaWebhookService {
       },
     });
 
-    // Log the update
     await this.prisma.transactionsLogs.create({
       data: {
         id: uuidv4(),
@@ -262,7 +250,6 @@ export class MantecaWebhookService {
   private async processOrderStatusUpdate(data: any): Promise<any> {
     this.logger.log(`Processing ORDER_STATUS_UPDATE for ID: ${data.id}`);
 
-    // Orders are part of Synthetics, so SYNTHETIC_STATUS_UPDATE is primary
     return {
       message:
         'ORDER_STATUS_UPDATE received - processing via Synthetic status is recommended',
@@ -277,7 +264,6 @@ export class MantecaWebhookService {
   private async processDepositStatusUpdate(data: any): Promise<any> {
     this.logger.log(`Processing DEPOSIT_STATUS_UPDATE for ID: ${data.id}`);
 
-    // Check if this relates to a ramp operation
     const rampOperation = await this.prisma.ramp_operations.findFirst({
       where: {
         OR: [
@@ -323,7 +309,6 @@ export class MantecaWebhookService {
         return 'confirm';
       case 'CANCELLED':
       case 'FAILED':
-        // For exchange transactions that fail
         if (
           transactionType.includes('exchange') ||
           transactionType.includes('qr')

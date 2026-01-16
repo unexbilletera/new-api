@@ -45,7 +45,6 @@ export class BindProxyDto {
   body: any;
 }
 
-// Response DTOs
 export class BindAccountDto {
   @ApiProperty()
   id: string;

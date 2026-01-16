@@ -121,7 +121,6 @@ export class RenaperService {
           .toLowerCase() as 'simple' | 'complete') || 'simple',
     };
 
-    // Increase timeout when using SOCKS proxy (slower connections)
     if (this.config.proxy && this.config.timeout < 60000) {
       this.config.timeout = 60000;
       if (this.config.logging) {
@@ -219,7 +218,6 @@ export class RenaperService {
           throw forbiddenError;
         }
 
-        // Non-retryable errors
         if (
           error.message?.includes('not enabled') ||
           error.message?.includes('SOCKS5 proxy not available')
@@ -227,7 +225,6 @@ export class RenaperService {
           throw error;
         }
 
-        // Retryable errors (network, timeout, etc)
         if (attempt < maxRetries) {
           const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
           this.logger.warn(
