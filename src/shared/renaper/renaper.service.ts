@@ -148,7 +148,7 @@ export class RenaperService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async getToken(service: 'vigencia' | 'facial' | 'huella'): Promise<string> {
@@ -188,7 +188,9 @@ export class RenaperService {
         );
 
         if (this.config.logging) {
-          this.logger.log(`RENAPER: Token generated successfully for ${service}`);
+          this.logger.log(
+            `RENAPER: Token generated successfully for ${service}`,
+          );
         }
 
         if (
@@ -218,7 +220,10 @@ export class RenaperService {
         }
 
         // Non-retryable errors
-        if (error.message?.includes('not enabled') || error.message?.includes('SOCKS5 proxy not available')) {
+        if (
+          error.message?.includes('not enabled') ||
+          error.message?.includes('SOCKS5 proxy not available')
+        ) {
           throw error;
         }
 
