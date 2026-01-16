@@ -544,6 +544,23 @@ export class OnboardingService {
       });
     }
 
+    const stepToComplete = country === 'ar' ? '2.1' : '3.1';
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
+    const state = onboardingState as any;
+    if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
+      state.completedSteps = [];
+    }
+    if (!state.completedSteps.includes(stepToComplete)) {
+      state.completedSteps.push(stepToComplete);
+    }
+    await this.prisma.users.update({
+      where: { id: userId },
+      data: { onboardingState },
+    });
+
     return {
       message: 'Identity onboarding started',
       identityId: identity.id,
