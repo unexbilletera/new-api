@@ -13,8 +13,13 @@ import { RateLimiterService } from '../../shared/security/rate-limiter.service';
 @Module({
   imports: [PrismaModule, JwtModule, LoggerModule, AccessLogModule],
   controllers: [AuthController],
-  providers: [AuthService, BackofficeUserModel, BackofficeAuthGuard, BruteForceService, RateLimiterService],
+  providers: [
+    AuthService,
+    BackofficeUserModel,
+    BackofficeAuthGuard,
+    BruteForceService,
+    RateLimiterService,
+  ],
   exports: [AuthService],
 })
 export class BackofficeAuthModule {}
-

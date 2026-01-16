@@ -36,8 +36,12 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Claude Code
+.claude/
+
 # dotenv environment variable files
 .env
+.env.test
 .env.development.local
 .env.test.local
 .env.production.local
@@ -56,7 +60,11 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-/generated/prisma
+/generated
 .env
 env.prod
 env.sandbox
+
+# Remove logs from ignore for backoffice
+!src/backoffice/logs/
+!src/backoffice/logs/**

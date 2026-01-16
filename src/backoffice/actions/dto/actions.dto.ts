@@ -2,68 +2,70 @@ import { IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateActionDto {
-  @ApiProperty({ description: 'Nome/código da ação' })
+  @ApiProperty({ description: 'Action name/code' })
   @IsString()
   code: string;
 
-  @ApiProperty({ description: 'Descrição da ação' })
+  @ApiProperty({ description: 'Action description' })
   @IsString()
   description: string;
 
-  @ApiPropertyOptional({ description: 'Grupo/módulo da ação' })
+  @ApiPropertyOptional({ description: 'Action group/module' })
   @IsString()
   @IsOptional()
   group?: string;
 
-  @ApiPropertyOptional({ description: 'Se a ação está ativa' })
+  @ApiPropertyOptional({ description: 'Whether the action is active' })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
 
-  @ApiPropertyOptional({ description: 'Metadados adicionais (icon, order, etc)' })
+  @ApiPropertyOptional({
+    description: 'Additional metadata (icon, order, etc)',
+  })
   @IsOptional()
   metadata?: { icon?: string; order?: number };
 }
 
 export class UpdateActionDto {
-  @ApiPropertyOptional({ description: 'Descrição da ação' })
+  @ApiPropertyOptional({ description: 'Action description' })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'Grupo/módulo da ação' })
+  @ApiPropertyOptional({ description: 'Action group/module' })
   @IsString()
   @IsOptional()
   group?: string;
 
-  @ApiPropertyOptional({ description: 'Se a ação está ativa' })
+  @ApiPropertyOptional({ description: 'Whether the action is active' })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
 }
 
 export class ListActionsQueryDto {
-  @ApiPropertyOptional({ description: 'Grupo/módulo das ações' })
+  @ApiPropertyOptional({ description: 'Action group/module' })
   @IsString()
   @IsOptional()
   group?: string;
 
-  @ApiPropertyOptional({ description: 'Busca por nome ou descrição' })
+  @ApiPropertyOptional({ description: 'Search by name or description' })
   @IsString()
   @IsOptional()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'Filtrar apenas ativas' })
+  @ApiPropertyOptional({ description: 'Filter only active actions' })
   @IsBoolean()
   @IsOptional()
   activeOnly?: boolean;
 
-  @ApiPropertyOptional({ description: 'Página' })
+  @ApiPropertyOptional({ description: 'Page number' })
   @IsNumber()
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Limite por página' })
+  @ApiPropertyOptional({ description: 'Items per page limit' })
   @IsNumber()
   @IsOptional()
   limit?: number;

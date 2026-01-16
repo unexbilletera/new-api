@@ -20,7 +20,7 @@ export class OnboardingMapper {
   ): StartUserOnboardingResponseDto {
     return {
       success: true,
-      message: 'Onboarding iniciado com sucesso',
+      message: 'Onboarding started successfully',
       userId,
       onboardingState,
       nextStep: 'emailForm',
@@ -34,17 +34,20 @@ export class OnboardingMapper {
   ): VerifyOnboardingCodeResponseDto {
     return {
       success: true,
-      message: 'Código verificado com sucesso',
+      message: 'Code verified successfully',
       userId,
       onboardingState,
       nextStep,
     };
   }
 
-  toUpdateUserOnboardingResponseDto(user: any, onboardingState: any): UpdateUserOnboardingResponseDto {
+  toUpdateUserOnboardingResponseDto(
+    user: any,
+    onboardingState: any,
+  ): UpdateUserOnboardingResponseDto {
     return {
       success: true,
-      message: 'Dados atualizados com sucesso',
+      message: 'Data updated successfully',
       user: {
         id: user.id,
         email: user.email,
@@ -55,21 +58,27 @@ export class OnboardingMapper {
     };
   }
 
-  toStartIdentityOnboardingResponseDto(identityId: string): StartIdentityOnboardingResponseDto {
+  toStartIdentityOnboardingResponseDto(
+    identityId: string,
+  ): StartIdentityOnboardingResponseDto {
     return {
       message: 'Identity onboarding started',
       identityId,
     };
   }
 
-  toUpdateIdentityOnboardingResponseDto(identityId: string): UpdateIdentityOnboardingResponseDto {
+  toUpdateIdentityOnboardingResponseDto(
+    identityId: string,
+  ): UpdateIdentityOnboardingResponseDto {
     return {
       message: 'Identity updated successfully',
       identityId,
     };
   }
 
-  toUploadArgentinaDocumentResponseDto(onboardingState: any): UploadArgentinaDocumentResponseDto {
+  toUploadArgentinaDocumentResponseDto(
+    onboardingState: any,
+  ): UploadArgentinaDocumentResponseDto {
     return {
       message: 'Document uploaded successfully',
       onboardingState,
@@ -90,9 +99,12 @@ export class OnboardingMapper {
     requiredSteps: string[],
     completedSteps: string[],
   ): OnboardingStatusResponseDto {
-    const pendingSteps = requiredSteps.filter((step) => !completedSteps.includes(step));
+    const pendingSteps = requiredSteps.filter(
+      (step) => !completedSteps.includes(step),
+    );
     const completionPercentage = Math.round(
-      ((requiredSteps.length - pendingSteps.length) / requiredSteps.length) * 100,
+      ((requiredSteps.length - pendingSteps.length) / requiredSteps.length) *
+        100,
     );
 
     return {
@@ -102,7 +114,9 @@ export class OnboardingMapper {
     };
   }
 
-  toValidateOnboardingDataResponseDto(errors: string[]): ValidateOnboardingDataResponseDto {
+  toValidateOnboardingDataResponseDto(
+    errors: string[],
+  ): ValidateOnboardingDataResponseDto {
     return {
       isValid: errors.length === 0,
       errors,

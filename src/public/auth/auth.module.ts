@@ -54,6 +54,14 @@ import { SuspiciousActivityService } from '../../shared/security/suspicious-acti
     RateLimiterService,
     SuspiciousActivityService,
   ],
-  exports: [AuthService, SignupService, SigninService, EmailValidationService, PhoneValidationService, PasswordRecoveryService, TokenService],
+  exports: [
+    AuthService,
+    SignupService,
+    SigninService,
+    EmailValidationService,
+    PhoneValidationService,
+    PasswordRecoveryService,
+    TokenService,
+  ],
 })
 export class PublicAuthModule {}

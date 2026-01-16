@@ -19,7 +19,7 @@ export class RoleModel {
   }
 
   async findById(id: string) {
-    return this.prisma.backofficeRoles.findUnique({
+    return this.prisma.backofficeRoles.findFirst({
       where: { id },
     });
   }

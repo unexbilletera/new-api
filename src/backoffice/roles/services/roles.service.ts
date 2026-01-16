@@ -1,34 +1,40 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { CreateRoleDto, UpdateRoleDto, RoleResponseDto } from '../dto/role.dto';
 import { randomUUID } from 'crypto';
 
 @Injectable()
 export class RolesService {
-  constructor(private prisma: PrismaService) {}  async list(): Promise<RoleResponseDto[]> {
+  constructor(private prisma: PrismaService) {}
+  async list(): Promise<RoleResponseDto[]> {
     const roles = await this.prisma.backofficeRoles.findMany({
       orderBy: { level: 'desc' },
     });
 
     return roles.map(this.mapToResponse);
-  }  async get(id: string): Promise<RoleResponseDto> {
-    const role = await this.prisma.backofficeRoles.findUnique({
+  }
+  async get(id: string): Promise<RoleResponseDto> {
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id },
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     return this.mapToResponse(role);
-  }  async create(dto: CreateRoleDto): Promise<RoleResponseDto> {
-
+  }
+  async create(dto: CreateRoleDto): Promise<RoleResponseDto> {
     const existing = await this.prisma.backofficeRoles.findFirst({
       where: { name: dto.name },
     });
 
     if (existing) {
-      throw new ConflictException('Já existe uma role com este nome');
+      throw new ConflictException('A role with this name already exists');
     }
 
     const role = await this.prisma.backofficeRoles.create({
@@ -43,13 +49,14 @@ export class RolesService {
     });
 
     return this.mapToResponse(role);
-  }  async update(id: string, dto: UpdateRoleDto): Promise<RoleResponseDto> {
-    const role = await this.prisma.backofficeRoles.findUnique({
+  }
+  async update(id: string, dto: UpdateRoleDto): Promise<RoleResponseDto> {
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id },
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     if (dto.name && dto.name !== role.name) {
@@ -57,7 +64,7 @@ export class RolesService {
         where: { name: dto.name },
       });
       if (existing) {
-        throw new ConflictException('Já existe uma role com este nome');
+        throw new ConflictException('A role with this name already exists');
       }
     }
 
@@ -72,13 +79,14 @@ export class RolesService {
     });
 
     return this.mapToResponse(updated);
-  }  async delete(id: string): Promise<{ success: boolean; message: string }> {
-    const role = await this.prisma.backofficeRoles.findUnique({
+  }
+  async delete(id: string): Promise<{ success: boolean; message: string }> {
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id },
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     const usersWithRole = await this.prisma.backofficeUsers.count({
@@ -87,7 +95,7 @@ export class RolesService {
 
     if (usersWithRole > 0) {
       throw new ConflictException(
-        `Não é possível deletar. ${usersWithRole} usuário(s) usando esta role`,
+        `Cannot delete. ${usersWithRole} user(s) using this role`,
       );
     }
 
@@ -95,7 +103,7 @@ export class RolesService {
       where: { id },
     });
 
-    return { success: true, message: 'Role deletada com sucesso' };
+    return { success: true, message: 'Role deleted successfully' };
   }
 
   private mapToResponse(role: any): RoleResponseDto {

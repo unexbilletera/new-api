@@ -1,5 +1,13 @@
-import { IsString, IsNumber, IsOptional, Min, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  Min,
+  IsEnum,
+  Matches,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { SpecializedValidationOptions } from '../../../../../common/validators';
 import { IsValidPixKeyFormat } from '../validators/pix-key-format.validator';
 
 export enum PixKeyType {
@@ -16,10 +24,14 @@ export class CreatePixCronosDto {
     example: 'uuid-da-conta-origem',
   })
   @IsString()
+  @Matches(
+    SpecializedValidationOptions.SOURCE_ACCOUNT_ID[0],
+    SpecializedValidationOptions.SOURCE_ACCOUNT_ID[1],
+  )
   sourceAccountId: string;
 
   @ApiProperty({
-    description: 'Valor da transferência (mínimo 0.01)',
+    description: 'Transfer amount (minimum 0.01)',
     example: 100.5,
     minimum: 0.01,
   })
@@ -28,7 +40,7 @@ export class CreatePixCronosDto {
   amount: number;
 
   @ApiProperty({
-    description: 'Tipo da chave PIX do destinatário',
+    description: 'Recipient PIX key type',
     enum: PixKeyType,
     example: 'cpf',
   })
@@ -36,7 +48,7 @@ export class CreatePixCronosDto {
   targetKeyType: PixKeyType;
 
   @ApiProperty({
-    description: 'Valor da chave PIX do destinatário',
+    description: 'Recipient PIX key value',
     example: '12345678900',
   })
   @IsString()
@@ -47,8 +59,8 @@ export class CreatePixCronosDto {
   targetKeyValue: string;
 
   @ApiProperty({
-    description: 'Descrição da transferência (opcional)',
-    example: 'Transferência PIX teste',
+    description: 'Transfer description (optional)',
+    example: 'PIX transfer test',
     required: false,
   })
   @IsString()

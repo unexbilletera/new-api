@@ -34,27 +34,24 @@ export class BackofficeAuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token não fornecido');
+      throw new UnauthorizedException('Token not provided');
     }
 
     try {
       const payload = await this.jwtService.verifyToken(token);
-      const user = await this.prisma.backofficeUsers.findUnique({
-        where: {
-          id: payload.userId,
-          deletedAt: null,
-        },
+      const user = await this.prisma.backofficeUsers.findFirst({
+        where: { id: payload.userId },
         include: {
           backofficeRoles: true,
         },
       });
 
       if (!user) {
-        throw new UnauthorizedException('Usuário não encontrado');
+        throw new UnauthorizedException('User not found');
       }
 
       if (user.status !== 'active') {
-        throw new UnauthorizedException('Usuário inativo');
+        throw new UnauthorizedException('Inactive user');
       }
       request.user = {
         id: user.id,
@@ -69,7 +66,7 @@ export class BackofficeAuthGuard implements CanActivate {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw new UnauthorizedException('Token inválido ou expirado');
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 

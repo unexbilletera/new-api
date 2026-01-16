@@ -11,18 +11,18 @@ async function bootstrap() {
   const logger = app.get(LoggerService);
   const workerService = app.get(WorkerService);
 
-  logger.info('Worker iniciando...');
+  logger.info('Worker starting...');
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 
   workerService.start().catch((error) => {
     logger.error(
-      `Erro fatal no worker: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      `Fatal worker error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );
     process.exit(1);
   });
 
   const shutdown = async (signal: string) => {
-    logger.info(`Recebido sinal ${signal}. Encerrando worker...`);
+    logger.info(`Received signal ${signal}. Shutting down worker...`);
     workerService.stop();
     await app.close();
     process.exit(0);

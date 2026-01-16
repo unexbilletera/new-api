@@ -1,28 +1,23 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-// Import types from generated/prisma for TypeScript type checking
+import { LoggerService } from '../logger/logger.service';
 import type {
   PrismaClient as GeneratedPrismaClient,
   Prisma,
 } from '../../../generated/prisma';
 
-// Runtime import - load PrismaClient dynamically from generated/prisma
-// This works in both development (from src/) and production (from dist/)
 interface PrismaModule {
   PrismaClient: new (...args: unknown[]) => GeneratedPrismaClient;
 }
 
 function loadPrismaClient(): new (...args: unknown[]) => GeneratedPrismaClient {
   const paths = [
-    '../../../generated/prisma', // From src/shared/prisma/ (development - watch mode)
-    '../../generated/prisma', // From dist/src/shared/prisma/ (production - compiled)
-    '../../../../generated/prisma', // Fallback: from project root (if generated/prisma exists in root)
+    '../../../generated/prisma',
+    '../../generated/prisma',
+    '../../../../generated/prisma',
   ];
 
   for (const modulePath of paths) {
     try {
-      // Dynamic require is necessary to load PrismaClient at runtime
-      // The Prisma client is generated in generated/prisma, not node_modules/.prisma/client
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
       const prismaModule = require(modulePath) as unknown;
       if (
         prismaModule &&
@@ -34,7 +29,6 @@ function loadPrismaClient(): new (...args: unknown[]) => GeneratedPrismaClient {
         return (prismaModule as PrismaModule).PrismaClient;
       }
     } catch {
-      // Path not found, try next
       continue;
     }
   }
@@ -46,18 +40,6 @@ function loadPrismaClient(): new (...args: unknown[]) => GeneratedPrismaClient {
 
 const PrismaClientClass = loadPrismaClient();
 
-/**
- * PrismaService com tipagem correta
- * Estende PrismaClient para garantir type safety
- * Usa PrismaClient gerado em generated/prisma (custom output location)
- *
- * TypeScript usa os tipos de GeneratedPrismaClient para autocomplete e type checking
- * Runtime usa o cliente carregado dinamicamente de generated/prisma
- *
- * IMPORTANT: This class is typed as GeneratedPrismaClient, but the actual implementation
- * is loaded dynamically at runtime. TypeScript will provide full type checking and
- * autocomplete for all Prisma models (users, transactions, backofficeUsers, etc.)
- */
 @Injectable()
 export class PrismaService
   extends (PrismaClientClass as unknown as new (
@@ -65,7 +47,26 @@ export class PrismaService
   ) => GeneratedPrismaClient)
   implements OnModuleInit, OnModuleDestroy, GeneratedPrismaClient
 {
-  constructor() {
+  private readonly softDeleteModels = [
+    'users',
+    'usersIdentities',
+    'usersAccounts',
+    'transactions',
+    'accreditations',
+    'benefits',
+    'cards',
+    'campaign_codes',
+    'challenges',
+    'contacts',
+    'notifications',
+    'stores',
+    'branches',
+    'sailpoints',
+    'backofficeRoles',
+    'backofficeUsers',
+  ];
+
+  constructor(private logger: LoggerService) {
     super({
       log: [
         {
@@ -81,6 +82,49 @@ export class PrismaService
     });
 
     this.setupQueryLogger();
+    this.setupSoftDeleteMiddleware();
+    this.setupSlowQueryLogging();
+  }
+
+  private setupSoftDeleteMiddleware(): void {
+    this.$use(async (params, next) => {
+      const { model, action, args } = params;
+
+      if (
+        model &&
+        this.softDeleteModels.includes(model as string) &&
+        action &&
+        ['findFirst', 'findMany', 'count'].includes(action as string)
+      ) {
+        if (args.where) {
+          args.where = {
+            AND: [args.where, { deletedAt: null }],
+          };
+        } else {
+          args.where = { deletedAt: null };
+        }
+      }
+
+      return next(params);
+    });
+  }
+
+  private setupSlowQueryLogging(): void {
+    this.$use(async (params, next) => {
+      const start = Date.now();
+      const result = await next(params);
+      const duration = Date.now() - start;
+
+      if (duration > 1000) {
+        const model = params.model || 'unknown';
+        const action = params.action || 'unknown';
+        this.logger.warn(
+          `Slow query detected: ${model}.${action} took ${duration}ms`,
+        );
+      }
+
+      return result;
+    });
   }
 
   private setupQueryLogger(): void {
@@ -108,7 +152,40 @@ export class PrismaService
   }
 
   async onModuleInit(): Promise<void> {
-    await this.$connect();
+    try {
+      await this.$connect();
+      this.logger.info('Database connection established successfully');
+    } catch (error: any) {
+      const errorMessage = error?.message || '';
+      let host = 'unknown';
+      let port = 'unknown';
+
+      const hostPortMatch = errorMessage.match(/at `([^:]+):(\d+)`/);
+      if (hostPortMatch) {
+        host = hostPortMatch[1];
+        port = hostPortMatch[2];
+      } else {
+        const dbUrl =
+          process.env.DATABASE_URL || process.env.WALLET_MYSQL_URL || '';
+        if (dbUrl) {
+          const urlMatch = dbUrl.match(/@([^:]+):(\d+)/);
+          if (urlMatch) {
+            host = urlMatch[1];
+            port = urlMatch[2];
+          }
+        }
+      }
+
+      this.logger.error(
+        `Database connection failed: Cannot reach database server at ${host}:${port}`,
+        error instanceof Error ? error : new Error(errorMessage),
+        {
+          errorCode: error?.errorCode || 'P1001',
+        },
+      );
+
+      throw error;
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
@@ -116,6 +193,4 @@ export class PrismaService
   }
 }
 
-// Type assertion to make TypeScript recognize PrismaService as GeneratedPrismaClient
-// This allows autocomplete and type checking for all Prisma models
 export type PrismaServiceType = GeneratedPrismaClient;

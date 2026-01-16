@@ -37,7 +37,8 @@ export class SmsService {
   }
 
   normalizePhone(phone: string): string {
-    return phone.replace(/\D/g, '');
+    const cleaned = phone.replace(/[^\d+]/g, '');
+    return cleaned.replace(/^(\+\d{2})(\d+)$/, '$1 $2');
   }
 
   async sendValidationCode(
@@ -82,10 +83,15 @@ export class SmsService {
         code,
         expiresInMinutes,
       );
-      this.logger.info('[SMS] Validation code sent', {
-        phone: normalizedPhone,
-        method: method,
-      });
+      this.logger.success(
+        `SMS verification code sent successfully - Code: ${code}`,
+        {
+          phone: normalizedPhone,
+          code: code,
+          method: method,
+          expiresIn: `${expiresInMinutes} minutes`,
+        },
+      );
     } catch (error) {
       this.logger.error('[SMS] Failed to send validation code', error, {
         phone: normalizedPhone,
@@ -152,13 +158,28 @@ export class SmsService {
     const mockCode = this.appConfigService.getMockCode6Digits();
 
     if (mockCodesEnabled && code === mockCode) {
-      this.logger.info('[SMS VALIDATION] Mock code accepted', {
+      this.logger.success('SMS verification mock code accepted', {
         code: code,
+        type: 'mock',
       });
       return true;
     }
 
-    return bcrypt.compareSync(code, storedHash);
+    const isValid = bcrypt.compareSync(code, storedHash);
+
+    if (isValid) {
+      this.logger.success('SMS verification code validated successfully', {
+        code: code,
+        type: 'real',
+      });
+    } else {
+      this.logger.warn('SMS verification code validation failed', {
+        code: code,
+        reason: 'Invalid code',
+      });
+    }
+
+    return isValid;
   }
 
   isMockCode(code: string): boolean {

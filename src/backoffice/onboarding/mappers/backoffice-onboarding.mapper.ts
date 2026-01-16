@@ -9,7 +9,9 @@ import {
 
 @Injectable()
 export class BackofficeOnboardingMapper {
-  toOnboardingIdentityResponseDto(identity: any): OnboardingIdentityResponseDto {
+  toOnboardingIdentityResponseDto(
+    identity: any,
+  ): OnboardingIdentityResponseDto {
     return {
       id: identity.id,
       userId: identity.userId,
@@ -47,7 +49,9 @@ export class BackofficeOnboardingMapper {
     };
   }
 
-  toApproveOnboardingResponseDto(identityId: string): ApproveOnboardingResponseDto {
+  toApproveOnboardingResponseDto(
+    identityId: string,
+  ): ApproveOnboardingResponseDto {
     return {
       message: 'Onboarding approved successfully',
       identityId,
@@ -56,7 +60,10 @@ export class BackofficeOnboardingMapper {
     };
   }
 
-  toRejectOnboardingResponseDto(identityId: string, reason: string): RejectOnboardingResponseDto {
+  toRejectOnboardingResponseDto(
+    identityId: string,
+    reason: string,
+  ): RejectOnboardingResponseDto {
     return {
       message: 'Onboarding rejected successfully',
       identityId,

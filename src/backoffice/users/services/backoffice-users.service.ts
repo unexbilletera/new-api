@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
 import {
@@ -11,7 +15,8 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class BackofficeUsersService {
-  constructor(private prisma: PrismaService) {}  async list(query: ListBackofficeUsersQueryDto): Promise<{
+  constructor(private prisma: PrismaService) {}
+  async list(query: ListBackofficeUsersQueryDto): Promise<{
     data: BackofficeUserResponseDto[];
     total: number;
     page: number;
@@ -57,20 +62,23 @@ export class BackofficeUsersService {
       page,
       limit,
     };
-  }  async get(id: string): Promise<BackofficeUserResponseDto> {
+  }
+  async get(id: string): Promise<BackofficeUserResponseDto> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id, deletedAt: null },
       include: { backofficeRoles: true },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     return this.mapToResponse(user);
-  }  async create(dto: CreateBackofficeUserDto): Promise<BackofficeUserResponseDto> {
-
-    const existing = await this.prisma.backofficeUsers.findUnique({
+  }
+  async create(
+    dto: CreateBackofficeUserDto,
+  ): Promise<BackofficeUserResponseDto> {
+    const existing = await this.prisma.backofficeUsers.findFirst({
       where: { email: dto.email.toLowerCase() },
     });
 
@@ -78,12 +86,12 @@ export class BackofficeUsersService {
       throw new ConflictException('Email já está em uso');
     }
 
-    const role = await this.prisma.backofficeRoles.findUnique({
+    const role = await this.prisma.backofficeRoles.findFirst({
       where: { id: dto.roleId },
     });
 
     if (!role) {
-      throw new NotFoundException('Role não encontrada');
+      throw new NotFoundException('Role not found');
     }
 
     const hashedPassword = await PasswordHelper.hash(dto.password);
@@ -103,17 +111,21 @@ export class BackofficeUsersService {
     });
 
     return this.mapToResponse(user);
-  }  async update(id: string, dto: UpdateBackofficeUserDto): Promise<BackofficeUserResponseDto> {
+  }
+  async update(
+    id: string,
+    dto: UpdateBackofficeUserDto,
+  ): Promise<BackofficeUserResponseDto> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     if (dto.email && dto.email.toLowerCase() !== user.email) {
-      const existing = await this.prisma.backofficeUsers.findUnique({
+      const existing = await this.prisma.backofficeUsers.findFirst({
         where: { email: dto.email.toLowerCase() },
       });
       if (existing) {
@@ -122,11 +134,11 @@ export class BackofficeUsersService {
     }
 
     if (dto.roleId) {
-      const role = await this.prisma.backofficeRoles.findUnique({
+      const role = await this.prisma.backofficeRoles.findFirst({
         where: { id: dto.roleId },
       });
       if (!role) {
-        throw new NotFoundException('Role não encontrada');
+        throw new NotFoundException('Role not found');
       }
     }
 
@@ -149,13 +161,14 @@ export class BackofficeUsersService {
     });
 
     return this.mapToResponse(updated);
-  }  async delete(id: string): Promise<{ success: boolean; message: string }> {
+  }
+  async delete(id: string): Promise<{ success: boolean; message: string }> {
     const user = await this.prisma.backofficeUsers.findFirst({
       where: { id, deletedAt: null },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     await this.prisma.backofficeUsers.update({
@@ -163,7 +176,7 @@ export class BackofficeUsersService {
       data: { deletedAt: new Date() },
     });
 
-    return { success: true, message: 'Usuário deletado com sucesso' };
+    return { success: true, message: 'User deleted successfully' };
   }
 
   private mapToResponse(user: any): BackofficeUserResponseDto {

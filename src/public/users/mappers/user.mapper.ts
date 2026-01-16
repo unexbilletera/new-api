@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import {
   UserProfileResponseDto,
+  UserProfileFullResponseDto,
   IdentityResponseDto,
+  IdentityLightDto,
   AccountResponseDto,
-  OnboardingStateDto,
+  AccountLightDto,
   ExchangeRatesDto,
-  UserDataDto,
   EmailChangeRequestResponseDto,
   EmailChangeConfirmResponseDto,
   ProfileUpdateResponseDto,
-  UserProfileUpdateDto,
   PasswordChangeResponseDto,
   AddressUpdateResponseDto,
-  AddressDataDto,
 } from '../dto/response';
 
 @Injectable()
@@ -27,7 +26,47 @@ export class UserMapper {
     };
 
     return {
-      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        name: user.name,
+        status: user.status,
+        access: user.access,
+        language: user.language,
+        country: user.country,
+        birthdate: user.birthdate,
+        gender: user.gender,
+        maritalStatus: user.maritalStatus,
+        emailVerified: !!user.emailVerifiedAt,
+        phoneVerified: !!user.phoneVerifiedAt,
+        livenessVerified: !!user.livenessVerifiedAt,
+        onboardingState,
+        usersIdentities: user.usersIdentities.map((i: any) =>
+          this.toIdentityLightDto(i),
+        ),
+        usersAccounts: user.usersAccounts.map((a: any) =>
+          this.toAccountLightDto(a),
+        ),
+        createdAt: user.createdAt,
+      },
+      forceUpgrade: options?.forceUpgrade || false,
+      ...(options?.exchangeRates && { exchangeRates: options.exchangeRates }),
+    };
+  }
+
+  toProfileFullResponseDto(
+    user: any,
+    options?: { exchangeRates?: ExchangeRatesDto; forceUpgrade?: boolean },
+  ): UserProfileFullResponseDto {
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
+
+    return {
       user: {
         id: user.id,
         email: user.email,
@@ -50,13 +89,28 @@ export class UserMapper {
         phoneVerifiedAt: user.phoneVerifiedAt,
         livenessVerifiedAt: user.livenessVerifiedAt,
         onboardingState,
-        usersIdentities: user.usersIdentities.map((i: any) => this.toIdentityResponseDto(i)),
-        usersAccounts: user.usersAccounts.map((a: any) => this.toAccountResponseDto(a)),
+        usersIdentities: user.usersIdentities.map((i: any) =>
+          this.toIdentityResponseDto(i),
+        ),
+        usersAccounts: user.usersAccounts.map((a: any) =>
+          this.toAccountResponseDto(a),
+        ),
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
       forceUpgrade: options?.forceUpgrade || false,
       exchangeRates: options?.exchangeRates || null,
+    };
+  }
+
+  private toIdentityLightDto(identity: any): IdentityLightDto {
+    return {
+      id: identity.id,
+      country: identity.country,
+      status: identity.status,
+      type: identity.type,
+      subtype: identity.subtype,
+      name: identity.name,
     };
   }
 
@@ -77,6 +131,17 @@ export class UserMapper {
     };
   }
 
+  private toAccountLightDto(account: any): AccountLightDto {
+    return {
+      id: account.id,
+      type: account.type,
+      status: account.status,
+      cvu: account.cvu,
+      alias: account.alias,
+      balance: account.balance?.toString() || null,
+    };
+  }
+
   private toAccountResponseDto(account: any): AccountResponseDto {
     return {
       id: account.id,
@@ -85,22 +150,26 @@ export class UserMapper {
       status: account.status,
       cvu: account.cvu,
       alias: account.alias,
-      balance: account.balance,
+      balance: account.balance?.toString() || null,
       createdAt: account.createdAt,
     };
   }
 
-  toEmailChangeRequestResponseDto(email: string, expiresIn: number, debug?: any): EmailChangeRequestResponseDto {
+  toEmailChangeRequestResponseDto(
+    email: string,
+    expiresIn: number,
+  ): EmailChangeRequestResponseDto {
     return {
       success: true,
       message: 'users.messages.emailChangeCodeSent',
       email,
       expiresIn,
-      debug,
     };
   }
 
-  toEmailChangeConfirmResponseDto(email: string): EmailChangeConfirmResponseDto {
+  toEmailChangeConfirmResponseDto(
+    email: string,
+  ): EmailChangeConfirmResponseDto {
     return {
       success: true,
       message: 'users.messages.emailChangedSuccessfully',

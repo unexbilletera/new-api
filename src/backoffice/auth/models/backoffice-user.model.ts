@@ -4,7 +4,11 @@ import { Injectable } from '@nestjs/common';
 import { LoginDto } from '../dto/login.dto';
 import { LoginResponseDto } from '../dto/login-response.dto';
 import { JwtService } from '../../../shared/jwt/jwt.service';
-import { ErrorCodes, ErrorHelper, SuccessCodes } from '../../../shared/errors/app-error';
+import {
+  ErrorCodes,
+  ErrorHelper,
+  SuccessCodes,
+} from '../../../shared/errors/app-error';
 
 @Injectable()
 export class BackofficeUserModel {
@@ -13,19 +17,14 @@ export class BackofficeUserModel {
     private jwtService: JwtService,
   ) {}
   async findByEmail(email: string) {
-    return this.prisma.backofficeUsers.findUnique({
-      where: {
-        email,
-        deletedAt: null,
-      },
+    return this.prisma.backofficeUsers.findFirst({
+      where: { email },
       include: {
         backofficeRoles: true,
       },
     });
   }
-  async validateCredentials(
-    loginDto: LoginDto,
-  ): Promise<LoginResponseDto> {
+  async validateCredentials(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.findByEmail(loginDto.email);
 
     if (!user) {
@@ -71,11 +70,8 @@ export class BackofficeUserModel {
     };
   }
   async findById(id: string) {
-    const user = await this.prisma.backofficeUsers.findUnique({
-      where: {
-        id,
-        deletedAt: null,
-      },
+    const user = await this.prisma.backofficeUsers.findFirst({
+      where: { id },
       include: {
         backofficeRoles: true,
       },
@@ -88,4 +84,3 @@ export class BackofficeUserModel {
     return user;
   }
 }
-

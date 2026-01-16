@@ -1,5 +1,24 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request, ForbiddenException } from '@nestjs/common';
-import { AuthGuard } from '../../../shared/guards/auth.guard';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+  ForbiddenException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import {
   UpdateUserProfileDto,
@@ -49,6 +68,8 @@ interface AuthenticatedUser {
   roleId?: string;
 }
 
+@ApiTags('1.2 Public - Users')
+@ApiBearerAuth('JWT-auth')
 @Controller('api/users')
 export class UserController {
   constructor(
@@ -65,16 +86,53 @@ export class UserController {
   ) {}
 
   @Get('user/me')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Get current user data',
+    description:
+      "Returns essential information about the authenticated user's profile. Use ?include=rates to include exchange rates.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User data returned successfully',
+    type: UserProfileResponseDto,
+  })
+  @ApiQuery({
+    name: 'systemVersion',
+    required: false,
+    description: 'Client system version',
+  })
+  @ApiQuery({
+    name: 'include',
+    required: false,
+    description: 'Include additional data (e.g., "rates" for exchange rates)',
+    example: 'rates',
+  })
   async getCurrentUser(
     @CurrentUser() user: AuthenticatedUser,
     @Query('systemVersion') systemVersion?: string,
+    @Query('include') include?: string,
   ): Promise<UserProfileResponseDto> {
-    return this.userProfileService.getCurrentUser(user.id, systemVersion);
+    const includeRates = include === 'rates';
+    return this.userProfileService.getCurrentUser(
+      user.id,
+      systemVersion,
+      includeRates,
+    );
   }
 
   @Post('user/change-email/request')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Request email change',
+    description: 'Initiates the user email change process',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Change request sent successfully',
+    type: EmailChangeRequestResponseDto,
+  })
+  @ApiBody({ type: RequestEmailChangeDto })
   async requestEmailChange(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: RequestEmailChangeDto,
@@ -83,7 +141,17 @@ export class UserController {
   }
 
   @Post('user/change-email/confirm')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Confirm email change',
+    description: 'Confirms the email change with the sent code',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Email changed successfully',
+    type: EmailChangeConfirmResponseDto,
+  })
+  @ApiBody({ type: ConfirmEmailChangeDto })
   async confirmEmailChange(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ConfirmEmailChangeDto,
@@ -92,7 +160,17 @@ export class UserController {
   }
 
   @Post('user/address')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Update address',
+    description: "Updates the user's registered address",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Address updated successfully',
+    type: AddressUpdateResponseDto,
+  })
+  @ApiBody({ type: UpdateAddressDto })
   async updateAddress(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateAddressDto,
@@ -101,7 +179,17 @@ export class UserController {
   }
 
   @Post('user/profile')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Update profile',
+    description: "Updates the user's profile information",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile updated successfully',
+    type: ProfileUpdateResponseDto,
+  })
+  @ApiBody({ type: UpdateUserProfileDto })
   async updateProfile(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateUserProfileDto,
@@ -110,7 +198,17 @@ export class UserController {
   }
 
   @Post('user/change-password')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Change password',
+    description: "Changes the authenticated user's password",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Password changed successfully',
+    type: PasswordChangeResponseDto,
+  })
+  @ApiBody({ type: ChangePasswordDto })
   async changePassword(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ChangePasswordDto,
@@ -123,11 +221,24 @@ export class UserController {
       'unknown';
     const userAgent = (req.headers['user-agent'] as string) || undefined;
 
-    return this.passwordService.changePassword(user.id, dto, { ipAddress, userAgent });
+    return this.passwordService.changePassword(user.id, dto, {
+      ipAddress,
+      userAgent,
+    });
   }
 
   @Post('user/signout')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Logout',
+    description: "Ends the authenticated user's session",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout successful',
+    type: SignoutResponseDto,
+  })
+  @ApiBody({ type: SignoutDto, required: false })
   async signout(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto?: SignoutDto,
@@ -136,7 +247,17 @@ export class UserController {
   }
 
   @Post('user/closeAccount')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Close account',
+    description: 'Initiates the user account closure process',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Closure request processed successfully',
+    type: AccountClosureResponseDto,
+  })
+  @ApiBody({ type: CloseAccountDto })
   async closeAccount(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CloseAccountDto,
@@ -145,7 +266,17 @@ export class UserController {
   }
 
   @Post('user/liveness')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Liveness verification',
+    description: 'Performs user liveness verification',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Verification completed successfully',
+    type: LivenessCheckResponseDto,
+  })
+  @ApiBody({ type: LivenessCheckDto })
   async livenessCheck(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: LivenessCheckDto,
@@ -154,7 +285,20 @@ export class UserController {
   }
 
   @Post('user/onboarding/:step')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Advance onboarding by step',
+    description: 'Advances the onboarding process to a specific step',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Onboarding step processed successfully',
+    type: OnboardingResponseDto,
+  })
+  @ApiParam({
+    name: 'step',
+    description: 'Onboarding step identifier',
+  })
   async onboardingWithStep(
     @CurrentUser() user: AuthenticatedUser,
     @Param('step') step: string,
@@ -163,7 +307,16 @@ export class UserController {
   }
 
   @Post('user/onboarding')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Update onboarding status',
+    description: "Updates the user's overall onboarding status",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Onboarding status updated successfully',
+    type: OnboardingResponseDto,
+  })
   async onboarding(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<OnboardingResponseDto> {
@@ -171,7 +324,17 @@ export class UserController {
   }
 
   @Post('sendMessage')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Send message',
+    description: 'Sends a user message through the system',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Message sent successfully',
+    type: MessagingResponseDto,
+  })
+  @ApiBody({ type: SendMessageDto })
   async sendMessage(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: SendMessageDto,
@@ -180,7 +343,20 @@ export class UserController {
   }
 
   @Get('user/identities/:userId')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'List user identities',
+    description: 'Returns all registered identities of the user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Identity list returned successfully',
+    type: IdentityListResponseDto,
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'User ID',
+  })
   async getUserIdentities(
     @CurrentUser() user: AuthenticatedUser,
     @Param('userId') userId: string,
@@ -192,7 +368,19 @@ export class UserController {
   }
 
   @Post('user/setDefaultUserIdentity/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Set default identity',
+    description: 'Sets an identity as default for the user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Default identity set successfully',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Identity ID',
+  })
   async setDefaultIdentity(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') identityId: string,
@@ -201,7 +389,19 @@ export class UserController {
   }
 
   @Post('user/setDefaultUserAccount/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Set default account',
+    description: 'Sets an account as default for the user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Default account set successfully',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Account ID',
+  })
   async setDefaultAccount(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') accountId: string,
@@ -210,17 +410,43 @@ export class UserController {
   }
 
   @Post('user/setUserAccountAlias/:id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Set account alias',
+    description: 'Sets a custom alias for the user account',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Alias set successfully',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Account ID',
+  })
+  @ApiBody({ type: SetUserAccountAliasDto })
   async setUserAccountAlias(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') accountId: string,
     @Body() dto: SetUserAccountAliasDto,
   ) {
-    return this.accountService.setUserAccountAlias(user.id, accountId, dto.alias);
+    return this.accountService.setUserAccountAlias(
+      user.id,
+      accountId,
+      dto.alias,
+    );
   }
 
   @Get('user/balances')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Get account balances',
+    description: 'Returns the balances of all user accounts',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Balances returned successfully',
+    type: AccountBalanceResponseDto,
+  })
   async getAccountBalances(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<AccountBalanceResponseDto> {
@@ -228,11 +454,35 @@ export class UserController {
   }
 
   @Get('userAccountInfo/:id')
+  @ApiOperation({
+    summary: 'Get account information',
+    description: 'Returns detailed information about a specific account',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Account information returned successfully',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Account ID',
+  })
   async getUserAccountInfo(@Param('id') accountId: string) {
     return this.accountService.getUserAccountInfo(accountId);
   }
 
   @Get('sailpointInfo/:id')
+  @ApiOperation({
+    summary: 'Get Sailpoint information',
+    description: 'Returns Sailpoint information for a specific ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Sailpoint information returned successfully',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Sailpoint ID',
+  })
   async getSailpointInfo(@Param('id') sailpointId: string) {
     return { message: 'Sailpoint info retrieved' };
   }

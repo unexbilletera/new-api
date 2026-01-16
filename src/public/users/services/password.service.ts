@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserModel } from '../models/user.model';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
 import { AccessLogService } from '../../../shared/access-log/access-log.service';
@@ -24,7 +29,9 @@ export class PasswordService {
     this.logger.info('[PASSWORD] Password change requested', { userId });
 
     if (!dto.currentPassword || !dto.newPassword) {
-      throw new BadRequestException('users.errors.currentPasswordAndNewPasswordRequired');
+      throw new BadRequestException(
+        'users.errors.currentPasswordAndNewPasswordRequired',
+      );
     }
 
     if (!dto.newPassword.match(/^\d{6}$/)) {

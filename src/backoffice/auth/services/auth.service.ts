@@ -15,18 +15,26 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const identifier = (loginDto.email || '').toLowerCase().trim();
 
-    const bruteForceCheck = await this.bruteForceService.checkAttempt(identifier, undefined, {
-      maxAttempts: 5,
-      windowMs: 15 * 60 * 1000,
-      lockoutDurationMs: 30 * 60 * 1000,
-    });
+    const bruteForceCheck = await this.bruteForceService.checkAttempt(
+      identifier,
+      undefined,
+      {
+        maxAttempts: 5,
+        windowMs: 15 * 60 * 1000,
+        lockoutDurationMs: 30 * 60 * 1000,
+      },
+    );
 
     if (!bruteForceCheck.allowed) {
-      throw new HttpException('backoffice.errors.tooManyAttempts', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        'backoffice.errors.tooManyAttempts',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
 
     try {
-      const response = await this.backofficeUserModel.validateCredentials(loginDto);
+      const response =
+        await this.backofficeUserModel.validateCredentials(loginDto);
       await this.bruteForceService.clearAttempts(identifier);
       return response;
     } catch (error) {
@@ -54,4 +62,3 @@ export class AuthService {
     };
   }
 }
-

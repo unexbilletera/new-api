@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ConsoleAdapterLogger, SmsAdapter, SmsMessage } from '../notifications.types';
+import {
+  ConsoleAdapterLogger,
+  SmsAdapter,
+  SmsMessage,
+} from '../notifications.types';
 
 @Injectable()
 export class ConsoleSmsAdapter implements SmsAdapter {

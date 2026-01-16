@@ -24,13 +24,13 @@ export class SystemConfigModel {
 
   async create(key: string, value: string, description?: string) {
     return this.prisma.system_config.create({
-      data: { 
+      data: {
         id: crypto.randomUUID(),
-        key, 
-        value, 
-        description, 
-        createdAt: new Date(), 
-        updatedAt: new Date() 
+        key,
+        value,
+        description,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     });
   }

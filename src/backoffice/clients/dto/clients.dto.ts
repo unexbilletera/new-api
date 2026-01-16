@@ -1,4 +1,10 @@
-import { IsOptional, IsString, IsDateString, IsEnum, IsUUID } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsEnum,
+  IsUUID,
+} from 'class-validator';
 
 export class ListClientsQueryDto {
   @IsOptional()

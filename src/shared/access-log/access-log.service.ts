@@ -18,24 +18,31 @@ export class AccessLogService {
   constructor(
     private prisma: PrismaService,
     private logger: LoggerService,
-  ) {}  extractDevice(userAgent?: string): DeviceType {
+  ) {}
+  extractDevice(userAgent?: string): DeviceType {
     if (!userAgent) return 'Mobile';
-    
+
     const ua = userAgent.toLowerCase();
-    
-    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+
+    if (
+      ua.includes('mobile') ||
+      ua.includes('android') ||
+      ua.includes('iphone')
+    ) {
       return 'Mobile';
     }
     if (ua.includes('tablet') || ua.includes('ipad')) {
       return 'Tablet';
     }
     return 'Desktop';
-  }  extractIpAddress(ipAddress?: string): string | null {
+  }
+  extractIpAddress(ipAddress?: string): string | null {
     if (!ipAddress) return null;
-    
+
     const parts = String(ipAddress).split(':');
     return parts.pop() || ipAddress;
-  }  async log(params: AccessLogParams): Promise<void> {
+  }
+  async log(params: AccessLogParams): Promise<void> {
     try {
       const device = this.extractDevice(params.userAgent);
       const cleanIp = this.extractIpAddress(params.ipAddress);
@@ -51,19 +58,30 @@ export class AccessLogService {
         },
       });
 
-      this.logger.debug(`Access log (${params.finalStatus}) created for user: ${params.userId}`);
+      this.logger.debug(
+        `Access log (${params.finalStatus}) created for user: ${params.userId}`,
+      );
     } catch (error: any) {
-
-      this.logger.error('Failed to persist access log', error instanceof Error ? error : undefined, {
-        message: error?.message,
-        code: error?.code,
-        userId: params.userId,
-        finalStatus: params.finalStatus,
-      });
+      this.logger.error(
+        'Failed to persist access log',
+        error instanceof Error ? error : undefined,
+        {
+          message: error?.message,
+          code: error?.code,
+          userId: params.userId,
+          finalStatus: params.finalStatus,
+        },
+      );
     }
-  }  async logSuccess(params: Omit<AccessLogParams, 'finalStatus'>): Promise<void> {
+  }
+  async logSuccess(
+    params: Omit<AccessLogParams, 'finalStatus'>,
+  ): Promise<void> {
     return this.log({ ...params, finalStatus: 'success' });
-  }  async logFailure(params: Omit<AccessLogParams, 'finalStatus'>): Promise<void> {
+  }
+  async logFailure(
+    params: Omit<AccessLogParams, 'finalStatus'>,
+  ): Promise<void> {
     return this.log({ ...params, finalStatus: 'failure' });
   }
 }

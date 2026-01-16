@@ -15,4 +15,3 @@ import { PixCronosValidationService } from '../secure/transactions/cronos/pix-cr
   exports: [WorkerService],
 })
 export class WorkerModule {}
-

@@ -1,4 +1,16 @@
-import { IsString, IsEmail, IsOptional, IsObject, Matches, IsPhoneNumber } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsObject,
+  Matches,
+  ValidateIf,
+  IsNotEmpty,
+} from 'class-validator';
+import {
+  ValidationOptions,
+  SpecializedValidationOptions,
+} from '../../../common/validators';
 
 export class StartUserOnboardingDto {
   @IsEmail()
@@ -10,14 +22,15 @@ export class VerifyOnboardingCodeDto {
   email: string;
 
   @IsString()
+  @Matches(...ValidationOptions.CODE_6_OR_8_DIGITS)
   code: string;
 
   @IsString()
-  @Matches(/^(email|phone)$/)
+  @Matches(...ValidationOptions.VALIDATION_TYPE)
   type: 'email' | 'phone';
 
   @IsOptional()
-  @IsPhoneNumber('BR')
+  @Matches(...ValidationOptions.PHONE_INTERNATIONAL)
   phone?: string;
 }
 
@@ -31,11 +44,11 @@ export class UpdateUserOnboardingDto {
   lastName?: string;
 
   @IsOptional()
-  @IsString()
+  @Matches(...ValidationOptions.PHONE_INTERNATIONAL)
   phone?: string;
 
   @IsOptional()
-  @Matches(/^\d{6}$/)
+  @Matches(...ValidationOptions.PASSWORD_6_DIGITS)
   password?: string;
 
   @IsOptional()
@@ -44,34 +57,43 @@ export class UpdateUserOnboardingDto {
 
   @IsOptional()
   @IsString()
+  @Matches(...SpecializedValidationOptions.COUNTRY_AR_BR)
   country?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...SpecializedValidationOptions.BIRTHDATE)
   birthdate?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.GENDER)
   gender?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.MARITAL_STATUS)
   maritalStatus?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.PEP)
   pep?: string;
 
-  @IsOptional()
+  @ValidateIf((o) => o.pep === '1')
+  @IsNotEmpty({ message: 'pepSince is required when pep is 1' })
   @IsString()
+  @Matches(...SpecializedValidationOptions.PEP_SINCE)
   pepSince?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.IMAGE_DATA_URL)
   livenessImage?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.CPF)
   cpf?: string;
 
   @IsOptional()
@@ -90,10 +112,11 @@ export class UpdateUserOnboardingDto {
 export class StartIdentityOnboardingDto {
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.COUNTRY_CODE_2)
   countryCode?: string;
 
   @IsOptional()
-  @Matches(/^(ar|br)$/i)
+  @Matches(...SpecializedValidationOptions.COUNTRY_AR_BR)
   country?: string;
 
   @IsOptional()
@@ -104,10 +127,29 @@ export class StartIdentityOnboardingDto {
 export class UpdateIdentityOnboardingDto {
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.CPF)
+  cpf?: string;
+
+  @IsOptional()
+  @IsString()
+  rg?: string;
+
+  @IsOptional()
+  @IsString()
+  rgIssuer?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(...SpecializedValidationOptions.DOCUMENT_EXPIRATION)
+  rgExpiration?: string;
+
+  @IsOptional()
+  @IsString()
   documentNumber?: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...SpecializedValidationOptions.DOCUMENT_EXPIRATION)
   documentExpiration?: string;
 
   @IsOptional()
@@ -121,10 +163,12 @@ export class UpdateIdentityOnboardingDto {
 
 export class UploadArgentinaDocumentDto {
   @IsString()
+  @Matches(...ValidationOptions.IMAGE_DATA_URL)
   frontImage: string;
 
   @IsOptional()
   @IsString()
+  @Matches(...ValidationOptions.IMAGE_DATA_URL)
   backImage?: string;
 
   @IsOptional()

@@ -11,7 +11,10 @@ import {
 export class TermsService {
   constructor(private prisma: PrismaService) {}
 
-  async check(userId: string, serviceType: ServiceType): Promise<TermCheckResponseDto> {
+  async check(
+    userId: string,
+    serviceType: ServiceType,
+  ): Promise<TermCheckResponseDto> {
     const acceptance = await this.prisma.user_term_acceptances.findFirst({
       where: {
         userId,
@@ -38,8 +41,11 @@ export class TermsService {
     userId: string,
     dto: AcceptTermDto,
     ipAddress?: string,
-  ): Promise<{ success: boolean; message: string; data?: TermAcceptanceResponseDto }> {
-
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data?: TermAcceptanceResponseDto;
+  }> {
     const existing = await this.prisma.user_term_acceptances.findFirst({
       where: {
         userId,
@@ -48,10 +54,9 @@ export class TermsService {
     });
 
     if (existing) {
-
       return {
         success: true,
-        message: 'Termo já aceito anteriormente',
+        message: 'Term already accepted previously',
         data: {
           id: existing.id,
           userId: existing.userId,
@@ -74,7 +79,7 @@ export class TermsService {
 
     return {
       success: true,
-      message: 'Termo aceito com sucesso',
+      message: 'Term accepted successfully',
       data: {
         id: acceptance.id,
         userId: acceptance.userId,
@@ -105,8 +110,10 @@ export class TermsService {
     missing: string[];
     accepted: string[];
   }> {
-
-    const requiredTerms = [ServiceType.MANTECA_PIX, ServiceType.MANTECA_EXCHANGE];
+    const requiredTerms = [
+      ServiceType.MANTECA_PIX,
+      ServiceType.MANTECA_EXCHANGE,
+    ];
 
     const acceptances = await this.prisma.user_term_acceptances.findMany({
       where: {

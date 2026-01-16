@@ -62,10 +62,9 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Configurar Swagger/OpenAPI
   const config = new DocumentBuilder()
     .setTitle('Unex API')
-    .setDescription('API para gerenciamento de transações financeiras')
+    .setDescription('API for financial transaction management')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -73,14 +72,41 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'JWT',
-        description: 'Enter JWT token',
+        description: 'Enter JWT token in format: Bearer <token>',
         in: 'header',
       },
-      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+      'JWT-auth',
     )
-    .addTag('transactions', 'Endpoints relacionados a transações')
-    .addTag('auth', 'Endpoints de autenticação')
-    .addTag('backoffice', 'Endpoints do backoffice')
+    .addTag(
+      '1.1 Public - Authentication',
+      'User authentication and registration',
+    )
+    .addTag('1.1 Public - Security', 'Security tokens for public operations')
+    .addTag('1.2 Public - Users', 'User profile and data management')
+    .addTag(
+      '1.3 Public - Onboarding',
+      'Onboarding process and identity verification',
+    )
+    .addTag('1.3 Public - Biometric', 'Biometric authentication and devices')
+    .addTag(
+      '2.1 Secure - Transactions',
+      'Financial transactions (PIX, transfers)',
+    )
+    .addTag('2.2 Secure - Notifications', 'Push and system notifications')
+    .addTag('2.2 Secure - Campaigns', 'Campaigns and promotional codes')
+    .addTag('2.3 Secure - Terms', 'Terms and conditions of service')
+    .addTag('2.3 Secure - Actions', 'Application actions and features')
+    .addTag('2.3 Secure - App Info', 'Application information and settings')
+    .addTag('3.1 Backoffice - Authentication', 'Backoffice user authentication')
+    .addTag('3.2 Backoffice - Users', 'Backoffice user management')
+    .addTag('3.2 Backoffice - Clients', 'Client and account management')
+    .addTag('3.1 Backoffice - Roles', 'Roles and permissions')
+    .addTag('3.3 Backoffice - Onboarding', 'Onboarding management')
+    .addTag('3.3 Backoffice - Actions', 'Action and permission management')
+    .addTag('3.3 Backoffice - System Config', 'System configuration')
+    .addTag('3.3 Backoffice - Logs', 'System logs and audit')
+    .addTag('4 Health', 'API health check')
+    .addTag('5 Shared', 'Shared utilities and root endpoints')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -90,10 +116,15 @@ async function bootstrap() {
     },
   });
 
-  const port = parseInt(process.env.PORT || process.env.WALLET_SERVER_PORT || '3000', 10);
+  const port = parseInt(
+    process.env.PORT || process.env.WALLET_SERVER_PORT || '3000',
+    10,
+  );
   await app.listen(port, '0.0.0.0');
   logger.info(`API running on http://0.0.0.0:${port}`);
-  logger.info(`Swagger documentation available at http://0.0.0.0:${port}/api/docs`);
+  logger.info(
+    `Swagger documentation available at http://0.0.0.0:${port}/api/docs`,
+  );
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 bootstrap();

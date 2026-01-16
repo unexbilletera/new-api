@@ -6,7 +6,7 @@ export class CampaignModel {
   constructor(private prisma: PrismaService) {}
 
   async getCampaign(campaignId: string) {
-    return this.prisma.campaign_codes.findUnique({
+    return this.prisma.campaign_codes.findFirst({
       where: { id: campaignId },
     });
   }

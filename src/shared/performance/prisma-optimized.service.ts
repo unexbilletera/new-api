@@ -3,7 +3,10 @@ import { PrismaClient, Prisma } from '../../../generated/prisma';
 import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
-export class PrismaOptimizedService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaOptimizedService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly maxRetries = 3;
   private readonly retryDelayMs = 100;
   private readonly queryTimeoutMs = 30000;
@@ -32,13 +35,20 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
   }
 
   private buildConnectionString(): string {
-    const baseUrl = process.env.WALLET_MYSQL_URL || process.env.DATABASE_URL || '';
+    const baseUrl =
+      process.env.WALLET_MYSQL_URL || process.env.DATABASE_URL || '';
 
     if (!baseUrl) return '';
 
     const url = new URL(baseUrl);
-    url.searchParams.set('connection_limit', this.connectionPoolConfig.connection_limit.toString());
-    url.searchParams.set('pool_timeout', this.connectionPoolConfig.pool_timeout.toString());
+    url.searchParams.set(
+      'connection_limit',
+      this.connectionPoolConfig.connection_limit.toString(),
+    );
+    url.searchParams.set(
+      'pool_timeout',
+      this.connectionPoolConfig.pool_timeout.toString(),
+    );
     url.searchParams.set('max_idle_time', '60');
     url.searchParams.set('connect_timeout', '10');
 
@@ -53,10 +63,10 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
 
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
-        return await Promise.race([
+        return (await Promise.race([
           queryFn(),
           this.createTimeout(this.queryTimeoutMs),
-        ]) as T;
+        ])) as T;
       } catch (error: any) {
         lastError = error;
 
@@ -66,24 +76,30 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
 
         if (this.isDeadlockError(error)) {
           const delay = this.calculateBackoff(attempt);
-          this.logger.warn(`Deadlock detected, retrying after ${delay}ms (attempt ${attempt + 1}/${retries + 1})`);
-          
+          this.logger.warn(
+            `Deadlock detected, retrying after ${delay}ms (attempt ${attempt + 1}/${retries + 1})`,
+          );
+
           await this.sleep(delay);
           continue;
         }
 
         if (this.isConnectionError(error)) {
           const delay = this.calculateBackoff(attempt);
-          this.logger.warn(`Connection error, retrying after ${delay}ms (attempt ${attempt + 1}/${retries + 1})`);
-          
+          this.logger.warn(
+            `Connection error, retrying after ${delay}ms (attempt ${attempt + 1}/${retries + 1})`,
+          );
+
           await this.sleep(delay);
           continue;
         }
 
         if (attempt < retries) {
           const delay = this.calculateBackoff(attempt);
-          this.logger.warn(`Query failed, retrying after ${delay}ms (attempt ${attempt + 1}/${retries + 1})`);
-          
+          this.logger.warn(
+            `Query failed, retrying after ${delay}ms (attempt ${attempt + 1}/${retries + 1})`,
+          );
+
           await this.sleep(delay);
           continue;
         }
@@ -97,17 +113,18 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
 
   async executeTransaction<T>(
     transactionFn: (tx: Prisma.TransactionClient) => Promise<T>,
-    isolationLevel: 'ReadUncommitted' | 'ReadCommitted' | 'RepeatableRead' | 'Serializable' = 'ReadCommitted',
+    isolationLevel:
+      | 'ReadUncommitted'
+      | 'ReadCommitted'
+      | 'RepeatableRead'
+      | 'Serializable' = 'ReadCommitted',
   ): Promise<T> {
     return this.executeWithRetry(async () => {
-      return this.$transaction(
-        transactionFn,
-        {
-          maxWait: 10000,
-          timeout: this.queryTimeoutMs,
-          isolationLevel,
-        },
-      );
+      return this.$transaction(transactionFn, {
+        maxWait: 10000,
+        timeout: this.queryTimeoutMs,
+        isolationLevel,
+      });
     });
   }
 
@@ -129,7 +146,10 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
       return true;
     }
 
-    if (errorMessage.includes('connection') || errorMessage.includes('timeout')) {
+    if (
+      errorMessage.includes('connection') ||
+      errorMessage.includes('timeout')
+    ) {
       return true;
     }
 
@@ -165,7 +185,7 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
     const baseDelay = this.retryDelayMs;
     const exponentialDelay = baseDelay * Math.pow(2, attempt);
     const jitter = Math.random() * 100;
-    
+
     return Math.min(exponentialDelay + jitter, 5000);
   }
 
@@ -178,13 +198,13 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private setupQueryLogger(): void {
     this.$on('query' as never, (e: Prisma.QueryEvent) => {
       const duration = e.duration ? `${e.duration}ms` : '';
-      
+
       if (e.duration && e.duration > 1000) {
         this.logger.warn('Slow query detected', {
           query: e.query.substring(0, 200),
@@ -211,7 +231,10 @@ export class PrismaOptimizedService extends PrismaClient implements OnModuleInit
       await this.$connect();
       this.logger.info('Prisma connected with optimized settings');
     } catch (error) {
-      this.logger.error('Failed to connect to database', error instanceof Error ? error : undefined);
+      this.logger.error(
+        'Failed to connect to database',
+        error instanceof Error ? error : undefined,
+      );
       throw error;
     }
   }

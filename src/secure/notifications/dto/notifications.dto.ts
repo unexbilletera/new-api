@@ -2,12 +2,12 @@ import { IsOptional, IsString, IsNumber, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ListNotificationsQueryDto {
-  @ApiPropertyOptional({ description: 'Página' })
+  @ApiPropertyOptional({ description: 'Page' })
   @IsNumber()
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Limite por página' })
+  @ApiPropertyOptional({ description: 'Limit per page' })
   @IsNumber()
   @IsOptional()
   limit?: number;
@@ -19,34 +19,34 @@ export class ListNotificationsQueryDto {
 }
 
 export class MarkAsReadDto {
-  @ApiProperty({ description: 'ID da notificação' })
+  @ApiProperty({ description: 'Notification ID' })
   @IsString()
   notificationId: string;
 }
 
 export class UpdatePushTokenDto {
-  @ApiProperty({ description: 'Token do dispositivo para push' })
+  @ApiProperty({ description: 'Device token for push' })
   @IsString()
   pushToken: string;
 
-  @ApiPropertyOptional({ description: 'Plataforma: ios, android' })
+  @ApiPropertyOptional({ description: 'Platform: ios, android' })
   @IsString()
   @IsOptional()
   platform?: string;
 
-  @ApiPropertyOptional({ description: 'ID do device' })
+  @ApiPropertyOptional({ description: 'Device ID' })
   @IsString()
   @IsOptional()
   deviceId?: string;
 }
 
 export class TestPushDto {
-  @ApiPropertyOptional({ description: 'Título da notificação de teste' })
+  @ApiPropertyOptional({ description: 'Test notification title' })
   @IsString()
   @IsOptional()
   title?: string;
 
-  @ApiPropertyOptional({ description: 'Mensagem da notificação de teste' })
+  @ApiPropertyOptional({ description: 'Test notification message' })
   @IsString()
   @IsOptional()
   message?: string;

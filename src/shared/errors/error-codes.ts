@@ -1,4 +1,3 @@
-
 export enum ErrorCodes {
   USERS_INVALID_PARAMETERS = '400 users.errors.invalidParameters',
   USERS_INVALID_USERNAME = '400 users.errors.invalidUsername',
@@ -75,6 +74,14 @@ export enum ErrorCodes {
   TRANSACTIONS_INVALID_PIX_KEY_PHONE = '400 transactions.errors.invalidPixKeyPhone',
   TRANSACTIONS_INVALID_PIX_KEY_EVP = '400 transactions.errors.invalidPixKeyEvp',
 
+  TRANSACTIONAL_PASSWORD_NOT_CREATED = '400 transactionalPassword.errors.notCreated',
+  TRANSACTIONAL_PASSWORD_INVALID = '400 transactionalPassword.errors.invalidPassword',
+  TRANSACTIONAL_PASSWORD_INCORRECT = '400 transactionalPassword.errors.incorrectPassword',
+  TRANSACTIONAL_PASSWORD_ALREADY_EXISTS = '400 transactionalPassword.errors.alreadyExists',
+  TRANSACTIONAL_PASSWORD_INVALID_FORMAT = '400 transactionalPassword.errors.invalidFormat',
+  TRANSACTIONAL_PASSWORD_SAME_AS_CURRENT = '400 transactionalPassword.errors.sameAsCurrent',
+  TRANSACTIONAL_PASSWORD_NOT_PROVIDED = '400 transactionalPassword.errors.notProvided',
+
   INTERNAL_SERVER_ERROR = '500 server.errors.internalError',
   NOT_FOUND = '404 server.errors.notFound',
   FORBIDDEN = '403 server.errors.forbidden',
@@ -88,4 +95,3 @@ export function getStatusCodeFromErrorCode(errorCode: string): number {
 export function isErrorCode(error: string): boolean {
   return /^\d{3}\s+\w+\.errors\.\w+$/.test(error);
 }
-

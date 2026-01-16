@@ -183,6 +183,7 @@ model campaign_codes {
   @@index([isActive], map: "idx_is_active")
   @@index([validFrom], map: "idx_valid_from")
   @@index([validTo], map: "idx_valid_to")
+  @@index([code, isActive, validTo], map: "idx_code_active_valid")
 }
 
 model cards {
@@ -579,6 +580,7 @@ model notifications {
   @@index([title], map: "title")
   @@index([updatedAt], map: "updatedAt")
   @@index([userId], map: "userId")
+  @@index([userId, status, createdAt], map: "idx_notif_user_status_date")
 }
 
 model phone_validation_codes {
@@ -887,6 +889,7 @@ model transactions {
   targetBank                                                          String?               @db.VarChar(100)
   mantecaId                                                           String?               @db.VarChar(50)
   reverseMantecaId                                                    String?               @db.VarChar(50)
+  idempotencyKey                                                      String?               @unique(map: "idempotencyKey") @db.VarChar(64)
   accreditations                                                      accreditations[]
   exchange_rate_codes                                                 exchange_rate_codes[]
   ramp_operations_ramp_operations_debit_transaction_idTotransactions  ramp_operations[]     @relation("ramp_operations_debit_transaction_idTotransactions")
@@ -933,6 +936,10 @@ model transactions {
   @@index([type], map: "type")
   @@index([updatedAt], map: "updatedAt")
   @@index([userId], map: "userId")
+  @@index([userId, status, createdAt], map: "idx_user_status_date")
+  @@index([status, createdAt], map: "idx_status_date")
+  @@index([type, status], map: "idx_type_status")
+  @@index([deletedAt, userId], map: "idx_deleted_user")
 }
 
 model transactionsLogs {
@@ -1125,6 +1132,9 @@ model users {
   @@index([phone], map: "phone")
   @@index([status], map: "status")
   @@index([updatedAt], map: "updatedAt")
+  @@index([status, isBlocked, isDisabled, lastLoginAt], map: "idx_user_status_blocked_disabled")
+  @@index([email, deletedAt], map: "idx_email_deleted")
+  @@index([lastLoginAt, createdAt], map: "idx_login_created")
 }
 
 model usersAccounts {
@@ -1156,6 +1166,8 @@ model usersAccounts {
   @@index([updatedAt], map: "updatedAt")
   @@index([userId], map: "userId")
   @@index([userIdentityId], map: "userIdentityId")
+  @@index([userId, status, deletedAt], map: "idx_account_user_status")
+  @@index([userIdentityId, status], map: "idx_account_identity_status")
 }
 
 model usersIdentities {

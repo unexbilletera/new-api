@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {
   SignupResponseDto,
-  SignupUserDto,
   SignupDeviceRequiredResponseDto,
   SigninResponseDto,
-  SigninUserDto,
   SigninDeviceRequiredResponseDto,
   EmailValidationResponseDto,
   EmailCodeVerificationResponseDto,
@@ -13,13 +11,16 @@ import {
   ForgotPasswordResponseDto,
   VerifyPasswordResponseDto,
   UnlockAccountResponseDto,
-  UnlockAccountUserDto,
   TokenResponseDto,
 } from '../dto/response';
 
 @Injectable()
 export class AuthMapper {
-  toSignupResponseDto(user: any, token: string, expiresIn: number = 3600): SignupResponseDto {
+  toSignupResponseDto(
+    user: any,
+    token: string,
+    expiresIn: number = 3600,
+  ): SignupResponseDto {
     return {
       user: {
         id: user.id,
@@ -33,12 +34,15 @@ export class AuthMapper {
     };
   }
 
-  toSignupDeviceRequiredResponseDto(user: any, token: string, deviceType: string): SignupDeviceRequiredResponseDto {
+  toSignupDeviceRequiredResponseDto(
+    user: any,
+    token: string,
+    deviceType: string,
+  ): SignupDeviceRequiredResponseDto {
     return {
       deviceRequired: true,
       deviceType,
-      message: 'Device registration required after signup',
-      userId: user.id,
+      message: 'It is necessary to register a device to continue',
       accessToken: token,
       user: {
         id: user.id,
@@ -50,7 +54,11 @@ export class AuthMapper {
     };
   }
 
-  toSigninResponseDto(user: any, token: string, expiresIn: number = 3600): SigninResponseDto {
+  toSigninResponseDto(
+    user: any,
+    token: string,
+    expiresIn: number = 3600,
+  ): SigninResponseDto {
     return {
       user: {
         id: user.id,
@@ -60,17 +68,19 @@ export class AuthMapper {
         phone: user.phone,
       },
       accessToken: token,
-      refreshToken: token,
       expiresIn,
     };
   }
 
-  toSigninDeviceRequiredResponseDto(user: any, token: string, deviceType: string): SigninDeviceRequiredResponseDto {
+  toSigninDeviceRequiredResponseDto(
+    user: any,
+    token: string,
+    deviceType: string,
+  ): SigninDeviceRequiredResponseDto {
     return {
       deviceRequired: true,
       deviceType,
-      message: 'Device registration required',
-      userId: user.id,
+      message: 'It is necessary to register a device to continue',
       accessToken: token,
       user: {
         id: user.id,
@@ -82,14 +92,16 @@ export class AuthMapper {
     };
   }
 
-  toEmailValidationResponseDto(message: string, debug?: string): EmailValidationResponseDto {
+  toEmailValidationResponseDto(message: string): EmailValidationResponseDto {
     return {
       message,
-      debug,
     };
   }
 
-  toEmailCodeVerificationResponseDto(message: string, email: string): EmailCodeVerificationResponseDto {
+  toEmailCodeVerificationResponseDto(
+    message: string,
+    email: string,
+  ): EmailCodeVerificationResponseDto {
     return {
       message,
       email,
@@ -97,14 +109,16 @@ export class AuthMapper {
     };
   }
 
-  toPhoneValidationResponseDto(message: string, debug?: string): PhoneValidationResponseDto {
+  toPhoneValidationResponseDto(message: string): PhoneValidationResponseDto {
     return {
       message,
-      debug,
     };
   }
 
-  toPhoneCodeVerificationResponseDto(message: string, phone: string): PhoneCodeVerificationResponseDto {
+  toPhoneCodeVerificationResponseDto(
+    message: string,
+    phone: string,
+  ): PhoneCodeVerificationResponseDto {
     return {
       message,
       phone,
@@ -112,10 +126,9 @@ export class AuthMapper {
     };
   }
 
-  toForgotPasswordResponseDto(message: string, debug?: string): ForgotPasswordResponseDto {
+  toForgotPasswordResponseDto(message: string): ForgotPasswordResponseDto {
     return {
       message,
-      debug,
     };
   }
 
@@ -123,7 +136,11 @@ export class AuthMapper {
     return { message };
   }
 
-  toUnlockAccountResponseDto(user: any, token: string, expiresIn: number = 3600): UnlockAccountResponseDto {
+  toUnlockAccountResponseDto(
+    user: any,
+    token: string,
+    expiresIn: number = 3600,
+  ): UnlockAccountResponseDto {
     return {
       user: {
         id: user.id,
@@ -135,13 +152,15 @@ export class AuthMapper {
         access: user.access,
       },
       accessToken: token,
-      refreshToken: token,
       expiresIn,
       message: 'Account unlocked successfully',
     };
   }
 
-  toTokenResponseDto(token: string, expiresIn: number = 3600): TokenResponseDto {
+  toTokenResponseDto(
+    token: string,
+    expiresIn: number = 3600,
+  ): TokenResponseDto {
     return {
       accessToken: token,
       tokenType: 'Bearer',

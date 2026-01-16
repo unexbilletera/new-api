@@ -11,4 +11,3 @@ import { LoggerModule } from '../logger/logger.module';
   exports: [SqsService, SqsReceiverService],
 })
 export class SqsModule {}
-

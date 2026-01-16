@@ -11,7 +11,10 @@ import {
 export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
-  async list(userId: string, query: ListNotificationsQueryDto): Promise<{
+  async list(
+    userId: string,
+    query: ListNotificationsQueryDto,
+  ): Promise<{
     data: NotificationResponseDto[];
     total: number;
     page: number;
@@ -60,17 +63,23 @@ export class NotificationsService {
     };
   }
 
-  async markAsRead(userId: string, notificationId: string): Promise<{ success: boolean; message: string }> {
+  async markAsRead(
+    userId: string,
+    notificationId: string,
+  ): Promise<{ success: boolean; message: string }> {
     const notification = await this.prisma.notifications.findFirst({
       where: { id: notificationId, userId, deletedAt: null },
     });
 
     if (!notification) {
-      throw new NotFoundException('Notificação não encontrada');
+      throw new NotFoundException('Notification not found');
     }
 
     if (notification.status === 'readed') {
-      return { success: true, message: 'Notificação já estava marcada como lida' };
+      return {
+        success: true,
+        message: 'Notification was already marked as read',
+      };
     }
 
     await this.prisma.notifications.update({
@@ -82,10 +91,12 @@ export class NotificationsService {
       },
     });
 
-    return { success: true, message: 'Notificação marcada como lida' };
+    return { success: true, message: 'Notification marked as read' };
   }
 
-  async markAllAsRead(userId: string): Promise<{ success: boolean; count: number }> {
+  async markAllAsRead(
+    userId: string,
+  ): Promise<{ success: boolean; count: number }> {
     const result = await this.prisma.notifications.updateMany({
       where: { userId, status: 'pending', deletedAt: null },
       data: {
@@ -98,10 +109,16 @@ export class NotificationsService {
     return { success: true, count: result.count };
   }
 
-  async updatePushToken(userId: string, dto: UpdatePushTokenDto): Promise<{ success: boolean; message: string }> {
+  async updatePushToken(
+    userId: string,
+    dto: UpdatePushTokenDto,
+  ): Promise<{ success: boolean; message: string }> {
     const platform = dto.platform || 'mobile';
-    const pushField = platform === 'ios' || platform === 'android' ? 'mobileDevicePush' : 'browserDevicePush';
-    
+    const pushField =
+      platform === 'ios' || platform === 'android'
+        ? 'mobileDevicePush'
+        : 'browserDevicePush';
+
     await this.prisma.users.update({
       where: { id: userId },
       data: {
@@ -110,26 +127,34 @@ export class NotificationsService {
       },
     });
 
-    return { success: true, message: 'Push token atualizado com sucesso' };
+    return { success: true, message: 'Push token updated successfully' };
   }
 
   async getPushToken(userId: string): Promise<{ pushToken: string | null }> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       select: { mobileDevicePush: true, browserDevicePush: true },
     });
 
-    return { pushToken: user?.mobileDevicePush || user?.browserDevicePush || null };
+    return {
+      pushToken: user?.mobileDevicePush || user?.browserDevicePush || null,
+    };
   }
 
-  async sendTestPush(userId: string, dto: TestPushDto): Promise<{ success: boolean; message: string }> {
-    const user = await this.prisma.users.findUnique({
+  async sendTestPush(
+    userId: string,
+    dto: TestPushDto,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
       select: { mobileDevicePush: true, browserDevicePush: true },
     });
 
     if (!user?.mobileDevicePush && !user?.browserDevicePush) {
-      return { success: false, message: 'Usuário não possui push token configurado' };
+      return {
+        success: false,
+        message: 'User does not have a configured push token',
+      };
     }
 
     await this.prisma.notifications.create({
@@ -137,23 +162,26 @@ export class NotificationsService {
         id: crypto.randomUUID(),
         userId,
         status: 'pending',
-        title: dto.title || 'Notificação de Teste',
-        message: dto.message || 'Esta é uma notificação de teste',
+        title: dto.title || 'Test Notification',
+        message: dto.message || 'This is a test notification',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
 
-    return { success: true, message: 'Notificação de teste enviada' };
+    return { success: true, message: 'Test notification sent' };
   }
 
-  async delete(userId: string, notificationId: string): Promise<{ success: boolean; message: string }> {
+  async delete(
+    userId: string,
+    notificationId: string,
+  ): Promise<{ success: boolean; message: string }> {
     const notification = await this.prisma.notifications.findFirst({
       where: { id: notificationId, userId, deletedAt: null },
     });
 
     if (!notification) {
-      throw new NotFoundException('Notificação não encontrada');
+      throw new NotFoundException('Notification not found');
     }
 
     await this.prisma.notifications.update({
@@ -161,6 +189,6 @@ export class NotificationsService {
       data: { deletedAt: new Date() },
     });
 
-    return { success: true, message: 'Notificação deletada' };
+    return { success: true, message: 'Notification deleted' };
   }
 }

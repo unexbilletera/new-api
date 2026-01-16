@@ -6,7 +6,7 @@ export class IdentityModel {
   constructor(private prisma: PrismaService) {}
 
   async findById(identityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: identityId },
     });
 

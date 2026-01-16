@@ -15,18 +15,20 @@ export class WorkerService {
 
   async start(): Promise<void> {
     if (this.isRunning) {
-      this.logger.warn('Worker já está rodando');
+      this.logger.warn('Worker is already running');
       return;
     }
 
     this.isRunning = true;
-    this.logger.info('Worker iniciado. Aguardando mensagens da fila SQS...');
+    this.logger.info('Worker started. Waiting for SQS queue messages...');
 
     while (this.isRunning) {
       try {
         await this.processMessages();
       } catch (error) {
-        this.logger.error(`Erro no loop principal do worker: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        this.logger.error(
+          `Error in worker main loop: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
         await this.sleep(5000);
       }
     }
@@ -34,7 +36,7 @@ export class WorkerService {
 
   stop(): void {
     this.isRunning = false;
-    this.logger.info('Worker parado');
+    this.logger.info('Worker stopped');
   }
 
   private async processMessages(): Promise<void> {
@@ -49,31 +51,39 @@ export class WorkerService {
       try {
         await this.processMessage(message);
       } catch (error) {
-        this.logger.error(`Erro ao processar mensagem: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        this.logger.error(
+          `Error processing message: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
     }
   }
 
-  private async processMessage(message: { ReceiptHandle?: string }): Promise<void> {
+  private async processMessage(message: {
+    ReceiptHandle?: string;
+  }): Promise<void> {
     const parsed = this.sqsReceiver.parseMessage(message);
 
     if (!parsed) {
-      this.logger.warn('Mensagem inválida ou não parseável');
+      this.logger.warn('Invalid or non-parseable message');
       if (message.ReceiptHandle) {
         await this.sqsReceiver.deleteMessage(message.ReceiptHandle);
       }
       return;
     }
 
-    this.logger.info(`Processando job: ${parsed.jobType} (MessageId: ${parsed.messageId})`);
+    this.logger.info(
+      `Processing job: ${parsed.jobType} (MessageId: ${parsed.messageId})`,
+    );
 
     try {
       await this.routeJob(parsed.jobType, parsed.payload);
 
       await this.sqsReceiver.deleteMessage(parsed.receiptHandle);
-      this.logger.info(`Job ${parsed.jobType} processado com sucesso`);
+      this.logger.info(`Job ${parsed.jobType} processed successfully`);
     } catch (error) {
-      this.logger.error(`Erro ao processar job ${parsed.jobType}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(
+        `Error processing job ${parsed.jobType}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
       throw error;
     }
   }
@@ -89,13 +99,12 @@ export class WorkerService {
         break;
 
       default:
-        this.logger.warn(`Tipo de job desconhecido: ${jobType}`);
-        throw new Error(`Tipo de job desconhecido: ${jobType}`);
+        this.logger.warn(`Unknown job type: ${jobType}`);
+        throw new Error(`Unknown job type: ${jobType}`);
     }
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
-

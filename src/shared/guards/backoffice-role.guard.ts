@@ -8,7 +8,8 @@ import {
 import { Reflector } from '@nestjs/core';
 
 export const MIN_LEVEL_KEY = 'minLevel';
-export const MinLevel = (level: number) => SetMetadata(MIN_LEVEL_KEY, level);@Injectable()
+export const MinLevel = (level: number) => SetMetadata(MIN_LEVEL_KEY, level);
+@Injectable()
 export class BackofficeRoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
@@ -26,13 +27,13 @@ export class BackofficeRoleGuard implements CanActivate {
     const user = request.user;
 
     if (!user) {
-      throw new ForbiddenException('Usuário não autenticado');
+      throw new ForbiddenException('User not authenticated');
     }
 
     const userLevel = user.role?.level || user.level || 0;
 
     if (userLevel < minLevel) {
-      throw new ForbiddenException('Permissão insuficiente para esta ação');
+      throw new ForbiddenException('Insufficient permission for this action');
     }
 
     return true;

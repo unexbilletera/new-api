@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { OnboardingModel } from '../models/onboarding.model';
 import { OnboardingMapper } from '../mappers/onboarding.mapper';
@@ -26,15 +30,20 @@ export class UserOnboardingService {
   }
 
   private normalizePhone(phone?: string): string | undefined {
-    return phone ? phone.replace(/\D/g, '') : undefined;
+    if (!phone) return undefined;
+    const cleaned = phone.replace(/[^\d+]/g, '');
+    return cleaned.replace(/^(\+\d{2})(\d+)$/, '$1 $2');
   }
 
   async startUserOnboarding(dto: StartUserOnboardingDto) {
-    this.logger.info('[ONBOARDING] Starting user onboarding', { email: dto.email });
+    this.logger.info('[ONBOARDING] Starting user onboarding', {
+      email: dto.email,
+    });
 
     const email = this.normalizeEmail(dto.email);
 
-    const emailRegex = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const emailRegex =
+      /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
       this.logger.warn('[ONBOARDING] Invalid email format', { email });
       throw new BadRequestException('users.errors.invalidEmail');
@@ -42,7 +51,10 @@ export class UserOnboardingService {
 
     const existingUser = await this.onboardingModel.findUserByEmail(email);
     if (existingUser) {
-      this.logger.warn('[ONBOARDING] Email already in use', { email, existingUserId: existingUser.id });
+      this.logger.warn('[ONBOARDING] Email already in use', {
+        email,
+        existingUserId: existingUser.id,
+      });
       throw new ConflictException('users.errors.emailAlreadyInUse');
     }
 
@@ -65,7 +77,10 @@ export class UserOnboardingService {
       completedSteps: onboardingState.completedSteps,
     });
 
-    return this.onboardingMapper.toStartUserOnboardingResponseDto(user.id, onboardingState);
+    return this.onboardingMapper.toStartUserOnboardingResponseDto(
+      user.id,
+      onboardingState,
+    );
   }
 
   async updateUserOnboarding(userId: string, dto: UpdateUserOnboardingDto) {
@@ -80,7 +95,15 @@ export class UserOnboardingService {
       throw new Error('users.errors.userNotFound');
     }
 
-    const currentState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const userOnboardingState = (user.onboardingState as any) || null;
+    const currentState = {
+      completedSteps: userOnboardingState?.completedSteps
+        ? [...userOnboardingState.completedSteps]
+        : [],
+      needsCorrection: userOnboardingState?.needsCorrection
+        ? [...userOnboardingState.needsCorrection]
+        : [],
+    };
     const dataToUpdate: any = {};
     let completedStep = '';
 
@@ -116,7 +139,9 @@ export class UserOnboardingService {
 
     if (dto.country || dto.birthdate || dto.gender || dto.maritalStatus) {
       dataToUpdate.country = dto.country ?? user.country;
-      dataToUpdate.birthdate = dto.birthdate ? new Date(dto.birthdate) : user.birthdate;
+      dataToUpdate.birthdate = dto.birthdate
+        ? new Date(dto.birthdate)
+        : user.birthdate;
       dataToUpdate.gender = dto.gender ?? user.gender;
       dataToUpdate.maritalStatus = dto.maritalStatus ?? user.maritalStatus;
       completedStep = '1.9';
@@ -124,12 +149,21 @@ export class UserOnboardingService {
 
     if (dto.pep || dto.pepSince) {
       dataToUpdate.pep = dto.pep ?? user.pep;
-      dataToUpdate.pepSince = dto.pepSince ? new Date(dto.pepSince) : user.pepSince;
+      dataToUpdate.pepSince = dto.pepSince
+        ? new Date(dto.pepSince)
+        : user.pepSince;
       completedStep = '1.10';
     }
 
     if (dto.livenessImage) {
-      await this.processLivenessImage(userId, dto.livenessImage, user, currentState);
+      dataToUpdate.livenessImage = dto.livenessImage;
+      dataToUpdate.livenessVerifiedAt = new Date();
+      await this.processLivenessImage(
+        userId,
+        dto.livenessImage,
+        user,
+        currentState,
+      );
       completedStep = '1.11';
     }
 
@@ -137,17 +171,40 @@ export class UserOnboardingService {
       currentState.completedSteps.push(completedStep);
     }
 
-    const requiredUserSteps = ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '1.10', '1.11', '1.12'];
-    const allUserStepsCompleted = requiredUserSteps.every((step) => currentState.completedSteps.includes(step));
+    const requiredUserSteps = [
+      '1.1',
+      '1.2',
+      '1.3',
+      '1.4',
+      '1.5',
+      '1.6',
+      '1.7',
+      '1.8',
+      '1.9',
+      '1.10',
+      '1.11',
+      '1.12',
+    ];
+    const allUserStepsCompleted = requiredUserSteps.every((step) =>
+      currentState.completedSteps.includes(step),
+    );
 
-    if (allUserStepsCompleted && !currentState.completedSteps.includes('1.13')) {
+    if (
+      allUserStepsCompleted &&
+      !currentState.completedSteps.includes('1.13')
+    ) {
       currentState.completedSteps.push('1.13');
-      this.logger.info('[ONBOARDING] All user onboarding steps completed', { userId });
+      this.logger.info('[ONBOARDING] All user onboarding steps completed', {
+        userId,
+      });
     }
 
     dataToUpdate.onboardingState = currentState;
 
-    const updated = await this.onboardingModel.updateUserOnboarding(userId, dataToUpdate);
+    const updated = await this.onboardingModel.updateUserOnboarding(
+      userId,
+      dataToUpdate,
+    );
 
     this.logger.info('[ONBOARDING] User onboarding data updated successfully', {
       userId,
@@ -155,54 +212,81 @@ export class UserOnboardingService {
       totalCompletedSteps: currentState.completedSteps.length,
     });
 
-    return this.onboardingMapper.toUpdateUserOnboardingResponseDto(updated, updated.onboardingState);
+    return this.onboardingMapper.toUpdateUserOnboardingResponseDto(
+      updated,
+      updated.onboardingState,
+    );
   }
 
-  private async processCampaignCode(userId: string, campaignCode: string, userIdPrimary: string) {
+  private async processCampaignCode(
+    userId: string,
+    campaignCode: string,
+    userIdPrimary: string,
+  ) {
     const now = new Date();
     const campaignCodeUpper = campaignCode.toUpperCase().trim();
-    const campaign = await this.onboardingModel.findCampaignCode(campaignCodeUpper);
+    const campaign =
+      await this.onboardingModel.findCampaignCode(campaignCodeUpper);
 
     if (campaign) {
       const validFromOk = !campaign.validFrom || campaign.validFrom <= now;
       const validToOk = !campaign.validTo || campaign.validTo >= now;
       if (validFromOk && validToOk) {
-        const existingUserCode = await this.onboardingModel.findUserCampaignCode(userId);
+        const existingUserCode =
+          await this.onboardingModel.findUserCampaignCode(userId);
         if (!existingUserCode) {
-          await this.onboardingModel.createUserCampaignCode(userId, campaign.id, campaign.code);
+          await this.onboardingModel.createUserCampaignCode(
+            userId,
+            campaign.id,
+            campaign.code,
+          );
         }
       }
     }
   }
 
-  private async processLivenessImage(userId: string, livenessImage: string, user: any, currentState: any) {
-    this.logger.info('[ONBOARDING] Processing liveness verification', { userId });
+  private async processLivenessImage(
+    userId: string,
+    livenessImage: string,
+    user: any,
+    currentState: any,
+  ) {
+    this.logger.info('[ONBOARDING] Processing liveness verification', {
+      userId,
+    });
 
     const validaEnabled = this.appConfigService.isValidaEnabled();
 
     if (!validaEnabled) {
-      this.logger.info('[ONBOARDING] Using simple photo validation (Valida disabled)', { userId });
-      const dataToUpdate = {
-        livenessImage,
-        livenessVerifiedAt: new Date(),
-      };
+      this.logger.info(
+        '[ONBOARDING] Using simple photo validation (Valida disabled)',
+        { userId },
+      );
 
-      if (!currentState.completedSteps.includes('1.11')) currentState.completedSteps.push('1.11');
-      if (!currentState.completedSteps.includes('1.12')) currentState.completedSteps.push('1.12');
+      if (!currentState.completedSteps.includes('1.11'))
+        currentState.completedSteps.push('1.11');
+      if (!currentState.completedSteps.includes('1.12'))
+        currentState.completedSteps.push('1.12');
 
       if (user.email) {
         await this.notificationService.sendEmail({
           to: user.email,
           subject: 'Selfie recebida',
-          text: 'Recebemos sua selfie para verificação de prova de vida.',
+          text: 'We received your selfie for proof-of-life verification.',
         });
       }
 
-      this.logger.info('[ONBOARDING] Simple liveness verification completed', { userId });
-    } else {
-      this.logger.info('[ONBOARDING] Valida enabled - liveness should be processed via /api/users/user/liveness', {
+      this.logger.info('[ONBOARDING] Simple liveness verification completed', {
         userId,
+        completedSteps: currentState.completedSteps,
       });
+    } else {
+      this.logger.info(
+        '[ONBOARDING] Valida enabled - liveness should be processed via /api/users/user/liveness',
+        {
+          userId,
+        },
+      );
     }
   }
 }

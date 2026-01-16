@@ -10,4 +10,3 @@ export class UserResponseDto {
   lastLoginAt?: Date | null;
   createdAt: Date;
 }
-

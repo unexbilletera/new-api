@@ -1,14 +1,12 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { JwtService } from '../../../shared/jwt/jwt.service';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { PasswordHelper } from '../../../shared/helpers/password.helper';
-import { ErrorCodes, ErrorHelper, SuccessCodes } from '../../../shared/errors/app-error';
+import {
+  ErrorCodes,
+  ErrorHelper,
+  SuccessCodes,
+} from '../../../shared/errors/app-error';
 
 @Controller('test/auth')
 export class TestAuthController {
@@ -19,9 +17,7 @@ export class TestAuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async testLogin(
-    @Body() body: { email: string; password: string },
-  ): Promise<{
+  async testLogin(@Body() body: { email: string; password: string }): Promise<{
     token?: string;
     user?: any;
     message?: string;
@@ -85,7 +81,8 @@ export class TestAuthController {
           email: user.email,
           name: user.name,
           status: user.status,
-          identity: user.usersIdentities_usersIdentities_userIdTousers[0] || null,
+          identity:
+            user.usersIdentities_usersIdentities_userIdTousers[0] || null,
         },
         message: SuccessCodes.USERS_LOGIN_SUCCESS,
         code: SuccessCodes.USERS_LOGIN_SUCCESS,
@@ -129,7 +126,9 @@ export class TestAuthController {
       });
 
       if (!user) {
-        throw ErrorHelper.unauthorized(ErrorCodes.BACKOFFICE_INVALID_CREDENTIALS);
+        throw ErrorHelper.unauthorized(
+          ErrorCodes.BACKOFFICE_INVALID_CREDENTIALS,
+        );
       }
 
       if (user.status !== 'active') {
@@ -142,7 +141,9 @@ export class TestAuthController {
       );
 
       if (!isPasswordValid) {
-        throw ErrorHelper.unauthorized(ErrorCodes.BACKOFFICE_INVALID_CREDENTIALS);
+        throw ErrorHelper.unauthorized(
+          ErrorCodes.BACKOFFICE_INVALID_CREDENTIALS,
+        );
       }
 
       await this.prisma.backofficeUsers.update({

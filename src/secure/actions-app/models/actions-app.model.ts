@@ -6,7 +6,7 @@ export class ActionsAppModel {
   constructor(private prisma: PrismaService) {}
 
   async getAction(actionId: string) {
-    return this.prisma.home_actions.findUnique({
+    return this.prisma.home_actions.findFirst({
       where: { id: actionId },
     });
   }

@@ -55,7 +55,9 @@ export class BiometricMapper {
     };
   }
 
-  toRegisterDeviceSoftResponseDto(deviceId: string): RegisterDeviceSoftResponseDto {
+  toRegisterDeviceSoftResponseDto(
+    deviceId: string,
+  ): RegisterDeviceSoftResponseDto {
     return {
       deviceId,
       status: 'active',
@@ -76,7 +78,9 @@ export class BiometricMapper {
     };
   }
 
-  toVerifySmsChallengeResponseDto(deviceId: string): VerifySmsChallengeResponseDto {
+  toVerifySmsChallengeResponseDto(
+    deviceId: string,
+  ): VerifySmsChallengeResponseDto {
     return {
       success: true,
       message: 'Device activated successfully',
@@ -89,7 +93,10 @@ export class BiometricMapper {
     return { status: 'revoked' };
   }
 
-  toListDevicesResponseDto(devices: any[], userId: string): ListDevicesResponseDto[] {
+  toListDevicesResponseDto(
+    devices: any[],
+    userId: string,
+  ): ListDevicesResponseDto[] {
     return devices.map((device) => ({
       deviceId: device.id,
       deviceIdentifier: device.deviceIdentifier,

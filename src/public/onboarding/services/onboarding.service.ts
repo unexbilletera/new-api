@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { randomUUID, randomBytes } from 'crypto';
 const bcrypt = require('bcrypt');
 
@@ -47,7 +52,9 @@ export class OnboardingService {
   }
 
   private normalizePhone(phone?: string): string | undefined {
-    return phone ? phone.replace(/\D/g, '') : undefined;
+    if (!phone) return undefined;
+    const cleaned = phone.replace(/[^\d+]/g, '');
+    return cleaned.replace(/^(\+\d{2})(\d+)$/, '$1 $2');
   }
 
   private async isCodeValid(code: string, hash: string): Promise<boolean> {
@@ -55,19 +62,27 @@ export class OnboardingService {
   }
 
   async startUserOnboarding(dto: StartUserOnboardingDto) {
-    this.logger.info('[ONBOARDING] Starting user onboarding', { email: dto.email });
+    this.logger.info('[ONBOARDING] Starting user onboarding', {
+      email: dto.email,
+    });
 
     const email = this.normalizeEmail(dto.email);
 
-    const emailRegex = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const emailRegex =
+      /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
       this.logger.warn('[ONBOARDING] Invalid email format', { email });
       throw new BadRequestException('users.errors.invalidEmail');
     }
 
-    const existingUser = await this.prisma.users.findFirst({ where: { email } });
+    const existingUser = await this.prisma.users.findFirst({
+      where: { email },
+    });
     if (existingUser) {
-      this.logger.warn('[ONBOARDING] Email already in use', { email, existingUserId: existingUser.id });
+      this.logger.warn('[ONBOARDING] Email already in use', {
+        email,
+        existingUserId: existingUser.id,
+      });
       throw new ConflictException('users.errors.emailAlreadyInUse');
     }
 
@@ -97,7 +112,7 @@ export class OnboardingService {
 
     return {
       success: true,
-      message: 'Onboarding iniciado com sucesso',
+      message: 'Onboarding started successfully',
       userId: user.id,
       onboardingState,
       nextStep: 'emailForm',
@@ -139,11 +154,17 @@ export class OnboardingService {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const onboardingState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
 
     if (dto.type === 'email') {
       try {
-        this.logger.info('[ONBOARDING] Verifying email code', { userId: user.id, email });
+        this.logger.info('[ONBOARDING] Verifying email code', {
+          userId: user.id,
+          email,
+        });
         await this.emailService.verifyCode(email!, dto.code, true);
 
         if (!onboardingState.completedSteps.includes('1.2')) {
@@ -160,14 +181,19 @@ export class OnboardingService {
       } catch (error) {
         this.logger.error(
           '[ONBOARDING] Email code verification failed',
-          error instanceof Error ? error : new Error('Email code verification failed'),
+          error instanceof Error
+            ? error
+            : new Error('Email code verification failed'),
           {
             userId: user.id,
             error: error instanceof Error ? error.message : 'Unknown error',
           },
         );
         if (error instanceof Error) {
-          if (error.message.includes('not found') || error.message.includes('expired')) {
+          if (
+            error.message.includes('not found') ||
+            error.message.includes('expired')
+          ) {
             throw new BadRequestException('users.errors.codeNotFoundOrExpired');
           }
           if (error.message.includes('Invalid')) {
@@ -182,7 +208,10 @@ export class OnboardingService {
       }
 
       try {
-        this.logger.info('[ONBOARDING] Verifying phone code', { userId: user.id, phone });
+        this.logger.info('[ONBOARDING] Verifying phone code', {
+          userId: user.id,
+          phone,
+        });
         await this.smsService.verifyCode(phone, dto.code);
 
         if (!onboardingState.completedSteps.includes('1.5')) {
@@ -199,14 +228,19 @@ export class OnboardingService {
       } catch (error) {
         this.logger.error(
           '[ONBOARDING] Phone code verification failed',
-          error instanceof Error ? error : new Error('Phone code verification failed'),
+          error instanceof Error
+            ? error
+            : new Error('Phone code verification failed'),
           {
             userId: user.id as string,
             error: error instanceof Error ? error.message : 'Unknown error',
           },
         );
         if (error instanceof Error) {
-          if (error.message.includes('not found') || error.message.includes('expired')) {
+          if (
+            error.message.includes('not found') ||
+            error.message.includes('expired')
+          ) {
             throw new BadRequestException('users.errors.codeNotFoundOrExpired');
           }
           if (error.message.includes('Invalid')) {
@@ -221,8 +255,10 @@ export class OnboardingService {
       where: { id: user.id },
       data: {
         onboardingState,
-        emailVerifiedAt: dto.type === 'email' ? new Date() : user.emailVerifiedAt,
-        phoneVerifiedAt: dto.type === 'phone' ? new Date() : user.phoneVerifiedAt,
+        emailVerifiedAt:
+          dto.type === 'email' ? new Date() : user.emailVerifiedAt,
+        phoneVerifiedAt:
+          dto.type === 'phone' ? new Date() : user.phoneVerifiedAt,
         updatedAt: new Date(),
       },
     });
@@ -236,7 +272,7 @@ export class OnboardingService {
 
     return {
       success: true,
-      message: 'Código verificado com sucesso',
+      message: 'Code verified successfully',
       userId: updated.id,
       onboardingState: updated.onboardingState,
       nextStep,
@@ -249,7 +285,7 @@ export class OnboardingService {
       fields: Object.keys(dto),
     });
 
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
 
@@ -258,7 +294,10 @@ export class OnboardingService {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const currentState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const currentState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
     const dataToUpdate: any = { updatedAt: new Date() };
     let completedStep = '';
 
@@ -288,9 +327,10 @@ export class OnboardingService {
           const validFromOk = !campaign.validFrom || campaign.validFrom <= now;
           const validToOk = !campaign.validTo || campaign.validTo >= now;
           if (validFromOk && validToOk) {
-            const existingUserCode = await this.prisma.user_campaign_codes.findUnique({
-              where: { userId },
-            });
+            const existingUserCode =
+              await this.prisma.user_campaign_codes.findFirst({
+                where: { userId },
+              });
             if (!existingUserCode) {
               await this.prisma.user_campaign_codes.create({
                 data: {
@@ -323,7 +363,9 @@ export class OnboardingService {
 
     if (dto.country || dto.birthdate || dto.gender || dto.maritalStatus) {
       dataToUpdate.country = dto.country ?? user.country;
-      dataToUpdate.birthdate = dto.birthdate ? new Date(dto.birthdate) : user.birthdate;
+      dataToUpdate.birthdate = dto.birthdate
+        ? new Date(dto.birthdate)
+        : user.birthdate;
       dataToUpdate.gender = dto.gender ?? user.gender;
       dataToUpdate.maritalStatus = dto.maritalStatus ?? user.maritalStatus;
       completedStep = '1.9';
@@ -331,36 +373,51 @@ export class OnboardingService {
 
     if (dto.pep || dto.pepSince) {
       dataToUpdate.pep = dto.pep ?? user.pep;
-      dataToUpdate.pepSince = dto.pepSince ? new Date(dto.pepSince) : user.pepSince;
+      dataToUpdate.pepSince = dto.pepSince
+        ? new Date(dto.pepSince)
+        : user.pepSince;
       completedStep = '1.10';
     }
 
     if (dto.livenessImage) {
-      this.logger.info('[ONBOARDING] Processing liveness verification', { userId });
+      this.logger.info('[ONBOARDING] Processing liveness verification', {
+        userId,
+      });
 
       const validaEnabled = this.appConfigService.isValidaEnabled();
 
       if (!validaEnabled) {
-        this.logger.info('[ONBOARDING] Using simple photo validation (Valida disabled)', { userId });
+        this.logger.info(
+          '[ONBOARDING] Using simple photo validation (Valida disabled)',
+          { userId },
+        );
         dataToUpdate.livenessImage = dto.livenessImage;
         dataToUpdate.livenessVerifiedAt = new Date();
         completedStep = '1.11';
-        if (!currentState.completedSteps.includes('1.11')) currentState.completedSteps.push('1.11');
-        if (!currentState.completedSteps.includes('1.12')) currentState.completedSteps.push('1.12');
+        if (!currentState.completedSteps.includes('1.11'))
+          currentState.completedSteps.push('1.11');
+        if (!currentState.completedSteps.includes('1.12'))
+          currentState.completedSteps.push('1.12');
 
         if (user.email) {
           await this.notificationService.sendEmail({
             to: user.email,
             subject: 'Selfie recebida',
-            text: 'Recebemos sua selfie para verificação de prova de vida.',
+            text: 'We received your selfie for proof-of-life verification.',
           });
         }
 
-        this.logger.info('[ONBOARDING] Simple liveness verification completed', { userId });
+        this.logger.info(
+          '[ONBOARDING] Simple liveness verification completed',
+          { userId },
+        );
       } else {
-        this.logger.info('[ONBOARDING] Valida enabled - liveness should be processed via /api/users/user/liveness', {
-          userId,
-        });
+        this.logger.info(
+          '[ONBOARDING] Valida enabled - liveness should be processed via /api/users/user/liveness',
+          {
+            userId,
+          },
+        );
       }
     }
 
@@ -368,12 +425,32 @@ export class OnboardingService {
       currentState.completedSteps.push(completedStep);
     }
 
-    const requiredUserSteps = ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '1.10', '1.11', '1.12'];
-    const allUserStepsCompleted = requiredUserSteps.every((step) => currentState.completedSteps.includes(step));
+    const requiredUserSteps = [
+      '1.1',
+      '1.2',
+      '1.3',
+      '1.4',
+      '1.5',
+      '1.6',
+      '1.7',
+      '1.8',
+      '1.9',
+      '1.10',
+      '1.11',
+      '1.12',
+    ];
+    const allUserStepsCompleted = requiredUserSteps.every((step) =>
+      currentState.completedSteps.includes(step),
+    );
 
-    if (allUserStepsCompleted && !currentState.completedSteps.includes('1.13')) {
+    if (
+      allUserStepsCompleted &&
+      !currentState.completedSteps.includes('1.13')
+    ) {
       currentState.completedSteps.push('1.13');
-      this.logger.info('[ONBOARDING] All user onboarding steps completed', { userId });
+      this.logger.info('[ONBOARDING] All user onboarding steps completed', {
+        userId,
+      });
     }
 
     dataToUpdate.onboardingState = currentState;
@@ -398,14 +475,17 @@ export class OnboardingService {
 
     return {
       success: true,
-      message: 'Dados atualizados com sucesso',
+      message: 'Data updated successfully',
       user: updated,
       onboardingState: updated.onboardingState,
     };
   }
 
-  async startIdentityOnboarding(userId: string, dto: StartIdentityOnboardingDto) {
-    const user = await this.prisma.users.findUnique({
+  async startIdentityOnboarding(
+    userId: string,
+    dto: StartIdentityOnboardingDto,
+  ) {
+    const user = await this.prisma.users.findFirst({
       where: { id: userId },
     });
 
@@ -413,13 +493,31 @@ export class OnboardingService {
       throw new NotFoundException('User not found');
     }
 
-    const country = ((dto.country || dto.countryCode || 'br').toLowerCase() as 'ar' | 'br');
+    const country = (dto.country || dto.countryCode || 'br').toLowerCase() as
+      | 'ar'
+      | 'br';
 
     const existingIdentity = await this.prisma.usersIdentities.findFirst({
       where: { userId, country: country as 'ar' | 'br', deletedAt: null },
     });
 
     if (existingIdentity) {
+      const stepToComplete = country === 'ar' ? '2.1' : '3.1';
+      const onboardingState = (user.onboardingState as any) || {
+        completedSteps: [],
+        needsCorrection: [],
+      };
+      const state = onboardingState as any;
+      if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
+        state.completedSteps = [];
+      }
+      if (!state.completedSteps.includes(stepToComplete)) {
+        state.completedSteps.push(stepToComplete);
+        await this.prisma.users.update({
+          where: { id: userId },
+          data: { onboardingState },
+        });
+      }
       return {
         message: 'Identity already exists',
         identityId: existingIdentity.id,
@@ -438,10 +536,11 @@ export class OnboardingService {
     });
 
     try {
-      const defaultProfile = await this.prisma.spending_limit_profiles.findFirst({
-        where: { isDefault: true, isActive: true, deletedAt: null },
-        select: { id: true },
-      });
+      const defaultProfile =
+        await this.prisma.spending_limit_profiles.findFirst({
+          where: { isDefault: true, isActive: true, deletedAt: null },
+          select: { id: true },
+        });
 
       if (defaultProfile?.id) {
         await this.prisma.user_identity_spending_limits.create({
@@ -456,8 +555,27 @@ export class OnboardingService {
         });
       }
     } catch (error) {
-      this.logger.warn('[onboarding] skipping spending limit creation', { error: error?.message || error });
+      this.logger.warn('[onboarding] skipping spending limit creation', {
+        error: error?.message || error,
+      });
     }
+
+    const stepToComplete = country === 'ar' ? '2.1' : '3.1';
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
+    const state = onboardingState as any;
+    if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
+      state.completedSteps = [];
+    }
+    if (!state.completedSteps.includes(stepToComplete)) {
+      state.completedSteps.push(stepToComplete);
+    }
+    await this.prisma.users.update({
+      where: { id: userId },
+      data: { onboardingState },
+    });
 
     return {
       message: 'Identity onboarding started',
@@ -465,8 +583,11 @@ export class OnboardingService {
     };
   }
 
-  async updateIdentityOnboarding(identityId: string, dto: UpdateIdentityOnboardingDto) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+  async updateIdentityOnboarding(
+    identityId: string,
+    dto: UpdateIdentityOnboardingDto,
+  ) {
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: identityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -476,7 +597,8 @@ export class OnboardingService {
     }
 
     const updates: any = { updatedAt: new Date() };
-    const onboardingState = (identity.users_usersIdentities_userIdTousers?.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const onboardingState = (identity.users_usersIdentities_userIdTousers
+      ?.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
 
     if (dto.documentNumber) {
       updates.identityDocumentNumber = dto.documentNumber;
@@ -498,7 +620,10 @@ export class OnboardingService {
     }
     if (!state.completedSteps.includes('2.2')) state.completedSteps.push('2.2');
 
-    await this.prisma.usersIdentities.update({ where: { id: identityId }, data: updates });
+    await this.prisma.usersIdentities.update({
+      where: { id: identityId },
+      data: updates,
+    });
     await this.prisma.users.update({
       where: { id: identity.userId },
       data: { onboardingState, updatedAt: new Date() },
@@ -510,15 +635,24 @@ export class OnboardingService {
     };
   }
 
-  async uploadArgentinaDocument(userId: string, identityId: string, dto: UploadArgentinaDocumentDto) {
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
-    const identity = await this.prisma.usersIdentities.findUnique({ where: { id: identityId } });
+  async uploadArgentinaDocument(
+    userId: string,
+    identityId: string,
+    dto: UploadArgentinaDocumentDto,
+  ) {
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
+    const identity = await this.prisma.usersIdentities.findFirst({
+      where: { id: identityId },
+    });
 
     if (!user || !identity) {
       throw new NotFoundException('User or identity not found');
     }
 
-    const onboardingState = (user.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const onboardingState = (user.onboardingState as any) || {
+      completedSteps: [],
+      needsCorrection: [],
+    };
 
     await this.prisma.usersIdentities.update({
       where: { id: identityId },
@@ -535,11 +669,15 @@ export class OnboardingService {
     });
 
     const userUpdates: any = { updatedAt: new Date() };
-    if (dto.pdf417Data?.firstName) userUpdates.firstName = dto.pdf417Data.firstName;
-    if (dto.pdf417Data?.lastName) userUpdates.lastName = dto.pdf417Data.lastName;
-    if (dto.pdf417Data?.dateOfBirth) userUpdates.birthdate = new Date(dto.pdf417Data.dateOfBirth);
+    if (dto.pdf417Data?.firstName)
+      userUpdates.firstName = dto.pdf417Data.firstName;
+    if (dto.pdf417Data?.lastName)
+      userUpdates.lastName = dto.pdf417Data.lastName;
+    if (dto.pdf417Data?.dateOfBirth)
+      userUpdates.birthdate = new Date(dto.pdf417Data.dateOfBirth);
     if (dto.pdf417Data?.gender)
-      userUpdates.gender = dto.pdf417Data.gender.toLowerCase() === 'm' ? 'male' : 'female';
+      userUpdates.gender =
+        dto.pdf417Data.gender.toLowerCase() === 'm' ? 'male' : 'female';
 
     const state = onboardingState as any;
     if (!state.completedSteps || !Array.isArray(state.completedSteps)) {
@@ -551,13 +689,16 @@ export class OnboardingService {
 
     userUpdates.onboardingState = onboardingState;
 
-    await this.prisma.users.update({ where: { id: userId }, data: userUpdates });
+    await this.prisma.users.update({
+      where: { id: userId },
+      data: userUpdates,
+    });
 
     if (user.email) {
       await this.notificationService.sendEmail({
         to: user.email,
         subject: 'Documento recebido',
-        text: 'Recebemos seu documento argentino para validação.',
+        text: 'We received your Argentine document for validation.',
       });
     }
 
@@ -568,7 +709,7 @@ export class OnboardingService {
   }
 
   async getOnboardingPendingData(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: userIdentityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -577,16 +718,26 @@ export class OnboardingService {
       throw new NotFoundException('Identity not found');
     }
 
-    const state = (identity.users_usersIdentities_userIdTousers?.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
-    const requiredSteps = identity.country === 'ar'
-      ? ['2.1', '2.2', '2.3', '2.4']
-      : ['3.1', '3.2', '3.3', '3.4', '3.5'];
+    const state = (identity.users_usersIdentities_userIdTousers
+      ?.onboardingState as any) || { completedSteps: [], needsCorrection: [] };
+    const requiredSteps =
+      identity.country === 'ar'
+        ? ['2.1', '2.2', '2.3', '2.4']
+        : ['3.1', '3.2', '3.3', '3.4', '3.5'];
 
-    const pendingSteps = requiredSteps.filter((step) => !state.completedSteps?.includes(step));
-    return { pendingFields: pendingSteps, needsCorrection: state.needsCorrection || [] };
+    const pendingSteps = requiredSteps.filter(
+      (step) => !state.completedSteps?.includes(step),
+    );
+    return {
+      pendingFields: pendingSteps,
+      needsCorrection: state.needsCorrection || [],
+    };
   }
 
-  async updateOnboardingSpecificData(userIdentityId: string, fieldUpdates: any) {
+  async updateOnboardingSpecificData(
+    userIdentityId: string,
+    fieldUpdates: any,
+  ) {
     await this.prisma.usersIdentities.update({
       where: { id: userIdentityId },
       data: {
@@ -599,7 +750,7 @@ export class OnboardingService {
   }
 
   async getOnboardingStatus(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: userIdentityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -608,13 +759,18 @@ export class OnboardingService {
       throw new NotFoundException('Identity not found');
     }
 
-    const state = (identity.users_usersIdentities_userIdTousers?.onboardingState as any) || { completedSteps: [] };
-    const requiredSteps = identity.country === 'ar'
-      ? ['2.1', '2.2', '2.3', '2.4']
-      : ['3.1', '3.2', '3.3', '3.4', '3.5'];
+    const state = (identity.users_usersIdentities_userIdTousers
+      ?.onboardingState as any) || { completedSteps: [] };
+    const requiredSteps =
+      identity.country === 'ar'
+        ? ['2.1', '2.2', '2.3', '2.4']
+        : ['3.1', '3.2', '3.3', '3.4', '3.5'];
     const done = state.completedSteps || [];
     const pendingSteps = requiredSteps.filter((s) => !done.includes(s));
-    const completionPercentage = Math.round(((requiredSteps.length - pendingSteps.length) / requiredSteps.length) * 100);
+    const completionPercentage = Math.round(
+      ((requiredSteps.length - pendingSteps.length) / requiredSteps.length) *
+        100,
+    );
 
     return {
       status: pendingSteps.length === 0 ? 'completed' : 'pending',
@@ -624,7 +780,7 @@ export class OnboardingService {
   }
 
   async validateOnboardingData(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({
+    const identity = await this.prisma.usersIdentities.findFirst({
       where: { id: userIdentityId },
       include: { users_usersIdentities_userIdTousers: true },
     });
@@ -635,14 +791,18 @@ export class OnboardingService {
 
     const errors = [] as string[];
     if (!identity.identityDocumentNumber) errors.push('identityDocumentNumber');
-    if (!identity.identityDocumentFrontImage) errors.push('identityDocumentFrontImage');
-    if (!identity.identityDocumentBackImage) errors.push('identityDocumentBackImage');
+    if (!identity.identityDocumentFrontImage)
+      errors.push('identityDocumentFrontImage');
+    if (!identity.identityDocumentBackImage)
+      errors.push('identityDocumentBackImage');
 
     return { isValid: errors.length === 0, errors };
   }
 
   async retryOnboarding(userIdentityId: string) {
-    const identity = await this.prisma.usersIdentities.findUnique({ where: { id: userIdentityId } });
+    const identity = await this.prisma.usersIdentities.findFirst({
+      where: { id: userIdentityId },
+    });
     if (!identity) {
       throw new NotFoundException('Identity not found');
     }

@@ -72,7 +72,9 @@ export class ValidaService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const error = new Error(`Valida token request failed: ${response.status}`);
+      const error = new Error(
+        `Valida token request failed: ${response.status}`,
+      );
       this.logger.error('[VALIDA] Token request failed', error, {
         status: response.status,
         errorData,
@@ -180,7 +182,9 @@ export class ValidaService {
       throw new Error('refId is required');
     }
 
-    const baseUrl = params.baseUrl || this.configService.get<string>('APP_BASE_URL', 'http://localhost:3000');
+    const baseUrl =
+      params.baseUrl ||
+      this.configService.get<string>('APP_BASE_URL', 'http://localhost:3000');
     const apiPath = params.apiPath || '/api';
     const validaEndpoint = `${baseUrl}${apiPath}/valida/`;
 

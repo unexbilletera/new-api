@@ -4,7 +4,14 @@ import {
   BadRequestException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { randomUUID, randomBytes, createPublicKey, createVerify, createHash, verify } from 'crypto';
+import {
+  randomUUID,
+  randomBytes,
+  createPublicKey,
+  createVerify,
+  createHash,
+  verify,
+} from 'crypto';
 const bcrypt = require('bcrypt');
 
 import { PrismaService } from '../../../shared/prisma/prisma.service';
@@ -71,7 +78,14 @@ export class BiometricService {
         return verify(null, digest, { key: publicKeyPem }, signature);
       } else {
         try {
-          if (verify(null, digest, { key: publicKeyPem, dsaEncoding: 'ieee-p1363' }, signature)) {
+          if (
+            verify(
+              null,
+              digest,
+              { key: publicKeyPem, dsaEncoding: 'ieee-p1363' },
+              signature,
+            )
+          ) {
             return true;
           }
         } catch {}
@@ -109,7 +123,11 @@ export class BiometricService {
     }
   }
 
-  private verifySignatureRS256(publicKeyPem: string, challenge: string, signatureBase64: string): boolean {
+  private verifySignatureRS256(
+    publicKeyPem: string,
+    challenge: string,
+    signatureBase64: string,
+  ): boolean {
     try {
       const signature = Buffer.from(signatureBase64, 'base64');
       const verifier = createVerify('sha256');
@@ -129,9 +147,18 @@ export class BiometricService {
     signatureFormat: string = 'der',
   ): boolean {
     if (keyType === 'ES256') {
-      return this.verifySignatureES256(publicKeyPem, challenge, signatureBase64, signatureFormat);
+      return this.verifySignatureES256(
+        publicKeyPem,
+        challenge,
+        signatureBase64,
+        signatureFormat,
+      );
     } else if (keyType === 'RS256') {
-      return this.verifySignatureRS256(publicKeyPem, challenge, signatureBase64);
+      return this.verifySignatureRS256(
+        publicKeyPem,
+        challenge,
+        signatureBase64,
+      );
     }
     return false;
   }
@@ -139,7 +166,7 @@ export class BiometricService {
   async generateChallenge(dto: GenerateChallengeDto) {
     const { userId, deviceId } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -173,9 +200,15 @@ export class BiometricService {
   }
 
   async verifySignature(dto: VerifySignatureDto) {
-    const { userId, deviceId, challengeId, signature, signatureFormat = 'der' } = dto;
+    const {
+      userId,
+      deviceId,
+      challengeId,
+      signature,
+      signatureFormat = 'der',
+    } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -187,7 +220,7 @@ export class BiometricService {
       throw new NotFoundException('auth.errors.deviceNotFound');
     }
 
-    const challengeRecord = await this.prisma.challenges.findUnique({
+    const challengeRecord = await this.prisma.challenges.findFirst({
       where: { id: challengeId },
     });
     if (!challengeRecord) {
@@ -202,7 +235,10 @@ export class BiometricService {
       throw new UnauthorizedException('auth.errors.challengeAlreadyUsed');
     }
 
-    if (challengeRecord.userId !== userId || challengeRecord.deviceId !== device.id) {
+    if (
+      challengeRecord.userId !== userId ||
+      challengeRecord.deviceId !== device.id
+    ) {
       throw new UnauthorizedException('auth.errors.invalidChallenge');
     }
 
@@ -254,7 +290,14 @@ export class BiometricService {
   }
 
   async registerDevice(userId: string, dto: RegisterDeviceDto) {
-    const { publicKeyPem, keyType, platform, attestation, deviceIdentifier, registrationType } = dto;
+    const {
+      publicKeyPem,
+      keyType,
+      platform,
+      attestation,
+      deviceIdentifier,
+      registrationType,
+    } = dto;
 
     if (!['ES256', 'RS256'].includes(keyType)) {
       throw new BadRequestException('auth.errors.invalidKeyType');
@@ -268,7 +311,7 @@ export class BiometricService {
       throw new BadRequestException('auth.errors.invalidPublicKey');
     }
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -299,7 +342,11 @@ export class BiometricService {
           publicKeyPem,
           keyType,
           platform,
-          attestation: attestation ? (typeof attestation === 'string' ? JSON.parse(attestation) : attestation) : undefined,
+          attestation: attestation
+            ? typeof attestation === 'string'
+              ? JSON.parse(attestation)
+              : attestation
+            : undefined,
           status: initialStatus,
           revokedAt: null,
         },
@@ -321,7 +368,11 @@ export class BiometricService {
         publicKeyPem,
         keyType,
         platform,
-        attestation: attestation ? (typeof attestation === 'string' ? JSON.parse(attestation) : attestation) : undefined,
+        attestation: attestation
+          ? typeof attestation === 'string'
+            ? JSON.parse(attestation)
+            : attestation
+          : undefined,
         status: initialStatus,
       },
     });
@@ -335,7 +386,8 @@ export class BiometricService {
   }
 
   async registerDeviceSoft(userId: string, dto: RegisterDeviceSoftDto) {
-    const { publicKeyPem, keyType, platform, attestation, deviceIdentifier } = dto;
+    const { publicKeyPem, keyType, platform, attestation, deviceIdentifier } =
+      dto;
 
     if (!['ES256', 'RS256'].includes(keyType)) {
       throw new BadRequestException('auth.errors.invalidKeyType');
@@ -349,7 +401,7 @@ export class BiometricService {
       throw new BadRequestException('auth.errors.invalidPublicKey');
     }
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -375,7 +427,11 @@ export class BiometricService {
         publicKeyPem,
         keyType,
         platform,
-        attestation: attestation ? (typeof attestation === 'string' ? JSON.parse(attestation) : attestation) : undefined,
+        attestation: attestation
+          ? typeof attestation === 'string'
+            ? JSON.parse(attestation)
+            : attestation
+          : undefined,
         status: 'active',
       },
     });
@@ -388,10 +444,13 @@ export class BiometricService {
     };
   }
 
-  async sendDeviceSmsValidation(userId: string, dto: SendDeviceSmsValidationDto) {
+  async sendDeviceSmsValidation(
+    userId: string,
+    dto: SendDeviceSmsValidationDto,
+  ) {
     const { deviceId } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -427,7 +486,7 @@ export class BiometricService {
   async verifySmsAndActivate(userId: string, dto: VerifySmsChallengeDto) {
     const { deviceId, code } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -483,7 +542,7 @@ export class BiometricService {
   async revokeDevice(userId: string, dto: RevokeDeviceDto) {
     const { deviceId } = dto;
 
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -509,7 +568,7 @@ export class BiometricService {
   }
 
   async listUserDevices(userId: string) {
-    const user = await this.prisma.users.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findFirst({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
@@ -569,7 +628,7 @@ export class BiometricService {
         isValid: false,
         status: 'revoked',
         error: 'auth.errors.deviceRevoked',
-        message: 'Sua conta foi acessada em outro dispositivo.',
+        message: 'Your account was accessed on another device.',
         canRegister: true,
         deviceId: device.id,
       };

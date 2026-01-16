@@ -2,7 +2,10 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { AuthUserModel } from '../models/user.model';
 import { EmailService } from '../../../shared/email/email.service';
 import { AuthMapper } from '../mappers/auth.mapper';
-import { SendEmailValidationDto, VerifyEmailCodeDto } from '../dto/email-validation.dto';
+import {
+  SendEmailValidationDto,
+  VerifyEmailCodeDto,
+} from '../dto/email-validation.dto';
 
 @Injectable()
 export class EmailValidationService {
@@ -20,12 +23,16 @@ export class EmailValidationService {
       true,
     );
 
-    return this.authMapper.toEmailValidationResponseDto(result.message, result.debug);
+    return this.authMapper.toEmailValidationResponseDto(result.message);
   }
 
   async verifyEmailCode(dto: VerifyEmailCodeDto) {
     try {
-      const result = await this.emailService.verifyCode(dto.email, dto.code, true);
+      const result = await this.emailService.verifyCode(
+        dto.email,
+        dto.code,
+        true,
+      );
 
       const normalizedEmail = this.emailService.normalizeEmail(dto.email);
       const user = await this.userModel.findByEmail(normalizedEmail);
@@ -34,7 +41,10 @@ export class EmailValidationService {
         await this.userModel.updateEmailVerified(normalizedEmail);
       }
 
-      return this.authMapper.toEmailCodeVerificationResponseDto(result.message, result.email);
+      return this.authMapper.toEmailCodeVerificationResponseDto(
+        result.message,
+        result.email,
+      );
     } catch (error) {
       if (error instanceof Error) {
         throw new BadRequestException(error.message);

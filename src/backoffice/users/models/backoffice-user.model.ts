@@ -19,7 +19,7 @@ export class BackofficeUserModel {
   }
 
   async findById(id: string) {
-    return this.prisma.backofficeUsers.findUnique({
+    return this.prisma.backofficeUsers.findFirst({
       where: { id },
     });
   }

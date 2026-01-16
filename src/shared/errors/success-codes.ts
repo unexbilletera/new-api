@@ -1,4 +1,3 @@
-
 export enum SuccessCodes {
   USERS_LOGIN_SUCCESS = '200 users.success.login',
   USERS_LOGOUT_SUCCESS = '200 users.success.logout',
@@ -16,6 +15,10 @@ export enum SuccessCodes {
   TRANSACTIONS_CONFIRMED = '200 transactions.success.confirmed',
   TRANSACTIONS_CANCELLED = '200 transactions.success.cancelled',
   TRANSACTIONS_COMPLETED = '200 transactions.success.completed',
+
+  TRANSACTIONAL_PASSWORD_CREATED = '200 transactionalPassword.success.created',
+  TRANSACTIONAL_PASSWORD_UPDATED = '200 transactionalPassword.success.updated',
+  TRANSACTIONAL_PASSWORD_VALIDATED = '200 transactionalPassword.success.validated',
 
   OPERATION_SUCCESS = '200 server.success.operationSuccess',
   DATA_RETRIEVED = '200 server.success.dataRetrieved',

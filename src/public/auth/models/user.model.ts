@@ -22,7 +22,9 @@ export class AuthUserModel {
       where: {
         id: userId,
         status: { in: ['pending', 'enable', 'error', 'disable'] },
-        access: { in: ['administrator', 'supervisor', 'operator', 'customer', 'user'] },
+        access: {
+          in: ['administrator', 'supervisor', 'operator', 'customer', 'user'],
+        },
       },
     });
 
@@ -103,7 +105,7 @@ export class AuthUserModel {
   }
 
   async findByIdSelect(userId: string) {
-    return this.prisma.users.findUnique({
+    return this.prisma.users.findFirst({
       where: { id: userId },
       select: {
         id: true,
@@ -118,7 +120,7 @@ export class AuthUserModel {
   }
 
   async findWithRelations(userId: string) {
-    return this.prisma.users.findUnique({
+    return this.prisma.users.findFirst({
       where: { id: userId },
     });
   }

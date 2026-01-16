@@ -2,7 +2,15 @@
 const autocannon = require('autocannon');
 
 class LoadTest {
-  constructor({ host, email, password, duration = 30, connections = 10, pipelining = 1, timeout = 10 }) {
+  constructor({
+    host,
+    email,
+    password,
+    duration = 30,
+    connections = 10,
+    pipelining = 1,
+    timeout = 10,
+  }) {
     this.host = host || '';
     this.email = email || '';
     this.password = password || '';
@@ -14,7 +22,9 @@ class LoadTest {
 
   validate() {
     if (!this.host || !this.email || !this.password) {
-      console.error('Missing host, email or password. Set them before running.');
+      console.error(
+        'Missing host, email or password. Set them before running.',
+      );
       process.exit(1);
     }
   }
@@ -37,7 +47,10 @@ class LoadTest {
       body: JSON.stringify({ email: this.email, password: this.password }),
     });
 
-    autocannon.track(instance, { renderProgressBar: true, renderResultsTable: true });
+    autocannon.track(instance, {
+      renderProgressBar: true,
+      renderResultsTable: true,
+    });
 
     instance.on('tick', () => {});
 

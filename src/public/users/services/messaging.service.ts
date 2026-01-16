@@ -4,7 +4,10 @@ import { MessagingResponseDto } from '../dto/response';
 
 @Injectable()
 export class MessagingService {
-  async sendMessage(userId: string, dto: SendMessageDto): Promise<MessagingResponseDto> {
+  async sendMessage(
+    userId: string,
+    dto: SendMessageDto,
+  ): Promise<MessagingResponseDto> {
     return {
       message: 'Message sent successfully',
     };

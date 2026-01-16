@@ -7,4 +7,3 @@ import { PrismaModule } from '../../shared/prisma/prisma.module';
   exports: [],
 })
 export class SecureLedgerModule {}
-

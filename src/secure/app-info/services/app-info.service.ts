@@ -9,8 +9,8 @@ import {
 
 @Injectable()
 export class AppInfoService {
-  constructor(private prisma: PrismaService) {}  async getAppInfo(userVersion?: string): Promise<AppInfoResponseDto> {
-
+  constructor(private prisma: PrismaService) {}
+  async getAppInfo(userVersion?: string): Promise<AppInfoResponseDto> {
     const configs = await this.prisma.system_config.findMany({
       where: {
         key: {
@@ -33,7 +33,8 @@ export class AppInfoService {
     const currentVersion = configMap.get('current_app_version') || '1.0.0';
     const updateUrl = configMap.get('update_url') || undefined;
     const maintenanceMode = configMap.get('maintenance_mode') === 'true';
-    const maintenanceMessage = configMap.get('maintenance_message') || undefined;
+    const maintenanceMessage =
+      configMap.get('maintenance_message') || undefined;
 
     const updateRequired = userVersion
       ? this.isVersionLower(userVersion, minVersion)
@@ -50,7 +51,8 @@ export class AppInfoService {
       maintenanceMessage,
       features,
     };
-  }  async checkVersion(
+  }
+  async checkVersion(
     userVersion: string,
     platform?: string,
   ): Promise<VersionCheckResponseDto> {
@@ -60,14 +62,18 @@ export class AppInfoService {
     const currentKey = platform
       ? `current_app_version_${platform}`
       : 'current_app_version';
-    const updateUrlKey = platform
-      ? `update_url_${platform}`
-      : 'update_url';
+    const updateUrlKey = platform ? `update_url_${platform}` : 'update_url';
 
     const configs = await this.prisma.system_config.findMany({
       where: {
         key: {
-          in: [configKey, currentKey, updateUrlKey, 'min_app_version', 'current_app_version'],
+          in: [
+            configKey,
+            currentKey,
+            updateUrlKey,
+            'min_app_version',
+            'current_app_version',
+          ],
         },
       },
     });
@@ -77,9 +83,7 @@ export class AppInfoService {
     );
 
     const minVersion =
-      configMap.get(configKey) ||
-      configMap.get('min_app_version') ||
-      '1.0.0';
+      configMap.get(configKey) || configMap.get('min_app_version') || '1.0.0';
     const currentVersion =
       configMap.get(currentKey) ||
       configMap.get('current_app_version') ||
@@ -97,23 +101,18 @@ export class AppInfoService {
       updateRecommended,
       updateUrl,
     };
-  }  async getNews(): Promise<NewsResponseDto[]> {
+  }
+  async getNews(): Promise<NewsResponseDto[]> {
     const now = new Date();
 
     const news = await this.prisma.news.findMany({
       where: {
         status: 'enable',
         deletedAt: null,
-        OR: [
-          { validFrom: null },
-          { validFrom: { lte: now } },
-        ],
+        OR: [{ validFrom: null }, { validFrom: { lte: now } }],
         AND: [
           {
-            OR: [
-              { validTo: null },
-              { validTo: { gte: now } },
-            ],
+            OR: [{ validTo: null }, { validTo: { gte: now } }],
           },
         ],
       },
@@ -133,8 +132,8 @@ export class AppInfoService {
       active: n.status === 'enable',
       createdAt: n.createdAt,
     }));
-  }  async getFeatures(): Promise<Record<string, boolean>> {
-
+  }
+  async getFeatures(): Promise<Record<string, boolean>> {
     const modules = await this.prisma.modules.findMany({
       where: { isActive: 1 },
     });
@@ -151,7 +150,8 @@ export class AppInfoService {
     features['notifications'] = process.env.FEATURE_NOTIFICATIONS !== 'false';
 
     return features;
-  }  async getFullInfo(userVersion?: string): Promise<FullAppInfoResponseDto> {
+  }
+  async getFullInfo(userVersion?: string): Promise<FullAppInfoResponseDto> {
     const [info, news, features] = await Promise.all([
       this.getAppInfo(userVersion),
       this.getNews(),
@@ -163,7 +163,8 @@ export class AppInfoService {
       news,
       features,
     };
-  }  private isVersionLower(userVersion: string, targetVersion: string): boolean {
+  }
+  private isVersionLower(userVersion: string, targetVersion: string): boolean {
     const parseVersion = (v: string) => {
       const parts = v.replace(/[^0-9.]/g, '').split('.');
       return {

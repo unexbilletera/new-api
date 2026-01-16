@@ -1,10 +1,25 @@
-import { Injectable, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { randomBytes, createPublicKey, createVerify, createHash, verify } from 'crypto';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
+import {
+  randomBytes,
+  createPublicKey,
+  createVerify,
+  createHash,
+  verify,
+} from 'crypto';
 import { DeviceModel } from '../models/device.model';
 import { BiometricMapper } from '../mappers/biometric.mapper';
 import { JwtService, JwtPayload } from '../../../shared/jwt/jwt.service';
 import { SmsService } from '../../../shared/sms/sms.service';
-import { GenerateChallengeDto, VerifySignatureDto, VerifySmsChallengeDto } from '../dto/biometric.dto';
+import {
+  GenerateChallengeDto,
+  VerifySignatureDto,
+  VerifySmsChallengeDto,
+} from '../dto/biometric.dto';
 
 const MIN_CHALLENGE_TTL_SECONDS = 30;
 const DEFAULT_CHALLENGE_TTL_SECONDS = 180;
@@ -41,7 +56,11 @@ export class ChallengeVerificationService {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const device = await this.deviceModel.findDeviceByIdAndUser(deviceId, userId, 'active');
+    const device = await this.deviceModel.findDeviceByIdAndUser(
+      deviceId,
+      userId,
+      'active',
+    );
     if (!device) {
       throw new NotFoundException('auth.errors.deviceNotFound');
     }
@@ -65,19 +84,30 @@ export class ChallengeVerificationService {
   }
 
   async verifySignature(dto: VerifySignatureDto) {
-    const { userId, deviceId, challengeId, signature, signatureFormat = 'der' } = dto;
+    const {
+      userId,
+      deviceId,
+      challengeId,
+      signature,
+      signatureFormat = 'der',
+    } = dto;
 
     const user = await this.deviceModel.findUserById(userId);
     if (!user) {
       throw new NotFoundException('users.errors.userNotFound');
     }
 
-    const device = await this.deviceModel.findDeviceByIdAndUser(deviceId, userId, 'active');
+    const device = await this.deviceModel.findDeviceByIdAndUser(
+      deviceId,
+      userId,
+      'active',
+    );
     if (!device) {
       throw new NotFoundException('auth.errors.deviceNotFound');
     }
 
-    const challengeRecord = await this.deviceModel.findChallengeById(challengeId);
+    const challengeRecord =
+      await this.deviceModel.findChallengeById(challengeId);
     if (!challengeRecord) {
       throw new NotFoundException('auth.errors.challengeNotFound');
     }
@@ -90,7 +120,10 @@ export class ChallengeVerificationService {
       throw new UnauthorizedException('auth.errors.challengeAlreadyUsed');
     }
 
-    if (challengeRecord.userId !== userId || challengeRecord.deviceId !== device.id) {
+    if (
+      challengeRecord.userId !== userId ||
+      challengeRecord.deviceId !== device.id
+    ) {
       throw new UnauthorizedException('auth.errors.invalidChallenge');
     }
 
@@ -106,7 +139,10 @@ export class ChallengeVerificationService {
       throw new UnauthorizedException('auth.errors.invalidSignature');
     }
 
-    await this.deviceModel.updateChallenge(challengeId, { used: true, usedAt: new Date() });
+    await this.deviceModel.updateChallenge(challengeId, {
+      used: true,
+      usedAt: new Date(),
+    });
 
     await this.deviceModel.updateDevice(device.id, { lastUsedAt: new Date() });
 
@@ -120,7 +156,11 @@ export class ChallengeVerificationService {
 
     await this.deviceModel.updateUserAccessToken(user.id, accessToken);
 
-    return this.biometricMapper.toVerifySignatureResponseDto(accessToken, 3600, user);
+    return this.biometricMapper.toVerifySignatureResponseDto(
+      accessToken,
+      3600,
+      user,
+    );
   }
 
   async verifySmsAndActivate(userId: string, dto: VerifySmsChallengeDto) {
@@ -143,7 +183,12 @@ export class ChallengeVerificationService {
     try {
       await this.smsService.verifyCode(user.phone, code, false);
 
-      await this.deviceModel.updateDevicesByUserStatus(userId, 'active', 'revoked', new Date());
+      await this.deviceModel.updateDevicesByUserStatus(
+        userId,
+        'active',
+        'revoked',
+        new Date(),
+      );
 
       await this.deviceModel.updateDevice(device.id, { status: 'active' });
 
@@ -172,9 +217,18 @@ export class ChallengeVerificationService {
     signatureFormat: string = 'der',
   ): boolean {
     if (keyType === 'ES256') {
-      return this.verifySignatureES256(publicKeyPem, challenge, signatureBase64, signatureFormat);
+      return this.verifySignatureES256(
+        publicKeyPem,
+        challenge,
+        signatureBase64,
+        signatureFormat,
+      );
     } else if (keyType === 'RS256') {
-      return this.verifySignatureRS256(publicKeyPem, challenge, signatureBase64);
+      return this.verifySignatureRS256(
+        publicKeyPem,
+        challenge,
+        signatureBase64,
+      );
     }
     return false;
   }
@@ -193,7 +247,14 @@ export class ChallengeVerificationService {
         return verify(null, digest, { key: publicKeyPem }, signature);
       } else {
         try {
-          if (verify(null, digest, { key: publicKeyPem, dsaEncoding: 'ieee-p1363' }, signature)) {
+          if (
+            verify(
+              null,
+              digest,
+              { key: publicKeyPem, dsaEncoding: 'ieee-p1363' },
+              signature,
+            )
+          ) {
             return true;
           }
         } catch {}
@@ -231,7 +292,11 @@ export class ChallengeVerificationService {
     }
   }
 
-  private verifySignatureRS256(publicKeyPem: string, challenge: string, signatureBase64: string): boolean {
+  private verifySignatureRS256(
+    publicKeyPem: string,
+    challenge: string,
+    signatureBase64: string,
+  ): boolean {
     try {
       const signature = Buffer.from(signatureBase64, 'base64');
       const verifier = createVerify('sha256');

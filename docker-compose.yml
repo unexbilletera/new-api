@@ -11,41 +11,271 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: UnexDev@2026
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - unex-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: unex-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: unex-api
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=mysql://admin:UnexDev@2026@mysql:3306/unex?connection_limit=50&pool_timeout=30
-    volumes:
-      - .:/app
-      - /app/node_modules
     depends_on:
       mysql:
         condition: service_healthy
-    networks:
-      - unex-network
-    command: npm run start:dev
+      redis:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    environment:
+      # ============================================
+      # SERVER CONFIG
+      # ============================================
+      WALLET_SERVER_PORT: 3000
+      WALLET_SERVER_URL: http://localhost:3000
+      WALLET_SERVER_DOMAIN: localhost
+      WALLET_SERVER_MAIL_FROM: noreply@unex.local
+      WALLET_JOB_KEY: local-dev-job-key-12345
+      WALLET_LOGO_IMAGE_ULR: https://via.placeholder.com/200x50?text=UNEX+DEV
+
+      # ============================================
+      # DATABASE (MySQL)
+      # ============================================
+      WALLET_MYSQL_LOG: enable
+      WALLET_MYSQL_URL: mysql://admin:UnexDev%402026@mysql:3306/unex?connection_limit=10&pool_timeout=10&connect_timeout=10
+      DATABASE_URL: mysql://admin:UnexDev%402026@mysql:3306/unex
+
+      # ============================================
+      # CACHE (Redis)
+      # ============================================
+      WALLET_REDIS_URL: redis://redis:6379/0
+
+      # ============================================
+      # AUTHENTICATION (JWT)
+      # ============================================
+      WALLET_TOKEN_SECRET: local-dev-jwt-secret-do-not-use-in-production
+      WALLET_TOKEN_EXPIRE: 86400 # 24 hours
+
+      # ============================================
+      # DEVELOPMENT MODE FLAGS
+      # ============================================
+      WALLET_SANDBOX: enable
+      WALLET_SANDBOX_SEND_PUSH: disable
+      WALLET_SANDBOX_SEND_MAIL: 'false'
+      WALLET_SANDBOX_SEND_SMS: 'false'
+      WALLET_DEVICE_VALIDATION_DISABLE: enable
+      ENABLE_MOCK_CODES: 'true'
+
+      # ============================================
+      # FEATURES
+      # ============================================
+      WALLET_TASKS: enable
+      WALLET_TASKS_LOG: enable
+      WALLET_SPENDING_LIMITS: enable
+      WALLET_SPENDING_LIMITS_LOG: enable
+      BIOMETRIC_CHALLENGE_TTL: 300 # 5 minutes
+
+      # ============================================
+      # EMAIL (SES) - Disabled for local dev
+      # ============================================
+      WALLET_EMAIL_KEY: local-dev-email-key
+      WALLET_EMAIL_PASSWORD: local-dev-email-password
+      WALLET_EMAIL_REGION: us-east-1
+
+      # ============================================
+      # SMS (Twilio) - Mock values for local dev
+      # ============================================
+      TWILIO_ACCOUNT_SID: AC_local_dev_mock_sid
+      TWILIO_AUTH_TOKEN: local_dev_mock_token
+      TWILIO_SMS_FROM: '+15551234567'
+      TWILIO_WHATSAPP_FROM: '+15551234567'
+      TWILIO_WHATSAPP_CONTENT_SID: local_dev_content_sid
+
+      # ============================================
+      # FILES (S3) - Mock values for local dev
+      # ============================================
+      WALLET_FILES_KEY: local-dev-s3-key
+      WALLET_FILES_PASSWORD: local-dev-s3-password
+      WALLET_FILES_REGION: us-east-1
+      WALLET_FILES_BUCKET: unex-local-dev-bucket
+      WALLET_FILES_PUBLIC_URL: http://localhost:3000/files
+
+      # ============================================
+      # PUSH NOTIFICATIONS (Expo)
+      # ============================================
+      WALLET_EXPO_PUSH_TOKEN: local-dev-expo-token
+
+      # ============================================
+      # AWS / SQS
+      # ============================================
+      AWS_REGION: us-east-1
+      SQS_TRANSACTIONS_QUEUE_URL: http://localhost:4566/000000000000/unex-transactions-dev
+
+      # ============================================
+      # EXTERNAL SERVICES - ALL DISABLED FOR LOCAL DEV
+      # ============================================
+      # Bind (Banking)
+      WALLET_BIND: disable
+      WALLET_BIND_LOG: enable
+      WALLET_BIND_PROXY: disable
+      WALLET_BIND_URL: http://mock-bind.local
+      WALLET_BIND_USERNAME: mock_bind_user
+      WALLET_BIND_PASSWORD: mock_bind_pass
+      WALLET_BIND_CRT: mock_certificate
+      WALLET_BIND_KEY: mock_key
+      WALLET_BIND_PASSPHRASE: mock_passphrase
+      WALLET_BIND_ACCOUNT: mock_account_123
+      WALLET_BIND_WEBHOOK_SECRET: local-dev-bind-webhook-secret
+
+      # Cronos (Crypto)
+      WALLET_CRONOS: disable
+      WALLET_CRONOS_LOG: enable
+      WALLET_CRONOS_PROXY: disable
+      WALLET_CRONOS_URL: http://mock-cronos.local
+      WALLET_CRONOS_USERNAME: mock_cronos_user
+      WALLET_CRONOS_PASSWORD: mock_cronos_pass
+      WALLET_CRONOS_USER_PASSWORD: mock_user_pass
+      WALLET_CRONOS_WEBHOOK_SECRET: local-dev-cronos-webhook-secret
+
+      # Manteca (Crypto Exchange)
+      WALLET_MANTECA: disable
+      WALLET_MANTECA_LOG: enable
+      WALLET_MANTECA_PROXY: disable
+      WALLET_MANTECA_URL: http://mock-manteca.local
+      WALLET_MANTECA_KEY: mock_manteca_api_key
+      WALLET_MANTECA_RATE_TTL: 60
+      WALLET_MANTECA_WEBHOOK_REQUEST_IP: 127.0.0.1
+      WALLET_MANTECA_WEBHOOK_REQUEST_SECRET: local-dev-manteca-webhook-secret
+
+      # Gire (Payments)
+      WALLET_GIRE: disable
+      WALLET_GIRE_LOG: enable
+      WALLET_GIRE_URL: http://mock-gire.local
+      WALLET_GIRE_ID: mock_gire_id
+      WALLET_GIRE_SECRET: mock_gire_secret
+      WALLET_GIRE_PROVINCE: CABA
+      WALLET_GIRE_WEBHOOK_SECRET: local-dev-gire-webhook-secret
+
+      # Pomelo (Cards)
+      WALLET_POMELO: disable
+      WALLET_POMELO_LOG: enable
+      WALLET_POMELO_URL: http://mock-pomelo.local
+      WALLET_POMELO_ID: mock_pomelo_id
+      WALLET_POMELO_SECRET: mock_pomelo_secret
+      WALLET_POMELO_AUDIENCE: mock_audience
+      WALLET_POMELO_AFFINITY_GROUP: mock_affinity
+      WALLET_POMELO_API_KEY: mock_api_key
+      WALLET_POMELO_SECRET_KEY: mock_secret_key
+      WALLET_POMELO_WHITELISTED_IP: 127.0.0.1
+      WALLET_POMELO_IDENTITY_URL: http://mock-pomelo-identity.local
+
+      # Valida (Identity Verification)
+      WALLET_VALIDA: disable
+      WALLET_VALIDA_LOG: enable
+      WALLET_VALIDA_URL: http://mock-valida.local
+      WALLET_VALIDA_USERNAME: mock_valida_user
+      WALLET_VALIDA_PASSWORD: mock_valida_pass
+      WALLET_VALIDA_THEME: default
+      WALLET_VALIDA_WEBHOOK_SECRET: local-dev-valida-webhook-secret
+
+      # Renaper (Argentine ID Verification)
+      WALLET_RENAPER: disable
+      WALLET_RENAPER_LOG: enable
+      WALLET_RENAPER_PROXY: disable
+      WALLET_RENAPER_URL: http://mock-renaper.local
+      WALLET_RENAPER_VIGENCIA_USER: mock_vigencia_user
+      WALLET_RENAPER_VIGENCIA_PASSWORD: mock_vigencia_pass
+      WALLET_RENAPER_FACIAL_USER: mock_facial_user
+      WALLET_RENAPER_FACIAL_PASSWORD: mock_facial_pass
+      WALLET_RENAPER_HUELLA_USER: mock_huella_user
+      WALLET_RENAPER_HUELLA_PASSWORD: mock_huella_pass
+      WALLET_RENAPER_MIN_CONFIDENCE: 0.85
+      WALLET_RENAPER_TIMEOUT: 30000
+      WALLET_RENAPER_WEBHOOK_SECRET: local-dev-renaper-webhook-secret
+
+      # Coelsa (CVU/Banking)
+      WALLET_COELSA: disable
+      WALLET_COELSA_LOG: enable
+      WALLET_COELSA_PROXY: disable
+      WALLET_COELSA_AUTH_URL: http://mock-coelsa-auth.local
+      WALLET_COELSA_CER: mock_certificate
+      WALLET_COELSA_KEY: mock_key
+      WALLET_COELSA_PASSPHRASE: mock_passphrase
+      WALLET_COELSA_DEBIN_URL: http://mock-coelsa-debin.local
+      WALLET_COELSA_DEBIN_USERNAME: mock_debin_user
+      WALLET_COELSA_DEBIN_PASSWORD: mock_debin_pass
+      WALLET_COELSA_DEBIN_ID: mock_debin_id
+      WALLET_COELSA_DEBIN_SECRET: mock_debin_secret
+      WALLET_COELSA_CVU_URL: http://mock-coelsa-cvu.local
+      WALLET_COELSA_CVU_USERNAME: mock_cvu_user
+      WALLET_COELSA_CVU_PASSWORD: mock_cvu_pass
+      WALLET_COELSA_CVU_ID: mock_cvu_id
+      WALLET_COELSA_CVU_SECRET: mock_cvu_secret
+      WALLET_COELSA_PSP_ID: mock_psp_id
+      WALLET_COELSA_WALLET_ID: mock_wallet_id
+      WALLET_COELSA_WEBHOOK_SECRET: local-dev-coelsa-webhook-secret
+      WALLET_COELSA_TEMPLATE_IEP_URL: http://mock-coelsa-iep.local
+      WALLET_COELSA_TEMPLATE_IEP_ACCESS_TOKEN: mock_iep_token
+
+      # Unex Internal
+      WALLET_UNEX: disable
+      WALLET_UNEX_LOG: enable
+      WALLET_UNEX_WEBHOOK_SECRET: local-dev-unex-webhook-secret
+
+      # Micronauta
+      WALLET_MICRONAUTA: disable
+      WALLET_MICRONAUTA_LOG: enable
+      WALLET_MICRONAUTA_URL: http://mock-micronauta.local
+      WALLET_MICRONAUTA_USERNAME: mock_micronauta_user
+      WALLET_MICRONAUTA_PASSWORD: mock_micronauta_pass
+      WALLET_MICRONAUTA_WALLET_ID: mock_wallet_id
+      WALLET_MICRONAUTA_CATEGORY_ID: mock_category_id
+      WALLET_MICRONAUTA_WEBHOOK_SECRET: local-dev-micronauta-webhook-secret
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    command: sh -c "npm install --legacy-peer-deps && npm run prisma:generate && npm run start:dev"
+    restart: unless-stopped
+
+  seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: unex-seeder
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      WALLET_MYSQL_URL: mysql://admin:UnexDev%402026@mysql:3306/unex
+      DATABASE_URL: mysql://admin:UnexDev%402026@mysql:3306/unex
+      MYSQL_HOST: mysql
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: UnexDev@2026
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "npm install --legacy-peer-deps && npm run prisma:generate && npx prisma db push && npm run prisma:seed"
+    profiles:
+      - seed
 
 volumes:
   mysql_data:
-
-networks:
-  unex-network:
-    driver: bridge

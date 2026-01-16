@@ -18,12 +18,11 @@ export class IdentityService {
       identities: identities.map((i: any) => ({
         id: i.id,
         country: i.country,
-        taxDocumentNumber: i.taxDocumentNumber,
         taxDocumentType: i.taxDocumentType,
-        identityDocumentNumber: i.identityDocumentNumber,
         identityDocumentType: i.identityDocumentType,
         status: i.status,
-        createdAt: i.createdAt,
+        type: i.type,
+        name: i.name,
       })),
     };
   }

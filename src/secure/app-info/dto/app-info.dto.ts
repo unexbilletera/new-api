@@ -1,4 +1,5 @@
-import { IsString, IsOptional } from 'class-validator';export class AppInfoResponseDto {
+import { IsString, IsOptional } from 'class-validator';
+export class AppInfoResponseDto {
   minVersion: string;
   currentVersion?: string;
   updateRequired: boolean;
@@ -6,7 +7,8 @@ import { IsString, IsOptional } from 'class-validator';export class AppInfoRespo
   maintenanceMode: boolean;
   maintenanceMessage?: string;
   features: Record<string, boolean>;
-}export class NewsResponseDto {
+}
+export class NewsResponseDto {
   id: string;
   title: string;
   message: string;
@@ -18,14 +20,16 @@ import { IsString, IsOptional } from 'class-validator';export class AppInfoRespo
   endDate?: Date;
   active: boolean;
   createdAt: Date;
-}export class VersionCheckResponseDto {
+}
+export class VersionCheckResponseDto {
   minVersion: string;
   currentVersion: string;
   userVersion: string;
   updateRequired: boolean;
   updateRecommended: boolean;
   updateUrl?: string;
-}export class CheckVersionQueryDto {
+}
+export class CheckVersionQueryDto {
   @IsString()
   @IsOptional()
   version?: string;
@@ -33,7 +37,8 @@ import { IsString, IsOptional } from 'class-validator';export class AppInfoRespo
   @IsString()
   @IsOptional()
   platform?: string;
-}export class FullAppInfoResponseDto {
+}
+export class FullAppInfoResponseDto {
   info: AppInfoResponseDto;
   news: NewsResponseDto[];
   features: Record<string, boolean>;

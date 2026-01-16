@@ -5,7 +5,7 @@ import {
   SendMessageCommandInput,
 } from '@aws-sdk/client-sqs';
 import { ConfigService } from '../config/config.service';
-import { ColoredLogger } from '../utils/logger-colors';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class SqsService {
@@ -13,14 +13,16 @@ export class SqsService {
   private queueUrl: string;
   private isConfigured: boolean = false;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private logger: LoggerService,
+  ) {
     const region = this.configService.get('AWS_REGION') || 'us-east-2';
     this.queueUrl =
       this.configService.get('SQS_TRANSACTIONS_QUEUE_URL') ||
       process.env.SQS_TRANSACTIONS_QUEUE_URL ||
       '';
 
-    // Configurar credenciais AWS se disponíveis
     const accessKeyId =
       this.configService.get('AWS_ACCESS_KEY_ID') ||
       process.env.AWS_ACCESS_KEY_ID;
@@ -29,7 +31,6 @@ export class SqsService {
       process.env.AWS_SECRET_ACCESS_KEY;
 
     if (accessKeyId && secretAccessKey) {
-      // Usar credenciais explícitas se fornecidas
       this.sqsClient = new SQSClient({
         region,
         credentials: {
@@ -38,28 +39,23 @@ export class SqsService {
         },
       });
       this.isConfigured = true;
-      ColoredLogger.info(
+      this.logger.info(
         '[SqsService]',
-        'SQS configurado com credenciais explícitas (AWS_ACCESS_KEY_ID)',
+        'SQS configured with explicit credentials (AWS_ACCESS_KEY_ID)',
       );
     } else if (this.queueUrl) {
-      // Tentar usar credenciais padrão do AWS SDK
-      // Isso funciona com:
-      // - IAM Role (se rodando em EC2/ECS/Lambda)
-      // - ~/.aws/credentials (se configurado localmente)
-      // - Variáveis de ambiente AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY (se configuradas pelo sistema)
       this.sqsClient = new SQSClient({ region });
       this.isConfigured = true;
-      ColoredLogger.info(
+      this.logger.info(
         '[SqsService]',
-        'SQS configurado. Tentando usar IAM role ou credenciais padrão do AWS SDK.',
+        'SQS configured. Trying IAM role or default AWS SDK credentials.',
       );
     }
 
     if (!this.queueUrl) {
-      ColoredLogger.warning(
-        '[SqsService] ⚠️',
-        'SQS_TRANSACTIONS_QUEUE_URL não configurada. Mensagens SQS não serão enviadas.',
+      this.logger.warn(
+        '[SqsService]',
+        'SQS_TRANSACTIONS_QUEUE_URL not configured. SQS messages will not be sent.',
       );
     }
   }
@@ -70,13 +66,13 @@ export class SqsService {
   ): Promise<{ messageId: string; requestId: string }> {
     if (!this.queueUrl) {
       throw new Error(
-        'SQS_TRANSACTIONS_QUEUE_URL não configurada. Configure a variável de ambiente SQS_TRANSACTIONS_QUEUE_URL.',
+        'SQS_TRANSACTIONS_QUEUE_URL is not configured. Set the SQS_TRANSACTIONS_QUEUE_URL environment variable.',
       );
     }
 
     if (!this.isConfigured || !this.sqsClient) {
       throw new Error(
-        'SQS não configurado. Configure AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY ou use IAM role. Mensagem não foi enviada.',
+        'SQS is not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY or use an IAM role. Message was not sent.',
       );
     }
 
@@ -109,17 +105,16 @@ export class SqsService {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
 
-      // Melhorar mensagem de erro para credenciais
       if (
         errorMessage.includes('credentials') ||
         errorMessage.includes('Could not load')
       ) {
         throw new Error(
-          `Erro ao enviar mensagem para SQS: Credenciais AWS não encontradas. Configure AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY ou use IAM role. Detalhes: ${errorMessage}`,
+          `Error sending message to SQS: AWS credentials not found. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY or use an IAM role. Details: ${errorMessage}`,
         );
       }
 
-      throw new Error(`Erro ao enviar mensagem para SQS: ${errorMessage}`);
+      throw new Error(`Error sending message to SQS: ${errorMessage}`);
     }
   }
 }

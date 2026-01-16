@@ -13,13 +13,13 @@ export class EntropyService {
     const max = Math.pow(10, length) - 1;
     const randomValue = randomBytes(4).readUInt32BE(0);
     const code = (randomValue % (max + 1)).toString().padStart(length, '0');
-    
+
     return code;
   }
 
   static generateSecureUUID(): string {
     const bytes = randomBytes(16);
-    
+
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
 
@@ -58,14 +58,17 @@ export class EntropyService {
     return randomBytes(length).toString('hex');
   }
 
-  static hasSufficientEntropy(token: string, minEntropyBits: number = 128): boolean {
+  static hasSufficientEntropy(
+    token: string,
+    minEntropyBits: number = 128,
+  ): boolean {
     if (!token || token.length === 0) {
       return false;
     }
 
     const uniqueChars = new Set(token).size;
     const length = token.length;
-    
+
     const entropyBits = length * Math.log2(uniqueChars || 1);
 
     return entropyBits >= minEntropyBits;
@@ -75,7 +78,7 @@ export class EntropyService {
     const combined = `${userId}:${secret}:${Date.now()}`;
     const hash = createHash('sha256').update(combined).digest('hex');
     const random = randomBytes(16).toString('hex');
-    
+
     return `${hash}:${random}`;
   }
 
