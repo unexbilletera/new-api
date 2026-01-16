@@ -112,7 +112,7 @@ export class RenaperService {
         this.configService.get<string>('WALLET_RENAPER_MIN_CONFIDENCE', '0.85'),
       ),
       timeout: parseInt(
-        this.configService.get<string>('WALLET_RENAPER_TIMEOUT', '30000'),
+        this.configService.get<string>('WALLET_RENAPER_TIMEOUT', '60000'),
         10,
       ),
       validationMode:
@@ -120,6 +120,16 @@ export class RenaperService {
           .get<string>('RENAPER_VALIDATION_MODE', 'simple')
           .toLowerCase() as 'simple' | 'complete') || 'simple',
     };
+
+    // Increase timeout when using SOCKS proxy (slower connections)
+    if (this.config.proxy && this.config.timeout < 60000) {
+      this.config.timeout = 60000;
+      if (this.config.logging) {
+        this.logger.log(
+          'RENAPER: Timeout increased to 60000ms for SOCKS proxy connection',
+        );
+      }
+    }
   }
 
   private createRenaperAgent(): https.Agent | SocksProxyAgent {
@@ -127,21 +137,18 @@ export class RenaperService {
       this.config.proxy || process.env.USE_SOCKS_PROXY === 'true';
 
     if (shouldUseProxy) {
-      try {
-        const proxyPort = process.env.SOCKS_PROXY_PORT || '8080';
-        this.logger.warn(
-          `RENAPER: Using SOCKS Proxy with mTLS (localhost:${proxyPort})`,
-        );
-        return new SocksProxyAgent(`socks5h://localhost:${proxyPort}`);
-      } catch (error) {
-        this.logger.error('RENAPER: Error creating SOCKS Proxy Agent', error);
-        throw new Error(
-          `SOCKS5 proxy not available at localhost:${process.env.SOCKS_PROXY_PORT || '8080'}`,
-        );
-      }
+      const proxyPort = process.env.SOCKS_PROXY_PORT || '8080';
+      this.logger.debug(
+        `RENAPER: Using SOCKS Proxy (socks5h://localhost:${proxyPort})`,
+      );
+      return new SocksProxyAgent(`socks5h://localhost:${proxyPort}`);
     } else {
       return new https.Agent();
     }
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   async getToken(service: 'vigencia' | 'facial' | 'huella'): Promise<string> {
@@ -158,56 +165,82 @@ export class RenaperService {
       this.logger.log(`RENAPER: Generating token for service ${service}`);
     }
 
-    try {
-      const response = await firstValueFrom(
-        this.httpService.post(
-          `${this.config.baseUrl}/API_ABIS/Autorizacion/token.php`,
-          new URLSearchParams({
-            username: credentials.username,
-            password: credentials.password,
-          }),
-          {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
+    const maxRetries = 3;
+    let lastError: any;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await firstValueFrom(
+          this.httpService.post(
+            `${this.config.baseUrl}/API_ABIS/Autorizacion/token.php`,
+            new URLSearchParams({
+              username: credentials.username,
+              password: credentials.password,
+            }),
+            {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              httpsAgent: this.createRenaperAgent(),
+              timeout: this.config.timeout,
             },
-            httpsAgent: this.createRenaperAgent(),
-            timeout: this.config.timeout,
-          },
-        ),
-      );
-
-      if (this.config.logging) {
-        this.logger.log(`RENAPER: Token generated successfully for ${service}`);
-      }
-
-      if (
-        response.data.codigo_http === 200 &&
-        response.data.data.codigo === 0
-      ) {
-        return response.data.data.token;
-      } else {
-        throw new Error(
-          `Error generating token: ${response.data.data?.message || 'Unknown error'}`,
+          ),
         );
-      }
-    } catch (error: any) {
-      this.logger.error('Error generating RENAPER token', error);
 
-      if (
-        error.response?.status === 403 ||
-        error.response?.data === 'FORBIDDEN - REMOTE ADDRESS NOT ALLOWED'
-      ) {
-        const forbiddenError: any = new Error(
-          'RENAPER API: IP not authorized. The IP address is not on the RENAPER API whitelist.',
+        if (this.config.logging) {
+          this.logger.log(`RENAPER: Token generated successfully for ${service}`);
+        }
+
+        if (
+          response.data.codigo_http === 200 &&
+          response.data.data.codigo === 0
+        ) {
+          return response.data.data.token;
+        } else {
+          throw new Error(
+            `Error generating token: ${response.data.data?.message || 'Unknown error'}`,
+          );
+        }
+      } catch (error: any) {
+        lastError = error;
+
+        if (
+          error.response?.status === 403 ||
+          error.response?.data === 'FORBIDDEN - REMOTE ADDRESS NOT ALLOWED'
+        ) {
+          const forbiddenError: any = new Error(
+            'RENAPER API: IP not authorized. The IP address is not on the RENAPER API whitelist.',
+          );
+          forbiddenError.code = 'RENAPER_FORBIDDEN';
+          forbiddenError.statusCode = 403;
+          forbiddenError.isForbidden = true;
+          throw forbiddenError;
+        }
+
+        // Non-retryable errors
+        if (error.message?.includes('not enabled') || error.message?.includes('SOCKS5 proxy not available')) {
+          throw error;
+        }
+
+        // Retryable errors (network, timeout, etc)
+        if (attempt < maxRetries) {
+          const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+          this.logger.warn(
+            `RENAPER: Token generation failed (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms. Error: ${error.message}`,
+          );
+          await this.delay(delayMs);
+          continue;
+        }
+
+        this.logger.error(
+          `RENAPER: Token generation failed after ${maxRetries} attempts`,
+          error,
         );
-        forbiddenError.code = 'RENAPER_FORBIDDEN';
-        forbiddenError.statusCode = 403;
-        forbiddenError.isForbidden = true;
-        throw forbiddenError;
+        throw error;
       }
-
-      throw error;
     }
+
+    throw lastError;
   }
 
   async verifyValidity(params: {
@@ -226,66 +259,83 @@ export class RenaperService {
     }
 
     const token = await this.getToken('vigencia');
+    const maxRetries = 2;
+    let lastError: any;
 
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(
-          `${this.config.baseUrl}/apidatos/verificaVigencia.php`,
-          {
-            params: {
-              dni: documentNumber,
-              sexo: gender,
-              id_tramite: tramiteId,
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await firstValueFrom(
+          this.httpService.get(
+            `${this.config.baseUrl}/apidatos/verificaVigencia.php`,
+            {
+              params: {
+                dni: documentNumber,
+                sexo: gender,
+                id_tramite: tramiteId,
+              },
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              httpsAgent: this.createRenaperAgent(),
+              timeout: this.config.timeout,
             },
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            httpsAgent: this.createRenaperAgent(),
-          },
-        ),
-      );
+          ),
+        );
 
-      const code = response.data.codigo;
-      const message = String(response.data.mensaje || '').toUpperCase();
-      const valid = response.data.vigente;
-      const deceased = String(response.data.fallecido || '').toUpperCase();
+        const code = response.data.codigo;
+        const message = String(response.data.mensaje || '').toUpperCase();
+        const valid = response.data.vigente;
+        const deceased = String(response.data.fallecido || '').toUpperCase();
 
-      let isValid = false;
-      let success = false;
+        let isValid = false;
+        let success = false;
 
-      if (code === 200) {
-        if (message.includes('DNI VIGENTE') && deceased !== 'SI') {
-          isValid = true;
+        if (code === 200) {
+          if (message.includes('DNI VIGENTE') && deceased !== 'SI') {
+            isValid = true;
+            success = true;
+          } else {
+            isValid = false;
+            success = false;
+          }
+        } else if (code === 0) {
           success = true;
+          isValid = valid === true || valid !== false;
         } else {
-          isValid = false;
           success = false;
+          isValid = false;
         }
-      } else if (code === 0) {
-        success = true;
-        isValid = valid === true || valid !== false;
-      } else {
-        success = false;
-        isValid = false;
-      }
 
-      if (success && isValid) {
-        return {
-          success: true,
-          valid: true,
-          message: response.data.mensaje || 'DNI valid',
-        };
-      } else {
-        return {
-          success: false,
-          valid: false,
-          message: response.data.mensaje || 'DNI not valid',
-        };
+        if (success && isValid) {
+          return {
+            success: true,
+            valid: true,
+            message: response.data.mensaje || 'DNI valid',
+          };
+        } else {
+          return {
+            success: false,
+            valid: false,
+            message: response.data.mensaje || 'DNI not valid',
+          };
+        }
+      } catch (error: any) {
+        lastError = error;
+
+        if (attempt < maxRetries) {
+          const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          this.logger.warn(
+            `RENAPER: Validity verification failed (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms. Error: ${error.message}`,
+          );
+          await this.delay(delayMs);
+          continue;
+        }
+
+        this.logger.error('Error verifying RENAPER validity', error);
       }
-    } catch (error) {
-      this.logger.error('Error verifying RENAPER validity', error);
-      throw error;
     }
+
+    throw lastError;
   }
 
   async validateFacial(params: {
@@ -304,63 +354,80 @@ export class RenaperService {
     }
 
     const token = await this.getToken('facial');
+    const maxRetries = 2;
+    let lastError: any;
 
-    const formData = new FormData();
-    formData.append('dni', documentNumber);
-    formData.append('sexo', gender);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const formData = new FormData();
+        formData.append('dni', documentNumber);
+        formData.append('sexo', gender);
 
-    if (typeof image === 'string' && image.startsWith('data:')) {
-      const base64Data = image.split(',')[1];
-      const buffer = Buffer.from(base64Data, 'base64');
-      formData.append('imagen', buffer, 'selfie.jpg');
-    } else if (Buffer.isBuffer(image)) {
-      formData.append('imagen', image, 'selfie.jpg');
-    } else {
-      formData.append('imagen', image);
-    }
+        if (typeof image === 'string' && image.startsWith('data:')) {
+          const base64Data = image.split(',')[1];
+          const buffer = Buffer.from(base64Data, 'base64');
+          formData.append('imagen', buffer, 'selfie.jpg');
+        } else if (Buffer.isBuffer(image)) {
+          formData.append('imagen', image, 'selfie.jpg');
+        } else {
+          formData.append('imagen', image);
+        }
 
-    const headers = {
-      ...formData.getHeaders(),
-      Authorization: `Bearer ${token}`,
-      'Accept-Encoding': 'identity',
-    };
-
-    try {
-      const response = await firstValueFrom(
-        this.httpService.post(
-          `${this.config.baseUrl}/API_ABIS/ValidacionFacialSincronico.php`,
-          formData,
-          {
-            headers,
-            httpsAgent: this.createRenaperAgent(),
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-          },
-        ),
-      );
-
-      if (response.data.codigo === 0) {
-        const similarity = response.data.similitud || 0;
-        const match = similarity >= this.config.minConfidence;
-
-        return {
-          success: true,
-          match,
-          similarity,
-          message: response.data.mensaje,
+        const headers = {
+          ...formData.getHeaders(),
+          Authorization: `Bearer ${token}`,
+          'Accept-Encoding': 'identity',
         };
-      } else {
-        return {
-          success: false,
-          match: false,
-          similarity: 0,
-          message: response.data.mensaje || 'Facial validation error',
-        };
+
+        const response = await firstValueFrom(
+          this.httpService.post(
+            `${this.config.baseUrl}/API_ABIS/ValidacionFacialSincronico.php`,
+            formData,
+            {
+              headers,
+              httpsAgent: this.createRenaperAgent(),
+              maxContentLength: Infinity,
+              maxBodyLength: Infinity,
+              timeout: this.config.timeout,
+            },
+          ),
+        );
+
+        if (response.data.codigo === 0) {
+          const similarity = response.data.similitud || 0;
+          const match = similarity >= this.config.minConfidence;
+
+          return {
+            success: true,
+            match,
+            similarity,
+            message: response.data.mensaje,
+          };
+        } else {
+          return {
+            success: false,
+            match: false,
+            similarity: 0,
+            message: response.data.mensaje || 'Facial validation error',
+          };
+        }
+      } catch (error: any) {
+        lastError = error;
+
+        if (attempt < maxRetries) {
+          const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          this.logger.warn(
+            `RENAPER: Facial validation failed (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms. Error: ${error.message}`,
+          );
+          await this.delay(delayMs);
+          continue;
+        }
+
+        this.logger.error('Error validating RENAPER facial', error);
       }
-    } catch (error) {
-      this.logger.error('Error validating RENAPER facial', error);
-      throw error;
     }
+
+    throw lastError;
   }
 
   async validateFingerprint(params: {
@@ -381,54 +448,71 @@ export class RenaperService {
     }
 
     const token = await this.getToken('huella');
+    const maxRetries = 2;
+    let lastError: any;
 
-    const formData = new FormData();
-    formData.append('dni', documentNumber);
-    formData.append('sexo', gender);
-    formData.append('huella', fingerprint);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const formData = new FormData();
+        formData.append('dni', documentNumber);
+        formData.append('sexo', gender);
+        formData.append('huella', fingerprint);
 
-    const headers = {
-      ...formData.getHeaders(),
-      Authorization: `Bearer ${token}`,
-      'Accept-Encoding': 'identity',
-    };
-
-    try {
-      const response = await firstValueFrom(
-        this.httpService.post(
-          `${this.config.baseUrl}/API_ABIS/ValidacionHuella.php`,
-          formData,
-          {
-            headers,
-            httpsAgent: this.createRenaperAgent(),
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-          },
-        ),
-      );
-
-      if (response.data.codigo === 0) {
-        const similarity = response.data.similitud || 0;
-        const match = similarity >= this.config.minConfidence;
-
-        return {
-          success: true,
-          match,
-          similarity,
-          message: response.data.mensaje,
+        const headers = {
+          ...formData.getHeaders(),
+          Authorization: `Bearer ${token}`,
+          'Accept-Encoding': 'identity',
         };
-      } else {
-        return {
-          success: false,
-          match: false,
-          similarity: 0,
-          message: response.data.mensaje || 'Fingerprint validation error',
-        };
+
+        const response = await firstValueFrom(
+          this.httpService.post(
+            `${this.config.baseUrl}/API_ABIS/ValidacionHuella.php`,
+            formData,
+            {
+              headers,
+              httpsAgent: this.createRenaperAgent(),
+              maxContentLength: Infinity,
+              maxBodyLength: Infinity,
+              timeout: this.config.timeout,
+            },
+          ),
+        );
+
+        if (response.data.codigo === 0) {
+          const similarity = response.data.similitud || 0;
+          const match = similarity >= this.config.minConfidence;
+
+          return {
+            success: true,
+            match,
+            similarity,
+            message: response.data.mensaje,
+          };
+        } else {
+          return {
+            success: false,
+            match: false,
+            similarity: 0,
+            message: response.data.mensaje || 'Fingerprint validation error',
+          };
+        }
+      } catch (error: any) {
+        lastError = error;
+
+        if (attempt < maxRetries) {
+          const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          this.logger.warn(
+            `RENAPER: Fingerprint validation failed (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms. Error: ${error.message}`,
+          );
+          await this.delay(delayMs);
+          continue;
+        }
+
+        this.logger.error('Error validating RENAPER fingerprint', error);
       }
-    } catch (error) {
-      this.logger.error('Error validating RENAPER fingerprint', error);
-      throw error;
     }
+
+    throw lastError;
   }
 
   async validateDocument(params: {
