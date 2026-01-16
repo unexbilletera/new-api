@@ -41,8 +41,6 @@ import {
 export class SpendingLimitsController {
   constructor(private readonly spendingLimitsService: SpendingLimitsService) {}
 
-  // ==================== PROFILES ====================
-
   @Get('profiles')
   @MinLevel(2)
   @ApiOperation({ summary: 'List spending limit profiles' })
@@ -101,8 +99,6 @@ export class SpendingLimitsController {
     return this.spendingLimitsService.deleteProfile(id);
   }
 
-  // ==================== IDENTITIES ====================
-
   @Get('identities')
   @MinLevel(2)
   @ApiOperation({ summary: 'List identities with spending limits' })
@@ -136,8 +132,6 @@ export class SpendingLimitsController {
   ) {
     return this.spendingLimitsService.updateUserProfile(userId, dto.profileId);
   }
-
-  // ==================== ALERTS ====================
 
   @Get('alerts')
   @MinLevel(2)

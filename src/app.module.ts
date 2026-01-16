@@ -40,7 +40,6 @@ import { AppInfoModule } from './secure/app-info/app-info.module';
 import { CampaignsModule } from './secure/campaigns/campaigns.module';
 import { TermsModule } from './secure/terms/terms.module';
 
-// New modules
 import { CardsModule } from './secure/cards/cards.module';
 import { CreditsModule } from './secure/credits/credits.module';
 import { ContactsModule } from './secure/contacts/contacts.module';
@@ -72,7 +71,6 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
-    // Core modules
     ConfigModule,
     LoggerModule,
     SqsModule,
@@ -86,14 +84,12 @@ import { HealthModule } from './health/health.module';
     CrudModule,
     HealthModule,
     SpendingLimitsModule,
-    // Public modules
     PublicAuthModule,
     PublicOnboardingModule,
     PublicUsersModule,
     BiometricModule,
     WebhooksModule,
     ComplianceModule,
-    // Secure modules
     SecureTransactionsModule,
     SecureExchangeModule,
     SecureLedgerModule,
@@ -108,7 +104,6 @@ import { HealthModule } from './health/health.module';
     SecureGireModule,
     SecureCoelsaModule,
     SecureBindModule,
-    // New secure modules
     CardsModule,
     CreditsModule,
     ContactsModule,
@@ -125,7 +120,6 @@ import { HealthModule } from './health/health.module';
     TasksModule,
     PushModule,
     UsersDataModule,
-    // Backoffice modules
     BackofficeAuthModule,
     BackofficeClientsModule,
     BackofficeUsersModule,

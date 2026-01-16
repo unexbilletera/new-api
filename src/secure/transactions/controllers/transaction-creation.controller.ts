@@ -40,8 +40,6 @@ export class TransactionCreationController {
     private readonly transactionCreationService: TransactionCreationService,
   ) {}
 
-  // ==================== BASIC TRANSACTIONS ====================
-
   @Post('createTransaction/cashin')
   @ApiOperation({ summary: 'Create cashin transaction' })
   @ApiResponse({ status: 201, description: 'Transaction created' })
@@ -69,8 +67,6 @@ export class TransactionCreationController {
   async createCashback(@Body() dto: CreateCashinDto, @Request() req: any) {
     return this.transactionCreationService.createCashback(dto, req.user);
   }
-
-  // ==================== PAYMENT TRANSACTIONS ====================
 
   @Post('createTransaction/payment')
   @ApiOperation({ summary: 'Create payment transaction (boleto)' })
@@ -106,8 +102,6 @@ export class TransactionCreationController {
   ) {
     return this.transactionCreationService.createPaymentCronos(dto, req.user);
   }
-
-  // ==================== QR TRANSACTIONS ====================
 
   @Post('createTransaction/cashoutCronosQr')
   @ApiOperation({
@@ -147,8 +141,6 @@ export class TransactionCreationController {
     );
   }
 
-  // ==================== EXCHANGE TRANSACTIONS ====================
-
   @Post('createTransaction/cashoutMantecaExchangeAr')
   @ApiOperation({
     summary: 'Create Manteca Exchange AR transaction (ARS → BRL)',
@@ -179,8 +171,6 @@ export class TransactionCreationController {
     );
   }
 
-  // ==================== GIRE TRANSACTIONS ====================
-
   @Post('createTransaction/cashoutGire')
   @ApiOperation({ summary: 'Create cashout GIRE transaction' })
   @ApiResponse({ status: 201, description: 'Transaction created' })
@@ -198,8 +188,6 @@ export class TransactionCreationController {
     return this.transactionCreationService.createRechargeGire(dto, req.user);
   }
 
-  // ==================== CRONOS TRANSACTIONS ====================
-
   @Post('createTransaction/rechargeCronos')
   @ApiOperation({ summary: 'Create recharge Cronos transaction (Brazil)' })
   @ApiResponse({ status: 201, description: 'Transaction created' })
@@ -209,8 +197,6 @@ export class TransactionCreationController {
   ) {
     return this.transactionCreationService.createRechargeCronos(dto, req.user);
   }
-
-  // ==================== COELSA TRANSACTIONS ====================
 
   @Post('createTransaction/cashinCoelsa')
   @ApiOperation({ summary: 'Create cashin COELSA transaction' })
@@ -232,8 +218,6 @@ export class TransactionCreationController {
   async createRefoundCoelsa(@Body() dto: CreateCoelsaDto, @Request() req: any) {
     return this.transactionCreationService.createRefoundCoelsa(dto, req.user);
   }
-
-  // ==================== TRANSACTION MANAGEMENT ====================
 
   @Post('confirmTransaction')
   @ApiOperation({ summary: 'Confirm a pending transaction' })

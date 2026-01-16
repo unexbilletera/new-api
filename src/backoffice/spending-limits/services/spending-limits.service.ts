@@ -78,7 +78,6 @@ export class SpendingLimitsService {
       throw new NotFoundException('Profile not found');
     }
 
-    // Count users with this profile
     const userCount = await this.prisma.user_identity_spending_limits.count({
       where: {
         profileId: id,
@@ -96,7 +95,6 @@ export class SpendingLimitsService {
    * Create new spending limit profile
    */
   async createProfile(dto: CreateProfileDto) {
-    // If setting as default, unset other defaults first
     if (dto.isDefault) {
       await this.prisma.spending_limit_profiles.updateMany({
         where: { isDefault: true },
@@ -138,7 +136,6 @@ export class SpendingLimitsService {
       throw new NotFoundException('Profile not found');
     }
 
-    // If setting as default, unset other defaults first
     if (dto.isDefault && !existing.isDefault) {
       await this.prisma.spending_limit_profiles.updateMany({
         where: { isDefault: true, id: { not: id } },
@@ -181,13 +178,11 @@ export class SpendingLimitsService {
       throw new NotFoundException('Profile not found');
     }
 
-    // Unset all other defaults
     await this.prisma.spending_limit_profiles.updateMany({
       where: { isDefault: true },
       data: { isDefault: false },
     });
 
-    // Set this one as default
     const profile = await this.prisma.spending_limit_profiles.update({
       where: { id },
       data: {
@@ -212,7 +207,6 @@ export class SpendingLimitsService {
       throw new NotFoundException('Profile not found');
     }
 
-    // Check if profile is in use
     const usageCount = await this.prisma.user_identity_spending_limits.count({
       where: {
         profileId: id,
@@ -328,7 +322,6 @@ export class SpendingLimitsService {
    * Update user profile assignment
    */
   async updateUserProfile(userId: string, profileId: string) {
-    // Find user's default identity
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
       select: { defaultUserIdentityId: true },
@@ -345,7 +338,6 @@ export class SpendingLimitsService {
    * Assign profile to identity
    */
   async assignProfile(userIdentityId: string, profileId: string) {
-    // Verify profile exists
     const profile = await this.prisma.spending_limit_profiles.findFirst({
       where: { id: profileId, deletedAt: null, isActive: true },
     });
@@ -354,7 +346,6 @@ export class SpendingLimitsService {
       throw new NotFoundException('Profile not found or inactive');
     }
 
-    // Verify identity exists
     const identity = await this.prisma.usersIdentities.findUnique({
       where: { id: userIdentityId },
     });
@@ -363,13 +354,11 @@ export class SpendingLimitsService {
       throw new NotFoundException('Identity not found');
     }
 
-    // Check if identity already has limits
     const existing = await this.prisma.user_identity_spending_limits.findFirst({
       where: { userIdentityId, deletedAt: null },
     });
 
     if (existing) {
-      // Update existing
       const updated = await this.prisma.user_identity_spending_limits.update({
         where: { id: existing.id },
         data: {
@@ -385,7 +374,6 @@ export class SpendingLimitsService {
       return updated;
     }
 
-    // Create new
     const created = await this.prisma.user_identity_spending_limits.create({
       data: {
         id: uuidv4(),

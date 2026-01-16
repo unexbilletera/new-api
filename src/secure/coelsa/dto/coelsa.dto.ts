@@ -20,7 +20,6 @@ export class CoelsaProxyDto {
   body?: any;
 }
 
-// Response DTOs
 export class CoelsaOperationDto {
   @ApiProperty()
   id: string;

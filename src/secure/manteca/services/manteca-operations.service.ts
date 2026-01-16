@@ -35,11 +35,9 @@ export class MantecaOperationsService {
   ): Promise<any> {
     this.logger.log(`Processing QR payment for user ${userId}`);
 
-    // Get user's country
     const country =
       await this.spendingLimitsService.getIdentityCountry(userIdentityId);
 
-    // Check spending limits
     const limitCheck = await this.spendingLimitsService.checkSpendingLimitV2({
       userIdentityId,
       amount: dto.amount,
@@ -53,7 +51,6 @@ export class MantecaOperationsService {
       );
     }
 
-    // Get source account
     const sourceAccountId = dto.sourceAccountId;
     let sourceAccount: any;
 
@@ -62,7 +59,6 @@ export class MantecaOperationsService {
         where: { id: sourceAccountId },
       });
     } else {
-      // Get default account for user
       sourceAccount = await this.prisma.usersAccounts.findFirst({
         where: {
           userIdentityId,
@@ -76,7 +72,6 @@ export class MantecaOperationsService {
       throw new BadRequestException('Source account not found');
     }
 
-    // Create transaction
     const transactionId = uuidv4();
     const now = new Date();
     const transactionType =
@@ -101,7 +96,6 @@ export class MantecaOperationsService {
       },
     });
 
-    // Update spending limits
     await this.spendingLimitsService.updateSpendingV2({
       userIdentityId,
       amount: dto.amount,
@@ -109,7 +103,6 @@ export class MantecaOperationsService {
       country,
     });
 
-    // Log transaction
     await this.prisma.transactionsLogs.create({
       data: {
         id: uuidv4(),
@@ -153,7 +146,6 @@ export class MantecaOperationsService {
     const country =
       await this.spendingLimitsService.getIdentityCountry(userIdentityId);
 
-    // Check spending limits
     const limitCheck = await this.spendingLimitsService.checkSpendingLimitV2({
       userIdentityId,
       amount: dto.amount,
@@ -189,7 +181,6 @@ export class MantecaOperationsService {
 
     const country = dto.targetCurrency.toUpperCase() === 'ARS' ? 'ar' : 'br';
 
-    // Get target account
     let targetAccount: any;
 
     if (dto.targetAccountId) {
@@ -210,7 +201,6 @@ export class MantecaOperationsService {
       throw new BadRequestException('Target account not found');
     }
 
-    // Create ramp operation record
     const operationId = uuidv4();
     const now = new Date();
 
@@ -258,7 +248,6 @@ export class MantecaOperationsService {
 
     const country = dto.sourceCurrency.toUpperCase() === 'ARS' ? 'ar' : 'br';
 
-    // Check spending limits
     const limitCheck = await this.spendingLimitsService.checkSpendingLimitV2({
       userIdentityId,
       amount: dto.amount,
@@ -272,7 +261,6 @@ export class MantecaOperationsService {
       );
     }
 
-    // Get source account
     let sourceAccount: any;
 
     if (dto.sourceAccountId) {
@@ -293,7 +281,6 @@ export class MantecaOperationsService {
       throw new BadRequestException('Source account not found');
     }
 
-    // Create ramp operation record
     const operationId = uuidv4();
     const now = new Date();
 
@@ -313,7 +300,6 @@ export class MantecaOperationsService {
       },
     });
 
-    // Update spending limits
     await this.spendingLimitsService.updateSpendingV2({
       userIdentityId,
       amount: dto.amount,
@@ -340,7 +326,6 @@ export class MantecaOperationsService {
    * Get synthetic operation status
    */
   async getSyntheticById(syntheticId: string): Promise<any> {
-    // First try to find in ramp_operations
     const rampOperation = await this.prisma.ramp_operations.findFirst({
       where: {
         OR: [{ id: syntheticId }, { manteca_operation_id: syntheticId }],
@@ -362,7 +347,6 @@ export class MantecaOperationsService {
       };
     }
 
-    // Try to find in transactions with mantecaId
     const transaction = await this.prisma.transactions.findFirst({
       where: {
         mantecaId: syntheticId,

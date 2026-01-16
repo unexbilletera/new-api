@@ -34,7 +34,6 @@ export class PixCronosService {
     targetAccountNumber?: string;
   }> {
     try {
-      // Check for existing transaction with same idempotency key
       if (idempotencyKey) {
         const existingTransaction =
           await this.transactionModel.findByIdempotencyKey(

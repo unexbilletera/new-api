@@ -221,7 +221,6 @@ export class RateCodeService {
         };
       }
 
-      // Verify user ownership
       if (rateCodeData.user_id !== userId) {
         this.logger.warn('Rate code user mismatch:', {
           rate_code_user: rateCodeData.user_id,
@@ -234,7 +233,6 @@ export class RateCodeService {
         };
       }
 
-      // Check if already used
       if (rateCodeData.used) {
         this.logger.warn('Rate code already used:', {
           used_at: rateCodeData.used_at,
@@ -248,7 +246,6 @@ export class RateCodeService {
         };
       }
 
-      // Check expiration
       const now = new Date();
       const expiresAt = new Date(rateCodeData.expires_at);
       const timeLeft = expiresAt.getTime() - now.getTime();
