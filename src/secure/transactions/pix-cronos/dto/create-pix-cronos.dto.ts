@@ -7,7 +7,7 @@ import {
   Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { SpecializedValidationOptions } from 'src/common/validators';
+import { SpecializedValidationOptions } from '../../../../../common/validators';
 
 export enum PixKeyType {
   CPF = 'cpf',

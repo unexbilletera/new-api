@@ -10,7 +10,7 @@ import {
 import {
   ValidationOptions,
   SpecializedValidationOptions,
-} from 'src/common/validators';
+} from '../../../common/validators';
 
 export class StartUserOnboardingDto {
   @IsEmail()

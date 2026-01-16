@@ -1,6 +1,6 @@
 import { IsEmail, IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ValidationOptions } from 'src/common/validators';
+import { ValidationOptions } from '../../../common/validators';
 
 export class SendEmailValidationDto {
   @ApiProperty({

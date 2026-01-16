@@ -17,7 +17,7 @@
 
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { UpdateUserOnboardingDto } from '../../../../../src/public/onboarding/dto/onboarding.dto';
+import { UpdateUserOnboardingDto, UpdateIdentityOnboardingDto } from '../../../../../src/public/onboarding/dto/onboarding.dto';
 
 /**
  * @testSuite UpdateUserOnboardingDto Validation
@@ -597,6 +597,232 @@ describe('UpdateUserOnboardingDto Validation', () => {
       const pepSinceError = errors.find((e) => e.property === 'pepSince');
       expect(pepSinceError).toBeDefined();
       expect(pepSinceError?.constraints).toHaveProperty('matches');
+    });
+  });
+});
+
+describe('UpdateIdentityOnboardingDto Validation', () => {
+  describe('CPF Field Validation', () => {
+    it('should accept valid CPF format (11 digits)', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        cpf: '12345678900',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should reject CPF with formatting (dots and dashes)', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        cpf: '123.456.789-00',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors[0].property).toBe('cpf');
+    });
+
+    it('should reject CPF with less than 11 digits', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        cpf: '1234567890',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it('should accept undefined CPF (optional field)', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {});
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('RG Field Validation', () => {
+    it('should accept valid RG number', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        rg: 'MG1234567',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept RG with different state formats', async () => {
+      const validRGs = ['SP123456789', 'RJ987654', 'MG1234567'];
+
+      for (const rg of validRGs) {
+        const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+          rg,
+        });
+
+        const errors = await validate(dto);
+
+        expect(errors).toHaveLength(0);
+      }
+    });
+
+    it('should accept undefined RG (optional field)', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {});
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('RG Issuer Field Validation', () => {
+    it('should accept valid RG issuer (SSP-SP)', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        rgIssuer: 'SSP-SP',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept various RG issuers', async () => {
+      const validIssuers = ['SSP-SP', 'DETRAN-MG', 'SSP-RJ', 'DETRAN-BA'];
+
+      for (const issuer of validIssuers) {
+        const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+          rgIssuer: issuer,
+        });
+
+        const errors = await validate(dto);
+
+        expect(errors).toHaveLength(0);
+      }
+    });
+
+    it('should accept undefined rgIssuer (optional field)', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {});
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('RG Expiration Field Validation', () => {
+    it('should accept valid YYYY-MM-DD format for rgExpiration', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        rgExpiration: '2030-12-31',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should reject invalid date format for rgExpiration', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        rgExpiration: '31-12-2030',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors.length).toBeGreaterThan(0);
+      const rgExpirationError = errors.find(
+        (e) => e.property === 'rgExpiration',
+      );
+      expect(rgExpirationError).toBeDefined();
+    });
+
+    it('should accept undefined rgExpiration (optional field)', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {});
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('CPF and RG Together', () => {
+    it('should accept valid CPF and RG together', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        cpf: '12345678900',
+        rg: 'MG1234567',
+        rgIssuer: 'SSP-SP',
+        rgExpiration: '2030-12-31',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept only CPF', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        cpf: '12345678900',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept only RG with issuer and expiration', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        rg: 'MG1234567',
+        rgIssuer: 'SSP-SP',
+        rgExpiration: '2030-12-31',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('Legacy Compatibility Fields', () => {
+    it('should accept deprecated documentNumber field', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        documentNumber: '12345678900',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept deprecated documentIssuer field', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        documentIssuer: 'SSP-SP',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept deprecated documentExpiration field', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        documentExpiration: '2030-12-31',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should accept all legacy fields together', async () => {
+      const dto = plainToInstance(UpdateIdentityOnboardingDto, {
+        documentNumber: '12345678900',
+        documentIssuer: 'SSP-SP',
+        documentExpiration: '2030-12-31',
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors).toHaveLength(0);
     });
   });
 });

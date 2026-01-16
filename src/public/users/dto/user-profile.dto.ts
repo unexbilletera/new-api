@@ -8,7 +8,7 @@ import {
 import {
   ValidationOptions,
   SpecializedValidationOptions,
-} from 'src/common/validators';
+} from '../../../common/validators';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class GetUserProfileDto {}

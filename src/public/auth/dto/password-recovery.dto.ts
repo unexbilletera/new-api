@@ -3,7 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   ValidationOptions,
   SpecializedValidationOptions,
-} from 'src/common/validators';
+} from '../../../common/validators';
 
 export class ForgotPasswordDto {
   @ApiProperty({
