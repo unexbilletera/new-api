@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app/services/app.service';
 import { AppModel } from './app/models/app.model';
@@ -6,9 +8,12 @@ import { AppMapper } from './app/mappers/app.mapper';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { JwtModule } from './shared/jwt/jwt.module';
 import { ConfigModule } from './shared/config/config.module';
+import { ConfigService } from './shared/config/config.service';
 import { LoggerModule } from './shared/logger/logger.module';
 import { SqsModule } from './shared/sqs/sqs.module';
 import { CronosModule } from './shared/cronos/cronos.module';
+import Redis from 'ioredis';
+import { ThrottlerRedisStorage } from './shared/throttler/throttler-redis.storage';
 import { RenaperModule as SharedRenaperModule } from './shared/renaper/renaper.module';
 import { BindModule } from './shared/bind/bind.module';
 import { StorageModule } from './shared/storage/storage.module';
@@ -23,6 +28,7 @@ import { PublicOnboardingModule } from './public/onboarding/onboarding.module';
 import { PublicUsersModule } from './public/users/users.module';
 import { BiometricModule } from './public/biometric/biometric.module';
 import { WebhooksModule } from './public/webhooks/webhooks.module';
+import { WebhooksModule as CronosWebhooksModule } from './webhooks/webhooks.module';
 import { ComplianceModule } from './public/compliance/compliance.module';
 
 import { SecureTransactionsModule } from './secure/transactions/transactions.module';
@@ -72,6 +78,41 @@ import { HealthModule } from './health/health.module';
 @Module({
   imports: [
     ConfigModule,
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const redisUrl = configService.get('REDIS_URL');
+        return {
+          throttlers: [
+            {
+              name: 'default',
+              ttl: 60000,
+              limit: 100,
+            },
+            {
+              name: 'auth',
+              ttl: 60000,
+              limit: 5,
+            },
+            {
+              name: 'transactions',
+              ttl: 60000,
+              limit: 10,
+            },
+          ],
+          storage: redisUrl
+            ? new ThrottlerRedisStorage(
+                new Redis(redisUrl, {
+                  maxRetriesPerRequest: 3,
+                  retryStrategy: (times: number) =>
+                    Math.min(times * 100, 3000),
+                }),
+              )
+            : undefined,
+        };
+      },
+    }),
     LoggerModule,
     SqsModule,
     CronosModule,
@@ -89,6 +130,7 @@ import { HealthModule } from './health/health.module';
     PublicUsersModule,
     BiometricModule,
     WebhooksModule,
+    CronosWebhooksModule,
     ComplianceModule,
     SecureTransactionsModule,
     SecureExchangeModule,
@@ -132,6 +174,10 @@ import { HealthModule } from './health/health.module';
   ],
   controllers: [AppController],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     AppService,
     AppModel,
     AppMapper,
