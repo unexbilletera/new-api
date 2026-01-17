@@ -1,7 +1,7 @@
 # Transactions Domain
 
 **Status:** `stable`
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-16
 **Owner:** Unex Development Team
 
 ## Overview
@@ -14,6 +14,11 @@ The transactions domain handles all financial operations including PIX transfers
 - [PIX Cronos Transactions](pix-cronos.md) - Create and confirm PIX transactions
   - `POST /transactions/pix/cronos/create`
   - `POST /transactions/pix/cronos/confirm`
+
+### Billet Cronos
+- [Billet Cronos Transactions](billet-cronos.md) - Consult and pay billets (boletos)
+  - `POST /transactions/billet/cronos/create`
+  - `POST /transactions/billet/cronos/confirm`
 
 ### Transaction History
 - `GET /transactions/history` - List user transactions

@@ -1,7 +1,7 @@
 # API Documentation
 
 **Status:** `stable`
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-16
 **Owner:** Unex Development Team
 
 ## Overview
@@ -18,6 +18,7 @@ Comprehensive API reference organized by domains, resources, and complete end-to
 - [Transactions](transactions/README.md) - Financial operations
 - [Notifications](notifications/README.md) - Push notifications
 - [Backoffice](backoffice/README.md) - Administrative operations
+- [Webhooks](webhooks/README.md) - External service callbacks
 
 ### By Flow
 
@@ -76,11 +77,22 @@ See [Onboarding Overview](onboarding/README.md) for complete flow.
 - `POST /transactions/pix/cronos/create` - Create PIX transaction
 - `POST /transactions/pix/cronos/confirm` - Confirm transaction
 
+**Billet Cronos:**
+- `POST /transactions/billet/cronos/create` - Consult and create billet payment
+- `POST /transactions/billet/cronos/confirm` - Confirm billet payment
+
 **History:**
 - `GET /transactions/history` - List transactions
 - `GET /transactions/:id` - Get transaction details
 
 See [Transactions Overview](transactions/README.md).
+
+### Webhooks
+
+**Cronos Webhooks:**
+- `POST /api/cronos/webhook` - Receive transaction status updates
+
+See [Webhooks Overview](webhooks/README.md).
 
 ### Notifications Domain
 
