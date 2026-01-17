@@ -7,6 +7,8 @@ import {
   Query,
   UseGuards,
   Request,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,6 +24,8 @@ import {
   BindAccountDto,
   BindTransactionDto,
   BindTransferDto,
+  CreateCvuDto,
+  CvuResponseDto,
 } from '../dto/bind.dto';
 import { JwtAuthGuard } from '../../../shared/guards/jwt-auth.guard';
 
@@ -41,6 +45,24 @@ export class BindController {
   })
   async listAccounts(@Request() req: any) {
     return this.bindOperationsService.listAccounts(req.user.id);
+  }
+
+  @Post('cvu')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create CVU for user' })
+  @ApiResponse({
+    status: 201,
+    description: 'CVU created successfully',
+    type: CvuResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid data or missing identity' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  async createCvu(@Body() dto: CreateCvuDto, @Request() req: any) {
+    return this.bindOperationsService.createCvu(
+      req.user.id,
+      req.user.defaultUserIdentityId,
+      dto.alias,
+    );
   }
 
   @Get('accounts/:id')

@@ -113,3 +113,24 @@ export class BindTransferDto {
   @ApiProperty()
   createdAt: Date;
 }
+
+export class CreateCvuDto {
+  @ApiPropertyOptional({ description: 'Custom alias for the CVU' })
+  @IsOptional()
+  @IsString()
+  alias?: string;
+}
+
+export class CvuResponseDto {
+  @ApiProperty({ description: 'Operation success status' })
+  success: boolean;
+
+  @ApiProperty({ description: 'Generated CVU number' })
+  cvu: string;
+
+  @ApiPropertyOptional({ description: 'CVU alias' })
+  alias?: string;
+
+  @ApiProperty({ description: 'Response message' })
+  message: string;
+}

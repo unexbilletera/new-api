@@ -1,12 +1,22 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
+import { BindService } from '../../../shared/bind/bind.service';
 import { TransactionFiltersDto } from '../dto/bind.dto';
 
 @Injectable()
 export class BindOperationsService {
   private readonly logger = new Logger(BindOperationsService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private bindService: BindService,
+  ) {}
 
   /**
    * List user's Bind accounts
@@ -36,6 +46,112 @@ export class BindOperationsService {
       ...acc,
       currency: 'ARS',
     }));
+  }
+
+  /**
+   * Create CVU for user
+   */
+  async createCvu(
+    userId: string,
+    userIdentityId: string,
+    alias?: string,
+  ): Promise<any> {
+    this.logger.log(`Creating CVU for user ${userId}`);
+
+    const existingAccount = await this.prisma.usersAccounts.findFirst({
+      where: {
+        userIdentityId,
+        type: 'bind',
+        cvu: { not: null },
+        deletedAt: null,
+      },
+    });
+
+    if (existingAccount?.cvu) {
+      return {
+        success: true,
+        cvu: existingAccount.cvu,
+        alias: existingAccount.alias,
+        message: 'CVU already exists for this user',
+      };
+    }
+
+    const identity = await this.prisma.usersIdentities.findUnique({
+      where: { id: userIdentityId },
+      select: {
+        id: true,
+        taxDocumentNumber: true,
+        name: true,
+      },
+    });
+
+    if (!identity) {
+      throw new BadRequestException('User identity not found');
+    }
+
+    if (!identity.taxDocumentNumber) {
+      throw new BadRequestException(
+        'User CUIT/CUIL not found. Please complete your identity verification.',
+      );
+    }
+
+    const userName = identity.name?.trim();
+    if (!userName) {
+      throw new BadRequestException(
+        'User name not found. Please complete your profile.',
+      );
+    }
+
+    const clientId = identity.id;
+
+    const cvuResult = await this.bindService.createCvu({
+      client_id: clientId,
+      cuit: identity.taxDocumentNumber,
+      name: userName,
+      currency: 'ARS',
+    });
+
+    let account = await this.prisma.usersAccounts.findFirst({
+      where: {
+        userIdentityId,
+        type: 'bind',
+        deletedAt: null,
+      },
+    });
+
+    if (account) {
+      await this.prisma.usersAccounts.update({
+        where: { id: account.id },
+        data: {
+          cvu: cvuResult.cvu,
+          alias: alias || cvuResult.alias,
+          status: 'enable',
+          updatedAt: new Date(),
+        },
+      });
+    } else {
+      account = await this.prisma.usersAccounts.create({
+        data: {
+          id: randomUUID(),
+          userId,
+          userIdentityId,
+          type: 'bind',
+          status: 'enable',
+          cvu: cvuResult.cvu,
+          alias: alias || cvuResult.alias,
+          balance: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    return {
+      success: true,
+      cvu: cvuResult.cvu,
+      alias: alias || cvuResult.alias,
+      message: 'CVU created successfully',
+    };
   }
 
   /**
