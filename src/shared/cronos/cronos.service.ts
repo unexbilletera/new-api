@@ -1838,6 +1838,133 @@ export class CronosService implements OnModuleInit {
     }
   }
 
+  async consultBillet(params: {
+    document: string;
+    barcode: string;
+  }): Promise<{
+    id_pagamento?: string;
+    valor?: number;
+    vencimento?: string;
+    beneficiario?: {
+      nome?: string;
+      documento?: string;
+    };
+  }> {
+    try {
+      if (!params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+      if (!params.barcode) {
+        throw new Error('Missing barcode. Invalid parameters');
+      }
+
+      if (this.config.logging) {
+        this.logger.info(
+          '[CronosService]',
+          `Consulting billet - document: ${params.document}, barcode: ${params.barcode.substring(0, 10)}...`,
+        );
+      }
+
+      const result = (await this.request({
+        method: 'POST',
+        action: '/api/v1/boleto/consultar',
+        document: params.document,
+        useUserAuth: true,
+        body: {
+          codigo_barras: params.barcode,
+        },
+      })) as {
+        id_pagamento?: string;
+        valor?: number;
+        vencimento?: string;
+        beneficiario?: {
+          nome?: string;
+          documento?: string;
+        };
+      };
+
+      if (this.config.logging) {
+        this.logger.success(
+          '[CronosService] SUCCESS',
+          'Billet consulted successfully',
+        );
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'Error consulting billet',
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async payBillet(params: {
+    document: string;
+    barcode: string;
+    amount: number;
+    cronosId?: string;
+    description?: string;
+  }): Promise<any> {
+    try {
+      if (!params.document) {
+        throw new Error('Missing document. Invalid parameters');
+      }
+      if (!params.barcode) {
+        throw new Error('Missing barcode. Invalid parameters');
+      }
+      if (!params.amount) {
+        throw new Error('Missing amount. Invalid parameters');
+      }
+
+      if (this.config.logging) {
+        this.logger.info(
+          '[CronosService]',
+          `Paying billet - document: ${params.document}, amount: ${params.amount}`,
+        );
+      }
+
+      const result = await this.request({
+        method: 'POST',
+        action: '/api/v1/boleto/pagar',
+        document: params.document,
+        useUserAuth: true,
+        body: {
+          id_pagamento: params.cronosId,
+          codigo_barras: params.barcode,
+          valor: params.amount,
+          descricao: params.description || '',
+        },
+      });
+
+      if (this.config.logging) {
+        this.logger.success(
+          '[CronosService] SUCCESS',
+          'Billet paid successfully',
+        );
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.errorWithStack(
+        '[CronosService] ERROR',
+        'Error paying billet',
+        error,
+      );
+      throw error;
+    }
+  }
+
+  isEnabled(): boolean {
+    return this.config.enable;
+  }
+
+  getWebhookSecret(): string {
+    return this.config.webhookSecret;
+  }
+
   async addPixKey(params: {
     document: string;
     type: string;
