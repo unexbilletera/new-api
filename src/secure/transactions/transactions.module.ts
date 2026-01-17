@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PixCronosModule } from './pix-cronos/pix-cronos.module';
+import { BilletCronosModule } from './billet-cronos/billet-cronos.module';
 import { PrismaModule } from '../../shared/prisma/prisma.module';
 import { TransactionalPasswordModule } from '../transactional-password/transactional-password.module';
 import { SpendingLimitsModule } from '../../shared/spending-limits/spending-limits.module';
@@ -13,6 +14,7 @@ import { TransactionCreationService } from './services/transaction-creation.serv
   imports: [
     PrismaModule,
     PixCronosModule,
+    BilletCronosModule,
     TransactionalPasswordModule,
     SpendingLimitsModule,
     SecureExchangeModule,
