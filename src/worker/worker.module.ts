@@ -6,11 +6,12 @@ import { ConfigModule } from '../shared/config/config.module';
 import { CronosModule } from '../shared/cronos/cronos.module';
 import { WorkerService } from './worker.service';
 import { PixCronosHandler } from './handlers/pix-cronos.handler';
+import { PixCronosValidationService } from '../secure/transactions/cronos/pix-cronos/services/pix-cronos-validation.service';
 
 @Module({
   imports: [PrismaModule, SqsModule, LoggerModule, ConfigModule, CronosModule],
   controllers: [],
-  providers: [WorkerService, PixCronosHandler],
+  providers: [WorkerService, PixCronosHandler, PixCronosValidationService],
   exports: [WorkerService],
 })
 export class WorkerModule {}

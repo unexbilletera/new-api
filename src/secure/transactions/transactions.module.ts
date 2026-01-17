@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
-import { PixCronosModule } from './pix-cronos/pix-cronos.module';
+import { PixCronosModule } from './cronos/pix-cronos/pix-cronos.module';
+import { BoletoCronosModule } from './cronos/boleto/boleto-cronos.module';
+import { BoletoGireModule } from './gire/boleto/boleto-gire.module';
 import { PrismaModule } from '../../shared/prisma/prisma.module';
 import { TransactionalPasswordModule } from '../transactional-password/transactional-password.module';
 import { SpendingLimitsModule } from '../../shared/spending-limits/spending-limits.module';
@@ -16,6 +18,8 @@ import { TransactionCreationService } from './services/transaction-creation.serv
     TransactionalPasswordModule,
     SpendingLimitsModule,
     SecureExchangeModule,
+    BoletoCronosModule,
+    BoletoGireModule,
   ],
   controllers: [TransactionsController, TransactionCreationController],
   providers: [TransactionsService, TransactionCreationService],

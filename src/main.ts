@@ -14,10 +14,40 @@ import { loadEnvironmentFile } from './shared/config/env-loader';
 loadEnvironmentFile();
 
 async function bootstrap() {
+  const fastifyAdapter = new FastifyAdapter({
+    bodyLimit: 1048576, // 1MB
+  });
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    fastifyAdapter,
   );
+
+  // Configurar raw body para webhooks usando hook preParsing
+  // Este hook captura o raw body antes do parser padrão processar
+  const instance = app.getHttpAdapter().getInstance();
+  
+  instance.addHook('preParsing', async (request, reply, payload) => {
+    // Apenas para rotas de webhook
+    if (request.url && request.url.includes('/webhook')) {
+      const chunks: Buffer[] = [];
+      
+      // Ler o stream e salvar raw body
+      for await (const chunk of payload) {
+        chunks.push(chunk);
+      }
+      
+      const rawBody = Buffer.concat(chunks).toString('utf8');
+      (request as any).rawBody = rawBody;
+      
+      // Retornar o payload como Buffer para que o parser padrão possa processar
+      return Buffer.from(rawBody);
+    }
+    
+    // Para outras rotas, retornar payload original
+    return payload;
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

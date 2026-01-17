@@ -7,7 +7,8 @@ import {
   Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { SpecializedValidationOptions } from '../../../../common/validators';
+import { SpecializedValidationOptions } from '../../../../../common/validators';
+import { IsValidPixKeyFormat } from '../validators/pix-key-format.validator';
 
 export enum PixKeyType {
   CPF = 'cpf',
@@ -51,6 +52,10 @@ export class CreatePixCronosDto {
     example: '12345678900',
   })
   @IsString()
+  @IsValidPixKeyFormat({
+    message:
+      'targetKeyValue must be a valid PIX key format for the specified type',
+  })
   targetKeyValue: string;
 
   @ApiProperty({
@@ -61,4 +66,14 @@ export class CreatePixCronosDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty({
+    description:
+      'Chave de idempotência para evitar transações duplicadas (opcional)',
+    example: 'unique-idempotency-key-123',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  idempotencyKey?: string;
 }

@@ -15,14 +15,15 @@ import {
   ApiBody,
   ApiHeader,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../../../shared/guards/jwt-auth.guard';
-import { CurrentUser } from '../../../../shared/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
+import { JwtAuthGuard } from '../../../../../shared/guards/jwt-auth.guard';
+import { CurrentUser } from '../../../../../shared/decorators/current-user.decorator';
 import { PixCronosService } from '../services/pix-cronos.service';
 import { CreatePixCronosDto } from '../dto/create-pix-cronos.dto';
 import { ConfirmPixCronosDto } from '../dto/confirm-pix-cronos.dto';
-import { SuccessCodes } from '../../../../shared/errors/app-error';
-import { LoggerService } from '../../../../shared/logger/logger.service';
-import type { CurrentUserPayloadDto } from '../../../../common/dto';
+import { SuccessCodes } from '../../../../../shared/errors/app-error';
+import type { CurrentUserPayloadDto } from '../../../../../common/dto';
+import { LoggerService } from 'src/shared/logger/logger.service';
 
 @ApiTags('2.1 Secure - Transactions')
 @Controller('transactions/pix/cronos')
@@ -35,7 +36,8 @@ export class PixCronosController {
   ) {}
 
   @Post('create')
-  @HttpCode(HttpStatus.CREATED)
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requisições por minuto
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Create PIX Cronos transaction',
     description:
@@ -90,10 +92,13 @@ export class PixCronosController {
     @Headers('x-idempotency-key') idempotencyKey?: string,
   ) {
     try {
+      if (idempotencyKey) {
+        dto.idempotencyKey = idempotencyKey;
+      }
+
       const transaction = await this.pixCronosService.createTransaction(
         user.id,
         dto,
-        idempotencyKey,
       );
 
       return {
@@ -112,6 +117,7 @@ export class PixCronosController {
   }
 
   @Post('confirm')
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requisições por minuto
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Confirm PIX Cronos transaction',
@@ -151,7 +157,6 @@ export class PixCronosController {
       const result = await this.pixCronosService.confirmTransaction(
         user.id,
         dto.transactionId,
-        dto.transactionalPassword,
       );
 
       return {
