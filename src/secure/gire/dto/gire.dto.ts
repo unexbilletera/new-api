@@ -32,7 +32,6 @@ export class CompanySearchDto {
   name: string;
 }
 
-// Response DTOs
 export class GireCompanyDto {
   @ApiProperty()
   id: string;

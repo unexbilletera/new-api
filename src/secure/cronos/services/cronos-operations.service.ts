@@ -37,7 +37,6 @@ export class CronosOperationsService {
   ): Promise<any> {
     this.logger.log(`Sending transactional token for user ${userId}`);
 
-    // Get user identity document if not provided
     let userDocument = document;
     if (!userDocument) {
       const identity = await this.prisma.usersIdentities.findUnique({
@@ -51,8 +50,6 @@ export class CronosOperationsService {
       throw new BadRequestException('User document not found');
     }
 
-    // Call Cronos service to send token
-    // This would be implemented in the shared CronosService
     return {
       success: true,
       message: 'Transactional token sent successfully',
@@ -64,7 +61,6 @@ export class CronosOperationsService {
    * Get recharge companies
    */
   async getRechargeCompanies(): Promise<any[]> {
-    // This would call Cronos API to get available companies
     return [
       { id: '1', name: 'TIM', category: 'mobile' },
       { id: '2', name: 'Claro', category: 'mobile' },
@@ -100,7 +96,6 @@ export class CronosOperationsService {
   ): Promise<any> {
     this.logger.log(`Setting PIX key for user ${userId}: ${dto.keyType}`);
 
-    // Validate key type
     const validKeyTypes = ['cpf', 'cnpj', 'phone', 'email', 'evp'];
     if (!validKeyTypes.includes(dto.keyType.toLowerCase())) {
       throw new BadRequestException(
@@ -108,7 +103,6 @@ export class CronosOperationsService {
       );
     }
 
-    // Get user account
     const account = await this.prisma.usersAccounts.findFirst({
       where: {
         userIdentityId,
@@ -121,7 +115,6 @@ export class CronosOperationsService {
       throw new BadRequestException('Cronos account not found for user');
     }
 
-    // Update account alias with PIX key
     let currentAlias: any = {};
     if (account.alias) {
       try {
@@ -159,7 +152,6 @@ export class CronosOperationsService {
   ): Promise<any> {
     this.logger.log(`Removing PIX key for user ${userId}: ${dto.keyType}`);
 
-    // Get user account
     const account = await this.prisma.usersAccounts.findFirst({
       where: {
         userIdentityId,
@@ -172,7 +164,6 @@ export class CronosOperationsService {
       throw new BadRequestException('Cronos account not found for user');
     }
 
-    // Remove key from alias
     let currentAlias: any = {};
     if (account.alias) {
       try {
@@ -205,7 +196,6 @@ export class CronosOperationsService {
   async processWebhook(data: any): Promise<any> {
     this.logger.log('Processing Cronos webhook');
 
-    // Handle different webhook types
     const eventType = data.event || data.type;
 
     switch (eventType) {
@@ -223,19 +213,16 @@ export class CronosOperationsService {
 
   private async handlePixReceived(data: any): Promise<any> {
     this.logger.log('Handling PIX received event');
-    // Implementation for PIX received
     return { message: 'PIX received processed', data };
   }
 
   private async handlePixSent(data: any): Promise<any> {
     this.logger.log('Handling PIX sent event');
-    // Implementation for PIX sent
     return { message: 'PIX sent processed', data };
   }
 
   private async handleBoletoPaid(data: any): Promise<any> {
     this.logger.log('Handling boleto paid event');
-    // Implementation for boleto paid
     return { message: 'Boleto paid processed', data };
   }
 
@@ -248,7 +235,6 @@ export class CronosOperationsService {
     body?: any,
   ): Promise<any> {
     this.logger.log(`Proxying request to Cronos: ${method} ${endpoint}`);
-    // This would be implemented to call the Cronos API directly
     return {
       message: 'Proxy request not implemented',
       endpoint,

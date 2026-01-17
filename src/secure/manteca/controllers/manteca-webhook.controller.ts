@@ -43,7 +43,6 @@ export class MantecaWebhookController {
     @Headers('x-manteca-signature') signature: string,
     @Req() req: RawBodyRequest<Request>,
   ) {
-    // Verify signature if provided
     if (signature && req.rawBody) {
       const isValid = this.webhookService.verifySignature(
         req.rawBody.toString(),
@@ -61,8 +60,6 @@ export class MantecaWebhookController {
   @ApiOperation({ summary: 'Manually check synthetic status (admin)' })
   @ApiResponse({ status: 200, description: 'Status checked' })
   async checkSyntheticStatus(@Body() body: { syntheticId: string }) {
-    // This would call Manteca API to check status
-    // For now, return a placeholder
     return {
       message: 'Manual status check not implemented',
       syntheticId: body.syntheticId,

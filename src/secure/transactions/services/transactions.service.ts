@@ -27,7 +27,6 @@ export class TransactionsService {
       deletedAt: null,
     };
 
-    // Apply filters
     if (query.status) {
       where.status = query.status;
     }
@@ -108,7 +107,6 @@ export class TransactionsService {
       this.prisma.transactions.count({ where }),
     ]);
 
-    // Format transactions
     const formattedData = data.map((tx) => ({
       ...tx,
       direction: tx.sourceUserId === userId ? 'out' : 'in',
@@ -229,19 +227,16 @@ export class TransactionsService {
       deletedAt: null,
     };
 
-    // Apply type filters
     if (filters?.types) {
       const types = filters.types.split(',').map((t) => t.trim());
       where.type = { in: types };
     }
 
-    // Apply status filters
     if (filters?.statuses) {
       const statuses = filters.statuses.split(',').map((s) => s.trim());
       where.status = { in: statuses };
     }
 
-    // Apply date range
     if (query.startDate || query.endDate) {
       where.date = {};
       if (query.startDate) {
@@ -274,7 +269,6 @@ export class TransactionsService {
       this.prisma.transactions.count({ where }),
     ]);
 
-    // Group by date for history view
     const groupedByDate = data.reduce((acc: any, tx) => {
       const dateKey = new Date(tx.date).toISOString().split('T')[0];
       if (!acc[dateKey]) {
@@ -320,7 +314,6 @@ export class TransactionsService {
       throw new NotFoundException('Transaction not found');
     }
 
-    // Check if transaction can be reversed
     const reversibleStatuses = ['confirm'];
     const reversibleTypes = [
       'cashout',
@@ -341,7 +334,6 @@ export class TransactionsService {
       );
     }
 
-    // Create reversal request log
     await this.prisma.transactionsLogs.create({
       data: {
         id: require('uuid').v4(),

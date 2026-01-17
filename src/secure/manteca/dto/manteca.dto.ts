@@ -119,7 +119,6 @@ export class WebhookDto {
   timestamp?: string;
 }
 
-// Response DTOs
 export class QrPaymentResponseDto {
   @ApiProperty()
   success: boolean;

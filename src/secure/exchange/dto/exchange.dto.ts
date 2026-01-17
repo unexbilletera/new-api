@@ -97,7 +97,6 @@ export class ConfirmDto {
   targetAccountId?: string;
 }
 
-// Response DTOs
 export class ExchangeRatesResponseDto {
   @ApiProperty()
   brl_ars_buy: number;

@@ -378,7 +378,6 @@ export class BindOperationsService {
 
   private async handleCashinReceived(data: any): Promise<any> {
     this.logger.log('Handling Bind cashin received');
-    // Handle incoming CVU transfer
     return { message: 'Cashin received processed', data };
   }
 

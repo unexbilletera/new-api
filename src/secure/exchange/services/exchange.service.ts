@@ -125,7 +125,6 @@ export class ExchangeService {
 
     const rates = await this.getRates();
 
-    // Determine rate based on currencies
     let rate: number;
     let commissionRate: number;
     let inferredOperation: 'buy' | 'sell';
@@ -134,12 +133,10 @@ export class ExchangeService {
     const toUpper = toCurrency.toUpperCase();
 
     if (fromUpper === 'BRL' && toUpper === 'ARS') {
-      // BRL -> ARS: user is selling BRL to get ARS
       rate = rates.brl_ars_sell;
       commissionRate = rates.commission_rate_sell;
       inferredOperation = 'sell';
     } else if (fromUpper === 'ARS' && toUpper === 'BRL') {
-      // ARS -> BRL: user is buying BRL with ARS
       rate = rates.ars_brl_buy;
       commissionRate = rates.commission_rate_buy;
       inferredOperation = 'buy';
@@ -262,7 +259,6 @@ export class ExchangeService {
   async confirm(params: ConfirmParams): Promise<ConfirmResult> {
     const { rateCode, userId, userIdentityId, sourceAccountId } = params;
 
-    // Validate rate code
     const validation = await this.rateCodeService.validateRateCode(
       rateCode,
       userId,
@@ -274,7 +270,6 @@ export class ExchangeService {
 
     const rateCodeData = validation.rateCodeData;
 
-    // Check spending limits
     const country =
       await this.spendingLimitsService.getIdentityCountry(userIdentityId);
     const limitCheck = await this.spendingLimitsService.checkSpendingLimitV2({
@@ -290,7 +285,6 @@ export class ExchangeService {
       );
     }
 
-    // Create transaction
     const transactionId = uuidv4();
     const now = new Date();
 
@@ -299,7 +293,6 @@ export class ExchangeService {
         ? 'cashout_manteca_exchange_ar'
         : 'cashout_manteca_exchange_br';
 
-    // Get source account info
     const sourceAccount = await this.prisma.usersAccounts.findUnique({
       where: { id: sourceAccountId },
     });
@@ -308,7 +301,6 @@ export class ExchangeService {
       throw new BadRequestException('Source account not found');
     }
 
-    // Create the debit transaction
     const transaction = await this.prisma.transactions.create({
       data: {
         id: transactionId,
@@ -328,10 +320,8 @@ export class ExchangeService {
       },
     });
 
-    // Mark rate code as used
     await this.rateCodeService.markRateCodeAsUsed(rateCode, transactionId);
 
-    // Update spending
     await this.spendingLimitsService.updateSpendingV2({
       userIdentityId,
       amount: rateCodeData.total_debit,
@@ -339,7 +329,6 @@ export class ExchangeService {
       country,
     });
 
-    // Create transaction log
     await this.prisma.transactionsLogs.create({
       data: {
         id: uuidv4(),

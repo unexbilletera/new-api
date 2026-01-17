@@ -116,10 +116,8 @@ export class SpendingLimitsService {
     const currentHour = now.getHours();
 
     if (startHour > endHour) {
-      // Night period crosses midnight (e.g., 20:00 - 07:00)
       return currentHour >= startHour || currentHour < endHour;
     } else {
-      // Normal night period (e.g., 22:00 - 06:00)
       return currentHour >= startHour && currentHour < endHour;
     }
   }
@@ -129,7 +127,6 @@ export class SpendingLimitsService {
    */
   async getDefaultProfileId(): Promise<string | null> {
     try {
-      // First try to find profile with isDefault = true
       const defaultProfile =
         await this.prisma.spending_limit_profiles.findFirst({
           where: {
@@ -144,7 +141,6 @@ export class SpendingLimitsService {
         return defaultProfile.id;
       }
 
-      // If not found, use Profile 1 (first of the 3 created profiles)
       const profile1 = await this.prisma.spending_limit_profiles.findUnique({
         where: { id: '11111111-1111-1111-1111-111111111111' },
         select: { id: true },
@@ -154,7 +150,6 @@ export class SpendingLimitsService {
         return profile1.id;
       }
 
-      // Fallback: find any active profile
       const anyProfile = await this.prisma.spending_limit_profiles.findFirst({
         where: {
           isActive: true,
@@ -208,7 +203,6 @@ export class SpendingLimitsService {
       throw new Error('Spending limits not found for this identity');
     }
 
-    // If custom profile, use custom values
     if (identityLimit.isCustom) {
       return {
         dailyTransferLimit: identityLimit.dailyTransferLimit,
@@ -222,7 +216,6 @@ export class SpendingLimitsService {
       };
     }
 
-    // Use profile values
     if (!identityLimit.profileId) {
       throw new Error('Profile ID not found for this identity');
     }
@@ -269,11 +262,9 @@ export class SpendingLimitsService {
     let limits: any = null;
 
     if (identityLimit.isCustom) {
-      // Use custom limits
       limits =
         country === 'ar' ? identityLimit.limitsAr : identityLimit.limitsBr;
     } else {
-      // Get limits from profile
       if (!identityLimit.profileId) {
         throw new Error('Profile ID not found for this identity');
       }
@@ -289,7 +280,6 @@ export class SpendingLimitsService {
       limits = country === 'ar' ? profile.limitsAr : profile.limitsBr;
     }
 
-    // If limits is null or a JSON string, parse it
     if (typeof limits === 'string') {
       limits = JSON.parse(limits);
     }
@@ -309,7 +299,6 @@ export class SpendingLimitsService {
     });
 
     if (!spending) {
-      // Create new record if doesn't exist
       const newSpending = await this.prisma.daily_spending_tracking.create({
         data: {
           userIdentityId,
@@ -350,23 +339,19 @@ export class SpendingLimitsService {
       );
     }
 
-    // Get identity limits
     const limits = await this.getIdentityLimits(userIdentityId);
 
-    // Get current daily spending
     const today = new Date().toISOString().split('T')[0];
     const currentSpending = await this.getCurrentSpending(
       userIdentityId,
       today,
     );
 
-    // Check if it's nighttime
     const isNightTime = this.isNightTime(
       limits.nightlyStartHour,
       limits.nightlyEndHour,
     );
 
-    // Determine applicable limits
     const applicableLimits = isNightTime
       ? {
           transfer: limits.nightlyTransferLimit,
@@ -377,7 +362,6 @@ export class SpendingLimitsService {
           boleto: limits.dailyBoletoLimit,
         };
 
-    // Check limit based on type
     const limitType =
       type === 'transfer' || type === 'pix' || type === 'qrCode'
         ? 'transfer'
@@ -405,7 +389,6 @@ export class SpendingLimitsService {
       canProceed,
     });
 
-    // If cannot proceed, create alert
     if (!canProceed) {
       await this.createAlert({
         userIdentityId,
@@ -453,7 +436,6 @@ export class SpendingLimitsService {
 
     const limits = await this.getCountryLimits(userIdentityId, country);
 
-    // Map operationType to key in JSON (transfer, qrCode, pix)
     let limitKey =
       operationType === 'qrCode'
         ? 'qrCode'
@@ -462,7 +444,6 @@ export class SpendingLimitsService {
           : 'transfer';
     let operationLimits = limits[limitKey] || {};
 
-    // If Pix and no maxPerTransaction configured, use transfer.maxPerTransaction as fallback
     let maxPerTransaction = operationLimits.maxPerTransaction;
     if (
       operationType === 'pix' &&
@@ -478,7 +459,6 @@ export class SpendingLimitsService {
       }
     }
 
-    // If unlimited, allow
     if (this.isUnlimited(maxPerTransaction)) {
       return {
         allowed: true,
@@ -518,7 +498,6 @@ export class SpendingLimitsService {
 
     const limits = await this.getCountryLimits(userIdentityId, country);
 
-    // Map operationType to limit key
     let limitKey =
       operationType === 'qrCode'
         ? 'qrCode'
@@ -530,7 +509,6 @@ export class SpendingLimitsService {
     let maxDaily = operationLimits.maxDaily;
     let maxCountDaily = operationLimits.maxCountDaily;
 
-    // For Pix, if no daily limits configured, use transfer as fallback
     if (operationType === 'pix' && country === 'br') {
       if (this.isUnlimited(maxDaily) && this.isUnlimited(maxCountDaily)) {
         const transferLimits = limits.transfer || {};
@@ -553,7 +531,6 @@ export class SpendingLimitsService {
       today,
     );
 
-    // Check count limit
     let countField = 0;
     if (country === 'ar') {
       if (operationType === 'transfer')
@@ -569,7 +546,6 @@ export class SpendingLimitsService {
         countField = currentSpending.pixCountBr || 0;
     }
 
-    // Check value daily limit
     let dailySpentField = 0;
     if (country === 'ar') {
       if (operationType === 'transfer')
@@ -585,7 +561,6 @@ export class SpendingLimitsService {
         dailySpentField = Number(currentSpending.dailyPixSpentBr) || 0;
     }
 
-    // Check count
     let countAllowed = true;
     let countRemaining: number | null = null;
     if (!this.isUnlimited(maxCountDaily)) {
@@ -593,7 +568,6 @@ export class SpendingLimitsService {
       countRemaining = countAllowed ? maxCountDaily - countField - 1 : 0;
     }
 
-    // Check value
     let valueAllowed = true;
     let valueRemaining: number | null = null;
     if (!this.isUnlimited(maxDaily)) {
@@ -634,7 +608,6 @@ export class SpendingLimitsService {
   }): Promise<MonthlyLimitResult> {
     const { userIdentityId, amount, country } = params;
 
-    // Monthly limit only exists for Argentina
     if (country !== 'ar') {
       return {
         allowed: true,
@@ -648,7 +621,6 @@ export class SpendingLimitsService {
     const operationLimits = limits.transfer || {};
     const maxMonthly = operationLimits.maxMonthly;
 
-    // If unlimited, allow
     if (this.isUnlimited(maxMonthly)) {
       return {
         allowed: true,
@@ -659,7 +631,6 @@ export class SpendingLimitsService {
       };
     }
 
-    // Get monthly tracking
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
@@ -676,7 +647,6 @@ export class SpendingLimitsService {
       });
 
     if (!monthlySpending) {
-      // Create monthly record if doesn't exist
       monthlySpending = await this.prisma.monthly_spending_tracking.create({
         data: {
           userIdentityId,
@@ -720,14 +690,11 @@ export class SpendingLimitsService {
       );
     }
 
-    // Get country if not provided
     const userCountry =
       country || (await this.getIdentityCountry(userIdentityId));
 
-    // Determine expected currency
     const expectedCurrency = userCountry === 'ar' ? 'ARS' : 'BRL';
 
-    // Validate transaction limit
     const transactionLimit = await this.checkTransactionLimit({
       userIdentityId,
       amount,
@@ -736,7 +703,6 @@ export class SpendingLimitsService {
       currency: currency || expectedCurrency,
     });
 
-    // Validate daily limit
     const dailyLimit = await this.checkDailyLimit({
       userIdentityId,
       amount,
@@ -745,7 +711,6 @@ export class SpendingLimitsService {
       currency: currency || expectedCurrency,
     });
 
-    // Validate monthly limit (only for Argentina transfers)
     let monthlyLimit: MonthlyLimitResult = {
       allowed: true,
       skip: true,
@@ -791,14 +756,12 @@ export class SpendingLimitsService {
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Get limits to check if it's nighttime
     const limits = await this.getIdentityLimits(userIdentityId);
     const isNightTime = this.isNightTime(
       limits.nightlyStartHour,
       limits.nightlyEndHour,
     );
 
-    // Determine fields to update
     const updateData: any = {};
     if (type === 'transfer') {
       if (isNightTime) {
@@ -862,7 +825,6 @@ export class SpendingLimitsService {
     const today = new Date().toISOString().split('T')[0];
     const updateData: any = {};
 
-    // Determine fields to update based on country and operation type
     if (country === 'ar') {
       if (operationType === 'transfer') {
         updateData.dailyTransferSpent = { increment: amount };
@@ -872,7 +834,6 @@ export class SpendingLimitsService {
         updateData.qrCodeCountAr = { increment: 1 };
       }
     } else {
-      // BR
       if (operationType === 'transfer') {
         updateData.dailyTransferSpent = { increment: amount };
         updateData.transferCountBr = { increment: 1 };
@@ -885,7 +846,6 @@ export class SpendingLimitsService {
       }
     }
 
-    // Update daily tracking
     const dailyResult = await this.prisma.daily_spending_tracking.upsert({
       where: {
         userIdentityId_transactionDate: {
@@ -919,7 +879,6 @@ export class SpendingLimitsService {
       },
     });
 
-    // If Argentina transfer, also update monthly tracking
     if (operationType === 'transfer' && country === 'ar') {
       const now = new Date();
       const year = now.getFullYear();
@@ -953,7 +912,6 @@ export class SpendingLimitsService {
    * Map alertType to valid enum values
    */
   private mapAlertTypeToEnum(alertType: string): string {
-    // Valid enum values: transfer_limit, boleto_limit, nightly_transfer_limit, nightly_boleto_limit
     if (alertType.includes('nightly')) {
       if (
         alertType.includes('transfer') ||
@@ -977,7 +935,6 @@ export class SpendingLimitsService {
       return 'boleto_limit';
     }
 
-    // Fallback to transfer_limit
     return 'transfer_limit';
   }
 
@@ -1005,7 +962,6 @@ export class SpendingLimitsService {
       throw new Error('Missing required parameters for alert creation');
     }
 
-    // Map alertType to valid enum value
     const validAlertType = this.mapAlertTypeToEnum(alertType);
 
     const alert = await this.prisma.spending_limit_alerts.create({
@@ -1031,7 +987,6 @@ export class SpendingLimitsService {
     success: boolean;
     deletedCount: number;
   }> {
-    // Delete records older than 30 days
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 

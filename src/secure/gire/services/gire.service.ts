@@ -14,8 +14,6 @@ export class GireService {
   async searchCompanies(name: string): Promise<any[]> {
     this.logger.log(`Searching GIRE companies: ${name}`);
 
-    // This would call GIRE API to search companies
-    // For now, return mock data
     return [
       {
         id: 'edenor',
@@ -92,7 +90,6 @@ export class GireService {
   async getBills(id1: string, id2: string, dto?: GetBillsDto): Promise<any[]> {
     this.logger.log(`Getting bills: ${id1}, ${id2}`);
 
-    // This would call GIRE API
     return [
       {
         id: `${id1}-${id2}`,
@@ -128,7 +125,6 @@ export class GireService {
   async getOperationStatus(operationId: string): Promise<any> {
     this.logger.log(`Getting operation status: ${operationId}`);
 
-    // Try to find in transactions
     const transaction = await this.prisma.transactions.findFirst({
       where: {
         OR: [{ gireId: operationId }, { id: operationId }],
@@ -195,7 +191,6 @@ export class GireService {
   ): Promise<any> {
     this.logger.log(`Processing GIRE webhook: ${method}/${action}`);
 
-    // Handle different webhook types
     if (method === 'payment' && action === 'confirmed') {
       return this.handlePaymentConfirmed(data);
     }
