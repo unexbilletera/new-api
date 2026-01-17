@@ -14,10 +14,34 @@ import { loadEnvironmentFile } from './shared/config/env-loader';
 loadEnvironmentFile();
 
 async function bootstrap() {
+  const fastifyAdapter = new FastifyAdapter({
+    bodyLimit: 1048576, // 1MB
+  });
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    fastifyAdapter,
   );
+
+  const instance = app.getHttpAdapter().getInstance();
+
+  instance.addHook('preParsing', async (request: any, _reply: any, payload: any) => {
+    if (request.url && request.url.includes('/webhook')) {
+      const chunks: Buffer[] = [];
+
+      for await (const chunk of payload) {
+        chunks.push(chunk);
+      }
+
+      const rawBody = Buffer.concat(chunks).toString('utf8');
+      request.rawBody = rawBody;
+
+      return Buffer.from(rawBody);
+    }
+
+    return payload;
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
