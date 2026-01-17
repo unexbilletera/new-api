@@ -82,7 +82,7 @@ import { HealthModule } from './health/health.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const redisUrl = configService.get('REDIS_URL');
+        const redisUrl = configService.get('WALLET_REDIS_URL');
         return {
           throttlers: [
             {
